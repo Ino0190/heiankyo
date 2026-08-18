@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -325,6 +326,15 @@ body.heian-game #viewport{position:absolute;inset:0;width:100%;height:100%}
  .heian-game-map{width:230px}.heian-mini-map{height:250px}
  .heian-game-info{left:16px;right:16px;max-width:none}.heian-game-help{display:none}
  .heian-game-title span{display:none}.heian-game-actions button{padding:8px 10px}
+}
+/* スマホ: マップは折りたたみ式。「地図」ボタンだけ残し、開いても街が見えるよう半透明・画面幅内に収める（2026-08-18井内さん指摘） */
+.heian-map-toggle{display:none}
+@media(max-width:600px){
+ .heian-map-toggle{display:block;width:100%;min-height:40px;margin-bottom:10px;background:#202a34;border:1px solid #85909a;color:#fff;font-size:16px}
+ .heian-game-map{top:96px;width:min(300px,calc(100vw - 32px));padding:10px;background:rgba(17,24,32,.82)}
+ .heian-game-map.collapsed{width:auto;padding:8px}
+ .heian-game-map.collapsed .heian-map-toggle{margin-bottom:0}
+ .heian-game-map.collapsed label,.heian-game-map.collapsed select,.heian-game-map.collapsed .heian-mini-map,.heian-game-map.collapsed .heian-map-source{display:none}
 }
 </style>
 <script type="importmap">
@@ -13704,10 +13714,18 @@ function startHeianGame(entryMode='overview'){
  if(new URLSearchParams(location.search).get('standaloneHeian')!=='1')action('編集画面へ',stopHeianGame);
  bar.appendChild(actions);hud.appendChild(bar);
  const panel=document.createElement('div');panel.className='heian-game-map';
+ // スマホでは地図が街を隠すため折りたたみ式にする。初期は閉・地点選択後も自動で閉じる（2026-08-18井内さん指摘）
+ const smallScreen=matchMedia('(max-width:600px)');
+ const mapToggle=document.createElement('button');mapToggle.type='button';mapToggle.className='heian-map-toggle';
+ const setMapCollapsed=v=>{panel.classList.toggle('collapsed',v);mapToggle.textContent=v?'地図・移動 ▸':'地図を閉じる ▾';};
+ mapToggle.addEventListener('click',()=>setMapCollapsed(!panel.classList.contains('collapsed')));
+ panel.appendChild(mapToggle);setMapCollapsed(smallScreen.matches);
+ smallScreen.addEventListener('change',e=>setMapCollapsed(e.matches)); // 回転・幅変化に追従
+ const collapseAfterPick=()=>{if(smallScreen.matches)setMapCollapsed(true);};
  const label=document.createElement('label');label.htmlFor='heianGameLocation';label.textContent='移動する地点';
  const select=document.createElement('select');select.id='heianGameLocation';
  for(const point of HEIAN_GAME_LOCATIONS){const option=document.createElement('option');option.value=point.id;option.textContent=point.name;select.appendChild(option);}
- select.addEventListener('change',()=>selectHeianGameLocation(select.value,true));panel.append(label,select);
+ select.addEventListener('change',()=>{selectHeianGameLocation(select.value,true);collapseAfterPick();});panel.append(label,select);
  const map=document.createElement('div');map.className='heian-mini-map';map.setAttribute('aria-label','平安京の条坊街路と主要地点の地図');
  const mapX=[-22550,-18040,-13530,-9020,-6000,-3226,0,3199,6000,9020,13530,18040,22550],mapZ=[-7000,-4274,-1422,1431,4297,7260,12687,18114,23541,28969,34396,39823,45250],mapPctX=x=>(x+22550)/45100*100,mapPctZ=z=>(z+7000)/52400*100;
  for(const x of mapX){const road=document.createElement('span');road.className='heian-map-road vertical major'+(x===0?' suzaku':'');road.style.left=mapPctX(x)+'%';map.appendChild(road);}
@@ -13718,8 +13736,8 @@ function startHeianGame(entryMode='overview'){
  const droneMarker=document.createElement('span');droneMarker.className='heian-map-drone';droneMarker.title='ドローン';droneMarker.setAttribute('aria-label','ドローン現在位置');droneMarker.hidden=true;map.appendChild(droneMarker);
  // マップ左上の「平安京」表記は自明なので出さない（2026-08-17井内さん指示）
  const north=document.createElement('span');north.className='heian-map-north';north.textContent='北 ↑';map.appendChild(north);
- for(const point of HEIAN_GAME_LOCATIONS.filter(point=>point.mapMarker!==false)){const marker=document.createElement('button');marker.type='button';marker.className='heian-map-marker';marker.dataset.location=point.id;marker.title=point.name;marker.setAttribute('aria-label',point.name);marker.style.left=((point.x+22550)/45100*100)+'%';marker.style.top=((point.z+7000)/52400*100)+'%';marker.addEventListener('click',()=>selectHeianGameLocation(point.id,true));map.appendChild(marker);}
- panel.appendChild(map);const source=document.createElement('div');source.style.cssText='margin-top:9px;color:#bfc7cf;font-size:14px;line-height:1.45';source.textContent='地形：国土地理院DEM ／ 河川：© OpenStreetMap contributors ／ 街路・区画：添付地図2枚';panel.appendChild(source);hud.appendChild(panel);
+ for(const point of HEIAN_GAME_LOCATIONS.filter(point=>point.mapMarker!==false)){const marker=document.createElement('button');marker.type='button';marker.className='heian-map-marker';marker.dataset.location=point.id;marker.title=point.name;marker.setAttribute('aria-label',point.name);marker.style.left=((point.x+22550)/45100*100)+'%';marker.style.top=((point.z+7000)/52400*100)+'%';marker.addEventListener('click',()=>{selectHeianGameLocation(point.id,true);collapseAfterPick();});map.appendChild(marker);}
+ panel.appendChild(map);const source=document.createElement('div');source.className='heian-map-source';source.style.cssText='margin-top:9px;color:#bfc7cf;font-size:14px;line-height:1.45';source.textContent='地形：国土地理院DEM ／ 河川：© OpenStreetMap contributors ／ 街路・区画：添付地図2枚';panel.appendChild(source);hud.appendChild(panel);
  const info=document.createElement('div');info.className='heian-game-info';info.setAttribute('aria-live','polite');
  const infoTitle=document.createElement('h2');infoTitle.id='heianGameInfoTitle';const infoText=document.createElement('p');infoText.id='heianGameInfoText';info.append(infoTitle,infoText);hud.appendChild(info);
  const help=document.createElement('div');help.className='heian-game-help';help.textContent='地面クリック：目的地変更 ／ 左ドラッグ：見回し ／ WASD：手動移動 ／ Shift：スキップ ／ Esc：歩行終了';hud.appendChild(help);
