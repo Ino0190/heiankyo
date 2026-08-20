@@ -34,7 +34,7 @@ const progressText=document.getElementById('progressText'),lead=document.getElem
 let loadProgress=0,loadingStarted=false;
 const historyLead=()=>LP[lang].history[loadProgress<20?0:loadProgress<48?1:loadProgress<70?2:loadProgress<92?3:4];
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const HEIAN_BUILD='767d6c730a0167f4df9242e39fbec49269166bc7c273a73fe90245d2a44485c4',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='1313cbc2daaa8b5c7e5d59b11a5c025d71585a65d0ef4d7c528e09852f70597f',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
