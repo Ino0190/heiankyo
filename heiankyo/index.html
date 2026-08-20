@@ -19,18 +19,22 @@ let settled=false;
 let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ja';
 const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを体験します。',
  leadTouch:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを、空から巡り、地上を歩けます。',
+ history:['桓武天皇は奈良の寺院勢力から距離を置く狙いもあり、平城京から長岡京を経て、794年に平安京へ都を移しました。','平安京は唐の長安を手本に、朱雀大路を中央軸とする碁盤目状の都として計画されました。','羅城門から朱雀大路を北へ進むと、国家儀礼と政治の中心である大内裏へ至りました。','都の南には東寺・西寺、七条付近には東市・西市が置かれ、人と物が集まりました。','この再現は遷都直後ではなく、造営から約百年後、延喜・延長期頃の平安京を想定しています。'],
  loading:'平安京を読み込んでいます。画面が変わるまでお待ちください。',start:'読み込みを開始する',
  confirm:'約50MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。',
  progress:'読み込みを開始しています…',error:'読み込みに時間がかかっています。ページを再読み込みしてください。',lang:'English'},
  en:{title:'Heian-kyo',lead:'Heian-kyo, capital of Japan for a thousand years, about a century after it was laid out.',
  leadTouch:'Explore Heian-kyo from the air and on foot, about a century after the capital was laid out.',
+ history:['Emperor Kanmu sought distance from Nara’s powerful Buddhist institutions, moving the capital from Heijo-kyo via Nagaoka-kyo to Heian-kyo in 794.','Modeled on Tang-dynasty Chang’an, Heian-kyo was planned as a grid with Suzaku Avenue as its central axis.','Following Suzaku Avenue north from Rajomon Gate led to the Daidairi, the center of state ceremony and government.','Toji and Saiji temples stood in the south, while the East and West Markets near Seventh Avenue drew people and goods.','This reconstruction depicts Heian-kyo not just after 794, but roughly a century later, around the Engi and Encho eras.'],
  loading:'Loading Heian-kyo. Please wait until the view appears.',start:'Start loading',
  confirm:'About 50MB of data will be loaded. Wi-Fi is recommended; loading takes one to three minutes.',
  progress:'Starting the download...',error:'Loading is taking a while. Please reload the page.',lang:'日本語'}};
 const fail=message=>{if(settled)return;settled=true;launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
-const progressText=document.getElementById('progressText');
+const progressText=document.getElementById('progressText'),lead=document.getElementById('lead');
+let loadProgress=0,loadingStarted=false;
+const historyLead=()=>LP[lang].history[loadProgress<20?0:loadProgress<48?1:loadProgress<70?2:loadProgress<92?3:4];
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const HEIAN_BUILD='fbc81724bbc7582cdac6b38c0716d151b422fd27696efade8499468550f4cf70',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='767d6c730a0167f4df9242e39fbec49269166bc7c273a73fe90245d2a44485c4',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
@@ -39,22 +43,21 @@ slideA.style.backgroundImage=`url('${slides[0]}')`;slideA.classList.add('show');
 const slideTimer=setInterval(()=>{if(settled){clearInterval(slideTimer);return;}
  slideIndex=(slideIndex+1)%slides.length;const back=slideFront===slideA?slideB:slideA;
  back.style.backgroundImage=`url('${slides[slideIndex]}')`;back.classList.add('show');slideFront.classList.remove('show');slideFront=back;},5000);
-addEventListener('message',event=>{if(event.source!==frame.contentWindow)return;if(event.data?.type==='heian-ready'){if(settled)return;settled=true;launch.remove();console.log('HEIAN_CONTENT_OK ready=true');}else if(event.data?.type==='heian-progress'){if(!settled&&progressText)progressText.textContent=String(event.data.text||'').slice(0,80);}else if(event.data?.type==='heian-error')fail(event.data.message);});
+addEventListener('message',event=>{if(event.source!==frame.contentWindow)return;if(event.data?.type==='heian-ready'){if(settled)return;settled=true;launch.remove();console.log('HEIAN_CONTENT_OK ready=true');}else if(event.data?.type==='heian-progress'){if(!settled&&progressText){progressText.textContent=String(event.data.text||'').slice(0,80);if(Number.isFinite(event.data.percent)){loadProgress=Math.max(0,Math.min(100,event.data.percent));if(loadingStarted)lead.textContent=historyLead();}}}else if(event.data?.type==='heian-error')fail(event.data.message);});
 frame.addEventListener('error',()=>fail('3D画面を読み込めませんでした。ページを再読み込みしてください。'));
 addEventListener('pointerdown',()=>{try{frame.contentWindow?.postMessage({type:'heian-activate'},'*');}catch(_){}},{passive:true});
 // スマホ・タブレットは約45MBの読み込みを始める前に確認する（PCは従来どおり即読み込み・2026-08-17井内さん指摘）
-const confirmBox=document.getElementById('confirm'),startButton=document.getElementById('startButton'),progressBar=document.getElementById('progressBar'),lead=document.getElementById('lead');
+const confirmBox=document.getElementById('confirm'),startButton=document.getElementById('startButton'),progressBar=document.getElementById('progressBar');
 const isTouch=matchMedia('(any-pointer:coarse)').matches&&(navigator.maxTouchPoints||0)>0;
-let loadingStarted=false;
 const langButton=document.getElementById('langButton'),mainTitle=document.getElementById('mainTitle');
 const applyLang=()=>{const d=LP[lang];document.documentElement.lang=lang;langButton.textContent=d.lang;
  mainTitle.textContent=d.title;document.title=d.title;
- lead.textContent=loadingStarted?d.loading:(isTouch?d.leadTouch:d.lead);
+ lead.textContent=loadingStarted?historyLead():(isTouch?d.leadTouch:d.lead);
  startButton.textContent=d.start;confirmBox.querySelector('p').textContent=d.confirm;
  if(!loadingStarted)progressText.textContent=d.progress;error.textContent=d.error;};
 langButton.addEventListener('click',()=>{lang=lang==='en'?'ja':'en';applyLang();
  if(loadingStarted)frame.contentWindow?.postMessage({type:'heian-lang',lang},'*');});
-const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;
+const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;lead.textContent=historyLead();
  // 公開版はheian-pages.pyが焼き込みkeyを埋め込み、起動画像とCadKit本体を同じreleaseへ固定する。
  // sourceを直接file://で開く時だけassetVersionは時刻になり、毎回キャッシュを外す。
  const cacheBust='&v='+encodeURIComponent(assetVersion);
@@ -63,7 +66,7 @@ const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;
 applyLang();
 if(isTouch){
  progressBar.hidden=true;progressText.hidden=true;confirmBox.hidden=false;
- startButton.addEventListener('click',()=>{confirmBox.hidden=true;progressBar.hidden=false;progressText.hidden=false;startLoading();lead.textContent=LP[lang].loading;});
+ startButton.addEventListener('click',()=>{confirmBox.hidden=true;progressBar.hidden=false;progressText.hidden=false;startLoading();});
 }else startLoading();
 </script>
 </body>
