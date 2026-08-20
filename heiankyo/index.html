@@ -30,7 +30,8 @@ const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営からお
 const fail=message=>{if(settled)return;settled=true;launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
 const progressText=document.getElementById('progressText');
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'];
+const HEIAN_BUILD='fbc81724bbc7582cdac6b38c0716d151b422fd27696efade8499468550f4cf70',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
 let slideIndex=0,slideFront=slideA;
@@ -54,9 +55,9 @@ const applyLang=()=>{const d=LP[lang];document.documentElement.lang=lang;langBut
 langButton.addEventListener('click',()=>{lang=lang==='en'?'ja':'en';applyLang();
  if(loadingStarted)frame.contentWindow?.postMessage({type:'heian-lang',lang},'*');});
 const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;
- // file://はブラウザキャッシュが古いCadKit/index.htmlを返すことがあり、新しい焼き込みとkey不一致（stale）になる
- // （2026-08-18再発）。file://のときだけ毎回queryを変えてキャッシュを外す。httpsはGitHub Pagesのcacheに任せる
- const cacheBust=location.protocol==='file:'?'&v='+Date.now():'';
+ // 公開版はheian-pages.pyが焼き込みkeyを埋め込み、起動画像とCadKit本体を同じreleaseへ固定する。
+ // sourceを直接file://で開く時だけassetVersionは時刻になり、毎回キャッシュを外す。
+ const cacheBust='&v='+encodeURIComponent(assetVersion);
  frame.src='../CadKit/index.html?standaloneHeian=1&allowFileOCCT=1'+(lang==='en'?'&lang=en':'')+cacheBust+'#heiangame';
  setTimeout(()=>fail('読み込みが完了しませんでした。ページを再読み込みしてください。'),300000);};
 applyLang();
