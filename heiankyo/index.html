@@ -9,7 +9,7 @@
 </style>
 </head>
 <body>
-<div class="launch" id="launch" role="status" aria-live="polite"><div class="slide" id="slideA"></div><div class="slide" id="slideB"></div><div class="shade"></div><div class="panel"><button id="langButton" type="button" style="position:absolute;right:24px;top:20px;padding:6px 14px;font-size:14px;color:#f4f1e9;background:#243040;border:0;cursor:pointer">English</button><p class="eyebrow">HEIAN-KYO</p><h1 id="mainTitle">平安京</h1><p style="margin:6px 0 0;color:#8fa0ae;font-size:14px;letter-spacing:.08em">Ver. 1.0</p><p id="lead">千年の都・平安京。造営から数十年を経た頃の街並みを体験します。</p><div class="progress" id="progressBar"><span></span></div><p id="progressText" style="margin:14px 0 0;color:#c9d3dc;font-size:16px">読み込みを開始しています…</p><div id="confirm" hidden><p style="margin:20px 0 0;color:#d8dee5;font-size:16px;line-height:1.7">約45MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。</p><button id="startButton" style="margin-top:18px;padding:12px 28px;font-size:18px;color:#10161c;background:#c9973b;border:0;cursor:pointer">読み込みを開始する</button></div><p class="error" id="error" hidden>読み込みに時間がかかっています。ページを再読み込みしてください。</p><dl class="credit"><dt>制作</dt><dd>3Dモデル・コード © 2026 <b>Ikuo Inouchi</b></dd><dt>地形</dt><dd>国土地理院 地理院タイル（数値標高モデル）を加工</dd><dt>河川</dt><dd>© OpenStreetMap contributors（ODbL）</dd><dt>建築・区画</dt><dd>史料に基づく推定復元</dd><dt>ライブラリ</dt><dd class="libs">three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd></dl></div></div>
+<div class="launch" id="launch" role="status" aria-live="polite"><div class="slide" id="slideA"></div><div class="slide" id="slideB"></div><div class="shade"></div><div class="panel"><button id="langButton" type="button" style="position:absolute;right:24px;top:20px;padding:6px 14px;font-size:14px;color:#f4f1e9;background:#243040;border:0;cursor:pointer">English</button><p class="eyebrow">HEIAN-KYO</p><h1 id="mainTitle">平安京</h1><p style="margin:6px 0 0;color:#8fa0ae;font-size:14px;letter-spacing:.08em">Ver. 1.0</p><p id="lead">千年の都・平安京。造営からおよそ百年を経た頃の街並みを体験します。</p><div class="progress" id="progressBar"><span></span></div><p id="progressText" style="margin:14px 0 0;color:#c9d3dc;font-size:16px">読み込みを開始しています…</p><div id="confirm" hidden><p style="margin:20px 0 0;color:#d8dee5;font-size:16px;line-height:1.7">約50MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。</p><button id="startButton" style="margin-top:18px;padding:12px 28px;font-size:18px;color:#10161c;background:#c9973b;border:0;cursor:pointer">読み込みを開始する</button></div><p class="error" id="error" hidden>読み込みに時間がかかっています。ページを再読み込みしてください。</p><dl class="credit"><dt>制作</dt><dd>3Dモデル・コード © 2026 <b>Ikuo Inouchi</b></dd><dt>地形</dt><dd>国土地理院 地理院タイル（数値標高モデル）を加工</dd><dt>河川</dt><dd>© OpenStreetMap contributors（ODbL）</dd><dt>建築・区画</dt><dd>史料に基づく推定復元</dd><dt>ライブラリ</dt><dd class="libs">three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd></dl></div></div>
 <iframe id="content" title="平安京 3D散策" allow="autoplay; fullscreen"></iframe>
 <script data-goatcounter="https://ino0190.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script>
@@ -17,20 +17,20 @@ const frame=document.getElementById('content'),launch=document.getElementById('l
 let settled=false;
 // 日英切替（2026-08-18井内さん指示）。?lang=en で英語起動。3D側へは lang パラメータで渡す
 let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ja';
-const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営から数十年を経た頃の街並みを体験します。',
- leadTouch:'千年の都・平安京。造営から数十年を経た頃の街並みを、空から巡り、地上を歩けます。',
+const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを体験します。',
+ leadTouch:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを、空から巡り、地上を歩けます。',
  loading:'平安京を読み込んでいます。画面が変わるまでお待ちください。',start:'読み込みを開始する',
- confirm:'約45MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。',
+ confirm:'約50MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。',
  progress:'読み込みを開始しています…',error:'読み込みに時間がかかっています。ページを再読み込みしてください。',lang:'English'},
- en:{title:'Heian-kyo',lead:'Heian-kyo, capital of Japan for a thousand years, a few decades after it was laid out.',
- leadTouch:'Explore Heian-kyo from the air and on foot, a few decades after the capital was laid out.',
+ en:{title:'Heian-kyo',lead:'Heian-kyo, capital of Japan for a thousand years, about a century after it was laid out.',
+ leadTouch:'Explore Heian-kyo from the air and on foot, about a century after the capital was laid out.',
  loading:'Loading Heian-kyo. Please wait until the view appears.',start:'Start loading',
- confirm:'About 45MB of data will be loaded. Wi-Fi is recommended; loading takes one to three minutes.',
+ confirm:'About 50MB of data will be loaded. Wi-Fi is recommended; loading takes one to three minutes.',
  progress:'Starting the download...',error:'Loading is taking a while. Please reload the page.',lang:'日本語'}};
 const fail=message=>{if(settled)return;settled=true;launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
 const progressText=document.getElementById('progressText');
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg'];
+const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'];
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
 let slideIndex=0,slideFront=slideA;
