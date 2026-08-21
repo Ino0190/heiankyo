@@ -39,7 +39,7 @@ const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!
 const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
 const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const HEIAN_BUILD='__HEIAN_BUILD__',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='65f5a304c8f5fb2f257ade43e1953c7107bb14adc2c31b0fc5c854eb82da21b6',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg','launch-07.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
