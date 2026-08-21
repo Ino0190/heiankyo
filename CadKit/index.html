@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="65f5a304c8f5fb2f257ade43e1953c7107bb14adc2c31b0fc5c854eb82da21b6">
+<meta name="heian-release" content="0627d03af34a707725263cf4e7859347d82f674886810ce62abf21ba4de77cbe">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -297,7 +297,7 @@ body.heian-game main{position:fixed;inset:0;display:block}
 body.heian-game #viewport{position:absolute;inset:0;width:100%;height:100%}
 #heianGameHud{position:absolute;inset:0;z-index:90;pointer-events:none;color:#f4f1e9;font-size:16px}
 .heian-game-bar{position:absolute;top:16px;left:16px;right:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.heian-game-title{padding:10px 14px;background:rgba(17,24,32,.88)}
+.heian-game-title{padding:0;background:none}
 .heian-game-title-heading{display:flex;align-items:center;gap:8px;height:22px}
 .heian-game-title-heading .kit-mark{width:22px;height:22px;display:block;flex:none}
 .heian-game-series{display:block;font-family:'Yu Gothic UI','Yu Gothic','游ゴシック',sans-serif;font-size:17px;line-height:22px;font-weight:700}.heian-game-title>strong{display:block;margin-top:6px;font-family:'Hiragino Mincho ProN','Yu Mincho','YuMincho',serif;font-size:50px;line-height:1.2;font-weight:600;letter-spacing:.08em}
@@ -349,20 +349,21 @@ body.heian-game #viewport{position:absolute;inset:0;width:100%;height:100%}
 /* スマホ: 地図は折りたたみ、主要操作は右上のハンバーガーメニューへ収める。 */
 .heian-map-toggle,.heian-menu-toggle{display:none}
 @media(max-width:600px){
- .heian-game-bar{top:10px;left:10px;right:10px;gap:8px;align-items:center}
- .heian-game-title{flex:1 1 auto;min-width:0;padding:6px 9px}
- .heian-game-title-heading{gap:8px}.heian-game-title-heading .kit-mark{width:22px;height:22px}
- .heian-game-series{font-size:17px;white-space:nowrap}.heian-game-title>strong{font-size:40px;white-space:nowrap;overflow:visible;text-overflow:clip}
+ .heian-game-bar{top:10px;left:10px;right:10px;gap:8px;align-items:flex-start}
+ .heian-game-title{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;padding:0;background:none}
+ .heian-game-title-heading{gap:6px;height:22px}.heian-game-title-heading .kit-mark{width:22px;height:22px}
+ .heian-game-series,.heian-game-title>strong{font-size:16px;line-height:22px;white-space:nowrap}
+ .heian-game-title>strong{display:block;margin:0;font-weight:600;letter-spacing:.04em}
  .heian-menu-toggle{display:block;flex:0 0 44px;width:44px;height:44px;padding:0;background:rgba(24,32,41,.94);border:1px solid #85909a;color:#fff;font-size:24px;line-height:1;pointer-events:auto}
  .heian-menu-toggle[hidden]{display:none!important}
  .heian-game-actions{display:none;position:absolute;right:0;top:50px;width:min(230px,calc(100vw - 20px));padding:8px;background:rgba(17,24,32,.96);border:1px solid #68737e;flex-direction:column;gap:6px;z-index:3}
  .heian-game-actions.open{display:flex}.heian-game-actions button{width:100%;min-height:44px;padding:9px 12px;font-size:16px;text-align:left;white-space:nowrap}
- .heian-map-toggle{display:block;width:100%;min-height:40px;margin-bottom:10px;background:#202a34;border:1px solid #85909a;color:#fff;font-size:16px}
- .heian-game-map{left:10px;top:94px;width:min(300px,calc(100vw - 20px));padding:10px;background:rgba(17,24,32,.82)}
+ .heian-map-toggle,.heian-mini-map,.heian-map-source{display:none!important}
+ .heian-game-map,.heian-game-map.collapsed{left:10px;top:64px;width:min(300px,calc(100vw - 20px));padding:0;background:none;border:0}
+ .heian-game-map label,.heian-game-map.collapsed label{display:block;margin-bottom:4px}
+ .heian-game-map select,.heian-game-map.collapsed select{display:block;height:40px;margin-bottom:0}
  .heian-game-info{left:10px;right:10px;bottom:10px;padding:10px 12px}
  .heian-game-info h2{font-size:19px}.heian-game-info p{font-size:14px;line-height:1.55}
- .heian-game-map.collapsed{width:auto;padding:8px}.heian-game-map.collapsed .heian-map-toggle{margin-bottom:0}
- .heian-game-map.collapsed label,.heian-game-map.collapsed select,.heian-game-map.collapsed .heian-mini-map,.heian-game-map.collapsed .heian-map-source{display:none}
 }
 </style>
 <script type="importmap">
@@ -13929,14 +13930,20 @@ function createHeianCourtLifeRuntime(){
   const cx=-390,cz=5260,playerColors=[k.mats.red,k.mats.blue,material(0x756047),material(0x596b50),material(0x76506f),material(0x8a6d3f)];
   for(let i=0;i<6;i++){const p=buildHeianStreetPerson(k,mats,playerColors[i],'西朝集堂右側の蹴鞠官人'+(i+1),{});p.group.add(heianShadowBlob(4.2,4.2,0,0,.3));root.add(p.group);players.push({...p,angle:i*Math.PI*2/6});}
   const ball=new THREE.Mesh(k.geometry.sphere,material(0xd8c9a5));ball.name='蹴鞠の鞠';ball.scale.set(1.8,1.8,1.8);root.add(ball);
-  const layerColors=[[0x8f4a6d,0xc28d76,0xd9b48d],[0x596b50,0x89936c,0xc1a86d],[0x6b567b,0x9d7591,0xd0a28d],[0x526d78,0x7994a0,0xbcae8e]],ladyRoutes=[{axis:'x',a:1415,b:2045,fixed:-1645,name:'南東西回廊'},{axis:'x',a:1435,b:2015,fixed:-2100,name:'北東西回廊'},{axis:'z',a:-2110,b:-1660,fixed:1395,name:'西南北渡廊'},{axis:'z',a:-2090,b:-1690,fixed:2055,name:'東南北渡廊'}];
+  // 市全体assetの内裏変換後world座標。殿舎内や庭を避け、実際の回廊床中心線だけを往復する。
+  const layerColors=[[0x8f4a6d,0xc28d76,0xd9b48d],[0x596b50,0x89936c,0xc1a86d],[0x6b567b,0x9d7591,0xd0a28d],[0x526d78,0x7994a0,0xbcae8e]],ladyRoutes=[
+   {axis:'x',a:1530,b:2152,fixed:-1639.75,floorLift:3,name:'中段東西回廊'},
+   {axis:'x',a:1992,b:2156,fixed:-2032.51,floorLift:3,name:'北東東西回廊'},
+   {axis:'z',a:-1560,b:-1300,fixed:1149.17,floorLift:3,name:'西南北回廊'},
+   {axis:'z',a:-1560,b:-1284,fixed:2496.34,floorLift:3,name:'東南北回廊'}
+  ];
   for(let i=0;i<4;i++){const f=buildHeianStreetPerson(k,mats,material(layerColors[i][0]),'後宮の十二単風女官'+(i+1),{hat:null});for(let j=0;j<3;j++)k.add(f.group,k.geometry.cylinder,material(layerColors[i][j]),[0,4+j*.65,0],[3.5-j*.12,.42,3.5-j*.12]);const train=k.add(f.group,k.geometry.box,material(layerColors[i][2]),[0,1.55,-5.1],[6.6,.65,7.8],[-.18,0,0]);train.name='後ろへ引く裳';k.add(f.group,k.geometry.sphere,k.mats.dark,[0,13.5,.8],[2,2.5,1.5]);f.group.add(heianShadowBlob(4.4,4.4,0,0,.3));root.add(f.group);ladies.push({...f,phase:i*.25,route:ladyRoutes[i],train});}
   scene.add(root);const runtime={root,players,ladies,ball,time:0,lastTime:performance.now(),update(dt){const now=performance.now(),d=Number.isFinite(dt)?dt:Math.min(.1,(now-this.lastTime)/1000);this.lastTime=now;this.time+=d;const t=this.time;
    const kickDuration=1.6,kickIndex=Math.floor(t/kickDuration)%players.length,kickPhase=(t%kickDuration)/kickDuration,nextIndex=(kickIndex+1)%players.length,basePositions=players.map(p=>({x:cx+Math.cos(p.angle)*50,z:cz+Math.sin(p.angle)*42}));this.kickIndex=kickIndex;this.kickPhase=kickPhase;
    const footPoint=p=>{const dx=cx-p.x,dz=cz-p.z,len=Math.hypot(dx,dz)||1;return{x:p.x+dx/len*6,z:p.z+dz/len*6};},from=footPoint(basePositions[kickIndex]),to=footPoint(basePositions[nextIndex]),bx=THREE.MathUtils.lerp(from.x,to.x,kickPhase),bz=THREE.MathUtils.lerp(from.z,to.z,kickPhase),by=THREE.MathUtils.lerp(heianWalkGroundY(from.x,from.z),heianWalkGroundY(to.x,to.z),kickPhase);
    ball.position.set(bx,by+4+Math.sin(Math.PI*kickPhase)*22,bz);
    players.forEach((p,i)=>{const base=basePositions[i],kickStep=i===kickIndex&&kickPhase<.45?Math.sin(Math.PI*kickPhase/.45)*8:0,receiveStep=i===nextIndex&&kickPhase>.72?Math.sin(Math.PI*(kickPhase-.72)/.28)*3:0,step=kickStep+receiveStep,dx=cx-base.x,dz=cz-base.z,len=Math.hypot(dx,dz)||1,x=base.x+dx/len*step,z=base.z+dz/len*step;p.group.position.set(x,heianWalkGroundY(x,z),z);p.group.rotation.y=Math.atan2(cx-x,cz-z);p.legs[0].rotation.x=0;p.legs[1].rotation.x=0;if(i===kickIndex&&kickPhase<.45)p.legs[i%2].rotation.x=-Math.sin(Math.PI*kickPhase/.45)*1.15;});
-   ladies.forEach((f,i)=>{const r=f.route,span=r.b-r.a,q=(t*(22.05/(span*2))+f.phase)%1,u=q<.5?q*2:2-q*2,v=r.a+u*span,x=r.axis==='x'?v:r.fixed,z=r.axis==='z'?v:r.fixed;f.group.position.set(x,heianWalkGroundY(x,z),z);f.group.rotation.y=r.axis==='x'?(q<.5?Math.PI/2:-Math.PI/2):(q<.5?0:Math.PI);f.legs[0].rotation.x=Math.sin(t*1.5+i)*.28;f.legs[1].rotation.x=-f.legs[0].rotation.x;});},inspect(){let finite=true;root.updateMatrixWorld(true);root.traverse(o=>{if(!o.matrixWorld.elements.every(Number.isFinite))finite=false;});return{kemariPlayers:6,kemariBalls:1,kemariPlace:'西朝集堂東側（正面から右）',kemariCenter:[cx,cz],kemariHallBbox:[-633,-489,5114,5403],kemariClearance:49,kemariRadius:[50,42],kemariCycleSeconds:9.6,kemariKickMotion:'one-step-inward alternating-foot relay',kemariActiveKicker:this.kickIndex??0,kemariKickPhase:+(this.kickPhase??0).toFixed(3),courtLadies:4,ladyStyle:'十二単風の多層裾と裳',ladyRoute:'後宮の東西2・南北2回廊',ladyRouteCount:new Set(ladies.map(f=>f.route.name)).size,ladyRouteNames:ladies.map(f=>f.route.name),ladySpeed:22.05,ladyCycleSeconds:57.14,ladyTrains:ladies.filter(f=>f.train?.position.z<0).length,ladyYawDirections:new Set(ladies.map(f=>+f.group.rotation.y.toFixed(3))).size,finite}},dispose(){scene.remove(root);for(const g of k.geometries)g.dispose();for(const m of k.materials)m.dispose();heianCourtLifeRuntime=null;}};runtime.update(0);heianCourtLifeRuntime=runtime;return runtime;
+   ladies.forEach((f,i)=>{const r=f.route,span=r.b-r.a,q=(t*(22.05/(span*2))+f.phase)%1,u=q<.5?q*2:2-q*2,v=r.a+u*span,x=r.axis==='x'?v:r.fixed,z=r.axis==='z'?v:r.fixed;f.group.position.set(x,heianWalkGroundY(x,z)+r.floorLift,z);f.group.rotation.y=r.axis==='x'?(q<.5?Math.PI/2:-Math.PI/2):(q<.5?0:Math.PI);f.legs[0].rotation.x=Math.sin(t*1.5+i)*.28;f.legs[1].rotation.x=-f.legs[0].rotation.x;});},inspect(){let finite=true;root.updateMatrixWorld(true);root.traverse(o=>{if(!o.matrixWorld.elements.every(Number.isFinite))finite=false;});return{kemariPlayers:6,kemariBalls:1,kemariPlace:'西朝集堂東側（正面から右）',kemariCenter:[cx,cz],kemariHallBbox:[-633,-489,5114,5403],kemariClearance:49,kemariRadius:[50,42],kemariCycleSeconds:9.6,kemariKickMotion:'one-step-inward alternating-foot relay',kemariActiveKicker:this.kickIndex??0,kemariKickPhase:+(this.kickPhase??0).toFixed(3),courtLadies:4,ladyStyle:'十二単風の多層裾と裳',ladyRoute:'後宮の東西2・南北2回廊',ladyRouteCount:new Set(ladies.map(f=>f.route.name)).size,ladyRouteNames:ladies.map(f=>f.route.name),ladyRoutes:ladies.map(f=>({axis:f.route.axis,a:f.route.a,b:f.route.b,fixed:f.route.fixed,floorLift:f.route.floorLift,position:[+f.group.position.x.toFixed(2),+f.group.position.y.toFixed(2),+f.group.position.z.toFixed(2)]})),ladySpeed:22.05,ladyCycleSeconds:57.14,ladyTrains:ladies.filter(f=>f.train?.position.z<0).length,ladyYawDirections:new Set(ladies.map(f=>+f.group.rotation.y.toFixed(3))).size,finite}},dispose(){scene.remove(root);for(const g of k.geometries)g.dispose();for(const m of k.materials)m.dispose();heianCourtLifeRuntime=null;}};runtime.update(0);heianCourtLifeRuntime=runtime;return runtime;
  }catch(e){console.error('朝堂院・後宮演出の生成失敗',e);return null;}
 }
 function disposeHeianCourtLife(){heianCourtLifeRuntime?.dispose();}
@@ -13962,7 +13969,7 @@ function createHeianCrowdRuntime(point=HEIAN_GAME_LOCATIONS[0]){
    // 西市は休市で無人、右京の水田も無人。東市は歩行時（tour以外）は疎らに（2026-08-17井内さん指示）
    // 船岡山（山）と後宮（内向きの殿舎群）は群衆を出さない（新ツアー停泊・2026-08-19）
    const noCrowd=/funaoka|kokyu/i.test(target.id);
-   runtime.activeCount=westMarket||paddies||noCrowd?0:eastMarket?(horikawa||tourVisit?960:320):suzaku?420:walkNearby?36:openingCourt?144:daigokuCourt?96:worship?72:courtSides?48:commoners?240:market?120:korokan?45:toji?90:shinsenenLoc?36:kokusoLoc?44:nobles?12:60;if(Number.isFinite(target.count))runtime.activeCount=THREE.MathUtils.clamp(Math.round(target.count),0,maxCount);runtime.crowdMode=crowdMode;runtime.formation=courtSides?'courtSides':worship?'worship':openingCourt?'daigokudenOpeningCourt':daigokuCourt?'daigokudenCourt':rows?'rows':'flow';runtime.areaSpan=courtSides?374:openingCourt?1156:(rows||worship||daigokuCourt)?352:span;runtime.location=target.id;runtime.center=marketSite?[marketSite.x,marketSite.z]:[a.x,a.z];runtime.marketMode=eastMarket?'eastMarket':null;runtime.personVariant=courtOfficial?'courtOfficial':null;runtime.exclusion=pond||null;
+   runtime.activeCount=westMarket||paddies||noCrowd?0:eastMarket?(horikawa||tourVisit?960:320):suzaku?420:walkNearby?36:openingCourt?144:daigokuCourt?96:worship?72:courtSides?48:commoners?240:market?120:korokan?45:toji?90:shinsenenLoc?36:kokusoLoc?44:nobles?12:60;if(Number.isFinite(target.count))runtime.activeCount=THREE.MathUtils.clamp(Math.round(target.count),0,maxCount);runtime.crowdMode=crowdMode;runtime.formation=courtSides?'courtSides':worship?'worship':openingCourt?'daigokudenOpeningCourt':daigokuCourt?'daigokudenCourt':rows?'rows':'flow';runtime.areaSpan=courtSides?374:openingCourt?1156:(rows||worship||daigokuCourt)?352:span;runtime.location=target.id;runtime.center=marketSite?[marketSite.x,marketSite.z]:[a.x,a.z];runtime.marketMode=eastMarket?'eastMarket':null;runtime.personVariant=courtOfficial||daigokuCourt||openingCourt?'courtOfficial':null;runtime.exclusion=pond||null;
    // 貴族邸の人は盛土台の天面（groundY+1）に立たせる。groundYそのままだと台に沈む（2026-08-17井内さん報告）
    runtime.surfaceY=Number.isFinite(nobleResidence?.groundY)?nobleResidence.groundY+1:null;runtime.surfaceMode=runtime.surfaceY===null?'terrain':'noble-platform';
    // 六條院（河原院）も同じく敷地の盛土台の上（=敷地内地形の最高点+2）。地形のままだと台に半身沈む
@@ -13973,8 +13980,8 @@ function createHeianCrowdRuntime(point=HEIAN_GAME_LOCATIONS[0]){
    for(const mesh of Object.values(parts))mesh.count=runtime.activeCount;
    // 東寺の礼拝MOBは全員僧侶（剃髪・烏帽子なし・墨染めの衣・2026-08-19井内さん指示）
    const monkColors=[0x554738,0x6e5a3e,0x7d6647],courtColors=[0x7d2f2a,0x42536a,0x5a4a42,0x9a895f];
-   people.forEach((p,i)=>{p.solo=commoners&&i%3===0;p.standing=p.solo?false:i%10<3;p.cargoRole=null;p.workStill=false;p.monk=toji;p.courtOfficial=courtOfficial;p.courtDress=courtOfficial?(i%3===0?'束帯':'衣冠'):null;p.female=courtOfficial||toji||openingCourt?false:daigokuCourt&&i>=60?false:i%5<2; // 宮廷域は束帯・衣冠風の男性官人だけ
-    {const c=new THREE.Color(p.monk?monkColors[i%3]:courtOfficial?courtColors[i%courtColors.length]:colors[i%colors.length]);parts.robe.setColorAt(i,c);parts.armL.setColorAt(i,c);parts.armR.setColorAt(i,c);}
+   people.forEach((p,i)=>{const official=courtOfficial||daigokuCourt||openingCourt;p.solo=commoners&&i%3===0;p.standing=p.solo?false:i%10<3;p.cargoRole=null;p.workStill=false;p.monk=toji;p.courtOfficial=official;p.courtDress=official?(i%3===0?'束帯':'衣冠'):null;p.female=official||toji?false:i%5<2; // 大極殿はtarget伝播に依存せず、オープニング・ドローンとも衣冠束帯の男性官人だけ
+    {const c=new THREE.Color(p.monk?monkColors[i%3]:official?courtColors[i%courtColors.length]:colors[i%colors.length]);parts.robe.setColorAt(i,c);parts.armL.setColorAt(i,c);parts.armR.setColorAt(i,c);}
     // 紫宸殿前の左右整列は「お互いを見ている形」=東列は西向き・西列は東向き（2026-08-18井内さん指示）
     if(courtSides){const slot=i%4,row=Math.floor(i/4),side=slot%2?1:-1,col=Math.floor(slot/2);p.axisX=0;p.axisZ=1;p.centerX=a.x+side*(300+col*30);p.centerZ=a.z;p.span=0;p.along=(row-5.5)*34;p.lane=0;p.heading=side>0?-Math.PI/2:Math.PI/2;return;}if(worship){const col=i%12,row=Math.floor(i/12);p.axisX=1;p.axisZ=0;p.centerX=a.x;p.centerZ=a.z;p.span=0;p.along=(col-5.5)*28;p.lane=(row-2.5)*30;p.heading=Math.atan2(ux,uz);return;}
     // オープニング大極殿: 朝庭中央の儀礼軸を空け、東西4列×南北18列の官人144人を左右対称に並べる。
@@ -14277,7 +14284,7 @@ const HEIAN_DRONE_ROUTE=[
  // holdLookOnExitも撤去: 一周見た後なので出発時はもう豊楽院を見てよい（2026-08-18井内さん指示）
  // sweepFixed: 入口=authored angle（前からの南からの水平進入）のまま、指定した角度だけ回って出る。
  // lapEntrySync（入口を出口へ同期）は入り方が変わってしまった→「前の入り方で半周でいい」（2026-08-18井内さん指示）
- {id:'daigokuden',name:'大極殿',x:6.6,z:1383,radius:480,altitude:55,lookHeight:130,angle:.15,orbit:-Math.PI,sweepFixed:true,orbitLinear:true,dwell:13000,levelApproach:true,formation:'daigokudenCourt',crowdX:0,crowdZ:2060,description:'朝堂院の正殿。高御座を据え、天皇の即位や国家の重要儀式を行った。'},
+ {id:'daigokuden',name:'大極殿',x:6.6,z:1383,radius:480,altitude:55,lookHeight:130,angle:.15,orbit:-Math.PI,sweepFixed:true,orbitLinear:true,dwell:13000,levelApproach:true,formation:'daigokudenCourt',crowdX:0,crowdZ:2320,description:'朝堂院の正殿。高御座を据え、天皇の即位や国家の重要儀式を行った。'},
  // 大極殿から左回りの勢いのまま入り、「ぐるっと回ってから」内裏（紫宸殿）へ抜ける（2026-08-18井内さん指示）。
  // -3.3rad（189°）は出口接線がちょうど内裏方向(.80,-.60)を向く角度＝ヘアピンなしで東へ放たれる
  {id:'burakuin',name:'豊楽院',x:-1976,z:2244,radius:760,altitude:200,lookHeight:70,angle:.8,orbit:-3.3,dwell:14000,description:'大内裏の饗宴施設。節会の宴や外国使節を迎える国家的な饗応が行われた。'}, // 左旋回・低め（2026-08-17井内さん指示）
@@ -14578,7 +14585,7 @@ function createHeianDroneTourRuntime(){
  const playOpening=()=>{if(!heianGameMode)return false;if(runtime.active||runtime.openingActive||runtime.cruising)stop('',false);if(heianWalk.active)heianWalk.stop('オープニングへ切替');setupCamera();runtime.index=-1;runtime.opening=openingStates();runtime.openingIndex=0;runtime.openingLegElapsed=0;runtime.openingLabelIndex=-1;runtime.openingLabelEvents=[];runtime.phase='opening';runtime.phaseStart=runtime.lastNow=performance.now();runtime.openingActive=true;try{heianTourMusic?.start();}catch(e){console.warn('オープニングBGMを開始できません:',e?.message||e);}openingStage(1);apply({position:runtime.opening[0].position,target:cityTarget()});const title=document.getElementById('heianGameInfoTitle'),text=document.getElementById('heianGameInfoText');if(title)title.textContent=legLabel(runtime.opening[0]);if(text)text.textContent=legDesc(runtime.opening[0]);setStatus('平安京オープニング：朱雀大路を大内裏へ直進');sync();return true;};
  // オープニングの朱雀大路沿いへ人・牛車・街路MOBを飛行区間ごとに配置する（2026-08-17井内さん指示）。
  // 牛車・街路MOBは市内規則（z<38000）の範囲だけ。群衆は朱雀大路の分布（240人・幅3km）を使う。
- const openingStage=idx=>{const state=runtime.opening[idx];if(state?.court||idx>=6){heianCrowdRuntime?.relocate({id:'opening-daigokuden',formation:'daigokudenOpeningCourt',personVariant:'courtOfficial',count:144,spawn:{x:0,z:2450},look:{x:0,z:1383}});heianMobRuntime?.setVisible(false);heianStreetLifeRuntime?.setAllVisible(false);return;}
+ const openingStage=idx=>{const state=runtime.opening[idx];if(state?.court||idx>=6){heianCrowdRuntime?.relocate({id:'opening-daigokuden',formation:'daigokudenOpeningCourt',personVariant:'courtOfficial',count:144,spawn:{x:0,z:2840},look:{x:0,z:1383}});heianMobRuntime?.setVisible(false);heianStreetLifeRuntime?.setAllVisible(false);return;}
   const zMap={1:44300,2:38600,3:30000,4:16000,5:9000},z=zMap[idx];if(!z)return;
   heianCrowdRuntime?.relocate({id:'opening-suzakuRoad',spawn:{x:0,z},look:{x:0,z:z-300}});
   if(z<38000){heianMobRuntime?.setVisible(true);heianMobRuntime?.relocateNear(z);heianStreetLifeRuntime?.setVisible(true);heianStreetLifeRuntime?.relocateNear(z);}
