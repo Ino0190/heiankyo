@@ -19,7 +19,7 @@ let settled=false;
 let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ja';
 const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを体験します。',
  leadTouch:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを、空から巡り、地上を歩けます。',
- history:['桓武天皇は奈良の寺院勢力から距離を置く狙いもあり、平城京から長岡京を経て、794年に平安京へ都を移しました。','平安京は唐の長安を手本に、朱雀大路を中央軸とする碁盤目状の都として計画されました。','羅城門から朱雀大路を北へ進むと、国家儀礼と政治の中心である大内裏へ至りました。','都の南には東寺・西寺、七条付近には東市・西市が置かれ、人と物が集まりました。','この再現は遷都直後ではなく、造営から約百年後、延喜・延長期頃の平安京を想定しています。'],
+ history:['桓武天皇は奈良の寺院勢力から距離を置く狙いもあり、平城京から長岡京を経て、794年に平安京へ都を移した。','平安京は唐の長安を手本に、朱雀大路を中央軸とする碁盤目状の都として計画された。','羅城門から朱雀大路を北へ進むと、国家儀礼と政治の中心である大内裏へ至った。','都の南には東寺・西寺、七条付近には東市・西市が置かれ、人と物が集まった。','この再現は遷都直後ではなく、造営から約百年後、延喜・延長期頃の平安京を想定している。'],
  loading:'平安京を読み込んでいます。画面が変わるまでお待ちください。',start:'読み込みを開始する',
  confirm:'約50MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。',
  progress:'読み込みを開始しています…',error:'読み込みに時間がかかっています。ページを再読み込みしてください。',lang:'English'},
@@ -29,12 +29,16 @@ const LP={ja:{title:'平安京',lead:'千年の都・平安京。造営からお
  loading:'Loading Heian-kyo. Please wait until the view appears.',start:'Start loading',
  confirm:'About 50MB of data will be loaded. Wi-Fi is recommended; loading takes one to three minutes.',
  progress:'Starting the download...',error:'Loading is taking a while. Please reload the page.',lang:'日本語'}};
-const fail=message=>{if(settled)return;settled=true;launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
 const progressText=document.getElementById('progressText'),lead=document.getElementById('lead');
-let loadProgress=0,loadingStarted=false;
-const historyLead=()=>LP[lang].history[loadProgress<20?0:loadProgress<48?1:loadProgress<70?2:loadProgress<92?3:4];
+let loadProgress=0,loadingStarted=false,historyIndex=0,historyTimer=null,retryCount=0,lastProgressAt=0,loadStartedAt=0,slowWatch=null,hardTimer=null,frameBase='';
+const historyLead=()=>LP[lang].history[historyIndex];
+const clearLoadTimers=()=>{clearInterval(historyTimer);clearInterval(slowWatch);clearTimeout(hardTimer);};
+const fail=message=>{if(settled)return;settled=true;clearLoadTimers();launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
+const finish=()=>{if(settled)return;settled=true;clearLoadTimers();launch.remove();console.log('HEIAN_CONTENT_OK ready=true retries='+retryCount);};
+const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
+const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const HEIAN_BUILD='1313cbc2daaa8b5c7e5d59b11a5c025d71585a65d0ef4d7c528e09852f70597f',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='32160b37a380513a2b47e9b351734957d74db0920e4666cecf492073ca5b048c',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
@@ -43,8 +47,10 @@ slideA.style.backgroundImage=`url('${slides[0]}')`;slideA.classList.add('show');
 const slideTimer=setInterval(()=>{if(settled){clearInterval(slideTimer);return;}
  slideIndex=(slideIndex+1)%slides.length;const back=slideFront===slideA?slideB:slideA;
  back.style.backgroundImage=`url('${slides[slideIndex]}')`;back.classList.add('show');slideFront.classList.remove('show');slideFront=back;},5000);
-addEventListener('message',event=>{if(event.source!==frame.contentWindow)return;if(event.data?.type==='heian-ready'){if(settled)return;settled=true;launch.remove();console.log('HEIAN_CONTENT_OK ready=true');}else if(event.data?.type==='heian-progress'){if(!settled&&progressText){progressText.textContent=String(event.data.text||'').slice(0,80);if(Number.isFinite(event.data.percent)){loadProgress=Math.max(0,Math.min(100,event.data.percent));if(loadingStarted)lead.textContent=historyLead();}}}else if(event.data?.type==='heian-error')fail(event.data.message);});
-frame.addEventListener('error',()=>fail('3D画面を読み込めませんでした。ページを再読み込みしてください。'));
+addEventListener('message',event=>{const data=event.data,attempt=Number(data?.attempt);
+ if(event.source!==frame.contentWindow||!Number.isInteger(attempt)||attempt!==retryCount)return;
+ if(data.type==='heian-ready')finish();else if(data.type==='heian-progress'){if(!settled&&progressText){lastProgressAt=Date.now();progressText.textContent=String(data.text||'').slice(0,80);if(Number.isFinite(data.percent))loadProgress=Math.max(0,Math.min(100,data.percent));}}else if(data.type==='heian-error')retryLoading(data.message);});
+frame.addEventListener('error',()=>retryLoading('3D画面を読み込めませんでした。'));
 addEventListener('pointerdown',()=>{try{frame.contentWindow?.postMessage({type:'heian-activate'},'*');}catch(_){}},{passive:true});
 // スマホ・タブレットは約45MBの読み込みを始める前に確認する（PCは従来どおり即読み込み・2026-08-17井内さん指摘）
 const confirmBox=document.getElementById('confirm'),startButton=document.getElementById('startButton'),progressBar=document.getElementById('progressBar');
@@ -57,12 +63,15 @@ const applyLang=()=>{const d=LP[lang];document.documentElement.lang=lang;langBut
  if(!loadingStarted)progressText.textContent=d.progress;error.textContent=d.error;};
 langButton.addEventListener('click',()=>{lang=lang==='en'?'ja':'en';applyLang();
  if(loadingStarted)frame.contentWindow?.postMessage({type:'heian-lang',lang},'*');});
-const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;lead.textContent=historyLead();
+const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;historyIndex=0;lead.textContent=historyLead();
+ // 履歴文は進捗の急変に追随させず各6秒表示する。最初だけ長く、次が一瞬になる現象を防ぐ。
+ historyTimer=setInterval(()=>{if(settled||historyIndex>=LP[lang].history.length-1)return;historyIndex++;lead.textContent=historyLead();},6000);
  // 公開版はheian-pages.pyが焼き込みkeyを埋め込み、起動画像とCadKit本体を同じreleaseへ固定する。
- // sourceを直接file://で開く時だけassetVersionは時刻になり、毎回キャッシュを外す。
  const cacheBust='&v='+encodeURIComponent(assetVersion);
- frame.src='../CadKit/index.html?standaloneHeian=1&allowFileOCCT=1'+(lang==='en'?'&lang=en':'')+cacheBust+'#heiangame';
- setTimeout(()=>fail('読み込みが完了しませんでした。ページを再読み込みしてください。'),300000);};
+ frameBase='../CadKit/index.html?standaloneHeian=1&allowFileOCCT=1'+(lang==='en'?'&lang=en':'')+cacheBust;loadFrame();
+ // 300秒経過後も90秒以上進捗が止まった時だけ、手動リロード相当をiframe内で一度だけ行う。
+ slowWatch=setInterval(()=>{if(!settled&&Date.now()-loadStartedAt>=300000&&Date.now()-lastProgressAt>=90000)retryLoading('読み込み進捗が止まりました。');},30000);
+ hardTimer=setTimeout(()=>fail('読み込みが完了しませんでした。ページを再読み込みしてください。'),900000);};
 applyLang();
 if(isTouch){
  progressBar.hidden=true;progressText.hidden=true;confirmBox.hidden=false;
