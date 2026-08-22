@@ -1,17 +1,23 @@
 # 平安京 3D散策
 
-平安京（794年・延暦13年の造営期）を、国土地理院の数値標高モデルと現況河川データの上に推定復元し、
-ブラウザだけで空から巡り、地上を歩けるコンテンツです。
+794年に造営された平安京を、造営から約百年後の延喜・延長期（10世紀前半）を想定して、
+国土地理院の数値標高モデルと現況河川データの上に推定復元したコンテンツです。
+ブラウザだけで空から巡り、地上を歩けます。
 
 公開ページ: https://ino0190.github.io/heiankyo/heiankyo/
 
 ## 内容
 
 - 入口: `index.html`（`heiankyo/index.html` へリダイレクト）
-- 3Dエンジン: `CadKit/index.html`（自作のブラウザCAD。three.js / manifold-3d / opencascade.js はCDNから取得）
+- 3Dエンジン: `CadKit/index.html`（公開散策ではThree.jsと生成済みデータを使用）
 - `heiankyo/terrain/heian-baked-assets*.js` は生成済み建築の焼き込みデータ（自動生成物・手で編集しない）
 
-動作環境: WebGL2対応のブラウザ（PC・スマートフォン）。初回は40MB程度のデータを読み込みます。
+動作環境: WebGL2対応のブラウザ（PC・スマートフォン）。初回は約50MBのデータを読み込みます。
+
+## 公開時の注意
+
+`heian-pages/`は生成済みの公開一式です。入口、CadKit本体、地形、水系、焼き込み分割データを必ず同じcommitで一括更新してください。
+一部だけを更新するとrelease keyが混在して起動できません。`BAKED_KEY.txt`は公開ファイルの世代確認に使います。
 
 ## 出典・クレジット
 
@@ -48,7 +54,9 @@
 ## アクセス解析
 
 ページビューの計測に [GoatCounter](https://www.goatcounter.com/) を使用しています。
-Cookieを使わず、個人を特定する情報は収集しません。
+また、表示完了・操作種別・可視時間帯などの匿名利用イベントをCloudflare Analytics Engineへ送信します。
+アプリから座標、自由記述、Cookie、localStorage、User-Agent、referrerは送信しません。
+Cloudflare側の蓄積データを公開ページから取得する機能はなく、閲覧には管理アカウントの権限が必要です。
 
 ## 本コンテンツの権利
 
