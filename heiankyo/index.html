@@ -55,10 +55,16 @@ const LP={ja:{title:'平安京',documentTitle:'HakoniwaKit 平安京',lead:'千�
  progress:'Starting the download...',error:'Loading is taking a while. Please reload the page.',lang:'日本語'}};
 const progressText=document.getElementById('progressText'),lead=document.getElementById('lead');
 let loadProgress=0,loadingStarted=false,historyIndex=0,historyTimer=null,retryCount=0,lastProgressAt=0,loadStartedAt=0,slowWatch=null,hardTimer=null,frameBase='';
+const HEIAN_RELOAD_PARAM='heianReload',HEIAN_RELOAD_TTL=10*60*1000;
+const HEIAN_RELOAD_KEY='hakoniwakit.heian.launcher-reload.v1:'+location.pathname;
 const historyLead=()=>LP[lang].history[historyIndex];
 const clearLoadTimers=()=>{clearInterval(historyTimer);clearInterval(slowWatch);clearTimeout(hardTimer);};
+const clearReleaseReload=()=>{try{sessionStorage.removeItem(HEIAN_RELOAD_KEY);}catch(_){}try{const url=new URL(location.href);if(url.searchParams.has(HEIAN_RELOAD_PARAM)){url.searchParams.delete(HEIAN_RELOAD_PARAM);history.replaceState(history.state,'',url.href);}}catch(_){}};
+const releaseReloadBlocked=()=>{try{const expires=Number(sessionStorage.getItem(HEIAN_RELOAD_KEY)||0);if(expires>Date.now())return true;sessionStorage.removeItem(HEIAN_RELOAD_KEY);}catch(_){}return false;};
+const releaseReloadUrlBlocked=url=>{const token=url.searchParams.get(HEIAN_RELOAD_PARAM);if(!token)return false;const started=Number.parseInt(token,36);return !Number.isFinite(started)||Date.now()-started<HEIAN_RELOAD_TTL;};
+const reloadLauncherForRelease=message=>{if(!/公開release(?:が混在|の)/.test(String(message||'')))return false;const url=new URL(location.href);if(releaseReloadUrlBlocked(url)||releaseReloadBlocked())return false;const now=Date.now();try{sessionStorage.setItem(HEIAN_RELOAD_KEY,String(now+HEIAN_RELOAD_TTL));}catch(_){}url.searchParams.set(HEIAN_RELOAD_PARAM,now.toString(36));console.warn('HEIAN_LAUNCHER_RELOAD release-mismatch');location.replace(url.href);return true;};
 const fail=message=>{if(settled)return;settled=true;clearLoadTimers();launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
-const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!document.querySelector('.launch-series .kit-mark'))return fail('ロード画面のブランド表示を確認できません。');settled=true;analyticsReady=true;if(analyticsLoadStartedAt)trackHeian('load_ready',{loadBucket:heianDurationBucket(performance.now()-analyticsLoadStartedAt),retry:retryCount});clearLoadTimers();launch.remove();console.log('HEIAN_CONTENT_OK ready=true retries='+retryCount);};
+const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!document.querySelector('.launch-series .kit-mark'))return fail('ロード画面のブランド表示を確認できません。');settled=true;analyticsReady=true;if(analyticsLoadStartedAt)trackHeian('load_ready',{loadBucket:heianDurationBucket(performance.now()-analyticsLoadStartedAt),retry:retryCount});clearLoadTimers();clearReleaseReload();launch.remove();console.log('HEIAN_CONTENT_OK ready=true retries='+retryCount);};
 const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
 const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
@@ -73,7 +79,7 @@ const slideTimer=setInterval(()=>{if(settled){clearInterval(slideTimer);return;}
  back.style.backgroundImage=`url('${slides[slideIndex]}')`;back.classList.add('show');slideFront.classList.remove('show');slideFront=back;},5000);
 addEventListener('message',event=>{const data=event.data,attempt=Number(data?.attempt);
  if(event.source!==frame.contentWindow||!Number.isInteger(attempt)||attempt!==retryCount)return;
- if(data.type==='heian-ready')finish();else if(data.type==='heian-progress'){if(!settled&&progressText){lastProgressAt=Date.now();progressText.textContent=String(data.text||'').slice(0,80);if(Number.isFinite(data.percent))loadProgress=Math.max(0,Math.min(100,data.percent));}}else if(data.type==='heian-error')retryLoading(data.message);else if(data.type==='heian-event'){if(data.event==='first_input'&&analyticsFirstInput)return;if(trackHeian(data.event,data.props)&&data.event==='first_input')analyticsFirstInput=true;}});
+ if(data.type==='heian-ready')finish();else if(data.type==='heian-progress'){if(!settled&&progressText){lastProgressAt=Date.now();progressText.textContent=String(data.text||'').slice(0,80);if(Number.isFinite(data.percent))loadProgress=Math.max(0,Math.min(100,data.percent));}}else if(data.type==='heian-error'){if(!reloadLauncherForRelease(data.message))retryLoading(data.message);}else if(data.type==='heian-event'){if(data.event==='first_input'&&analyticsFirstInput)return;if(trackHeian(data.event,data.props)&&data.event==='first_input')analyticsFirstInput=true;}});
 frame.addEventListener('error',()=>retryLoading('3D画面を読み込めませんでした。'));
 addEventListener('pointerdown',()=>{try{frame.contentWindow?.postMessage({type:'heian-activate'},'*');}catch(_){}},{passive:true});
 // スマホ・タブレットは約45MBの読み込みを始める前に確認する（PCは従来どおり即読み込み・2026-08-17井内さん指摘）
