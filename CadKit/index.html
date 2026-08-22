@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="32815ae57c79b24ecfc97b983e4e1e79e9e8d638c1b8e3141eb06b6948562a5f">
+<meta name="heian-release" content="0d437ef4d8ee36a9def4c300365b92ae8ca79067b04df9352b806153512aafb9">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -334,7 +334,9 @@ body.heian-game #viewport{position:absolute;inset:0;width:100%;height:100%}
 .heian-game-info h2{margin:0 0 5px;color:#fff;font-size:24px}
 .heian-game-info p{margin:0;color:#d8dee5;font-size:16px;line-height:1.6}
 .heian-game-help{position:absolute;right:16px;bottom:16px;padding:9px 12px;background:rgba(17,24,32,.82);color:#d8dee5;font-size:14px}
-#heianGameHud.heian-photo-mode>:not(.heian-photo-bar){display:none!important}
+#heianGameHud.heian-photo-mode>:not(.heian-game-bar):not(.heian-photo-bar){display:none!important}
+#heianGameHud.heian-photo-mode .heian-game-bar>:not(.heian-game-title){display:none!important}
+#heianGameHud.heian-photo-mode .heian-game-title>span{display:none!important}
 .heian-photo-bar{position:absolute;z-index:4;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:8px;padding:8px;background:rgba(17,24,32,.9);pointer-events:auto}
 .heian-photo-bar[hidden]{display:none!important}.heian-photo-bar button{min-width:96px;min-height:44px;padding:9px 16px;border:1px solid #85909a;background:#182029;color:#fff;font-size:16px}.heian-photo-bar button:first-child{background:#7a5720;border-color:#d2a64f;color:#fff4d8}
 /* 幅1220px未満は左下の解説パネル（最大700px）と重なるため幅を絞って折り返す。1000px以下はスマホ同様に隠す（2026-08-19井内さん報告） */
@@ -10405,12 +10407,12 @@ window.__shotView=(view,scale=1)=>{
   'soshi-gable':[[-4880,105,-6140],[-5125,32,-6440]],
   'soryu-tower':[[790,170,2220],[560,70,1960]],
   'daidairi-offices':[[4100,460,5600],[2050,35,4150]],
-  'daidairi-chukain':[[920,500,-40],[300,25,-805]],
+  'daidairi-chukain':[[920,500,60],[300,25,-705]],
   'daidairi-taiseikan':[[2850,450,4700],[1986,25,3550]],
   'daidairi-jingikan':[[5580,470,5700],[4960,25,4932]],
   'daidairi-tea':[[5560,460,-5520],[4960,20,-6250]],
-  'daidairi-north':[[2100,520,-4400],[1500,25,-3100]],
-  'daidairi-shingon':[[40,430,250],[-990,25,-750]],
+  'daidairi-north':[[2100,520,-4300],[1500,25,-3000]],
+  'daidairi-shingon':[[40,430,350],[-990,25,-650]],
   'daidairi-osachika':[[-5750,430,-3900],[-4970,25,-5036]],
   'daidairi-jibusho':[[-4550,430,6100],[-3727,25,5001]],
   'daigokuden-shibi':[[550,280,2050],[0,170,1560]],
@@ -11924,19 +11926,20 @@ function heianKit(){
   parts.push(roof(cx,cz,132,112,lowerEave,label+'一階大寄棟屋根','yosemune',.45,1,false));
   // 朝堂院の上載せ5櫓だけ、白壁70%・朱小壁30%を丸めず固定する。
   const ornateWall=(x,z,w,d,y,h,name)=>{const lower=h*.7;parts.push(box(x,z,w,d,y,lower,name+'内壁'));parts.push(box(x,z,w,d,y+lower,h-lower,name+'内壁上小壁'));};
-  const centralY=lowerEave+20,centralSize=46,centralStoryH=18;
-  ornateWall(cx,cz,centralSize,centralSize,centralY,centralStoryH,label+'中央下櫓');
-  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*centralSize/2,cz+sz*centralSize/2,centralY,centralStoryH,2,label+'楼上角柱'));
-  const topY=centralY+centralStoryH;
-  ornateWall(cx,cz,centralSize,centralSize,topY,centralStoryH,label+'中央上櫓');
-  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*centralSize/2,cz+sz*centralSize/2,topY,centralStoryH,1.8,label+'中央上櫓角柱'));
-  parts.push(roof(cx,cz,68,68,topY+centralStoryH,label+'中央上櫓屋根','hogyo',.55,1,false));
-  const turretY=lowerEave+9,turretH=20,turretSize=24;
+  // 中央楼と周囲4塔は壁幅を2/3にし、下端だけ下げて棟高を維持したまま大屋根へ差し込む。
+  const centralY=lowerEave+17,centralSize=46*2/3,centralLowerH=21,centralUpperH=18;
+  ornateWall(cx,cz,centralSize,centralSize,centralY,centralLowerH,label+'中央下櫓');
+  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*centralSize/2,cz+sz*centralSize/2,centralY,centralLowerH,2,label+'楼上角柱'));
+  const topY=centralY+centralLowerH;
+  ornateWall(cx,cz,centralSize,centralSize,topY,centralUpperH,label+'中央上櫓');
+  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*centralSize/2,cz+sz*centralSize/2,topY,centralUpperH,1.8,label+'中央上櫓角柱'));
+  parts.push(roof(cx,cz,68,68*2/3,topY+centralUpperH,label+'中央上櫓屋根','irimoya',.8,.8,false));
+  const turretY=lowerEave+6,turretH=23,turretSize=24*2/3;
   for(const sx of[-1,1])for(const sz of[-1,1]){
-   const x=cx+sx*41,z=cz+sz*34;
+   const x=cx+sx*37,z=cz+sz*30;
    ornateWall(x,z,turretSize,turretSize,turretY,turretH,label+'稜線小櫓');
    for(const px of[-1,1])for(const pz of[-1,1])parts.push(col(x+px*turretSize/2,z+pz*turretSize/2,turretY,turretH,1.4,label+'稜線小櫓角柱'));
-   parts.push(roof(x,z,42,42,turretY+turretH,label+'稜線小櫓屋根','hogyo',.5,.8,false));
+   parts.push(roof(x,z,42,28,turretY+turretH,label+'稜線小櫓屋根','irimoya',.7,.8,false));
   }
  };
  // 扁額（殿舎名の額・文字なし・2026-08-19井内さん指示「主な楼門・大堂に軒の下の額を」）。
@@ -12170,6 +12173,10 @@ function heianPondShoreOuterPoints(points,{offset=18,seed=1,jitter=.3}={}){
 }
 function heianPondShoreGeometry(points,options={}){
  const outer=heianPondShoreOuterPoints(points,options),shape=new THREE.Shape(outer),hole=new THREE.Path();hole.moveTo(points[0].x,points[0].y);for(let i=1;i<points.length;i++)hole.lineTo(points[i].x,points[i].y);hole.closePath();shape.holes.push(hole);return new THREE.ShapeGeometry(shape);
+}
+// 水面の下へ敷く浅瀬面。内周を持たせず、水面との境界に輪郭線を作らない。
+function heianPondShoreFillGeometry(points,options={}){
+ return new THREE.ShapeGeometry(new THREE.Shape(heianPondShoreOuterPoints(points,options)));
 }
 function heianTerrainPondShoreGeometry(points,worldX,worldZ,options={}){
  const outer=heianPondShoreOuterPoints(points,options),positions=[],put=p=>positions.push(p.x,terrainYAt(worldX+p.x,worldZ+p.y)+.82,p.y);
@@ -12411,7 +12418,7 @@ function paintHeianArchitecture(label){
   else if(/竜尾壇垂れ旗・白/.test(n))color='#eee5cf';
   else if(/竜尾壇旗竿/.test(n))color=SHINDEN_PART_PALETTE.column;
   else if(/朱欄干|朱扉/.test(n))color='#a64032';
-  else if(/板葺屋根/.test(n))color=SHINDEN_PART_PALETTE.roof;
+  else if(/檜皮葺.*屋根|板葺.*屋根/.test(n))color=SHINDEN_PART_PALETTE.roof;
   else if(/屋根|裳階|塀笠|大垣笠|白壁笠/.test(n))color=(singleInner||(label==='大内裏'&&innerIds.has(b.colorIdx))||suzakuinAsset)?SHINDEN_PART_PALETTE.roof:SHINDEN_PART_PALETTE.roofTile; // 白壁笠=riseWallの笠（羅城）。規則に無く白かった（2026-08-18井内さん指摘）
   else if(/鴟尾/.test(n))color=/^(大極殿|豊楽殿)鴟尾/.test(n)?SHINDEN_PART_PALETTE.metal:SHINDEN_PART_PALETTE.roofTile; // 金色は大極殿・豊楽殿のみ。門・紫宸殿・寺院金堂は瓦色
   else if(/相輪/.test(n))color=SHINDEN_PART_PALETTE.metal;
@@ -12422,6 +12429,7 @@ function paintHeianArchitecture(label){
   else if(/塀|大垣/.test(n))color=templeAsset?SHINDEN_PART_PALETTE.plaster:SHINDEN_PART_PALETTE.wall;
   else if(/基壇|階|竜尾壇|竜尾道/.test(n))color=SHINDEN_PART_PALETTE.stone;
   else if(/床|渡廊|扉/.test(n))color=SHINDEN_PART_PALETTE.floor; // 扉=棟門の板扉は木の色（2026-08-19）
+  else if(/通路|道路/.test(n))color=HEIAN_DAIDAIRI_GRAVEL; // 宴の松原から内裏への道を「松」の語で緑地判定しない
   else if(/社殿|鳥居/.test(n))color='#a64032'; // 神社の社殿・鳥居は朱（基壇・屋根は先行ルールで着色済み・2026-08-17）
   else if(/川舟|桟橋杭|荷俵|荷箱|荷車/.test(n))color=SHINDEN_PART_PALETTE.floor; // 淀津の舟・杭・荷は木の色（2026-08-17）
   else if(/松|桜|梅|柳|橘|菜園|木/.test(n))color=SHINDEN_PART_PALETTE.foliage;
@@ -12491,12 +12499,13 @@ function buildRajomonParts(k,parts){
   gableRoof(parts,gx,0,56,24,24,6,'羅城脇門屋根',5,5);
  };
  // 羅城は外端18→門際30へ競り上げ、x=±260の幅48だけを脇門開口として空ける。
+ // 門側の内端は固定し、左右外端だけ各200（実寸約20m）延長する。
  for(const s of[-1,1]){
-  k.riseWall(parts,'x',0,s*380,s*284,12,18,19,'羅城白壁');
+  k.riseWall(parts,'x',0,s*580,s*284,12,18,19,'羅城白壁');
   k.riseWall(parts,'x',0,s*236,s*140,12,21.3,30,'羅城白壁');
   sideGate(s*260);
-  // 脇門開口内の旧飾り柱は除き、壁上の柱だけ残す。
-  for(let i=0;i<6;i++){const x=s*(150+i*44);if(Math.abs(Math.abs(x)-260)<24)continue;for(const dz of[-6.5,6.5])parts.push(col(x,dz,-1,17,1.6,'羅城朱柱'));}
+  // 脇門開口内の旧飾り柱は除き、延長部まで約44間隔で壁上の柱を並べる。
+  for(let i=0;i<10;i++){const x=s*(150+i*44);if(Math.abs(Math.abs(x)-260)<24)continue;for(const dz of[-6.5,6.5])parts.push(col(x,dz,-1,17,1.6,'羅城朱柱'));}
  }
 }
 function makeRajomon(){return makeHeian('羅城門',k=>{const parts=[];buildRajomonParts(k,parts);return[['羅城門',parts]];});}
@@ -12886,6 +12895,9 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
  // kitがスケール済みなら、直接extrudeする小門屋根も同じ変換をかける（屋根だけ元位置に残っていた・2026-08-18井内さん指摘）
  const TX=v=>xform?xform.X(v):v,TZ=v=>xform?xform.Z(v):v,TSX=v=>xform?v*xform.sx:v,TSZ=v=>xform?v*xform.sz:v;
  const site=[],wall=[],cho=[],dai=[],buraku=[],dairi=[],kancho=[];
+ const INNER_CLUSTER_SOUTH_SHIFT=100;
+ const innerClusterNames=new Set(['糸所','内膳司','采女町','木工内候','中和院','真言院']);
+ const innerClusterZ=(name,z)=>z+(innerClusterNames.has(name)?INNER_CLUSTER_SOUTH_SHIFT:0);
  site.push(box(0,0,12000,14000,-4,4,'地面'));
  const X=5990,Z=6990;
  // 宮城門（単層・入母屋・基壇つき）。門体は左右の脚＋上の梁に分けて中央を開ける
@@ -12932,7 +12944,7 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
  // 内裏は南壁z=-47と西側接続を固定したまま北・東を縮小する。
  // sx=1.15・sz=1.02、shift=(113,1029)で外郭は概ねx618..2696／z-2881..-47。
  // 北側の南院との道路幅を約5mから約25mへ戻し、蘭林坊等の軒の逸脱を防ぐ。
- buildDairiInner(scaleKitXY(shiftKit(k,113,1029),1650,-2299,1.150,1.020),dairi);
+ buildDairiInner(scaleKitXY(shiftKit(k,113,1029+INNER_CLUSTER_SOUTH_SHIFT),1650,-2299+INNER_CLUSTER_SOUTH_SHIFT,1.150,1.020),dairi);
  buildBuraku(scaleKitXY(shiftKit(k,-503,-157),-1600,3680,1.523,0.962),buraku);
  // 内裏外郭の西の一画（門名入り区画図・2026-08-02井内さん指摘「外郭は中和院や左の施設も囲む」）:
  // 糸所・内膳司・采女町・中和院を内裏外郭と一続きの塀で囲む。西面に宮秋門、北に通用口2つ。
@@ -12943,11 +12955,12 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
    else{dairi.push(box(fixed,mid,8,len,-1,22,'内裏西外郭塀'));dairi.push(box(fixed,mid,14,len+6,20,3,'内裏西外郭塀笠'));}};
   // 2026-08-19: 南面を中和院南端＝建礼門の壁の線（z=-47）へ移動して一直線に（寸法入り大内裏図）。
   // 内裏外郭西塀は z-3078..-47 を通しで走るようになったため、角への取り付き短冊は不要になった
-  for(const[a,b]of[[-2771,-1145],[-1055,-51]])seg('z',-711,a,b);   // 西面（宮秋門の開口）
-  for(const s of[-1,1])dairi.push(box(-711,-1100+s*34,32,24,-1,38,'宮秋門脚'));
-  dairi.push(box(-711,-1100,32,100,37,7,'宮秋門梁'));dairi.push(roof(-711,-1100,70,124,44,'宮秋門屋根'));
-  for(const[a,b]of[[-711,-340],[-260,260],[340,658]])seg('x',-2777,a,b); // 北面（通用口2）
-  for(const[a,b]of[[-711,-145],[-55,658]])seg('x',-47,a,b);        // 南面（通用口1・建礼門の壁と同一線）
+  for(const[a,b]of[[-2671,-1280],[-1190,49]])seg('z',-711,a,b);   // 西面。中和院北の連絡通路軸へ宮秋門を合わせる
+  for(const s of[-1,1])dairi.push(box(-711,-1235+s*34,32,24,-1,38,'宮秋門脚'));
+  dairi.push(box(-711,-1235,32,100,37,7,'宮秋門梁'));dairi.push(roof(-711,-1235,70,124,44,'宮秋門屋根'));
+  for(const[a,b]of[[-711,-340],[-260,260],[340,658]])seg('x',-2677,a,b); // 北面（通用口2）
+  for(const[a,b]of[[-711,-145],[-55,658]])seg('x',53,a,b);          // 南面（通用口1・内裏外郭と一体移動）
+  dairi.push(box(-26.5,-1235,1369,70,-2,2,'中和院北・宴の松原門から内裏への通路'));
  }
  // 宴の松原のBRep松48本は生成が7分超停止するため撤去。地表の緑地表現だけを残す。
  // 曹司区画v2: 塀＋小門＋中身レイアウト。[名,cx,cz,幅,奥行,型,門の向き]
@@ -12991,45 +13004,112 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
   // 格式差は建物数と基壇高で示し、宮殿のような重層・総朱塗りにはしない。
   const officeRank=type==='jibusho'?0:name==='太政官'?3:/^(中務省|宮内省)$/.test(name)?2:
    /^(式部省|治部省|民部省|兵部省|刑部省|大蔵省)$/.test(name)?1:0;
+  const innerPartition=(label,axis,fixed,a0,a1)=>{const mid=(a0+a1)/2,len=a1-a0,wh=14;
+   if(axis==='x'){p.push(box(mid,fixed,len,6,-1,wh,label+'境界塀'));p.push(box(mid,fixed,len+4,10,wh-2,3,label+'境界塀笠'));}
+   else{p.push(box(fixed,mid,6,len,-1,wh,label+'境界塀'));p.push(box(fixed,mid,10,len+4,wh-2,3,label+'境界塀笠'));}};
+  const officeHall=(label,x,z,pw,pd)=>gable(p,x,z,Math.min(pw-36,190),Math.min(pd-36,86),-1,18,11,label+'庁舎');
+  const officeStore=(label,x,z,nm,sw=76,sd=126)=>{
+   for(const sx of[-1,1])for(const sz of[-1,0,1])p.push(col(x+sx*(sw/2-6),z+sz*(sd/2-11),-1,10,2.4,label+nm+'高床柱'));
+   gable(p,x,z,sw,sd,8,25,12,label+nm);
+  };
+  // 左京職型の正庁・東西脇庁。各省の敷地と既存内壁に合わせて寸法・中心を個別指定する。
+  const officeCompound=(label,s)=>{
+   const ox=cx+(s.ox||0),mainZ=cz+s.mainZ,sideZ=cz+s.sideZ,baseH=s.baseH||5,hallH=s.hallH||27;
+   p.push(box(ox,mainZ,s.mainW+28,s.mainD+22,-1,baseH,label+'正庁基壇'));
+   gable(p,ox,mainZ,s.mainW,s.mainD,baseH-1,hallH,s.rise||18,label+'正庁');
+   for(const sx of[-1,1])for(const sz of[-1,1])p.push(col(ox+sx*(s.mainW/2-4),mainZ+sz*(s.mainD/2-4),baseH-1,hallH,2,label+'正庁角柱'));
+   gable(p,ox-s.sideX,sideZ,s.sideW,s.sideD,-1,s.sideH||23,s.sideRise||15,label+'西脇庁');
+   gable(p,ox+s.sideX,sideZ,s.sideW,s.sideD,-1,s.sideH||23,s.sideRise||15,label+'東脇庁');
+   if(s.record)gable(p,ox+(s.record.x||0),cz+s.record.z,s.record.w,s.record.d,-1,20,12,label+(s.record.name||'記録所'));
+   for(const st of s.stores||[])officeStore(label,ox+st[0],cz+st[1],st[2],st[3],st[4]);
+   if(s.hut)gable(p,ox+s.hut.x,cz+s.hut.z,s.hut.w,s.hut.d,-1,17,10,label+(s.hut.name||'雑小屋'));
+   for(const h of s.hedges||[])p.push(box(ox+h[0],cz+h[1],h[2],h[3],-1,h[4]||12,label+'生垣'));
+  };
   if(name==='茶園'){
    // 北東隅の茶園。南門から中央通路を空け、西側に畝、東側に管理小屋を置く。
    for(let i=0;i<5;i++)p.push(box(cx-240,cz-250+i*105,390,18,-1,11,'茶園茶畝生垣'+(i+1)));
    gable(p,cx+240,cz-255,170,90,-1,18,11,'茶園管理小屋一');
    gable(p,cx+240,cz+270,150,80,-1,17,10,'茶園管理小屋二');
+  }else if(name==='木工内候'){
+   gable(p,cx-45,cz-70,190,70,-1,20,12,'木工内候東西作業場');
+   gable(p,cx+70,cz+55,70,170,-1,20,12,'木工内候南北作業場');
+   gable(p,cx-75,cz+75,82,58,-1,17,10,'木工内候資材小屋');
+  }else if(name==='真言院'){
+   const mainZ=cz+70;
+   gable(p,cx,mainZ,210,120,-1,26,18,'真言院修法堂・檜皮葺五間四面');
+   p.push(box(cx,mainZ,180,90,-1,4,'真言院修法堂板敷母屋'));
+   p.push(box(cx+55,mainZ,54,70,4,5,'胎蔵界曼荼羅修法壇（西向き）'),box(cx-55,mainZ,54,70,4,5,'金剛界曼荼羅修法壇（東向き）'));
+   gable(p,cx+210,cz+120,120,210,-1,23,15,'真言院長者坊・檜皮葺五間四面');
+   gable(p,cx-220,cz+120,90,150,-1,23,15,'真言院護摩堂・檜皮葺五間三間');
+   gable(p,cx,cz-190,210,90,-1,20,12,'真言院伴僧宿所・板葺七間三間');
+   gable(p,cx,cz-370,270,90,-1,20,12,'真言院厨所・九間三間');
+   gable(p,cx-175,cz-520,100,60,-1,16,9,'真言院北門西雑舎');gable(p,cx+175,cz-520,100,60,-1,16,9,'真言院北門東雑舎');
+  }else if(name==='造酒司'||name==='漆室'){
+   const storeLabel=name==='造酒司'?'蔵':'漆保管蔵';
+   for(let i=0;i<5;i++){const x=cx-360+i*180;for(const sx of[-1,1])for(const sz of[-1,0,1])p.push(col(x+sx*34,cz-260+sz*66,-1,10,2.8,name+storeLabel+(i+1)+'高床柱'));gable(p,x,cz-260,82,150,8,32,13,name+storeLabel+(i+1));}
+   gable(p,cx-350,cz+210,96,Math.min(520,d-260),-1,23,14,name+(name==='造酒司'?'南北酒造長屋':'南北作業長屋'));
+   gable(p,cx+60,cz+250,300,90,-1,20,12,name+(name==='造酒司'?'麹・仕込舎':'漆調製舎'));
+  }else if(name==='内匠寮'){
+   for(const[x,i]of[[-330,1],[-110,2],[110,3],[330,4]])gable(p,cx+x,cz,90,560,-1,21,13,'内匠寮長屋'+i);
+  }else if(name==='外記庁・南所・一本御書所・釜所・内竪所'){
+   const z0=cz-d/2+18,z1=cz+d/2-18,x0=cx-w/2+18,x1=cx+w/2-18;
+   innerPartition('外記庁等','z',cx,z0,z1);
+   for(const z of[cz-d/6,cz+d/6])innerPartition('外記庁等','x',z,x0,cx);
+   innerPartition('外記庁等','x',cz,x1-(x1-cx),x1);
+   for(const[label,x,z]of[['外記庁',cx-w*.24,cz-d*.32],['南所',cx-w*.24,cz],['一本御書所',cx-w*.24,cz+d*.32],['釜所',cx+w*.24,cz-d*.24],['内竪所',cx+w*.24,cz+d*.24]])officeHall(label,x,z,w*.42,d*.27);
+  }else if(name==='式部省・主税厨・民部厨・主計厨・式部厨'){
+   const splitX=cx-w*.055,splitZ=cz+d*.08,x0=cx-w/2+18,x1=cx+w/2-18,z0=cz-d/2+18,z1=cz+d/2-18;
+   innerPartition('式部省諸司','z',splitX,z0,z1);innerPartition('式部省諸厨','x',splitZ,splitX,x1);
+   for(const x of[cx+w*.16,cx+w*.32])innerPartition('式部省諸厨','z',x,z0,splitZ);
+   const officeCX=(x0+splitX)/2;
+   officeCompound('式部省',{ox:officeCX-cx,mainZ:-300,mainW:410,mainD:130,sideX:350,sideZ:0,sideW:72,sideD:340,
+    record:{x:0,z:315,w:240,d:78},hedges:[[0,410,280,12,12]]});
+   for(const[label,x]of[['主税厨',cx+w*.08],['民部厨',cx+w*.24],['主計厨',cx+w*.4]])officeHall(label,x,cz-d*.2,w*.14,d*.34);
+   officeHall('式部厨',cx+w*.24,cz+d*.3,w*.45,d*.28);
+  }else if(name==='大舎人寮・侍従厨'){
+   innerPartition('大舎人寮・侍従厨','x',cz,cx-w/2+18,cx+w/2-18);
+   officeHall('大舎人寮',cx,cz-d*.25,w*.72,d*.38);officeHall('侍従厨',cx,cz+d*.25,w*.72,d*.38);
+  }else if(name==='民部省'){
+   const splitZ=cz+d*.12,x0=cx-w/2+18,x1=cx+w/2-18,z1=cz+d/2-18;
+   innerPartition('民部省・主計・主税','x',splitZ,x0,x1);innerPartition('主計・主税','z',cx,splitZ,z1);
+   officeCompound('民部省',{mainZ:-350,mainW:620,mainD:150,sideX:760,sideZ:-130,sideW:90,sideD:300,
+    record:{x:0,z:40,w:230,d:70,name:'文書所'},hedges:[[0,90,300,12,12]],baseH:6,hallH:28,rise:18});
+   officeHall('主税',cx-w*.24,cz+d*.31,w*.42,d*.28);officeHall('主計',cx+w*.24,cz+d*.31,w*.42,d*.28);
+  }else if(name==='太政官'){
+   const splitZ=cz-d*.18,x0=cx-w/2+18,x1=cx+w/2-18;
+   innerPartition('太政官諸司','x',splitZ,x0,x1);
+   innerPartition('太政官諸司','z',cx-w*.18,cz-d/2+18,splitZ);innerPartition('太政官諸司','z',cx+w*.18,cz-d/2+18,splitZ);
+   officeHall('勘解由',cx-w*.34,cz-d*.33,w*.26,d*.26);officeHall('朝所',cx+w*.34,cz-d*.33,w*.26,d*.26);
+   officeCompound('太政官',{mainZ:-60,mainW:620,mainD:190,sideX:760,sideZ:160,sideW:90,sideD:330,
+    record:{x:-190,z:455,w:300,d:76},stores:[[560,450,'文書倉',80,110]],baseH:7,hallH:31,rise:20,sideH:25,sideRise:16});
+  }else if(name==='西院・醤院・主水司'){
+   const splitX=cx+w*.065,splitZ=cz+d*.045,z0=cz-d/2+18,z1=cz+d/2-18,x1=cx+w/2-18;
+   innerPartition('西院・醤院','z',splitX,z0,z1);innerPartition('醤院・主水司','x',splitZ,splitX,x1);
+   officeHall('西院',cx-w*.23,cz,w*.42,d*.55);officeHall('醤院',cx+w*.28,cz-d*.23,w*.32,d*.35);officeHall('主水司',cx+w*.28,cz+d*.28,w*.32,d*.34);
+  }else if(name==='大炊寮'){
+   const splitX=cx-w*.08,z0=cz-d/2+18,z1=cz+d/2-18,x0=cx-w/2+18;
+   innerPartition('供御院・大炊寮','z',splitX,z0,z1);innerPartition('供御院・大膳厨','x',cz,x0,splitX);
+   officeHall('供御院',cx-w*.29,cz-d*.25,w*.28,d*.34);officeHall('大膳厨',cx-w*.29,cz+d*.25,w*.28,d*.34);
+   gable(p,cx+w*.2,cz,Math.min(w*.45,340),Math.min(d*.5,260),-1,25,17,'大炊寮正庁');
   }else if(officeRank){
-   const treasury=name==='大蔵省',mainW=Math.min(w-180,officeRank===3?600:officeRank===2?460:400);
-   const mainD=Math.min(officeRank===3?150:130,Math.max(90,d*.18)),hallZ=cz-d*.26;
-   const baseH=officeRank===3?7:officeRank===2?5:4,hallH=officeRank===3?31:officeRank===2?28:26;
-   p.push(box(cx,hallZ,mainW+28,mainD+22,-1,baseH,name+'正庁基壇'));
-   gable(p,cx,hallZ,mainW,mainD,baseH-1,hallH,officeRank===3?20:18,name+'正庁');
-   for(const sx of[-1,1])for(const sz of[-1,1])
-    p.push(col(cx+sx*(mainW/2-4),hallZ+sz*(mainD/2-4),baseH-1,hallH,2,name+'正庁角柱'));
-   const store=(x,z,nm)=>{for(const sx of[-1,1])for(const sz of[-1,0,1])
-    p.push(col(x+sx*32,z+sz*52,-1,10,2.4,name+nm+'高床柱'));
-    gable(p,x,z,76,126,8,25,12,name+nm);};
-   if(treasury){
-    store(cx-130,cz+d*.08,'文書倉');store(cx+130,cz+d*.08,'財物倉');
-    store(cx,cz+d*.31,'納殿');
-   }else if(w>=900&&d>=820){
-    const sideD=Math.min(340,d*.42),sideX=w/2-110;
-    gable(p,cx-sideX,cz+d*.03,82,sideD,-1,23,15,name+'西曹司');
-    gable(p,cx+sideX,cz+d*.03,82,sideD,-1,23,15,name+'東曹司');
-    gable(p,cx,cz+d*.31,Math.min(mainW*.62,300),82,-1,20,12,name+(officeRank>=2?'南曹司':'厨'));
+   if(name==='宮内省'){
+    officeCompound('宮内省',{mainZ:-320,mainW:460,mainD:145,sideX:500,sideZ:10,sideW:82,sideD:330,
+     record:{x:-130,z:295,w:280,d:80},stores:[[360,360,'文書倉',76,110]],hedges:[[0,500,420,12,12]],baseH:5,hallH:28});
+   }else if(name==='大蔵省'){
+    const stores=[];let n=0;
+    for(const z of[276,516])for(const x of[-375,-225,-75,75,225,375])stores.push([x,z,'整列倉'+String(++n).padStart(2,'0'),76,126]);
+    officeCompound('大蔵省',{mainZ:-360,mainW:460,mainD:140,sideX:500,sideZ:-90,sideW:80,sideD:300,
+     record:{x:0,z:100,w:260,d:70},stores,baseH:5,hallH:28});
+   }else if(name==='兵部省'){
+    officeCompound('兵部省',{mainZ:-200,mainW:390,mainD:120,sideX:420,sideZ:5,sideW:76,sideD:300,
+     record:{x:-90,z:265,w:220,d:72},stores:[[300,300,'文書倉',70,100]],hedges:[[-170,365,220,12,11]],baseH:4,hallH:26});
    }else{
+    const mainW=Math.min(w-180,officeRank===2?460:400),mainD=Math.min(130,Math.max(90,d*.18)),hallZ=cz-d*.26;
+    const baseH=officeRank===2?5:4,hallH=officeRank===2?28:26;
+    p.push(box(cx,hallZ,mainW+28,mainD+22,-1,baseH,name+'正庁基壇'));
+    gable(p,cx,hallZ,mainW,mainD,baseH-1,hallH,18,name+'正庁');
+    for(const sx of[-1,1])for(const sz of[-1,1])p.push(col(cx+sx*(mainW/2-4),hallZ+sz*(mainD/2-4),baseH-1,hallH,2,name+'正庁角柱'));
     gable(p,cx,cz+d*.17,Math.min(mainW,w-180),90,-1,22,14,name+'曹司');
-    if(d>900)store(cx+w*.31,cz+d*.31,'文書倉');
-   }
-   if(name==='太政官'){
-    // 資料図の細分を外形内に示す。南帯3院に加え、左右院を南北2区画へ分ける。
-    const innerWall=(axis,fixed,a0,a1)=>{const mid=(a0+a1)/2,len=a1-a0;
-     if(axis==='x'){p.push(box(mid,fixed,len,8,-1,18,'太政官内区画塀'));p.push(box(mid,fixed,len+4,12,16,3,'太政官内区画塀笠'));}
-     else{p.push(box(fixed,mid,8,len,-1,18,'太政官内区画塀'));p.push(box(fixed,mid,12,len+4,16,3,'太政官内区画塀笠'));}};
-    for(const[a,b]of[[cx-w/2+18,cx-50],[cx+50,cx+w/2-18]])innerWall('x',cz+246,a,b);
-    for(const x of[cx-w*.22,cx+w*.22])for(const[a,b]of[[cz+250,cz+336],[cz+406,cz+d/2-18]])innerWall('z',x,a,b);
-    const west=[cx-w/2+18,cx-w*.22-4],east=[cx+w*.22+4,cx+w/2-18];
-    for(const[a,b]of[west,east]){const m=(a+b)/2;innerWall('x',cz+455,a,m-34);innerWall('x',cz+455,m+34,b);}
-    for(const[s,label]of[[-1,'西'],[1,'東']])for(const[dz,n]of[[350,'北'],[510,'南']])
-     gable(p,cx+s*w*.355,cz+dz,180,70,-1,18,11,'太政官'+label+'小院'+n+'舎');
    }
   }else if(name==='神祇官西院'){
    // 添付平面図の西院（斎院）: 北庁・八神殿・東舎・南舎・西舎・御幣殿を院内へ配置。
@@ -13046,38 +13126,39 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
    gable(p,cx,cz+292,220,90,-1,21,13,name+'南舎');
    gable(p,cx+95,cz-155,50,50,-1,15,9,name+'井舎');
   }else if(type==='jibusho'){
-   // 治部省は北の横棟と南の中央脚を持つT字。南西に玄蕃寮、南東に諸陵寮を置く。
-   const splitZ=cz-81,legHalf=150,innerZ0=cz-d/2+18,innerZ1=cz+d/2-18;
+   // 治部省は北の正庁・東西脇庁と、南の中央脚・玄蕃寮・諸陵寮をT字内壁で共存させる。
+   const splitZ=cz-81,legHalf=150,innerZ1=cz+d/2-18;
    const innerWall=(axis,fixed,a0,a1)=>{const mid=(a0+a1)/2,len=a1-a0;
     if(axis==='x'){p.push(box(mid,fixed,len,8,-1,18,'治部省T字境界塀'));p.push(box(mid,fixed,len+4,12,16,3,'治部省T字境界塀笠'));}
     else{p.push(box(fixed,mid,8,len,-1,18,'治部省T字境界塀'));p.push(box(fixed,mid,12,len+4,16,3,'治部省T字境界塀笠'));}};
    innerWall('x',splitZ,cx-w/2+18,cx-legHalf);innerWall('x',splitZ,cx+legHalf,cx+w/2-18);
    for(const x of[cx-legHalf,cx+legHalf])for(const[a,b]of[[splitZ,cz+205],[cz+275,innerZ1]])innerWall('z',x,a,b);
-   gable(p,cx,cz-350,420,110,-1,27,18,'治部省正庁');
-   gable(p,cx-400,cz-190,82,250,-1,22,14,'治部省西曹司');
-   gable(p,cx+400,cz-190,82,250,-1,22,14,'治部省東曹司');
-   gable(p,cx,cz+300,90,220,-1,22,14,'治部省南曹司');
+   officeCompound('治部省',{mainZ:-410,mainW:420,mainD:110,sideX:400,sideZ:-230,sideW:80,sideD:210,
+    record:{x:0,z:-125,w:230,d:60},baseH:5,hallH:27});
+   officeStore('治部省',cx,cz+210,'文書倉',76,110);
+   gable(p,cx,cz+420,82,120,-1,17,10,'治部省雑小屋');
    for(const[s,label]of[[-1,'玄蕃寮'],[1,'諸陵寮']]){
     const x=cx+s*370;gable(p,x,cz+210,210,82,-1,22,14,label+'正庁');
     gable(p,x+s*105,cz+390,70,190,-1,19,12,label+'曹司');
    }
-  }else if(type==='court'){ // 正殿（北寄り）＋左右の脇殿（縦棟）＋南の前舎
+  }else if(type==='court'&&name!=='大蔵'){ // 正殿（北寄り）＋左右の脇殿（縦棟）＋南の前舎
    gable(p,cx+jx,cz-d/4,hw,hd,-1,26,18,name+'正殿');
    const wd=Math.min(d-320,300);
    gable(p,cx-w/2+120,cz+jz/2,90,wd,-1,24,16,name+'西舎');
    gable(p,cx+w/2-120,cz-jz/2,90,wd,-1,24,16,name+'東舎');
    if(d>1100)gable(p,cx-jx,cz+d/4+20,Math.min(hw-80,300),90,-1,22,14,name+'南舎');
-  }else if(type==='meryo'){ // 馬寮: 敷地の左（西）に縦長の厩（敷地の約7割長・資料準拠）、
-   // 既存の横棟は少し東へ寄せる（2026-08-19井内さん指示）
-   gable(p,cx-w/2+150,cz,150,d*.7,-1,22,13,name+'厩');
-   {const rows=d>1300?3:2,hx=Math.min(w-460,440);
+  }else if(type==='meryo'){ // 馬寮: 現行3棟を東へ寄せ、西側に朱雀院型の厩と馬場を複製する。
+   const stableX=cx-w/2+115,trackX=cx-w/2+305,longD=d-180;
+   gable(p,stableX,cz,92,Math.min(1200,longD),-1,24,14,name+'厩（朱雀院型）');
+   p.push(box(trackX,cz,120,longD,-2,2,name+'馬場（朱雀院型）'));
+   {const rows=3,hx=Math.min(w-500,400);
     for(let r=0;r<rows;r++)
-     gable(p,cx+130+(r%2?jx:-jx),cz-d/4+r*(d/2/(rows-1||1))*0.9,hx,Math.min(130,hd),-1,24,16,name);}
+     gable(p,cx+270+(r%2?jx/2:-jx/2),cz-d/4+r*(d/2/(rows-1))*.9,hx,Math.min(130,hd),-1,24,16,name+'東側既存舎'+(r+1));}
   }else if(type==='rows'){ // 並列2〜3棟
    const rows=d>1300?3:2;
    for(let r=0;r<rows;r++)
     gable(p,cx+(r%2?jx:-jx),cz-d/4+r*(d/2/(rows-1||1))*0.9,hw,Math.min(130,hd),-1,24,16,name);
-  }else if(type==='kura'){ // 高床式倉庫の並び（縦棟・床下に柱）。官学地区の穀倉院と同じ流儀（2026-08-18井内さん指示）
+  }else if(name==='大蔵'||type==='kura'){ // 高床式倉庫の並び。名称が大蔵の全区画は穀倉院型で統一する。
    const kuraW=90,kuraD=Math.min(220,d-300),pitchX=220,pitchZ=kuraD+120;
    const cols=Math.min(5,Math.max(2,Math.floor((w-200)/pitchX)));
    const rowsN=Math.max(1,Math.min(3,Math.floor((d-360)/pitchZ)));
@@ -13086,7 +13167,7 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
     gable(p,x,z,kuraW,kuraD,8,50,14,name+label);
    };
    for(let r=0;r<rowsN;r++)for(let i2=0;i2<cols;i2++)
-    store(cx-(cols-1)*pitchX/2+i2*pitchX+jx/2,cz-d/2+220+r*pitchZ+jz/2,'倉');
+    store(cx-(cols-1)*pitchX/2+i2*pitchX,cz-d/2+220+r*pitchZ,'整列倉'+(r*cols+i2+1));
    gable(p,cx,cz+d/2-110,Math.min(hw,260),80,-1,20,12,name+'番所');
   }else if(type==='chukain'){ // 中和院: 神嘉殿・北殿を中心軸へ置き、東西舎と回廊を完全な鏡像で生成する。
    gable(p,cx,cz-100,250,110,-1,26,20,name+'神嘉殿');
@@ -13142,36 +13223,33 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
   ['糸所',-7,-2488,1245,437,'rows','W'],
   ['職御曹司',3991,-2179,1232,1240,'court','W'],
   ['采女町',320,-1785,591,830,'rows','S'],
-  ['内膳司',-337,-1655,585,1090,'rows','S'],
-  ['区画31',-4359,-1416,201,287,'rows','N'],
-  ['区画32',-4132,-1416,255,443,'rows','E'],
-  ['木工内匠',-350,-890,300,300,'rows','S'],
+  ['内膳司',-337,-1740,585,740,'rows','S'],
+  ['武徳殿',-4132,-1416,255,443,'rows','E'],
+  ['木工内候',-350,-890,300,300,'mokko','S'],
   ['中和院',320,-805,591,990,'chukain','E'],
-  ['真言院',-1051,-750,645,1266,'rows','S'],
+  ['真言院',-1151,-710,645,1266,'shingon','N'],
   ['右兵衛府',-5290,-659,1098,1226,'mixed','E'],
-  ['区画37',3991,-600,1232,1344,'court','W'],
+  ['外記庁・南所・一本御書所・釜所・内竪所',3991,-600,1232,1344,'official-subplots','W'],
   ['左兵衛府',5277,-600,1071,1344,'mixed','N'],
   ['造酒司',-3965,670,1180,1226,'court','E'],
   ['内匠寮',-5290,672,1098,1200,'mixed','S'],
   ['西雅院',3991,672,1232,1200,'court','W'],
   ['東雅院',5277,672,1071,1200,'mixed','S'],
-  ['区画43',2344,1872,295,574,'rows','N'],
-  ['区画44',2612,1872,241,574,'rows','N'],
-  ['区画45',2893,1872,322,574,'rows','N'],
-  ['区画46',1352,1878,361,587,'rows','N'],
-  ['区画47',1694,1878,322,587,'rows','N'],
-  ['区画48',2022,1878,335,587,'rows','N'],
-  ['西院',4339,1918,536,666,'rows','N'],
+  ['監物',2344,1872,295,574,'rows','N'],
+  ['主鈴',2612,1872,241,574,'rows','N'],
+  ['主鑰',2893,1872,322,574,'rows','N'],
+  ['侍従局',1352,1878,361,587,'rows','N'],
+  ['内舎人',1694,1878,322,587,'rows','N'],
+  ['中務省北曹司',2022,1878,335,587,'rows','N'],
+  ['西院・醤院・主水司',3991,2199,1232,1227,'rows','W'],
   ['典薬寮',-3965,2170,1180,1174,'court','E'],
-  ['区画51',3723,2199,696,1227,'rows','W'],
   ['大膳職',5277,2199,1071,1227,'mixed','N'],
   ['陰陽寮',2625,2486,858,653,'rows','E'],
   ['中務省',1681,2519,1018,639,'rows','W'],
-  ['区画55',4339,2531,536,561,'rows','W'],
-  ['左馬寮',-5290,2870,1098,2571,'rows','N'],
+  ['左馬寮',-5290,2870,1098,2571,'meryo','N'],
   ['御井',-3965,3208,1180,639,'rows','E'],
   ['太政官',2113,3549,1882,1188,'court','E'],
-  ['区画59',3991,3549,1232,1214,'court','W'],
+  ['宮内省',3991,3549,1232,1214,'court','W'],
   ['大炊寮',5277,3549,1071,1214,'mixed','S'],
   ['中務厨',-3965,3847,1180,639,'rows','E'],
   ['民部省',2113,4919,1882,978,'court','S'],
@@ -13179,18 +13257,16 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
   ['神祇官西院',5096,4932,710,978,'mixed','S'],
   ['神祇官東院',5632,4932,361,978,'rows','S'],
   ['治部省',-3965,5001,1180,1148,'jibusho','E'],
-  ['右馬寮',-5290,5571,1098,2257,'rows','N'],
-  ['区画68',3991,5982,1232,496,'rows','W'],
-  ['式部省',1473,6217,911,966,'mixed','W'],
-  ['大舎人寮',2491,6217,1125,966,'court','N'],
+  ['右馬寮',-5290,5571,1098,2257,'meryo','N'],
+  ['式部省・主税厨・民部厨・主計厨・式部厨',2035.5,6217,2036,966,'official-subplots','W'],
+  ['大舎人寮・侍従厨',3991,6217,1232,966,'rows','W'],
   ['雅楽寮',5277,6217,1071,966,'mixed','N'],
   ['判事',-4373,6263,469,874,'rows','N'],
   ['刑部省',-3745,6263,740,874,'mixed','E'],
   ['弾正台',-2451,6263,1044,874,'mixed','W'],
   ['兵部省',-1400,6263,1058,874,'mixed','E'],
-  ['区画76',3991,6465,1232,470,'rows','W'],
  ];
- SOSHI.forEach(([name,cx,cz,w,d,type,gs],i)=>soshi(name,cx,cz,w,d,type,gs,i+1,
+ SOSHI.forEach(([name,cx,cz,w,d,type,gs],i)=>soshi(name,cx,innerClusterZ(name,cz),w,d,type,gs,i+1,
   name==='神祇官西院'?['E']:name==='神祇官東院'?['W']:[]));
  // 神祇官西院・東院は中央壁を二重にせず共有し、図の中門で相互接続する。
  {
@@ -13202,20 +13278,18 @@ function makeDaidairi(){return makeHeian('大内裏',k=>{
   for(const dz of[-30,30])kancho.push(box(x,gz+dz,16,10,-1,31,'神祇官中門柱'));
   k.gableRoof(kancho,x,gz,32,84,29,7,'神祇官中門屋根',6,4);
  }
- // 園韓神社: 宮中唯一の名神大社。宮内省の北西隅（『拾芥抄』は西、『年中行事絵巻』は北西隅）に
- // 南北2宇（南=園神社・北=韓神社）・いずれも東面・正面一間×側面二間の春日造風（Wikipedia「園韓神社」準拠、
- // 宮内省の区画位置は推定・2026-08-17井内さん承認の配置案）。玉垣は東に開口。
+ // 園韓神社: 宮内省区画の北西隅。南北2宇（南=園神社・北=韓神社）を東面させる。
  {
   const sx=3480;
-  for(const[cz,nm]of[[1760,'園神社'],[1670,'韓神社']]){
+  for(const[cz,nm]of[[3115,'園神社'],[3025,'韓神社']]){
    kancho.push(k.box(sx,cz,66,36,-1,5,nm+'基壇'));
    kancho.push(k.box(sx-4,cz,44,24,4,16,nm+'社殿'));
    kancho.push(k.roof(sx-4,cz,60,34,20,nm+'社殿屋根'));
   }
-  kancho.push(k.box(sx,1638,94,5,-1,10,'園韓神社玉垣'));
-  kancho.push(k.box(sx,1792,94,5,-1,10,'園韓神社玉垣'));
-  kancho.push(k.box(sx-47,1715,5,154,-1,10,'園韓神社玉垣'));
-  for(const s of[-1,1])kancho.push(k.box(sx+47,1715+s*48.5,5,57,-1,10,'園韓神社玉垣'));
+  kancho.push(k.box(sx,2993,94,5,-1,10,'園韓神社玉垣'));
+  kancho.push(k.box(sx,3147,94,5,-1,10,'園韓神社玉垣'));
+  kancho.push(k.box(sx-47,3070,5,154,-1,10,'園韓神社玉垣'));
+  for(const s of[-1,1])kancho.push(k.box(sx+47,3070+s*48.5,5,57,-1,10,'園韓神社玉垣'));
  }
  return[['大垣・宮城門',wall],['朝堂院',cho],['大極殿',dai],['豊楽院',buraku],
   ['内裏',dairi],['官衙',kancho],['敷地',site]];
@@ -14989,7 +15063,7 @@ const HEIAN_HOVER_POINTS=[ // 大内裏内の門・殿（HEIAN_GAME_LOCATIONSと
 // world XZのbboxへ集約する（2026-08-19井内さん指示「朝堂院の建物・宮内省などの区画・内裏の門も名前を」）。
 // 結合後は名前が消えるので、landmark配置直後（merge前）に collectHeianHoverNames で収集する
 let heianNamedPlaces=[],heianSubregions=[];
-const HEIAN_HOVER_PART_SUFFIX=/(?:の|・)?(?:上層|下層|\d+層|大屋根|屋根|裳階|楼上|鴟尾|露盤|伏鉢|心棒|九輪|水煙|宝珠|相輪|軒裏|組物|梁|柱|脚|白壁|内壁|上小壁|小壁|袖壁|壁角|壁|上|側面|側|妻小壁|妻|腰|基壇|基礎|階段|階|段\d*|床板|床|扉|欄干|高欄|渡殿|渡廊|回廊|翼廊|廊|笠|塀|大垣|垣|幹|冠|小門|扁額|東面|西面|南面|北面)+$/;
+const HEIAN_HOVER_PART_SUFFIX=/(?:の|・)?(?:上層|下層|\d+層|大屋根|屋根|裳階|楼上|鴟尾|露盤|伏鉢|心棒|九輪|水煙|宝珠|相輪|軒裏|組物|梁|柱|脚|白壁|内壁|上小壁|小壁|袖壁|壁角|壁|上|側面|側|妻小壁|妻|腰|基壇|基礎|階段|階|段\d*|床板|床|扉|欄干|高欄|渡殿|渡廊|回廊|翼廊|廊|笠|塀|大垣|生垣|玉垣|垣|幹|冠|小門|扁額|東面|西面|南面|北面)+$/;
 function collectHeianHoverNames(group,assetName){
  group.updateMatrixWorld(true);
  const skip=/^(地面|水面|松|桜|梅|柳|橘|木|林|幹|枝|葉|菜園|築地|篝火|灯明|川舟|桟橋|荷俵|荷箱)/;
@@ -15199,8 +15273,14 @@ function heianPhotoRecord(){
  return{placeId:point.id,place:locName(point),x:camera.position.x/10,y:camera.position.y/10,z:camera.position.z/10,heading,direction:directions[Math.floor((heading+22.5)/45)%8],capturedAt:now.toISOString(),displayTime:now.toLocaleString(heianLang==='en'?'en-GB':'ja-JP',{hour12:false})};
 }
 function stampHeianPhoto(canvas,record){
- const ctx=canvas.getContext('2d'),fontSize=Math.max(20,Math.round(Math.min(canvas.width,canvas.height)*.022)),pad=Math.round(fontSize*.65),line1='HakoniwaKit 平安京 — '+record.place,line2='X '+record.x.toFixed(1)+'m / Z '+record.z.toFixed(1)+'m ｜ '+record.direction+'向き '+Math.round(record.heading)+'° ｜ '+record.displayTime;
- ctx.save();ctx.font='600 '+fontSize+'px "Yu Gothic","Hiragino Sans",sans-serif';const width=Math.ceil(Math.max(ctx.measureText(line1).width,ctx.measureText(line2).width)+pad*2),height=Math.ceil(fontSize*2.55+pad*1.4),x=canvas.width-width-pad,y=canvas.height-height-pad;ctx.fillStyle='rgba(13,18,24,.76)';ctx.fillRect(x,y,width,height);ctx.fillStyle='#f4f1e9';ctx.textBaseline='top';ctx.fillText(line1,x+pad,y+pad*.65);ctx.font='400 '+Math.round(fontSize*.8)+'px "Yu Gothic","Hiragino Sans",sans-serif';ctx.fillStyle='#d8dee5';ctx.fillText(line2,x+pad,y+pad*.65+fontSize*1.28);ctx.restore();
+ const ctx=canvas.getContext('2d'),fontSize=Math.max(20,Math.round(Math.min(canvas.width,canvas.height)*.022)),pad=Math.round(fontSize*.65),markSize=Math.round(fontSize*1.55),markGap=Math.round(fontSize*.55),line1='HakoniwaKit 平安京 — '+record.place,line2='X '+record.x.toFixed(1)+'m / Z '+record.z.toFixed(1)+'m ｜ '+record.direction+'向き '+Math.round(record.heading)+'° ｜ '+record.displayTime;
+ ctx.save();ctx.font='600 '+fontSize+'px "Yu Gothic","Hiragino Sans",sans-serif';
+ const textWidth=Math.ceil(Math.max(ctx.measureText(line1).width,ctx.measureText(line2).width)),width=markSize+markGap+textWidth+pad*2,height=Math.ceil(Math.max(markSize,fontSize*2.55)+pad*1.4),x=canvas.width-width-pad,y=canvas.height-height-pad,textX=x+pad+markSize+markGap;
+ ctx.fillStyle='rgba(13,18,24,.76)';ctx.fillRect(x,y,width,height);
+ const markOuter=new Path2D('M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'),markGrid=new Path2D('M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z');
+ ctx.save();ctx.translate(x+pad,y+(height-markSize)/2);ctx.scale(markSize/285,markSize/285);ctx.translate(-414,-291);ctx.fillStyle='#f4f1e9';ctx.fill(markOuter,'evenodd');ctx.fill(markGrid);ctx.restore();
+ ctx.fillStyle='#f4f1e9';ctx.textBaseline='top';ctx.fillText(line1,textX,y+pad*.65);ctx.font='400 '+Math.round(fontSize*.8)+'px "Yu Gothic","Hiragino Sans",sans-serif';ctx.fillStyle='#d8dee5';ctx.fillText(line2,textX,y+pad*.65+fontSize*1.28);ctx.restore();
+ canvas.__heianPhotoStamp={logo:true,markSize,textX,box:[x,y,width,height]};
 }
 function captureHeianGameCanvas(){
  if(!heianGameMode||!heianTerrainGroup)return null;
@@ -16832,7 +16912,7 @@ function makeHeianSuzakuin(){
   garden.push(k.box(80,heianSuzakuinCoreZ(-626.5),1150,1263,-2,2,'朱雀院白砂南庭（朝覲・算賀・相撲の場）'));
   const pondControls=HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),pondPoints=heianClosedCurvePoints(pondControls,64);
   garden.push(k.run({type:'extrude',mode:'new',depth:2,sketchId:addSketchData('floor',-1,[{type:'poly',closed:true,pts:pondPoints.map(p=>[+p.x.toFixed(1),+(-p.y).toFixed(1)])}]).id},'水面・朱雀院苑池（不規則曲線岸線・推定）'));
-  const island=(cx,cz,rx,rz,seed,label)=>{const points=heianIrregularPondPoints(cx,heianSuzakuinCoreZ(cz),rx,rz,seed,10,32);garden.push(k.run({type:'extrude',mode:'new',depth:5,sketchId:addSketchData('floor',-1,[{type:'poly',closed:true,pts:points.map(p=>[+p.x.toFixed(1),+(-p.y).toFixed(1)])}]).id},label));};
+  const island=(cx,cz,rx,rz,seed,label)=>{const points=heianIrregularPondPoints(cx,heianSuzakuinCoreZ(cz),rx,rz,seed,10,32);garden.push(k.run({type:'extrude',mode:'new',depth:7,sketchId:addSketchData('floor',-1,[{type:'poly',closed:true,pts:points.map(p=>[+p.x.toFixed(1),+(-p.y).toFixed(1)])}]).id},label));};
   island(-650,780,115,72,31,'朱雀院中島一（不規則曲線・推定）');
   island(-250,1230,95,62,47,'朱雀院中島二（不規則曲線・推定）');
   den(garden,-820,heianSuzakuinCoreZ(1180),120,84,22,'朱雀院池畔亭（推定）');
@@ -17417,16 +17497,19 @@ function addHeianMarketOfficeCompounds(parent,marketLayouts){
  return{compounds:compounds.length,offices,warehouses,walkObstacles,perimeterWalls,gates,gateSides:['北','南','東','西'],wallStyle:'低い板塀（景観上の推定）',officeAttached:compounds.every(c=>c.attachedGap<=20),officeWallHeight,officePostHeight,officeEaveHeight,officeRidgeHeight,northSide:true,mirrored:true,insideSite:true,stallCollisions:compounds.reduce((n,c)=>n+c.collisions,0),details:compounds};
 }
 function addHeianMatsunoharaTrees(parent){
- const count=30,root=new THREE.Group();root.name='宴の松原・松と広葉樹の混植30本';parent.add(root);
+ const count=30,root=new THREE.Group();root.name='宴の松原・周縁6群の松と広葉樹30本';parent.add(root);
  const trunk=new THREE.InstancedMesh(new THREE.CylinderGeometry(2.2,3.4,34,7),new THREE.MeshLambertMaterial({color:0x66503a}),count),dummy=new THREE.Object3D();
  const crownGeometries=[new THREE.CylinderGeometry(3,14,28,8),new THREE.SphereGeometry(16,9,7),new THREE.DodecahedronGeometry(14,1)];
  const crownColors=[0x486b43,0x5f824d,0x6f8a54],crowns=crownGeometries.map((g,i)=>new THREE.InstancedMesh(g,new THREE.MeshLambertMaterial({color:crownColors[i]}),10));
- for(let i=0;i<count;i++){const col=i%6,row=Math.floor(i/6),x=-3970+col*620+((i*83)%150)-75,z=-2050+row*520+((i*47)%130)-65,y=terrainYAt(x,z),s=.9+((i*29)%35)/100;
+ // 中央動線を空けたまま西3群・東3群へ決定論的に群植する。
+ const clusters=[[-3950,-1850,280,250],[-3400,-600,320,300],[-3100,350,260,220],[-1800,-1800,300,260],[-1150,-700,330,320],[-1650,320,280,240]];
+ const spots=clusters.flatMap(([cx,cz,rx,rz],g)=>Array.from({length:5},(_,j)=>{const a=j*2.399963+g*.71,r=.42+((g*17+j*23)%47)/100;return[cx+Math.cos(a)*rx*r,cz+Math.sin(a)*rz*r];}));
+ for(let i=0;i<count;i++){const[x,z]=spots[i],y=terrainYAt(x,z),s=.78+((i*29)%52)/100;
   dummy.rotation.set(0,(i*1.7)%Math.PI,0);dummy.position.set(x,y+17*s,z);dummy.scale.set(s,s,s);dummy.updateMatrix();trunk.setMatrixAt(i,dummy.matrix);
   const k=i%3,j=Math.floor(i/3),cy=y+(k===0?43:41)*s;dummy.position.set(x,cy,z);dummy.updateMatrix();crowns[k].setMatrixAt(j,dummy.matrix);}
  trunk.instanceMatrix.needsUpdate=true;trunk.frustumCulled=false;trunk.name='宴の松原・樹木幹';root.add(trunk);
  crowns.forEach((m,i)=>{m.instanceMatrix.needsUpdate=true;m.frustumCulled=false;m.name=i===0?'宴の松原・松樹冠':'宴の松原・広葉樹樹冠'+i;root.add(m);});
- return{trees:count,pines:10,broadleaf:20,drawCalls:4,representation:'instanced-mixed-pine-broadleaf',zone:[-4320,-480,-2420,640],visible:root.visible};
+ return{trees:count,pines:10,broadleaf:20,drawCalls:4,representation:'instanced-perimeter-clusters',clusters:6,centralPath:[-2660,-2140],zone:[-4320,-480,-2420,640],visible:root.visible};
 }
 function addHeianLandmarks(assets){
  const layer=new THREE.Group();layer.name='平安京主要施設';let meshes=0,drawMeshes=0,shinsenenPondMeshes=0,shinsenenShoreMeshes=0,shinsenenTrees=0,shinsenenGroundMode='terrain-continuous',ryubidanFlags=0,ryubidanFlagPoles=0,suzakuinInfo=null,daigakuryoHall=null,kokusoCarts=0,kokusoCartShadows=0,kokusoCartDeckSizes=[],kokusoCartWheels=0,kokusoCartWheelSizes=[],templeGardenHedges=0,nonInnerOpenLeaves=0,matsunoharaInfo=null;const placements={},innerGateLeaves={},officialFormalHalls={};
@@ -17479,11 +17562,12 @@ function addHeianLandmarks(assets){
      off.sort((p,q)=>q.over-p.over);overhangBodies=off.slice(0,8);}}}
   if(a.id==='suzakuin'){
    const names=[],roofs=[],frames=[],palaceRoofs=[],pondMeshes=[],islandOneMeshes=[],islandTwoMeshes=[],mainWallBox=new THREE.Box3(),mainRoofBox=new THREE.Box3(),mainStairBox=new THREE.Box3(),gardenBox=new THREE.Box3(),northCenterBox=new THREE.Box3(),northWestBox=new THREE.Box3(),northEastBox=new THREE.Box3(),serviceHouseBox=new THREE.Box3(),babaBox=new THREE.Box3(),stableBox=new THREE.Box3(),islandOneBox=new THREE.Box3(),islandTwoBox=new THREE.Box3();
-   a.group.traverse(o=>{if(!o.isMesh)return;const n=o.name||'';names.push(n);if(/朱雀院苑池/.test(n))pondMeshes.push(o);if(/屋根|裳階/.test(n))roofs.push(o);if(/栢梁殿比定.*(?:柱|梁|小壁)/.test(n))frames.push(o);if(/朱雀院(?:正殿|仁寿殿|麗景殿風東殿|清涼殿風西殿|宜陽殿風東殿|北列(?:中央殿|西脇殿|東脇殿)).*屋根/.test(n))palaceRoofs.push(o);if(/栢梁殿比定.*内壁(?:上小壁)?/.test(n))mainWallBox.expandByObject(o);if(/栢梁殿比定.*屋根/.test(n))mainRoofBox.expandByObject(o);if(/栢梁殿比定.*南階/.test(n))mainStairBox.expandByObject(o);if(/白砂南庭/.test(n))gardenBox.expandByObject(o);if(/北列中央殿.*屋根/.test(n))northCenterBox.expandByObject(o);if(/北列西脇殿.*屋根/.test(n))northWestBox.expandByObject(o);if(/北列東脇殿.*屋根/.test(n))northEastBox.expandByObject(o);if(/島町家司詰所/.test(n))serviceHouseBox.expandByObject(o);if(/朱雀院馬場（競馬・駒牽の場）/.test(n))babaBox.expandByObject(o);if(/朱雀院厩/.test(n))stableBox.expandByObject(o);if(/中島一/.test(n)){islandOneBox.expandByObject(o);islandOneMeshes.push(o);}if(/中島二/.test(n)){islandTwoBox.expandByObject(o);islandTwoMeshes.push(o);}});
+   a.group.traverse(o=>{if(!o.isMesh)return;const n=o.name||'';names.push(n);if(/水面・朱雀院苑池/.test(n))pondMeshes.push(o);if(/屋根|裳階/.test(n))roofs.push(o);if(/栢梁殿比定.*(?:柱|梁|小壁)/.test(n))frames.push(o);if(/朱雀院(?:正殿|仁寿殿|麗景殿風東殿|清涼殿風西殿|宜陽殿風東殿|北列(?:中央殿|西脇殿|東脇殿)).*屋根/.test(n))palaceRoofs.push(o);if(/栢梁殿比定.*内壁(?:上小壁)?/.test(n))mainWallBox.expandByObject(o);if(/栢梁殿比定.*屋根/.test(n))mainRoofBox.expandByObject(o);if(/栢梁殿比定.*南階/.test(n))mainStairBox.expandByObject(o);if(/白砂南庭/.test(n))gardenBox.expandByObject(o);if(/北列中央殿.*屋根/.test(n))northCenterBox.expandByObject(o);if(/北列西脇殿.*屋根/.test(n))northWestBox.expandByObject(o);if(/北列東脇殿.*屋根/.test(n))northEastBox.expandByObject(o);if(/島町家司詰所/.test(n))serviceHouseBox.expandByObject(o);if(/朱雀院馬場（競馬・駒牽の場）/.test(n))babaBox.expandByObject(o);if(/朱雀院厩/.test(n))stableBox.expandByObject(o);if(/中島一/.test(n)){islandOneBox.expandByObject(o);islandOneMeshes.push(o);}if(/中島二/.test(n)){islandTwoBox.expandByObject(o);islandTwoMeshes.push(o);}});
    const pondMaterial=new THREE.MeshBasicMaterial({color:HEIAN_WATER_COLOR,transparent:true,opacity:HEIAN_POND_OPACITY,side:THREE.DoubleSide,depthTest:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3});for(const pond of pondMeshes){pond.material=pondMaterial;pond.renderOrder=4;pond.frustumCulled=false;}
-   const suzakuinPondPoints=heianClosedCurvePoints(HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),64),shoreGeometry=heianPondShoreGeometry(suzakuinPondPoints,{offset:20,seed:87}),shoreMesh=new THREE.Mesh(shoreGeometry,heianPondShoreMaterial());shoreGeometry.rotateX(Math.PI/2);shoreMesh.position.y=1.18;shoreMesh.name='朱雀院苑池・淡い浅瀬リング';shoreMesh.renderOrder=5;shoreMesh.frustumCulled=false;a.group.add(shoreMesh);names.push(shoreMesh.name);
-   const has=r=>names.some(n=>r.test(n)),hiwada=new THREE.Color(SHINDEN_PART_PALETTE.roof).getHex(),darkFrame=new THREE.Color('#463b33').getHex(),isHiwada=o=>o.material?.color?.getHex()===hiwada,count=r=>roofs.filter(o=>r.test(o.name)),hiwadaCount=list=>list.filter(isHiwada).length,stableRoofs=count(/朱雀院厩/),serviceRoofs=count(/島町(?:倉|雑舎|家司詰所)/),hiwadaRoofs=hiwadaCount(roofs),wallW=mainWallBox.max.x-mainWallBox.min.x,wallD=mainWallBox.max.z-mainWallBox.min.z,roofW=mainRoofBox.max.x-mainRoofBox.min.x,roofD=mainRoofBox.max.z-mainRoofBox.min.z,centerX=b=>(b.min.x+b.max.x)/2,centerZ=b=>(b.min.z+b.max.z)/2,localCenter=b=>[Math.round(centerX(b)-a.x),Math.round(centerZ(b)-a.z)],originY=a.group.getWorldPosition(new THREE.Vector3()).y,mainEaveHeight=Math.round(mainRoofBox.min.y-originY),minPalaceEaveHeight=Math.round(Math.min(...palaceRoofs.map(o=>new THREE.Box3().setFromObject(o).min.y-originY))),northRowCount=Number(Number.isFinite(northCenterBox.min.x))+Number(Number.isFinite(northWestBox.min.x))+Number(Number.isFinite(northEastBox.min.x)),northRowSymmetric=northRowCount===3&&Math.abs((centerX(northWestBox)+centerX(northEastBox))/2-centerX(northCenterBox))<1&&Math.abs((northWestBox.max.x-northWestBox.min.x)-(northEastBox.max.x-northEastBox.min.x))<1,mainSetSouthShift=Math.round(centerZ(mainRoofBox)-a.z+1450),gardenStairGap=Math.round((gardenBox.min.z-mainStairBox.max.z)*10)/10,overlapXZ=(p,q)=>p.min.x<q.max.x&&p.max.x>q.min.x&&p.min.z<q.max.z&&p.max.z>q.min.z,insideSite=b=>b.min.x>=a.x-a.w/2&&b.max.x<=a.x+a.w/2&&b.min.z>=a.z-a.d/2&&b.max.z<=a.z+a.d/2,serviceHouseCenter=localCenter(serviceHouseBox),babaCenter=localCenter(babaBox),stableCenter=localCenter(stableBox),serviceHouseNorth=serviceHouseBox.max.z<Math.min(northCenterBox.min.z,northWestBox.min.z,northEastBox.min.z),serviceHouseNonOverlapping=[mainRoofBox,northCenterBox,northWestBox,northEastBox].every(b=>!overlapXZ(serviceHouseBox,b)),reconfiguredInsideSite=[mainRoofBox,gardenBox,serviceHouseBox,babaBox,stableBox,islandOneBox,islandTwoBox].every(insideSite),uniquePlanVertices=list=>{const out=new Set(),v=new THREE.Vector3();for(const o of list){const p=o.geometry?.getAttribute('position');if(!p)continue;for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);out.add(Math.round(v.x*10)+','+Math.round(v.z*10));}}return out.size;},islandPlanVertices=[uniquePlanVertices(islandOneMeshes),uniquePlanVertices(islandTwoMeshes)],islandCurved=islandPlanVertices.every(n=>n>=16);
-   suzakuinInfo={x:a.x,z:a.z,w:a.w,d:a.d,pondMaterialType:pondMaterial.type,pondMaterialMeshes:pondMeshes.length,pondMaterialUnified:pondMeshes.length>0&&pondMeshes.every(p=>p.material===pondMaterial),pondColor:'#'+pondMaterial.color.getHexString(),pondOpacity:pondMaterial.opacity,pondTransparent:pondMaterial.transparent,pondDepthWrite:pondMaterial.depthWrite,shorelineMeshes:1,shorelineMode:'outer-offset-jitter',shorelineOffset:20,shorelineSeed:87,shorelineColor:'#'+shoreMesh.material.color.getHexString(),shorelineOpacity:shoreMesh.material.opacity,genericShells:0,commonServices:0,mainHall:has(/栢梁殿比定/),sidePalace:has(/麗景殿風東殿/),sidePalaceGallery:has(/麗景殿接続回廊/),frontTrees:has(/正殿前西庭木/)&&has(/正殿前東庭木/),mainRoofOverhang:[Math.round((roofW-wallW)/2),Math.round((roofD-wallD)/2)],mainEaveHeight,minPalaceEaveHeight,mainSetSouthShift,gardenStairGap,northRowCount,northRowSymmetric,northRowConnections:has(/北列西接続回廊/)&&has(/北列東接続回廊/)&&has(/北列中軸回廊/),stableGable:has(/朱雀院厩.*切妻屋根/),darkFrames:frames.length,allDarkFrames:frames.length>0&&frames.every(o=>o.material?.color?.getHex()===darkFrame),southGarden:has(/白砂南庭/),atsukoResidence:has(/温子御所正殿/),pond:has(/朱雀院苑池/),pondShape:'irregular-closed-curve',pondVertices:64,islands:Number(has(/中島一/))+Number(has(/中島二/)),islandShape:'irregular-closed-curve',islandPlanVertices,islandCurved,coreSouthShift:HEIAN_SUZAKUIN_CORE_SOUTH_SHIFT,serviceHouse:has(/島町家司詰所/),serviceHouseCenter,serviceHouseNorth,serviceHouseNonOverlapping,babaCenter,stableCenter,babaStableFixed:babaCenter[0]===1040&&babaCenter[1]===720&&stableCenter[0]===820&&stableCenter[1]===650,reconfiguredInsideSite,baba:has(/朱雀院馬場/),stable:has(/朱雀院厩/),shimamachi:has(/島町倉/)&&has(/島町雑舎/),roofMeshes:roofs.length,hiwadaRoofs,allHiwada:roofs.length>0&&hiwadaRoofs===roofs.length,stableHiwada:stableRoofs.length>0&&hiwadaCount(stableRoofs)===stableRoofs.length,serviceHiwada:serviceRoofs.length>0&&hiwadaCount(serviceRoofs)===serviceRoofs.length,eastGates:HEIAN_SUZAKUIN_EAST_GATES.map(g=>{const road=heianAvenueTable?.z?.find(a=>a.name===g.road);return{road:g.road,x:a.x+a.w/2-45,z:g.z,roadZ:road?.c??null,alignmentError:road?Math.round(Math.abs(g.z-road.c)*1000)/1000:null};}),eastGateCount:HEIAN_SUZAKUIN_EAST_GATES.length,eastGateModels:HEIAN_SUZAKUIN_EAST_GATES.filter(g=>has(new RegExp('朱雀院'+g.road+'門'))).length};
+   const suzakuinPondPoints=heianClosedCurvePoints(HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),64),shoreGeometry=heianPondShoreFillGeometry(suzakuinPondPoints,{offset:20,seed:87}),shoreMesh=new THREE.Mesh(shoreGeometry,heianPondShoreMaterial());shoreGeometry.rotateX(Math.PI/2);shoreMesh.position.y=.82;shoreMesh.name='朱雀院苑池・内周線なし浅瀬面';shoreMesh.renderOrder=3;shoreMesh.frustumCulled=false;a.group.add(shoreMesh);names.push(shoreMesh.name);
+   const pondBox=new THREE.Box3();for(const pond of pondMeshes)pondBox.expandByObject(pond);
+   const has=r=>names.some(n=>r.test(n)),hiwada=new THREE.Color(SHINDEN_PART_PALETTE.roof).getHex(),darkFrame=new THREE.Color('#463b33').getHex(),isHiwada=o=>o.material?.color?.getHex()===hiwada,count=r=>roofs.filter(o=>r.test(o.name)),hiwadaCount=list=>list.filter(isHiwada).length,stableRoofs=count(/朱雀院厩/),serviceRoofs=count(/島町(?:倉|雑舎|家司詰所)/),hiwadaRoofs=hiwadaCount(roofs),wallW=mainWallBox.max.x-mainWallBox.min.x,wallD=mainWallBox.max.z-mainWallBox.min.z,roofW=mainRoofBox.max.x-mainRoofBox.min.x,roofD=mainRoofBox.max.z-mainRoofBox.min.z,centerX=b=>(b.min.x+b.max.x)/2,centerZ=b=>(b.min.z+b.max.z)/2,localCenter=b=>[Math.round(centerX(b)-a.x),Math.round(centerZ(b)-a.z)],originY=a.group.getWorldPosition(new THREE.Vector3()).y,mainEaveHeight=Math.round(mainRoofBox.min.y-originY),minPalaceEaveHeight=Math.round(Math.min(...palaceRoofs.map(o=>new THREE.Box3().setFromObject(o).min.y-originY))),islandMinRise=Math.round((Math.min(islandOneBox.max.y,islandTwoBox.max.y)-pondBox.max.y)*10)/10,northRowCount=Number(Number.isFinite(northCenterBox.min.x))+Number(Number.isFinite(northWestBox.min.x))+Number(Number.isFinite(northEastBox.min.x)),northRowSymmetric=northRowCount===3&&Math.abs((centerX(northWestBox)+centerX(northEastBox))/2-centerX(northCenterBox))<1&&Math.abs((northWestBox.max.x-northWestBox.min.x)-(northEastBox.max.x-northEastBox.min.x))<1,mainSetSouthShift=Math.round(centerZ(mainRoofBox)-a.z+1450),gardenStairGap=Math.round((gardenBox.min.z-mainStairBox.max.z)*10)/10,overlapXZ=(p,q)=>p.min.x<q.max.x&&p.max.x>q.min.x&&p.min.z<q.max.z&&p.max.z>q.min.z,insideSite=b=>b.min.x>=a.x-a.w/2&&b.max.x<=a.x+a.w/2&&b.min.z>=a.z-a.d/2&&b.max.z<=a.z+a.d/2,serviceHouseCenter=localCenter(serviceHouseBox),babaCenter=localCenter(babaBox),stableCenter=localCenter(stableBox),serviceHouseNorth=serviceHouseBox.max.z<Math.min(northCenterBox.min.z,northWestBox.min.z,northEastBox.min.z),serviceHouseNonOverlapping=[mainRoofBox,northCenterBox,northWestBox,northEastBox].every(b=>!overlapXZ(serviceHouseBox,b)),reconfiguredInsideSite=[mainRoofBox,gardenBox,serviceHouseBox,babaBox,stableBox,islandOneBox,islandTwoBox].every(insideSite),uniquePlanVertices=list=>{const out=new Set(),v=new THREE.Vector3();for(const o of list){const p=o.geometry?.getAttribute('position');if(!p)continue;for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);out.add(Math.round(v.x*10)+','+Math.round(v.z*10));}}return out.size;},islandPlanVertices=[uniquePlanVertices(islandOneMeshes),uniquePlanVertices(islandTwoMeshes)],islandCurved=islandPlanVertices.every(n=>n>=16);
+   suzakuinInfo={x:a.x,z:a.z,w:a.w,d:a.d,pondMaterialType:pondMaterial.type,pondMaterialMeshes:pondMeshes.length,pondMaterialUnified:pondMeshes.length>0&&pondMeshes.every(p=>p.material===pondMaterial),pondColor:'#'+pondMaterial.color.getHexString(),pondOpacity:pondMaterial.opacity,pondTransparent:pondMaterial.transparent,pondDepthWrite:pondMaterial.depthWrite,shorelineMeshes:1,shorelineMode:'underlay-fill-no-inner-edge',shorelineInnerEdge:false,islandMinRise,shorelineOffset:20,shorelineSeed:87,shorelineColor:'#'+shoreMesh.material.color.getHexString(),shorelineOpacity:shoreMesh.material.opacity,genericShells:0,commonServices:0,mainHall:has(/栢梁殿比定/),sidePalace:has(/麗景殿風東殿/),sidePalaceGallery:has(/麗景殿接続回廊/),frontTrees:has(/正殿前西庭木/)&&has(/正殿前東庭木/),mainRoofOverhang:[Math.round((roofW-wallW)/2),Math.round((roofD-wallD)/2)],mainEaveHeight,minPalaceEaveHeight,mainSetSouthShift,gardenStairGap,northRowCount,northRowSymmetric,northRowConnections:has(/北列西接続回廊/)&&has(/北列東接続回廊/)&&has(/北列中軸回廊/),stableGable:has(/朱雀院厩.*切妻屋根/),darkFrames:frames.length,allDarkFrames:frames.length>0&&frames.every(o=>o.material?.color?.getHex()===darkFrame),southGarden:has(/白砂南庭/),atsukoResidence:has(/温子御所正殿/),pond:has(/朱雀院苑池/),pondShape:'irregular-closed-curve',pondVertices:64,islands:Number(has(/中島一/))+Number(has(/中島二/)),islandShape:'irregular-closed-curve',islandPlanVertices,islandCurved,coreSouthShift:HEIAN_SUZAKUIN_CORE_SOUTH_SHIFT,serviceHouse:has(/島町家司詰所/),serviceHouseCenter,serviceHouseNorth,serviceHouseNonOverlapping,babaCenter,stableCenter,babaStableFixed:babaCenter[0]===1040&&babaCenter[1]===720&&stableCenter[0]===820&&stableCenter[1]===650,reconfiguredInsideSite,baba:has(/朱雀院馬場/),stable:has(/朱雀院厩/),shimamachi:has(/島町倉/)&&has(/島町雑舎/),roofMeshes:roofs.length,hiwadaRoofs,allHiwada:roofs.length>0&&hiwadaRoofs===roofs.length,stableHiwada:stableRoofs.length>0&&hiwadaCount(stableRoofs)===stableRoofs.length,serviceHiwada:serviceRoofs.length>0&&hiwadaCount(serviceRoofs)===serviceRoofs.length,eastGates:HEIAN_SUZAKUIN_EAST_GATES.map(g=>{const road=heianAvenueTable?.z?.find(a=>a.name===g.road);return{road:g.road,x:a.x+a.w/2-45,z:g.z,roadZ:road?.c??null,alignmentError:road?Math.round(Math.abs(g.z-road.c)*1000)/1000:null};}),eastGateCount:HEIAN_SUZAKUIN_EAST_GATES.length,eastGateModels:HEIAN_SUZAKUIN_EAST_GATES.filter(g=>has(new RegExp('朱雀院'+g.road+'門'))).length};
   }
   if(a.id==='daigakuryo'){const hallBox=new THREE.Box3(),shakutenBox=new THREE.Box3(),hallNames=[],shakutenNames=[];a.group.traverse(o=>{if(!o.isMesh)return;if(/大学寮講堂/.test(o.name)){hallBox.expandByObject(o);hallNames.push(o.name);}else if(/大学寮廟堂（釈奠堂）/.test(o.name)){shakutenBox.expandByObject(o);shakutenNames.push(o.name);}});const dims=b=>[Math.round(b.max.x-b.min.x),Math.round(b.max.z-b.min.z)],centerZ=b=>(b.min.z+b.max.z)/2,complete=names=>['柱','梁','床','妻小壁','屋根'].every(part=>names.some(n=>n.includes(part))),hd=dims(hallBox),sd=dims(shakutenBox);daigakuryoHall={hallSize:hd,shakutenSize:sd,bothEastWest:hd[0]>hd[1]&&sd[0]>sd[1],shakutenShorter:sd[0]<hd[0],hallSouthOfShakuten:centerZ(hallBox)>centerZ(shakutenBox),insideSite:[hallBox,shakutenBox].every(b=>b.min.x>=a.x-a.w/2&&b.max.x<=a.x+a.w/2&&b.min.z>=a.z-a.d/2&&b.max.z<=a.z+a.d/2),betweenClearance:Math.round(hallBox.min.z-shakutenBox.max.z),hallComplete:complete(hallNames),shakutenComplete:complete(shakutenNames),name:'大学寮廟堂（釈奠堂）'};}
   collectHeianHoverNames(a.group,a.name); // マウスオーバー固有名（結合前に収集・2026-08-19）
@@ -18092,9 +18176,9 @@ async function makeHeianTerrain(){
   const suzakuin=window.__heianSuzakuinInfo?.(),daigakuryoHall=landmarks.daigakuryoHall,kawaranoin=window.__heianKawaranoinPond?.(),funaokaRoad=window.__heianFunaokaRoadInfo?.(),funaokaShrine=window.__heianFunaokaShrine?.(),kawaraService=(window.__heianEstateService?.()||[]).filter(q=>q.estate==='六條院');
   const funaokaInTerrain=funaokaShrine&&Math.abs(funaokaShrine.x)<=t.widthM*5&&Math.abs(funaokaShrine.z)<=t.heightM*5;
   if(!funaokaRoad||!funaokaShrine||!funaokaRoad.summitOnNorthExtension||funaokaShrine.x!==funaokaRoad.toX||funaokaShrine.z>=-7150||!funaokaInTerrain||!funaokaRoad.eastOfKamiya||!funaokaRoad.northStraight||!funaokaRoad.stopsAtFoot||funaokaRoad.toX!==0||funaokaRoad.shrineDistance<1000||funaokaRoad.shrineDistance>3000||funaokaShrine.riseFromFoot<=0)throw new Error('船岡山の位置・紙屋川・北直線路が不正です '+JSON.stringify({road:funaokaRoad,shrine:funaokaShrine,inTerrain:funaokaInTerrain}));
-  if(!suzakuin||suzakuin.eastGateCount!==3||suzakuin.eastGateModels!==3||suzakuin.eastGates?.some(g=>g.alignmentError!==0)||suzakuin.genericShells||suzakuin.commonServices||!suzakuin.mainHall||!suzakuin.sidePalace||!suzakuin.sidePalaceGallery||!suzakuin.frontTrees||!suzakuin.allDarkFrames||suzakuin.mainRoofOverhang?.[0]<50||suzakuin.mainRoofOverhang?.[1]<45||suzakuin.mainEaveHeight!==38||suzakuin.minPalaceEaveHeight<38||suzakuin.mainSetSouthShift!==300||suzakuin.coreSouthShift!==200||Math.abs(suzakuin.gardenStairGap)>1||suzakuin.northRowCount!==3||!suzakuin.northRowSymmetric||!suzakuin.northRowConnections||!suzakuin.stableGable||!suzakuin.southGarden||!suzakuin.atsukoResidence||!suzakuin.pond||suzakuin.pondShape!=='irregular-closed-curve'||suzakuin.pondVertices<48||suzakuin.islands!==2||suzakuin.islandShape!=='irregular-closed-curve'||!suzakuin.islandCurved||suzakuin.islandPlanVertices?.some(n=>n<16)||!suzakuin.serviceHouse||suzakuin.serviceHouseCenter?.[0]!==530||suzakuin.serviceHouseCenter?.[1]!==-2390||!suzakuin.serviceHouseNorth||!suzakuin.serviceHouseNonOverlapping||!suzakuin.babaStableFixed||!suzakuin.reconfiguredInsideSite||!suzakuin.baba||!suzakuin.stable||!suzakuin.shimamachi||!suzakuin.allHiwada||!suzakuin.stableHiwada||!suzakuin.serviceHiwada||suzakuin.pondMaterialType!=='MeshBasicMaterial'||suzakuin.pondMaterialMeshes<1||!suzakuin.pondMaterialUnified||suzakuin.pondColor!=='#4b9fbe'||suzakuin.pondOpacity!==HEIAN_POND_OPACITY||suzakuin.pondTransparent!==true||suzakuin.pondDepthWrite!==false||suzakuin.shorelineMeshes!==1||suzakuin.shorelineMode!=='outer-offset-jitter'||suzakuin.shorelineColor!=='#d9eff0'||suzakuin.shorelineOpacity!==HEIAN_POND_SHORE_OPACITY)throw new Error('朱雀院の高さ・南庭接続・北側対称列・切妻厩・色が不正です '+JSON.stringify(suzakuin));
+  if(!suzakuin||suzakuin.eastGateCount!==3||suzakuin.eastGateModels!==3||suzakuin.eastGates?.some(g=>g.alignmentError!==0)||suzakuin.genericShells||suzakuin.commonServices||!suzakuin.mainHall||!suzakuin.sidePalace||!suzakuin.sidePalaceGallery||!suzakuin.frontTrees||!suzakuin.allDarkFrames||suzakuin.mainRoofOverhang?.[0]<50||suzakuin.mainRoofOverhang?.[1]<45||suzakuin.mainEaveHeight!==38||suzakuin.minPalaceEaveHeight<38||suzakuin.mainSetSouthShift!==300||suzakuin.coreSouthShift!==200||Math.abs(suzakuin.gardenStairGap)>1||suzakuin.northRowCount!==3||!suzakuin.northRowSymmetric||!suzakuin.northRowConnections||!suzakuin.stableGable||!suzakuin.southGarden||!suzakuin.atsukoResidence||!suzakuin.pond||suzakuin.pondShape!=='irregular-closed-curve'||suzakuin.pondVertices<48||suzakuin.islands!==2||suzakuin.islandShape!=='irregular-closed-curve'||!suzakuin.islandCurved||suzakuin.islandPlanVertices?.some(n=>n<16)||!suzakuin.serviceHouse||suzakuin.serviceHouseCenter?.[0]!==530||suzakuin.serviceHouseCenter?.[1]!==-2390||!suzakuin.serviceHouseNorth||!suzakuin.serviceHouseNonOverlapping||!suzakuin.babaStableFixed||!suzakuin.reconfiguredInsideSite||!suzakuin.baba||!suzakuin.stable||!suzakuin.shimamachi||!suzakuin.allHiwada||!suzakuin.stableHiwada||!suzakuin.serviceHiwada||suzakuin.pondMaterialType!=='MeshBasicMaterial'||suzakuin.pondMaterialMeshes<1||!suzakuin.pondMaterialUnified||suzakuin.pondColor!=='#4b9fbe'||suzakuin.pondOpacity!==HEIAN_POND_OPACITY||suzakuin.pondTransparent!==true||suzakuin.pondDepthWrite!==false||suzakuin.shorelineMeshes!==1||suzakuin.shorelineMode!=='underlay-fill-no-inner-edge'||suzakuin.shorelineInnerEdge!==false||suzakuin.islandMinRise<4||suzakuin.shorelineColor!=='#d9eff0'||suzakuin.shorelineOpacity!==HEIAN_POND_SHORE_OPACITY)throw new Error('朱雀院の高さ・南庭接続・北側対称列・切妻厩・色が不正です '+JSON.stringify(suzakuin));
   if(Object.values(t.waterColors||{}).some(c=>c!=='#4b9fbe'))throw new Error('水面色が統一されていません '+JSON.stringify(t.waterColors));
-  const matsuGreen=t.greenZones?.find(g=>g.id==='matsunohara');if(!matsuGreen||matsuGreen.strength<.55||matsuGreen.centerColor===t.daidairiGroundColor||matsuGreen.centerColor===matsuGreen.edgeColor||landmarks.matsunoharaInfo?.trees!==30||landmarks.matsunoharaInfo?.pines!==10||landmarks.matsunoharaInfo?.broadleaf!==20||landmarks.matsunoharaInfo?.drawCalls!==4||landmarks.matsunoharaInfo?.visible!==true)throw new Error('宴の松原の緑地・樹木が不正です '+JSON.stringify({green:matsuGreen,trees:landmarks.matsunoharaInfo}));
+  const matsuGreen=t.greenZones?.find(g=>g.id==='matsunohara');if(!matsuGreen||matsuGreen.strength<.55||matsuGreen.centerColor===t.daidairiGroundColor||matsuGreen.centerColor===matsuGreen.edgeColor||landmarks.matsunoharaInfo?.trees!==30||landmarks.matsunoharaInfo?.pines!==10||landmarks.matsunoharaInfo?.broadleaf!==20||landmarks.matsunoharaInfo?.drawCalls!==4||landmarks.matsunoharaInfo?.representation!=='instanced-perimeter-clusters'||landmarks.matsunoharaInfo?.clusters!==6||landmarks.matsunoharaInfo?.zone?.join(',')!=='-4320,-480,-2420,640'||landmarks.matsunoharaInfo?.visible!==true)throw new Error('宴の松原の緑地・樹木が不正です '+JSON.stringify({green:matsuGreen,trees:landmarks.matsunoharaInfo}));
   if(landmarks.kokusoCartShadows!==3||landmarks.templeGardenHedges!==6)throw new Error('穀倉院荷車影または東西寺の生垣が不正です '+JSON.stringify({cartShadows:landmarks.kokusoCartShadows,hedges:landmarks.templeGardenHedges}));
   if(t.daidairiGroundColor!=='#b3a184'||t.roadColor!=='#b5a887')throw new Error('大内裏の地面が土色ではありません '+JSON.stringify({ground:t.daidairiGroundColor,road:t.roadColor}));
   if(!daigakuryoHall||!daigakuryoHall.bothEastWest||!daigakuryoHall.shakutenShorter||!daigakuryoHall.hallSouthOfShakuten||!daigakuryoHall.insideSite||daigakuryoHall.betweenClearance<100||!daigakuryoHall.hallComplete||!daigakuryoHall.shakutenComplete||daigakuryoHall.name!=='大学寮廟堂（釈奠堂）')throw new Error('大学寮講堂・廟堂の向き・位置・造形が不正です '+JSON.stringify(daigakuryoHall));
@@ -22611,7 +22695,9 @@ if(location.hash==='#heiantest'){
    rajomonRoof=bodyBB('羅城門屋根'),
    rajomonDepthOK=Math.abs(depthOf('羅城門基壇')-88)<.1&&Math.abs(depthOf('羅城門袖壁')-64)<.1&&Math.abs(depthOf('羅城門下屋根')-120)<.1&&Math.abs(depthOf('羅城門楼上')-64)<.1&&Math.abs(depthOf('羅城門屋根')-144)<.1&&rajomonRoof&&Math.abs(rajomonRoof.max.y-172)<.1,
    rajomonSideDoors=bodies.filter(b=>b.name.startsWith('羅城脇門朱扉')),rajomonSidePosts=bodies.filter(b=>b.name.startsWith('羅城脇門門柱')),rajomonSideRoofs=bodies.filter(b=>b.name.startsWith('羅城脇門屋根')),rajomonSideBases=bodies.filter(b=>b.name.startsWith('羅城脇門基壇')),
-   rajomonSideGateOK=rajomonSideDoors.length===4&&rajomonSidePosts.length===8&&rajomonSideRoofs.length===2&&rajomonSideBases.length===2&&[-1,1].every(s=>rajomonSideDoors.filter(b=>centerOf(b).x*s>225).length===2&&rajomonSideRoofs.filter(b=>centerOf(b).x*s>225).length===1)&&rajomonSideDoors.every(b=>b.mesh.material.color.getHexString()==='a64032')&&rajomonSideBases.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3());return Math.abs(q.x-50)<.1&&Math.abs(q.z-20)<.1;})&&rajomonSideRoofs.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3());return q.x<70&&q.z<40;});
+   rajomonSideGateOK=rajomonSideDoors.length===4&&rajomonSidePosts.length===8&&rajomonSideRoofs.length===2&&rajomonSideBases.length===2&&[-1,1].every(s=>rajomonSideDoors.filter(b=>centerOf(b).x*s>225).length===2&&rajomonSideRoofs.filter(b=>centerOf(b).x*s>225).length===1)&&rajomonSideDoors.every(b=>b.mesh.material.color.getHexString()==='a64032')&&rajomonSideBases.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3());return Math.abs(q.x-50)<.1&&Math.abs(q.z-20)<.1;})&&rajomonSideRoofs.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3());return q.x<70&&q.z<40;}),
+   rajomonWallBox=new THREE.Box3(),rajomonWallBodies=bodies.filter(b=>b.name.startsWith('羅城白壁')),
+   rajomonWallsExtended=(rajomonWallBodies.forEach(b=>rajomonWallBox.union(new THREE.Box3().setFromObject(b.mesh))),rajomonWallBox.min.x<=-579&&rajomonWallBox.max.x>=579);
   const occtOK=bodies.every(b=>!!b.occtShape); // 小物アセットはOCCT（大内裏はmanifold）
   const okD=makeDaidairi();
   const bb=bodyBB,
@@ -22623,35 +22709,65 @@ if(location.hash==='#heiantest'){
    otenmonColumns=gateStats['応天門'],kaishomonColumns=gateStats['会昌門'],otenmonBase=bb('応天門基壇'),otenmonWidth=otenmonBase?otenmonBase.getSize(new THREE.Vector3()).x:0,
    otenmonExpandedOK=otenmonColumns.total===21&&otenmonColumns.positions===7&&otenmonColumns.zPositions===3&&otenmonWidth>210&&kaishomonColumns.total===15&&kaishomonColumns.positions===5&&kaishomonColumns.zPositions===3;
   const bodyUnion=n=>{const q=new THREE.Box3();let found=false;for(const b of bodies.filter(x=>x.name.startsWith(n))){q.union(new THREE.Box3().setFromObject(b.mesh));found=true;}return found?q:null;},
+   roofCount=n=>bodies.filter(b=>b.name.startsWith(n)&&b.name.includes('屋根')).length,
    boxCenterX=b=>b?(b.min.x+b.max.x)/2:NaN,boxCenterZ=b=>b?(b.min.z+b.max.z)/2:NaN,
-   chukainWest=bb('中和院西舎基壇'),chukainEast=bb('中和院東舎基壇'),chukainMain=bb('中和院神嘉殿基壇'),chukainSite=bodyUnion('中和院塀'),mokkoSite=bodyUnion('木工内匠塀'),shumei=bb('修明門屋根'),
+   chukainWest=bb('中和院西舎基壇'),chukainEast=bb('中和院東舎基壇'),chukainMain=bb('中和院神嘉殿基壇'),chukainSite=bodyUnion('中和院塀'),mokkoSite=bodyUnion('木工内候塀'),shumei=bb('修明門屋根'),
    chukainSymmetryOK=!!(chukainWest&&chukainEast&&chukainMain)&&Math.abs((boxCenterX(chukainWest)+boxCenterX(chukainEast))/2-boxCenterX(chukainMain))<.1&&Math.abs(chukainWest.min.z-chukainEast.min.z)<.1&&bodies.filter(b=>b.name.startsWith('中和院小門屋根')).length===1,
-   chukainPlacementOK=!!(chukainSite&&mokkoSite&&shumei)&&Math.abs(boxCenterZ(chukainSite)+805)<1&&chukainSite.min.x>mokkoSite.max.x&&chukainSite.min.z<mokkoSite.max.z&&chukainSite.max.z>mokkoSite.min.z&&chukainSite.max.z<shumei.min.z-40,
-   taiseikanInnerWalls=bodies.filter(b=>b.name.startsWith('太政官内区画塀')&&!b.name.includes('笠')),taiseikanInnerCaps=bodies.filter(b=>b.name.startsWith('太政官内区画塀笠')),taiseikanAnnexRoofs=bodies.filter(b=>/^太政官[西東]小院[北南]舎屋根/.test(b.name)),
-   taiseikanParcelsOK=taiseikanInnerWalls.length===10&&taiseikanInnerCaps.length===10&&taiseikanAnnexRoofs.length===4,
+   chukainPlacementOK=!!(chukainSite&&mokkoSite&&shumei)&&Math.abs(boxCenterZ(chukainSite)+705)<1&&chukainSite.min.x>mokkoSite.max.x&&chukainSite.min.z<mokkoSite.max.z&&chukainSite.max.z>mokkoSite.min.z&&chukainSite.max.z<shumei.min.z-40,
+   legendNames=['外記庁','南所','一本御書所','釜所','内竪所','侍従局','内舎人','監物','主鈴','主鑰','陰陽寮','朝所','勘解由','主計','主税','主計厨','民部厨','主税厨','式部厨','大舎人寮','侍従厨'],
+   taiseikanParcelsOK=!!bb('太政官正庁屋根')&&!!bb('朝所庁舎屋根')&&!!bb('勘解由庁舎屋根'),
+   officialParcelsOK=legendNames.every(n=>bodies.some(b=>b.name.startsWith(n))),
+   referenceNames=['武徳殿','木工内候','西院','醤院','主水司','宮内省','供御院','園神社','韓神社','太政官','民部省','式部省','玄蕃寮','諸陵寮'],
+   referenceNamesOK=referenceNames.every(n=>bodies.some(b=>b.name.startsWith(n)))&&!bodies.some(b=>/^区画\d+/.test(b.name)),
+   sharedParcelWallsOK=!bodies.some(b=>/区画塀/.test(b.name))&&['外記庁等境界塀','式部省諸司境界塀','西院・醤院境界塀','醤院・主水司境界塀','供御院・大炊寮境界塀','民部省・主計・主税境界塀','大舎人寮・侍従厨境界塀'].every(n=>!!bb(n)),
+   shingonBuildings=['真言院修法堂','真言院長者坊','真言院護摩堂','真言院伴僧宿所','真言院厨所','真言院北門西雑舎','真言院北門東雑舎'],
+   shingonCompoundOK=shingonBuildings.every(n=>roofCount(n)===1)&&!!bb('胎蔵界曼荼羅修法壇（西向き）')&&!!bb('金剛界曼荼羅修法壇（東向き）'),
+   productionFacilitiesOK=roofCount('造酒司蔵')===5&&roofCount('漆室漆保管蔵')===5&&roofCount('内匠寮長屋')===4&&['木工内候東西作業場','木工内候南北作業場','木工内候資材小屋'].every(n=>roofCount(n)===1),
+   horseFacilitiesOK=['左馬寮','右馬寮'].every(n=>!!bb(n+'厩（朱雀院型）屋根')&&!!bb(n+'馬場（朱雀院型）')&&bodies.filter(b=>b.name.startsWith(n+'東側既存舎')&&b.name.includes('屋根')).length===3),
+   treasuryFacilitiesOK=bodies.filter(b=>/^大蔵整列倉\d+屋根/.test(b.name)).length>=28&&bodies.filter(b=>/^大蔵省整列倉\d+屋根/.test(b.name)).length===12,
    jingikanCenterWalls=bodies.filter(b=>b.name.startsWith('神祇官中央境界塀')&&!b.name.includes('笠')),jingikanCenterCaps=bodies.filter(b=>b.name.startsWith('神祇官中央境界塀笠')),
    jingikanCompoundOK=jingikanCenterWalls.length===2&&jingikanCenterCaps.length===2&&bodies.filter(b=>b.name.startsWith('神祇官中門柱')).length===2&&bodies.filter(b=>b.name.startsWith('神祇官中門屋根')).length===1&&bodies.filter(b=>b.name.startsWith('神祇官西院塀')&&!b.name.includes('笠')).length===4&&bodies.filter(b=>b.name.startsWith('神祇官東院塀')&&!b.name.includes('笠')).length===4,
    teaHedges=bodies.filter(b=>b.name.startsWith('茶園茶畝生垣')),teaHuts=bodies.filter(b=>b.name.startsWith('茶園管理小屋')&&b.name.includes('屋根')),
    teaGardenOK=teaHedges.length===5&&teaHuts.length===2&&teaHedges.every(b=>b.mesh.material.color.getHexString()===SHINDEN_PART_PALETTE.foliage.slice(1)),
    dairiOuter=bodyUnion('内裏外郭塀'),southZone=bodyUnion('南院'),ranrin=bodyUnion('蘭林坊'),northRoadGap=dairiOuter&&southZone?dairiOuter.min.z-southZone.max.z:-1,
    dairiNorthFitOK=!!(dairiOuter&&southZone&&ranrin)&&northRoadGap>180&&ranrin.min.z>=dairiOuter.min.z-1,
-   shingon=bodyUnion('真言院塀'),shingonNorthOK=!!shingon&&Math.abs(boxCenterZ(shingon)+750)<1&&shingon.max.z<-110,
+   shingon=bodyUnion('真言院塀'),shingonNorthOK=!!shingon&&Math.abs(boxCenterZ(shingon)+610)<1&&shingon.max.z<55,
+   shingonMokkoGap=shingon&&mokkoSite?mokkoSite.min.x-shingon.max.x:-1,shingonSouthWestOK=!!(shingon&&mokkoSite)&&shingonMokkoGap>300&&boxCenterX(shingon)<-1050,
+   westPassageBody=bodies.find(b=>b.name.startsWith('中和院北・宴の松原門から内裏への通路')),westPassage=bb('中和院北・宴の松原門から内裏への通路'),westPassageSize=westPassage?.getSize(new THREE.Vector3()),westPassageRoadOK=!!westPassageBody&&westPassageBody.mesh.material.color.getHexString()===HEIAN_DAIDAIRI_GRAVEL.slice(1),
+   innerClusterShiftOK=!!(dairiOuter&&westPassage)&&Math.abs(dairiOuter.max.z-58.12)<.2&&Math.abs(boxCenterZ(westPassage)+1235)<.1&&westPassageSize.x>1280&&westPassageSize.x<1295&&Math.abs(westPassageSize.z-70)<.1,
    osachika=bodyUnion('正親司塀'),uneme=bodyUnion('采女司塀'),osachSplitOK=!!(osachika&&uneme)&&uneme.min.x-osachika.max.x>60&&Math.abs(osachika.min.z-uneme.min.z)<.1&&Math.abs(osachika.max.z-uneme.max.z)<.1,
    jibuWalls=bodies.filter(b=>b.name.startsWith('治部省T字境界塀')&&!b.name.includes('笠')),jibuCaps=bodies.filter(b=>b.name.startsWith('治部省T字境界塀笠')),jibuMain=bb('治部省正庁屋根'),genba=bb('玄蕃寮正庁屋根'),shoryo=bb('諸陵寮正庁屋根'),
    jibuTOK=jibuWalls.length===6&&jibuCaps.length===6&&!!(jibuMain&&genba&&shoryo)&&boxCenterZ(jibuMain)<boxCenterZ(genba)&&boxCenterX(genba)<boxCenterX(jibuMain)&&boxCenterX(shoryo)>boxCenterX(jibuMain),
-   specialFacilitiesOK=chukainSymmetryOK&&chukainPlacementOK&&taiseikanParcelsOK&&jingikanCompoundOK&&teaGardenOK,
-   layoutCorrectionsOK=dairiNorthFitOK&&shingonNorthOK&&osachSplitOK&&jibuTOK;
+   officeScaleX=11279/12000,
+   officeSpecs=[['太政官','太政官',620,190,330],['宮内省','宮内省',460,145,330],['民部省','民部省',620,150,300],['治部省','治部省',420,110,210],['式部省','式部省・主税厨・民部厨・主計厨・式部厨',410,130,340],['大蔵省','大蔵省',460,140,300],['兵部省','兵部省',390,120,300]],
+   officeLayoutsOK=officeSpecs.every(([n,siteName,mainW,mainD,sideD])=>{
+    const site=bodyUnion(siteName+'塀'),main=bodyUnion(n+'正庁'),west=bodyUnion(n+'西脇庁'),east=bodyUnion(n+'東脇庁'),base=bodyUnion(n+'正庁基壇');
+    if(!(site&&main&&west&&east&&base))return false;
+    const bs=base.getSize(new THREE.Vector3()),ws=west.getSize(new THREE.Vector3()),es=east.getSize(new THREE.Vector3()),inside=q=>q.min.x>=site.min.x+4&&q.max.x<=site.max.x-4&&q.min.z>=site.min.z+4&&q.max.z<=site.max.z-4;
+    return [main,west,east].every(inside)&&boxCenterX(west)<boxCenterX(main)&&boxCenterX(main)<boxCenterX(east)&&boxCenterZ(main)<boxCenterZ(west)&&Math.abs(boxCenterZ(west)-boxCenterZ(east))<.2&&Math.abs(bs.x-(mainW+28)*officeScaleX)<1&&Math.abs(bs.z-(mainD+22))<.2&&Math.abs(ws.z-(sideD+20))<.2&&Math.abs(es.z-(sideD+20))<.2;
+   }),
+   taiseikanFormal=bodyUnion('太政官正庁'),taiseikanSplit=bb('太政官諸司境界塀'),minbuFormal=bodyUnion('民部省西脇庁'),minbuSplit=bb('民部省・主計・主税境界塀'),jibuFormal=bodyUnion('治部省記録所'),jibuSplit=bb('治部省T字境界塀'),shikibuFormal=bodyUnion('式部省東脇庁'),shikibuSplit=bb('式部省諸司境界塀'),kunaiWest=bodyUnion('宮内省西脇庁'),onKanShrine=bodyUnion('園韓神社'),
+   officePartitionsOK=!!(taiseikanFormal&&taiseikanSplit&&minbuFormal&&minbuSplit&&jibuFormal&&jibuSplit&&shikibuFormal&&shikibuSplit&&kunaiWest&&onKanShrine)&&taiseikanFormal.min.z>taiseikanSplit.max.z&&minbuFormal.max.z<minbuSplit.min.z&&jibuFormal.max.z<jibuSplit.min.z&&shikibuFormal.max.x<shikibuSplit.min.x&&!kunaiWest.intersectsBox(onKanShrine),
+   officeNamesOK=officeSpecs.every(([n])=>['正庁','西脇庁','東脇庁'].every(s=>!!bodyUnion(n+s)))&&!bodyUnion('中務省西脇庁')&&!bodyUnion('刑部省西脇庁'),
+   officeExtrasOK=['太政官記録所','宮内省記録所','民部省文書所','治部省記録所','式部省記録所','大蔵省記録所','兵部省記録所','太政官文書倉','宮内省文書倉','治部省文書倉','治部省雑小屋','兵部省文書倉','民部省生垣','式部省生垣','宮内省生垣','兵部省生垣'].every(n=>!!bodyUnion(n))&&bodies.filter(b=>/^大蔵省整列倉\d+屋根/.test(b.name)).length===12,
+   specialFacilitiesOK=chukainSymmetryOK&&chukainPlacementOK&&taiseikanParcelsOK&&officialParcelsOK&&referenceNamesOK&&sharedParcelWallsOK&&shingonCompoundOK&&productionFacilitiesOK&&horseFacilitiesOK&&treasuryFacilitiesOK&&jingikanCompoundOK&&teaGardenOK&&officeLayoutsOK&&officePartitionsOK&&officeNamesOK&&officeExtrasOK,
+   layoutCorrectionsOK=dairiNorthFitOK&&shingonNorthOK&&shingonSouthWestOK&&westPassageRoadOK&&innerClusterShiftOK&&osachSplitOK&&jibuTOK;
   const wc=['翔鸞楼外側北身屋基壇','翔鸞楼内側南身屋基壇','栖鳳楼外側北身屋基壇','栖鳳楼内側南身屋基壇'].map(bb),wr=['翔鸞楼外側北身屋東西棟入母屋屋根','翔鸞楼内側南身屋東西棟入母屋屋根','栖鳳楼外側北身屋東西棟入母屋屋根','栖鳳楼内側南身屋東西棟入母屋屋根'].map(bb),cc=b=>b&&(b.min.x+b.max.x)/2,cz=b=>b&&(b.min.z+b.max.z)/2;
   const wingRoofOK=wr.every(b=>b&&(b.max.x-b.min.x)>108&&(b.max.z-b.min.z)>85&&(b.max.y-b.min.y)>30),wingRoofHorizontal=wr.every(b=>(b.max.x-b.min.x)-(b.max.z-b.min.z)>18),wingCompoundOK=wc.every(Boolean)&&wc.every(b=>Math.abs((b.max.x-b.min.x)-(wc[0].max.x-wc[0].min.x))<.1&&Math.abs((b.max.z-b.min.z)-(wc[0].max.z-wc[0].min.z))<.1)&&(wc[0].max.x-wc[0].min.x)>70&&(wc[0].max.z-wc[0].min.z)>70&&Math.abs((cc(wc[0])+cc(wc[2]))/2-(cc(wc[1])+cc(wc[3]))/2)<.1&&Math.abs(cz(wc[0])-cz(wc[2]))<.1&&Math.abs(cz(wc[1])-cz(wc[3]))<.1&&cc(wc[0])<cc(wc[1])&&cc(wc[3])<cc(wc[2])&&Math.abs((cc(wc[1])-cc(wc[0]))-(cc(wc[2])-cc(wc[3])))<.1&&cz(wc[1])-cz(wc[0])>20&&Math.abs((cz(wc[1])-cz(wc[0]))-(cz(wc[3])-cz(wc[2])))<.1;
   const dai=bb('大極殿大屋根'),gnd=bb('地面'),suz=bb('朱雀門屋根'),shi=bb('紫宸殿屋根');
   const upperColumnCount=n=>bodies.filter(b=>b.name.startsWith(n)&&b.name.includes('楼上角柱')).length,wingUpperColumnsOK=['翔鸞楼外側北身屋','翔鸞楼内側南身屋','栖鳳楼外側北身屋','栖鳳楼内側南身屋'].every(n=>upperColumnCount(n)===4),gateUpperColumnsOK=['応天門','会昌門','朱雀門'].every(n=>upperColumnCount(n)===4),towerUpperColumnsOK=['白虎楼','蒼龍楼'].every(n=>upperColumnCount(n)===4),upperRedColumnsOK=bodies.filter(b=>b.name.includes('楼上角柱')&&/翔鸞楼|栖鳳楼|応天門|会昌門|朱雀門|白虎楼|蒼龍楼/.test(b.name)).every(b=>b.mesh.material.color.getHexString()==='a64032');
   const namedCount=(n,s)=>bodies.filter(b=>b.name.startsWith(n+s)).length,
-   squarePlan=(n,s)=>{const b=bb(n+s);if(!b)return false;const size=b.getSize(new THREE.Vector3()),r=size.x/size.z;return Math.abs(r-1)<.015;},
-   wall30OK=(n,s,count,totalH)=>{const lo=bodies.filter(b=>b.name.startsWith(n+s+'内壁')&&!b.name.includes('上小壁')),up=bodies.filter(b=>b.name.startsWith(n+s+'内壁上小壁'));return lo.length===count&&up.length===count&&lo.every((b,i)=>{const lh=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3()).y,uh=new THREE.Box3().setFromObject(up[i].mesh).getSize(new THREE.Vector3()).y,h=lh+uh;return Math.abs(h-totalH)<.01&&Math.abs(uh/h-.3)<.001&&b.mesh.material.color.getHexString()===SHINDEN_PART_PALETTE.plaster.slice(1)&&up[i].mesh.material.color.getHexString()==='a64032';});},
+   near=(a,b,t=.15)=>Math.abs(a-b)<t,
+   planOK=(n,s,w,d)=>{const b=bb(n+s),q=b?.getSize(new THREE.Vector3());return !!q&&near(q.x,w)&&near(q.z,d);},
+   wall30OK=(n,s,count,totalH)=>{const lo=bodies.filter(b=>b.name.startsWith(n+s+'内壁')&&!b.name.includes('上小壁')),up=bodies.filter(b=>b.name.startsWith(n+s+'内壁上小壁'));return lo.length===count&&up.length===count&&lo.every((b,i)=>{const lh=new THREE.Box3().setFromObject(b.mesh).getSize(new THREE.Vector3()).y,uh=new THREE.Box3().setFromObject(up[i].mesh).getSize(new THREE.Vector3()).y,h=lh+uh;return near(h,totalH,.01)&&near(uh/h,.3,.001)&&b.mesh.material.color.getHexString()===SHINDEN_PART_PALETTE.plaster.slice(1)&&up[i].mesh.material.color.getHexString()==='a64032';});},
+   wallSpanOK=(n,s,count,y0,y1)=>{const q=bodies.filter(b=>b.name.startsWith(n+s+'内壁')).map(b=>new THREE.Box3().setFromObject(b.mesh));return q.length===count*2&&near(Math.min(...q.map(b=>b.min.y)),y0)&&near(Math.max(...q.map(b=>b.max.y)),y1);},
+   turretPlacementOK=n=>{const c=bb(n+'中央下櫓内壁'),q=bodies.filter(b=>b.name.startsWith(n+'稜線小櫓内壁')&&!b.name.includes('上小壁')).map(b=>new THREE.Box3().setFromObject(b.mesh));return !!c&&q.length===4&&q.every(b=>near(Math.abs(boxCenterX(b)-boxCenterX(c)),37)&&near(Math.abs(boxCenterZ(b)-boxCenterZ(c)),30));},
    towerOrnateCountsOK=['白虎楼','蒼龍楼'].every(n=>namedCount(n,'中央中間屋根')===0&&namedCount(n,'中央上櫓屋根')===1&&namedCount(n,'稜線小櫓屋根')===4),
-   towerOrnateSquareOK=['白虎楼','蒼龍楼'].every(n=>squarePlan(n,'中央下櫓内壁')&&squarePlan(n,'中央上櫓内壁')&&squarePlan(n,'中央上櫓屋根')&&squarePlan(n,'稜線小櫓内壁')&&squarePlan(n,'稜線小櫓屋根')),
-   towerOrnateWall30OK=['白虎楼','蒼龍楼'].every(n=>wall30OK(n,'中央下櫓',1,18)&&wall30OK(n,'中央上櫓',1,18)&&wall30OK(n,'稜線小櫓',4,20)),
-   towerOrnateOK=towerOrnateCountsOK&&towerOrnateSquareOK&&towerOrnateWall30OK,
+   towerOrnateSquareOK=['白虎楼','蒼龍楼'].every(n=>planOK(n,'中央下櫓内壁',92/3,92/3)&&planOK(n,'中央上櫓内壁',92/3,92/3)&&planOK(n,'中央上櫓屋根',68,136/3)&&planOK(n,'稜線小櫓内壁',16,16)&&planOK(n,'稜線小櫓屋根',42,28)),
+   towerOrnateWall30OK=['白虎楼','蒼龍楼'].every(n=>wall30OK(n,'中央下櫓',1,21)&&wall30OK(n,'中央上櫓',1,18)&&wall30OK(n,'稜線小櫓',4,23)),
+   towerOrnateHeightOK=['白虎楼','蒼龍楼'].every(n=>{const base=bb(n+'一階大寄棟屋根'),cr=bb(n+'中央上櫓屋根'),tr=bb(n+'稜線小櫓屋根');return !!(base&&cr&&tr)&&wallSpanOK(n,'中央下櫓',1,base.min.y+17,base.min.y+38)&&wallSpanOK(n,'中央上櫓',1,base.min.y+38,base.min.y+56)&&wallSpanOK(n,'稜線小櫓',4,base.min.y+6,base.min.y+29)&&near(cr.min.y,base.min.y+56)&&near(cr.max.y,base.min.y+75.2,.35)&&near(tr.min.y,base.min.y+29)&&near(tr.max.y,base.min.y+40.2,.35)&&base.max.y>base.min.y+17; }),
+   towerOrnatePlacementOK=['白虎楼','蒼龍楼'].every(turretPlacementOK),
+   towerOrnateOK=towerOrnateCountsOK&&towerOrnateSquareOK&&towerOrnateWall30OK&&towerOrnateHeightOK&&towerOrnatePlacementOK,
    towerOrnateExclusive=['齊景楼','栖霞楼'].every(n=>namedCount(n,'中央中間屋根')===0&&namedCount(n,'中央上櫓屋根')===0&&namedCount(n,'稜線小櫓屋根')===0),
    towerLowerStoryOK=['白虎楼','蒼龍楼','齊景楼','栖霞楼'].every(n=>{const lo=bb(n+'下層内壁'),hi=bb(n+'下層内壁上小壁'),h=lo&&hi?hi.max.y-lo.min.y:0;return namedCount(n,'下層壁面柱')===12&&h>44&&h<49;});
   const innerGallery=bb('内裏回廊屋根'),kokyuRoofNames=['承香殿屋根','常寧殿屋根','貞観殿屋根','弘徽殿屋根','登華殿屋根','麗景殿屋根','宣耀殿屋根','飛香舎（藤壺）屋根','凝花舎（梅壺）屋根','襲芳舎（雷鳴壺）屋根','昭陽舎（梨壺）屋根','昭陽北舎屋根','淑景舎（桐壺）屋根','淑景北舎屋根'],kokyuRoofs=kokyuRoofNames.map(bb),kokyuRoofOK=!!innerGallery&&kokyuRoofs.every(b=>b&&b.min.y>innerGallery.min.y&&b.max.y>innerGallery.max.y);
@@ -22680,9 +22796,9 @@ if(location.hash==='#heiantest'){
   const saved=JSON.parse(JSON.stringify(projectData()));
   loadProject(saved);
   const skip=ops.filter(o=>o._skipped).length,nD=bodies.length;
-  pass=okM&&nM===9&&okH&&nH===2&&okR&&rajomonColumnsOK&&rajomonDepthOK&&rajomonSideGateOK&&okD&&specialFacilitiesOK&&layoutCorrectionsOK&&otenmonExpandedOK&&gateThreeRowsOK&&gateDepthsOK&&daiOK&&gndOK&&suzOK&&shiOK&&wingCompoundOK&&wingRoofOK&&wingRoofHorizontal&&wingUpperColumnsOK&&gateUpperColumnsOK&&towerUpperColumnsOK&&upperRedColumnsOK&&towerOrnateOK&&towerOrnateExclusive&&towerLowerStoryOK&&kokyuRoofOK&&roofPaletteOK&&innerWallPaletteOK&&shibiOK // 楼門は梁行3列・奥行拡張・棟高維持。羅城門は正面8本×3列＋左右脇門
+  pass=okM&&nM===9&&okH&&nH===2&&okR&&rajomonColumnsOK&&rajomonDepthOK&&rajomonSideGateOK&&rajomonWallsExtended&&okD&&specialFacilitiesOK&&layoutCorrectionsOK&&otenmonExpandedOK&&gateThreeRowsOK&&gateDepthsOK&&daiOK&&gndOK&&suzOK&&shiOK&&wingCompoundOK&&wingRoofOK&&wingRoofHorizontal&&wingUpperColumnsOK&&gateUpperColumnsOK&&towerUpperColumnsOK&&upperRedColumnsOK&&towerOrnateOK&&towerOrnateExclusive&&towerLowerStoryOK&&kokyuRoofOK&&roofPaletteOK&&innerWallPaletteOK&&shibiOK // 楼門は梁行3列・奥行拡張・棟高維持。羅城門は正面8本×3列＋左右脇門
    &&heiCount>150&&gateCount>=40&&gateClearanceOK&&matsuCount===0&&matsuTrunks.length===0&&matsuCrowns.length===0&&Object.values(matsuSizes).every(n=>n===0)&&occtOK&&skip===0&&nD>5800&&nD<7500; // 宴の松原BRep松336 bodyを撤去（2026-08-21）。緑地は地形表現で維持
-  msg='machiya='+nM+' hottate='+nH+' rajomon='+nR+' rajomonColumns='+rajomonRearColumns+'/'+rajomonMiddleColumns+'/'+rajomonFrontColumns+' rajomonDepth='+rajomonDepthOK+' sideGates='+rajomonSideGateOK+' daidairi='+nD+' otenmonColumns='+otenmonColumns.positions+'/'+otenmonColumns.total+' otenmonWidth='+Math.round(otenmonWidth*10)/10+' gateThreeRows='+gateThreeRowsOK+' gateDepths='+gateDepthsOK+' facilities='+[chukainSymmetryOK,chukainPlacementOK,taiseikanParcelsOK,jingikanCompoundOK,teaGardenOK].join('/')+' layout='+[dairiNorthFitOK,shingonNorthOK,osachSplitOK,jibuTOK].join('/')+' northRoadGap='+Math.round(northRoadGap*10)/10+' daigoku='+daiOK
+  msg='machiya='+nM+' hottate='+nH+' rajomon='+nR+' rajomonColumns='+rajomonRearColumns+'/'+rajomonMiddleColumns+'/'+rajomonFrontColumns+' rajomonDepth='+rajomonDepthOK+' sideGates='+rajomonSideGateOK+' wallsExtended='+rajomonWallsExtended+' daidairi='+nD+' otenmonColumns='+otenmonColumns.positions+'/'+otenmonColumns.total+' otenmonWidth='+Math.round(otenmonWidth*10)/10+' gateThreeRows='+gateThreeRowsOK+' gateDepths='+gateDepthsOK+' facilities='+[chukainSymmetryOK,chukainPlacementOK,taiseikanParcelsOK,officialParcelsOK,shingonCompoundOK,productionFacilitiesOK,horseFacilitiesOK,treasuryFacilitiesOK,jingikanCompoundOK,teaGardenOK,officeLayoutsOK,officePartitionsOK,officeNamesOK,officeExtrasOK].join('/')+' layout='+[dairiNorthFitOK,shingonNorthOK,innerClusterShiftOK,osachSplitOK,jibuTOK].join('/')+' northRoadGap='+Math.round(northRoadGap*10)/10+' innerCluster='+JSON.stringify({outerMax:dairiOuter?.max.z,passageZ:boxCenterZ(westPassage),passageSize:westPassageSize&&[westPassageSize.x,westPassageSize.z]})+' daigoku='+daiOK
    +' gnd='+gndOK+' suzaku='+suzOK+' shishinden='+shiOK+' wingTowers='+wingCompoundOK+' wingIrimoya='+wingRoofOK+' wingEastWest='+wingRoofHorizontal+' wingRoofSizes='+wr.map(b=>b?[b.max.x-b.min.x,b.max.z-b.min.z,b.max.y-b.min.y].map(v=>Math.round(v*10)/10):null).join('/')+' upperRedColumns='+(wingUpperColumnsOK&&gateUpperColumnsOK&&towerUpperColumnsOK&&upperRedColumnsOK)+' compoundTowers='+(towerOrnateOK&&towerOrnateExclusive)+' compoundParts='+[towerOrnateCountsOK,towerOrnateSquareOK,towerOrnateWall30OK].join('/')+' towerLowerStory='+towerLowerStoryOK+' kokyuRoofs='+kokyuRoofOK+' roofPalette='+roofPaletteOK+' innerWallPalette='+innerWallPaletteOK+' shibi='+shibiOK+' hei='+heiCount+' gate='+gateCount
    +' gateClearance='+gateClearanceOK+' gateBeams='+gateBeams.length+' matsu='+matsuCount+' matsuSizes='+JSON.stringify(matsuSizes)+' pineTrunks='+matsuTrunks.length+' pineCrowns='+matsuCrowns.length+' occt='+occtOK+' skip='+skip+' ms='+Math.round(performance.now()-t0);
  }catch(e){msg='err='+e.message;}
