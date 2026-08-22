@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HakoniwaKit 平安京</title>
+<meta name="heian-analytics-endpoint" content="https://heian-analytics.number0190.workers.dev/hk">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#111820;color:#f4f1e9;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}iframe{display:block;width:100%;height:100%;border:0;background:#111820}.launch{position:fixed;inset:0;z-index:2;display:grid;place-items:center;background:#10161c;overflow:hidden}.launch .slide{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity 1.6s ease}.launch .slide.show{opacity:1}.launch .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,35,45,.68),rgba(16,22,28,.84))}.launch .panel{position:relative;z-index:1}.panel{position:relative;width:min(720px,calc(100% - 40px));padding:40px 32px;background:#17212a}.launch-brand{margin:0 0 16px}.launch-series{display:flex;align-items:center;gap:8px;font-family:'Yu Gothic UI','Yu Gothic','游ゴシック',sans-serif;font-size:17px;line-height:22px;font-weight:700}.launch-series strong{font:inherit}.launch-series .kit-mark{width:22px;height:22px;display:block;flex:none;color:#f4f1e9}.panel h1{margin:6px 0 0;font-family:'Hiragino Mincho ProN','Yu Mincho','YuMincho',serif;font-size:50px;line-height:1.2;font-weight:600;letter-spacing:.08em}.panel p{max-width:680px;margin:0;color:#d8dee5;font-size:18px;line-height:1.8}.progress{height:3px;margin-top:28px;overflow:hidden;background:#38444e}.progress span{display:block;width:38%;height:100%;background:#c9973b;animation:load 1.4s ease-in-out infinite alternate}.launch.failed .progress span{width:100%;animation:none;transform:none;background:#b75c48}.error{margin-top:20px;color:#ffd5c9;font-size:16px}.credit{margin:28px 0 0;padding-top:20px;border-top:1px solid #2d3a45;display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:15px;line-height:1.65}.credit dt{color:#8fa0ae;font-size:14px;letter-spacing:.06em;white-space:nowrap}.credit dd{margin:0;color:#b6c2cc}.credit dd b{font-weight:600;color:#d8dee5}.credit dd .kit-mark{width:14px;height:14px;display:inline-block;vertical-align:-2px;margin:0 5px 0 3px;color:#d8dee5}.credit .libs{color:#93a2ae;font-size:14px}@media(max-width:640px){.credit{grid-template-columns:1fr;gap:2px 0}.credit dt{margin-top:10px}}@keyframes load{to{transform:translateX(165%)}}@media(max-width:640px){.panel{padding:28px 24px}.panel h1{font-size:40px}.panel p{font-size:16px}}
@@ -16,17 +17,39 @@
 <script>
 const frame=document.getElementById('content'),launch=document.getElementById('launch'),error=document.getElementById('error');
 let settled=false;
+// 匿名利用計測。自由記述・座標・IP・UA・referrerは送らず、許可したイベントと値だけを離脱時にまとめる。
+const HEIAN_EVENT_NAMES=new Set(['load_start','load_ready','first_input','place_select','tour_start','tour_end','walk_start','walk_end','night_toggle','music_toggle','session_end']);
+const HEIAN_DURATION_BUCKETS=new Set(['0-10s','10-30s','30-60s','1-2m','2-5m','5m+']);
+const heianDurationBucket=ms=>ms<10000?'0-10s':ms<30000?'10-30s':ms<60000?'30-60s':ms<120000?'1-2m':ms<300000?'2-5m':'5m+';
+const cleanEventProps=(event,props={})=>{if(!HEIAN_EVENT_NAMES.has(event)||!props||Array.isArray(props)||typeof props!=='object')return null;const out={};
+ if(event==='load_ready'){if(!HEIAN_DURATION_BUCKETS.has(props.loadBucket)||!Number.isInteger(props.retry)||props.retry<0||props.retry>3)return null;out.loadBucket=props.loadBucket;out.retry=props.retry;}
+ else if(event==='first_input'){if(!['pointer','wheel'].includes(props.kind))return null;out.kind=props.kind;}
+ else if(event==='place_select'){if(typeof props.placeId!=='string'||!/^[A-Za-z0-9_-]{1,40}$/.test(props.placeId)||!['select','map'].includes(props.source))return null;out.placeId=props.placeId;out.source=props.source;}
+ else if(event==='tour_end'){if(!['complete','cancel'].includes(props.result)||!HEIAN_DURATION_BUCKETS.has(props.durationBucket))return null;out.result=props.result;out.durationBucket=props.durationBucket;}
+ else if(event==='walk_end'){if(!HEIAN_DURATION_BUCKETS.has(props.durationBucket))return null;out.durationBucket=props.durationBucket;}
+ else if(event==='night_toggle'||event==='music_toggle'){if(typeof props.enabled!=='boolean')return null;out.enabled=props.enabled;}
+ else if(event==='session_end'){if(!HEIAN_DURATION_BUCKETS.has(props.visibleBucket)||typeof props.ready!=='boolean'||typeof props.firstInput!=='boolean')return null;out.visibleBucket=props.visibleBucket;out.ready=props.ready;out.firstInput=props.firstInput;}
+ return out;};
+let analyticsQueue=[],analyticsVisibleMs=0,analyticsVisibleAt=document.hidden?0:performance.now(),analyticsLoadStartedAt=0,analyticsFirstInput=false,analyticsReady=false,analyticsEnded=false;
+const analyticsSessionId=crypto.randomUUID?.()||Array.from(crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16).padStart(8,'0')).join('');
+const captureVisible=()=>{if(analyticsVisibleAt){analyticsVisibleMs+=performance.now()-analyticsVisibleAt;analyticsVisibleAt=0;}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)captureVisible();else analyticsVisibleAt=performance.now();});
+const trackHeian=(event,props={})=>{const clean=cleanEventProps(event,props);if(clean===null||analyticsQueue.length>=80)return false;analyticsQueue.push({e:event,d:clean,t:Math.max(0,Math.round(performance.now()))});return true;};
+let analyticsEndpoint='';try{const raw=document.querySelector('meta[name="heian-analytics-endpoint"]')?.content.trim();if(raw){const url=new URL(raw);if(url.protocol==='https:')analyticsEndpoint=url.href;}}catch(_){}
+const flushAnalytics=()=>{if(!analyticsEndpoint||location.protocol==='file:'||!navigator.sendBeacon||!analyticsQueue.length)return false;const body=JSON.stringify({v:1,sid:analyticsSessionId,visibleMs:Math.max(0,Math.round(analyticsVisibleMs)),log:analyticsQueue});if(body.length>16000)return false;try{return navigator.sendBeacon(analyticsEndpoint,new Blob([body],{type:'text/plain;charset=UTF-8'}));}catch(_){return false;}};
+addEventListener('pagehide',()=>{if(analyticsEnded)return;analyticsEnded=true;captureVisible();trackHeian('session_end',{visibleBucket:heianDurationBucket(analyticsVisibleMs),ready:analyticsReady,firstInput:analyticsFirstInput});flushAnalytics();});
+window.__heianAnalytics={inspect:()=>({endpointConfigured:!!analyticsEndpoint,transportEnabled:!!analyticsEndpoint&&location.protocol!=='file:',events:analyticsQueue.map(item=>item.e),queue:structuredClone(analyticsQueue),visibleMs:Math.round(analyticsVisibleMs+(analyticsVisibleAt?performance.now()-analyticsVisibleAt:0))}),track:trackHeian,flush:flushAnalytics};
 // 日英切替（2026-08-18井内さん指示）。?lang=en で英語起動。3D側へは lang パラメータで渡す
 let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ja';
 const LP={ja:{title:'平安京',documentTitle:'HakoniwaKit 平安京',lead:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを体験します。',
  leadTouch:'千年の都・平安京。造営からおよそ百年を経た頃の街並みを、空から巡り、地上を歩けます。',
- history:['桓武天皇は奈良の寺院勢力から距離を置く狙いもあり、平城京から長岡京を経て、794年に平安京へ都を移した。','平安京は唐の長安を手本に、朱雀大路を中央軸とする碁盤目状の都として計画された。','羅城門から朱雀大路を北へ進むと、国家儀礼と政治の中心である大内裏へ至った。','都の南には東寺・西寺、七条付近には東市・西市が置かれ、人と物が集まった。','この再現は遷都直後ではなく、造営から約百年後、延喜・延長期頃の平安京を想定している。'],
+ history:['桓武天皇は奈良の寺院勢力から距離を置く狙いもあり、平城京から長岡京を経て、794年に平安京へ都を移した。','平安京は唐の長安を手本に、朱雀大路を中央軸とする碁盤目状の都として計画された。','羅城門から朱雀大路を北へ進むと大内裏へ至った。自然地形は北高南低で、都の北端と羅城門付近には約38メートルの標高差があった。','都の南には東寺・西寺、七条付近には東市・西市が置かれ、人と物が集まった。','この再現は遷都直後ではなく、造営から約百年後、延喜・延長期頃の平安京を想定している。'],
  loading:'平安京を読み込んでいます。画面が変わるまでお待ちください。',start:'読み込みを開始する',
  confirm:'約50MBのデータを読み込みます。Wi-Fi環境での利用をおすすめします。読み込みには1〜3分ほどかかります。',
  progress:'読み込みを開始しています…',error:'読み込みに時間がかかっています。ページを再読み込みしてください。',lang:'English'},
  en:{title:'Heian-kyo',documentTitle:'HakoniwaKit Heian-kyo',lead:'Heian-kyo, capital of Japan for a thousand years, about a century after it was laid out.',
  leadTouch:'Explore Heian-kyo from the air and on foot, about a century after the capital was laid out.',
- history:['Emperor Kanmu sought distance from Nara’s powerful Buddhist institutions, moving the capital from Heijo-kyo via Nagaoka-kyo to Heian-kyo in 794.','Modeled on Tang-dynasty Chang’an, Heian-kyo was planned as a grid with Suzaku Avenue as its central axis.','Following Suzaku Avenue north from Rajomon Gate led to the Daidairi, the center of state ceremony and government.','Toji and Saiji temples stood in the south, while the East and West Markets near Seventh Avenue drew people and goods.','This reconstruction depicts Heian-kyo not just after 794, but roughly a century later, around the Engi and Encho eras.'],
+ history:['Emperor Kanmu sought distance from Nara’s powerful Buddhist institutions, moving the capital from Heijo-kyo via Nagaoka-kyo to Heian-kyo in 794.','Modeled on Tang-dynasty Chang’an, Heian-kyo was planned as a grid with Suzaku Avenue as its central axis.','Following Suzaku Avenue north from Rajomon Gate led to the Daidairi. The natural ground rose about 38 metres from Rajomon to the northern edge of the capital.','Toji and Saiji temples stood in the south, while the East and West Markets near Seventh Avenue drew people and goods.','This reconstruction depicts Heian-kyo not just after 794, but roughly a century later, around the Engi and Encho eras.'],
  loading:'Loading Heian-kyo. Please wait until the view appears.',start:'Start loading',
  confirm:'About 50MB of data will be loaded. Wi-Fi is recommended; loading takes one to three minutes.',
  progress:'Starting the download...',error:'Loading is taking a while. Please reload the page.',lang:'日本語'}};
@@ -35,11 +58,11 @@ let loadProgress=0,loadingStarted=false,historyIndex=0,historyTimer=null,retryCo
 const historyLead=()=>LP[lang].history[historyIndex];
 const clearLoadTimers=()=>{clearInterval(historyTimer);clearInterval(slowWatch);clearTimeout(hardTimer);};
 const fail=message=>{if(settled)return;settled=true;clearLoadTimers();launch.classList.add('failed');error.hidden=false;error.textContent=message||'読み込みに失敗しました。ページを再読み込みしてください。';console.error('HEIAN_CONTENT_FAIL '+error.textContent);};
-const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!document.querySelector('.launch-series .kit-mark'))return fail('ロード画面のブランド表示を確認できません。');settled=true;clearLoadTimers();launch.remove();console.log('HEIAN_CONTENT_OK ready=true retries='+retryCount);};
+const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!document.querySelector('.launch-series .kit-mark'))return fail('ロード画面のブランド表示を確認できません。');settled=true;analyticsReady=true;if(analyticsLoadStartedAt)trackHeian('load_ready',{loadBucket:heianDurationBucket(performance.now()-analyticsLoadStartedAt),retry:retryCount});clearLoadTimers();launch.remove();console.log('HEIAN_CONTENT_OK ready=true retries='+retryCount);};
 const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
 const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所（空撮・東寺・朱雀大路・寝殿造・大内裏）をクロスフェードで順に見せる
-const HEIAN_BUILD='0627d03af34a707725263cf4e7859347d82f674886810ce62abf21ba4de77cbe',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='32815ae57c79b24ecfc97b983e4e1e79e9e8d638c1b8e3141eb06b6948562a5f',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg','launch-01.jpg','launch-02.jpg','launch-03.jpg','launch-04.jpg','launch-05.jpg','launch-06.jpg','launch-07.jpg'].map(src=>src+'?v='+assetVersion);
 for(const src of slides)new Image().src=src;
 const slideA=document.getElementById('slideA'),slideB=document.getElementById('slideB');
@@ -50,7 +73,7 @@ const slideTimer=setInterval(()=>{if(settled){clearInterval(slideTimer);return;}
  back.style.backgroundImage=`url('${slides[slideIndex]}')`;back.classList.add('show');slideFront.classList.remove('show');slideFront=back;},5000);
 addEventListener('message',event=>{const data=event.data,attempt=Number(data?.attempt);
  if(event.source!==frame.contentWindow||!Number.isInteger(attempt)||attempt!==retryCount)return;
- if(data.type==='heian-ready')finish();else if(data.type==='heian-progress'){if(!settled&&progressText){lastProgressAt=Date.now();progressText.textContent=String(data.text||'').slice(0,80);if(Number.isFinite(data.percent))loadProgress=Math.max(0,Math.min(100,data.percent));}}else if(data.type==='heian-error')retryLoading(data.message);});
+ if(data.type==='heian-ready')finish();else if(data.type==='heian-progress'){if(!settled&&progressText){lastProgressAt=Date.now();progressText.textContent=String(data.text||'').slice(0,80);if(Number.isFinite(data.percent))loadProgress=Math.max(0,Math.min(100,data.percent));}}else if(data.type==='heian-error')retryLoading(data.message);else if(data.type==='heian-event'){if(data.event==='first_input'&&analyticsFirstInput)return;if(trackHeian(data.event,data.props)&&data.event==='first_input')analyticsFirstInput=true;}});
 frame.addEventListener('error',()=>retryLoading('3D画面を読み込めませんでした。'));
 addEventListener('pointerdown',()=>{try{frame.contentWindow?.postMessage({type:'heian-activate'},'*');}catch(_){}},{passive:true});
 // スマホ・タブレットは約45MBの読み込みを始める前に確認する（PCは従来どおり即読み込み・2026-08-17井内さん指摘）
@@ -65,7 +88,7 @@ const applyLang=()=>{const d=LP[lang];document.documentElement.lang=lang;langBut
  if(!loadingStarted)progressText.textContent=d.progress;error.textContent=d.error;};
 langButton.addEventListener('click',()=>{lang=lang==='en'?'ja':'en';applyLang();
  if(loadingStarted)frame.contentWindow?.postMessage({type:'heian-lang',lang},'*');});
-const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;historyIndex=0;lead.textContent=historyLead();
+const startLoading=()=>{if(loadingStarted)return;loadingStarted=true;analyticsLoadStartedAt=performance.now();trackHeian('load_start');historyIndex=0;lead.textContent=historyLead();
  // 履歴文は進捗の急変に追随させず各6秒表示する。最初だけ長く、次が一瞬になる現象を防ぐ。
  historyTimer=setInterval(()=>{if(settled||historyIndex>=LP[lang].history.length-1)return;historyIndex++;lead.textContent=historyLead();},6000);
  // 公開版はheian-pages.pyが焼き込みkeyを埋め込み、起動画像とCadKit本体を同じreleaseへ固定する。
