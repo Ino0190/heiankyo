@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="70d0dfec4d92728bb80c275a34706480010d86e8e394e22ca2bfef87552cbf92">
+<meta name="heian-release" content="8ea2ae88fbde445d23175fe821fc155dbecfdff2a22a47b8fe8e4c7bdbbf5e6f">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -387,6 +387,18 @@ body.heian-photo-active dialog,body.heian-photo-active #heianEntryGate,body.heia
  .heian-game-map select,.heian-game-map.collapsed select{display:block;height:40px;margin-bottom:0}
  .heian-game-info{left:10px;right:10px;bottom:10px;padding:10px 12px}
  .heian-game-info h2{font-size:19px}.heian-game-info p{font-size:14px;line-height:1.55}
+ /* 移動地点と時計はハンバーガーの中で縦積みにする（2026-09-02）。中に入ったら絶対配置を解く */
+ .heian-game-actions.heian-menu-stacked{width:min(320px,calc(100vw - 20px));max-height:calc(100vh - 80px);overflow-y:auto}
+ .heian-game-actions .heian-game-map,.heian-game-actions .heian-game-map.collapsed{position:static;left:auto;right:auto;top:auto!important;width:100%;padding:0;background:none;border:0}
+ .heian-game-actions .heian-game-map label{margin-bottom:4px;font-size:14px}
+ .heian-game-actions .heian-game-map select{width:100%;height:44px;margin-bottom:0;font-size:16px}
+ .heian-game-actions .heian-clock{position:static;left:auto;right:auto;bottom:auto;width:100%;padding:8px 10px;background:rgba(31,40,50,.94);border:1px solid #3f4a56}
+ .heian-game-actions .heian-clock-read{font-size:16px}
+ /* 🚫 .heian-game-actions button{width:100%} が時計の再生・倍速にも効いて縦2段になっていた */
+ .heian-game-actions .heian-clock button{width:auto;min-width:76px;min-height:36px;padding:6px 10px;font-size:14px;text-align:center}
+ /* 幅302では「東市 月齢0%」が再生・倍速と同じ行に入らず3行に折り返していた。市と月齢は次の行へ */
+ .heian-game-actions .heian-clock-row{flex-wrap:wrap;row-gap:6px}
+ .heian-game-actions .heian-clock-market{width:100%;margin-left:0;white-space:nowrap}
 }
 </style>
 <script type="importmap">
@@ -1128,6 +1140,9 @@ function createHeianWalkController(host){
  let overheadDistance=host.overheadDistance??90;
  const minZoomDistance=host.minZoomDistance??45,maxZoomDistance=host.maxZoomDistance??220;
  const overheadPitch=host.overheadPitch??-.28;
+ // 三人称カメラが地面へ潜らないための余裕と、寄せられる最短距離（2026-09-02）
+ const cameraClearance=host.cameraClearance??6,cameraMinDistance=host.cameraMinDistance??14;
+ const maxPitch=host.maxPitch??1.05; // 上限を.4→1.05（約60°）へ。空を見上げられるようにする
  const keys=new Set();
  const forward=new THREE.Vector3(),right=new THREE.Vector3(),candidate=new THREE.Vector3(),actorPosition=new THREE.Vector3();
  let active=false,saved=null,button=null,yaw=0,pitch=overheadPitch,heading=Math.PI,travelHeading=Math.PI,lastTime=0,moving=false,running=false,viewMode='overhead',autoTarget=null;
@@ -1160,7 +1175,31 @@ function createHeianWalkController(host){
  function lookHeading(){return Math.atan2(-Math.sin(yaw),-Math.cos(yaw));}
  function aimCamera(){
   const camera=host.getCamera();camera.up.set(0,1,0);direction();
-  if(thirdPerson){controls.target.copy(actorPosition).add(new THREE.Vector3(0,followTargetHeight,0));camera.position.copy(controls.target).addScaledVector(forward,-overheadDistance);}
+  if(thirdPerson){
+   controls.target.copy(actorPosition).add(new THREE.Vector3(0,followTargetHeight,0));
+   // 🚫 camera は target から forward の逆方向へ置くので、上を向く（pitch>0）とカメラは真下へ回り込む。
+   //    pitch=.4 でも target より35下＝地面の26下で、土の中から見上げる絵になっていた
+   //    （2026-09-02井内さん「空を見たいので上に向けると地面の下にカメラがいってしまう」）。
+   //    視線（yaw/pitch）は保ったまま距離だけ詰めて、地面＋clearanceより下へ行かせない
+   const t=terrain();let dist=overheadDistance;
+   if(t?.groundY){
+    for(let i=0;i<4;i++){
+     const px=controls.target.x-forward.x*dist,pz=controls.target.z-forward.z*dist,g=t.groundY(px,pz);
+     if(!Number.isFinite(g))break;
+     if(controls.target.y-forward.y*dist>=g+cameraClearance)break;
+     // 上を向いていない（forward.y≒0以下）のに埋まるのは前方の地形が高い場合。寄せて逃げる
+     if(forward.y<=.02){dist=Math.max(cameraMinDistance,dist*.7);continue;}
+     const allowed=(controls.target.y-g-cameraClearance)/forward.y;
+     const next=Math.max(cameraMinDistance,Math.min(dist,allowed));
+     if(Math.abs(next-dist)<.5){dist=next;break;}
+     dist=next;
+    }
+   }
+   camera.position.copy(controls.target).addScaledVector(forward,-dist);
+   // 最短距離まで詰めても埋まる場合の保険。ここまで来たらカメラは地面すれすれで上を向く
+   if(t?.groundY){const g=t.groundY(camera.position.x,camera.position.z);
+    if(Number.isFinite(g))camera.position.y=Math.max(camera.position.y,g+cameraClearance);}
+  }
   else controls.target.copy(camera.position).addScaledVector(forward,10);
   camera.lookAt(controls.target);
  }
@@ -1261,7 +1300,7 @@ function createHeianWalkController(host){
   const totalX=event.clientX-dragStartX,totalY=event.clientY-dragStartY;
   if(!draggingView&&Math.hypot(totalX,totalY)>=dragThreshold){draggingView=true;domElement.style.cursor='grabbing';}
   const dx=event.clientX-dragLastX,dy=event.clientY-dragLastY;dragLastX=event.clientX;dragLastY=event.clientY;
-  if(draggingView&&(dx||dy)){yaw-=dx*.002;pitch=THREE.MathUtils.clamp(pitch-dy*.0015,-.85,.4);syncActor();aimCamera();}
+  if(draggingView&&(dx||dy)){yaw-=dx*.002;pitch=THREE.MathUtils.clamp(pitch-dy*.0015,-.85,maxPitch);syncActor();aimCamera();}
  }
  function onCanvasPointerDown(event){
   if(!active||event.button!==0||dragPointerId!==null||isEditable(event.target))return;
@@ -1284,7 +1323,11 @@ function createHeianWalkController(host){
   domElement.removeEventListener('pointermove',onViewPointerMove);domElement.removeEventListener('pointerdown',onCanvasPointerDown);domElement.removeEventListener('pointerup',onCanvasPointerUp);domElement.removeEventListener('pointercancel',onCanvasPointerCancel);domElement.removeEventListener('wheel',onWheel);window.removeEventListener('blur',clearKeys);
  }
  document.addEventListener('keydown',onKeyDown);document.addEventListener('keyup',onKeyUp);domElement.addEventListener('pointermove',onViewPointerMove);domElement.addEventListener('pointerdown',onCanvasPointerDown);domElement.addEventListener('pointerup',onCanvasPointerUp);domElement.addEventListener('pointercancel',onCanvasPointerCancel);domElement.addEventListener('wheel',onWheel,{passive:false});window.addEventListener('blur',clearKeys);
- return{get active(){return active;},get mode(){return thirdPerson?'tinrobot-third-person':'first-person';},get viewMode(){return viewMode;},get running(){return running;},get autoWalking(){return !!autoTarget;},get position(){return actorPosition.clone();},get heading(){return heading;},get travelHeading(){return travelHeading;},walkTo:setAutoTarget,start,stop,relocate,toggleView,toggle:()=>active?stop():start(),setEnabled:on=>on?start():stop(),update,mount,dispose};
+ return{get active(){return active;},get mode(){return thirdPerson?'tinrobot-third-person':'first-person';},get viewMode(){return viewMode;},get running(){return running;},get autoWalking(){return !!autoTarget;},get position(){return actorPosition.clone();},get heading(){return heading;},get travelHeading(){return travelHeading;},
+  // 見上げ角の実測用（カメラが地面へ潜らないかを数値で確かめる・2026-09-02）
+  get pitch(){return pitch;},get maxPitch(){return maxPitch;},
+  setPitch:v=>{pitch=THREE.MathUtils.clamp(Number(v)||0,-.85,maxPitch);if(active)aimCamera();return pitch;},
+  walkTo:setAutoTarget,start,stop,relocate,toggleView,toggle:()=>active?stop():start(),setEnabled:on=>on?start():stop(),update,mount,dispose};
 }
 </script>
 <script>
@@ -1591,6 +1634,22 @@ function resize(){
  orthoCam.left=-orthoBaseH*a;orthoCam.right=orthoBaseH*a;
  orthoCam.top=orthoBaseH;orthoCam.bottom=-orthoBaseH;
  orthoCam.updateProjectionMatrix();
+ // 🚫 散策ロボの太輪郭（LineMaterial・worldUnits:false）の resolution を生成時の1回だけ設定していたため、
+ //    リサイズや画面回転で古い値が残り、線幅が実寸と合わなくなっていた。スマホでは線が太くなりすぎて
+ //    ロボットが黒い塊に潜って見えた（2026-09-02井内さん「歩くを選ぶとロボットが黒い何かに埋まっている」）。
+ //    linewidth はピクセル単位なので、狭い画面ではロボットの画面上の大きさに対して相対的に太くなる。
+ //    画面幅に合わせて細くし、resolution は毎回のリサイズで実サイズへ合わせる
+ syncHeianRobotOutline(w,h);
+}
+// 太輪郭の解像度と線幅を画面サイズへ合わせる。resize と生成時の両方から呼ぶ
+function syncHeianRobotOutline(w=vp.clientWidth,h=vp.clientHeight){
+ const r=heianTinRobotRuntime;if(!r?.outlineMaterial)return null;
+ const width=Math.max(1,w),height=Math.max(1,h);
+ r.outlineMaterial.resolution.set(width,height);
+ const lw=Math.round(THREE.MathUtils.clamp(width/780*1.8,.8,1.8)*100)/100;
+ if(r.outlineMaterial.linewidth!==lw){r.outlineMaterial.linewidth=lw;r.outlineWidth=lw;
+  r.outlineMaterial.needsUpdate=true;}
+ return{resolution:[width,height],linewidth:lw};
 }
 // パース（透視投影）⇔ 平行投影の切替
 function setPerspective(on){
@@ -14761,6 +14820,9 @@ const HEIAN_NIGHT={
  // 灯りは黄色く・小さく・弱く: 橙×大スケールだと俯瞰で火事に見える（2026-08-19井内さん指摘）
  fire:0xffd27a,lamp:0xffe6a8,fireScale:420,lampScale:260,glowScale:3600, // glow=全景で大内裏をほのかに見せる被せ（もっと小さく・2026-08-18井内さん）
  roadDim:0.07, // 夜の無灯材質（道・畦など）の減光率。0.14→0.07＝さらに倍暗く（2026-08-30井内さん「夜間の道は今の倍くらい暗くしたい」）
+ // 歩行中はさらに落とす（2026-09-02井内さん「歩くモードだと、夜の道はもっと暗くていい」）。
+ // 俯瞰・ツアーは街の形が読めないと困るので roadDim のまま。地上に降りたときだけ 0.07→0.028 にする
+ roadDimWalk:0.028,
  glowNearHide:9000, // glow（大内裏の被せ）はカメラ距離がこれ未満なら消す。地上で視界を覆うため（2026-08-27）
  // 🚫 篝火420・灯明260は「遠景で点に見える」ための径で、実物（炎は1〜2m＝10〜20units）の20倍以上ある。
  //    glow だけ距離で消していたので、地上を歩くと篝火・灯明が視界を覆っていた（2026-08-30）。
@@ -14959,8 +15021,9 @@ function applyHeianTimeOfDay(hour,day=heianClock.day){
  r.moon.intensity=HEIAN_NIGHT.moonIntensity*lamp*(0.35+0.65*illum); // 朔の夜は月明かりが無い
  for(const s of r.root.children){const base=s.userData.heianBaseOpacity;if(base===undefined)continue;
   s.material.opacity=base*lamp;s.material.needsUpdate=true;}
- // 道・水面の無灯材質は昼色×(1→roadDim)で補間する
- for(const[m,hex]of r.dimmed){const dim=THREE.MathUtils.lerp(1,HEIAN_NIGHT.roadDim,lamp);m.color.setHex(hex).multiplyScalar(dim);}
+ // 道・水面の無灯材質は昼色×(1→roadDim)で補間する。歩行中だけ下限を roadDimWalk まで落とす
+ const roadFloor=heianWalk?.active?HEIAN_NIGHT.roadDimWalk:HEIAN_NIGHT.roadDim;
+ for(const[m,hex]of r.dimmed){const dim=THREE.MathUtils.lerp(1,roadFloor,lamp);m.color.setHex(hex).multiplyScalar(dim);}
  updateHeianStars(hour,day,lamp); // 星空・天の川・月（薄明で消え、薄暮で戻る）
  heianClock.hour=((hour%24)+24)%24;heianClock.day=day;
  heianClockSyncUI?.(); // 🚫 updateHeianClock側だけで呼んでいたため、__heianSetClockで動かすと表示が古いままだった（2026-08-30実測「19.2時なのに05:11」）
@@ -15014,6 +15077,11 @@ window.__heianClock=()=>({...heianClock,...heianClockLerpKeys(heianClock.hour),l
  skyTopHex:heianSkyPixel(4),skyBottomHex:heianSkyPixel(506),
  dayLightIntensities:heianNightRuntime?heianNightRuntime.saved.map(([l])=>Math.round(l.intensity*1000)/1000):null,
  lampOpacity:heianNightRuntime?Math.round((heianNightRuntime.root.children[0]?.material.opacity??0)*1000)/1000:null,
+ // 夜の道の減光。歩行中は roadDimWalk まで落ちる（2026-09-02井内さん「歩くモードだと夜の道はもっと暗くていい」）
+ walking:!!heianWalk?.active,
+ roadFloor:heianWalk?.active?HEIAN_NIGHT.roadDimWalk:HEIAN_NIGHT.roadDim,
+ roadColors:(heianNightRuntime?.dimmed||[]).slice(0,3).map(([m,hex])=>
+  '#'+m.color.getHexString()+'←#'+hex.toString(16).padStart(6,'0')),
  shadowOpacity:Math.round(([...HEIAN_SHADOW.mats][0]?.opacity??0)*1000)/1000,shadowMats:[...HEIAN_SHADOW.mats].length});
 window.__heianSetClock=(hour,day)=>{if(!heianNightRuntime)setHeianNight(true);return applyHeianTimeOfDay(Number(hour)||0,Number(day)||heianClock.day);}; // 検証・目視用
 window.__heianClockRun=on=>setHeianClockRunning(!!on);
@@ -15293,6 +15361,7 @@ function createHeianTinRobotRuntime(options={}){
   const runtime={source,allBodies,robotBodies,visible:false,moving:false,running:false,gaitKind:null,gaitCycle:null,gaitSpeed:null,strideUsed:null,position:new THREE.Vector3(),heading:Math.PI,travelHeading:Math.PI,lookHeading:Math.PI,
    gaitSteps:poses.filter(p=>p.name==='ヨチヨチ（右足前）'||p.name==='ヨチヨチ（左足前）').flatMap(poseSteps),
    skipSteps:poseSteps(poses.find(p=>p.name==='スキップ（左右ループ）'))};
+  // 解像度と線幅は生成後に syncHeianRobotOutline が画面サイズへ合わせ直す（リサイズでも追従する）
   const outlineMaterial=new LineMaterial({color:0x0d1117,linewidth:1.8,worldUnits:false});outlineMaterial.resolution.set(Math.max(1,vp.clientWidth),Math.max(1,vp.clientHeight));
   const outlines=robotBodies.map((b,i)=>{const source=b.edgeObj?.geometry?.getAttribute('position');if(!source)throw new Error('散策ロボ輪郭データが不正 body='+i);const geometry=new LineSegmentsGeometry();geometry.setPositions(source.array);const line=new LineSegments2(geometry,outlineMaterial);line.name='散策ロボ太輪郭';line.userData.body=b;b.edgeObj.visible=false;b.mesh.add(line);return line;});runtime.outlineMaterial=outlineMaterial;runtime.outlines=outlines;runtime.outlineWidth=1.8;
   runtime.shadowMesh=heianShadowBlob(6,6,0,0,0);runtime.shadowMesh.visible=false;scene.add(runtime.shadowMesh); // プレイヤーの接地影（2026-08-19）
@@ -15379,7 +15448,9 @@ function createHeianTinRobotRuntime(options={}){
   // 段ごとの前進量は姿勢だけで決まる静的な量なので、生成時に1度測ってキャッシュする（毎フレームは重い）
   runtime.gaitStepsFine=heianSubdivideGaitSteps(runtime.gaitSteps,HEIAN_GAIT_STRIDE.subdivide);
   runtime.gaitProfile=heianGaitAdvanceProfile(runtime.gaitStepsFine,HEIAN_GAIT_STRIDE.legGain);
-  runtime.setVisible(false);heianTinRobotRuntime=runtime;return runtime;
+  runtime.setVisible(false);heianTinRobotRuntime=runtime;
+  syncHeianRobotOutline(); // 輪郭の解像度・線幅を今の画面サイズへ合わせる（スマホで線が太りすぎるのを防ぐ）
+  return runtime;
  }catch(e){
   console.error('平安京散策ロボ生成失敗',e);cleanup(false);return null;
  }finally{BULKGEN=previousBulk;}
@@ -16276,7 +16347,14 @@ const heianWalk=createHeianWalkController({
  // 🚫 speed 36 は歩容の歩幅8.26に対して4.4倍速く、どう周期を詰めても接地足が滑った
  //    （2026-08-30井内さん「設置している足は滑るべきじゃない」）。歩きは20へ落として周期0.41秒＝滑りゼロ、
  //    足りない分は Shift のスキップ（2.6倍＝52）で稼ぐ（井内さん「急ぎたい時はスキップかジャンプ」）
- speed:20,runMultiplier:2.6,maxStep:8,maxDrop:16,maxRelief:10, // 基壇・石段は8mmまで登り、16mmまで降りる
+ // 🚫 maxStep 8 / maxRelief 10 では東寺・西寺の門の基壇を登れず、南大門と西寺の西門・北西門で
+ //    止まっていた（2026-09-02井内さん「また東寺、西寺の南大門が通れない。段差で止まってしまう」）。
+ //    実測: 門の下だけ基壇があり、その天面は地形＋8〜10（基壇の底が造成面基準で3〜4.5浮くため）。
+ //    南大門は前方と左右3点の起伏も11.5で maxRelief を超えていた。門の基壇は実寸0.8〜1.0mの段差で、
+ //    人が踏み石で登る高さなので、判定を 11 / 13 まで緩めて全門を通す（落差 maxDrop は据え置き）
+ //    実測の内訳: 他の門の基壇は地形＋7〜9.6だが、南大門だけ＋11.5（基壇が厚い7＋造成面基準の浮き3）。
+ //    南大門は正面玄関で必ず通る門なので、11.5を含めて maxStep 12 にする
+ speed:20,runMultiplier:2.6,maxStep:12,maxDrop:16,maxRelief:13,
  getStartPosition:()=>heianGameMode?heianGameSpawn.position:{x:0,z:7600},
  getStartTarget:()=>heianGameMode?heianGameSpawn.target:{x:0,z:6800,height:45},
  ensureActor:createHeianTinRobotRuntime,
@@ -16287,7 +16365,9 @@ const heianWalk=createHeianWalkController({
  cancelCameraTween:()=>{viewTween=null;},
  onViewChange:syncHeianGameViewUI,
  onMotionChange:()=>syncHeianGameWalkUI(heianWalk.active),
- onActiveChange:active=>{setHeianWalkPerformance(active);syncHeianGameWalkUI(active);if(active){beginHeianWalkEvent();controls.autoRotate=false;syncHeianWalkAmbient(true);heianTourMusic?.setWalking(true);heianTourMusic?.start();}else{endHeianWalkEvent();resetHeianWalkAmbient();heianTourMusic?.setWalking(false);if(!heianDroneTour?.active&&!heianDroneTour?.cruising)heianTourMusic?.stop();}}
+ onActiveChange:active=>{setHeianWalkPerformance(active);syncHeianGameWalkUI(active);
+  // 夜の道の暗さは歩行中だけ深くする。時計を止めていても切り替わるよう、ここで色を打ち直す
+  if(heianNightRuntime)applyHeianTimeOfDay(heianClock.hour,heianClock.day);if(active){beginHeianWalkEvent();controls.autoRotate=false;syncHeianWalkAmbient(true);heianTourMusic?.setWalking(true);heianTourMusic?.start();}else{endHeianWalkEvent();resetHeianWalkAmbient();heianTourMusic?.setWalking(false);if(!heianDroneTour?.active&&!heianDroneTour?.cruising)heianTourMusic?.stop();}}
 });
 // 日英切り替え（2026-08-18井内さん指示）。?lang=en で英語起動。表示文字列だけを差し替え、3D部品の内部名は変えない。
 let heianLang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ja';
@@ -17101,6 +17181,52 @@ window.__heianGateWalkProbe=(x0,z0,dx,dz,distance=900,radius=5,step=6)=>{
    if(hits.length>=6)break;}}
  return{from:[x0,z0],dir:[Math.round(ux*100)/100,Math.round(uz*100)/100],radius,distance,passed:hits.length===0,blocked:hits};
 };
+// 門を通れるかを「歩行と同じ3条件」で測る（2026-09-02）。
+// 🚫 __heianGateWalkProbe は障害物（heianWalkBlocked）だけを見ていたので passed:true になるのに、
+//    実際は段差で止まっていた（井内さん「また東寺、西寺の南大門が通れない。段差で止まってしまう」）。
+//    movementAllowed は ①障害物 ②段差（rise>maxStep / rise<-maxDrop）③前方と左右3点の起伏（maxRelief）
+//    の3つで止まる。同じ式で刻んで、止まる位置と理由・実測値を返す
+window.__heianWalkPathProbe=(x0,z0,dx,dz,opt={})=>{
+ const{distance=900,radius=5,step=6,maxStep=8,maxDrop=16,maxRelief=10}=opt;
+ const len=Math.hypot(dx,dz)||1,fx=dx/len,fz=dz/len,rx=-fz,rz=fx;
+ const g=(x,z)=>heianWalkGroundY(x,z),r1=v=>Math.round(v*10)/10;
+ let cur=g(x0,z0),worstRise=0,worstRelief=0;
+ for(let t=step;t<=distance;t+=step){
+  const x=x0+fx*t,z=z0+fz*t,b=heianWalkBlocked(x,z,radius);
+  if(b)return{passed:false,stop:{t:Math.round(t),at:[Math.round(x),Math.round(z)],
+   reason:'障害物',name:b.name||'(無名)'},worstRise:r1(worstRise),worstRelief:r1(worstRelief)};
+  const next=g(x,z),rise=next-cur;
+  if(Math.abs(rise)>Math.abs(worstRise))worstRise=rise;
+  if(!Number.isFinite(next)||rise>maxStep||rise<-maxDrop)
+   return{passed:false,stop:{t:Math.round(t),at:[Math.round(x),Math.round(z)],
+    reason:rise>0?'登れない段差':'落差が大きい',rise:r1(rise),limit:rise>0?maxStep:-maxDrop,
+    from:r1(cur),to:r1(next)},worstRise:r1(worstRise),worstRelief:r1(worstRelief)};
+  const px=x+fx*radius,pz=z+fz*radius;
+  const s=[next,g(px+rx*radius,pz+rz*radius),g(px-rx*radius,pz-rz*radius)];
+  const relief=Math.max(...s)-Math.min(...s);
+  if(relief>worstRelief)worstRelief=relief;
+  if(s.some(v=>!Number.isFinite(v))||relief>maxRelief)
+   return{passed:false,stop:{t:Math.round(t),at:[Math.round(x),Math.round(z)],
+    reason:'起伏が急（前方と左右3点）',relief:r1(relief),limit:maxRelief,samples:s.map(r1)},
+    worstRise:r1(worstRise),worstRelief:r1(worstRelief)};
+  cur=next;
+ }
+ return{passed:true,stop:null,worstRise:r1(worstRise),worstRelief:r1(worstRelief)};
+};
+// 経路上の歩行面・地形面・表示面の高さプロファイル。段差がどの部材で生じているかを見る（2026-09-02）
+window.__heianWalkProfile=(x0,z0,dx,dz,{distance=400,step=10}={})=>{
+ const len=Math.hypot(dx,dz)||1,fx=dx/len,fz=dz/len,r1=v=>Math.round(v*10)/10,out=[];
+ for(let t=0;t<=distance;t+=step){const x=x0+fx*t,z=z0+fz*t;
+  out.push([Math.round(t),r1(terrainYAt(x,z)),r1(heianWalkGroundY(x,z)),r1(heianWalkDisplayY(x,z))]);}
+ return out; // [t, 地形, 歩行, 表示]
+};
+// 検証用: ある矩形に掛かる歩行面（この上を歩ける面）を全部返す。門の下の段差の正体を特定する（2026-09-02）
+window.__heianWalkSurfacesIn=(minX,maxX,minZ,maxZ)=>heianWalkSurfaceMeshes
+ .map(m=>({m,b:m.userData.walkBox}))
+ .filter(({b})=>b&&b.max.x>minX&&b.min.x<maxX&&b.max.z>minZ&&b.min.z<maxZ)
+ .map(({m,b})=>({name:m.name,rect:[Math.round(b.min.x),Math.round(b.max.x),Math.round(b.min.z),Math.round(b.max.z)],
+  topY:Math.round(b.max.y*10)/10,bottomY:Math.round(b.min.y*10)/10}))
+ .sort((p,q)=>q.topY-p.topY);
 // 検証用: ある矩形に掛かる歩行障害物を全部返す（門の開口を塞いでいる部材の特定用）
 window.__heianObstaclesIn=(minX,maxX,minZ,maxZ)=>heianWalkObstacleRecords
  .filter(b=>b.maxX>minX&&b.minX<maxX&&b.maxZ>minZ&&b.minZ<maxZ)
@@ -17589,6 +17715,28 @@ function startHeianGame(entryMode='overview'){
  const info=document.createElement('div');info.className='heian-game-info';info.setAttribute('aria-live','polite');
  const infoTitle=document.createElement('h2');infoTitle.id='heianGameInfoTitle';const infoText=document.createElement('p');infoText.id='heianGameInfoText';info.append(infoTitle,infoText);hud.appendChild(info);
  hud.appendChild(clockPanel);syncClockUI(); // 時計（2026-08-30）
+ // スマホでは移動地点と時計もハンバーガーの中へ収める（2026-09-02井内さん「時間表示が大きすぎるので、
+ // 移動地点と時間もハンバーガーメニューで出すようにしよう」）。実測でも時計が画面下1/4を占め、
+ // 解説パネルと重なっていた。🚫 親が違う（panel/clockPanel は hud の子、actions は bar の子）ので
+ // CSSだけでは寄せられない。DOMを移し替え、PC幅へ戻したら元の位置へ返す
+ const syncHeianMobileMenu=()=>{
+  const narrow=matchMedia('(max-width:600px)').matches;
+  if(narrow){
+   if(panel.parentNode!==actions)actions.insertBefore(panel,actions.firstChild);
+   if(clockPanel.parentNode!==actions)actions.appendChild(clockPanel);
+  }else{
+   if(panel.parentNode!==hud)hud.insertBefore(panel,info);
+   if(clockPanel.parentNode!==hud)hud.appendChild(clockPanel);
+  }
+  actions.classList.toggle('heian-menu-stacked',narrow);
+  return narrow;
+ };
+ syncHeianMobileMenu();
+ matchMedia('(max-width:600px)').addEventListener('change',syncHeianMobileMenu);
+ window.__heianMobileMenu=()=>({narrow:matchMedia('(max-width:600px)').matches,
+  mapInMenu:panel.parentNode===actions,clockInMenu:clockPanel.parentNode===actions,
+  menuOpen:actions.classList.contains('open'),stacked:actions.classList.contains('heian-menu-stacked'),
+  clockRect:(r=>({w:Math.round(r.width),h:Math.round(r.height)}))(clockPanel.getBoundingClientRect())});
  const help=document.createElement('div');help.className='heian-game-help';heianGameHelpEl=help;hud.appendChild(help);syncHeianGameHelp();
  const photoBar=document.createElement('div');photoBar.className='heian-photo-bar';photoBar.hidden=true;photoBar.setAttribute('aria-label','撮影モード');
  const photoCaptureButton=document.createElement('button');photoCaptureButton.type='button';photoCaptureButton.textContent=ui('shoot');photoCaptureButton.addEventListener('click',saveHeianGamePhoto);
@@ -17721,6 +17869,31 @@ function startHeianGame(entryMode='overview'){
    heading:Math.round((heianWalk.travelHeading||0)*180/Math.PI),
    place:window.__heianPlaceName?.(p.x,p.z)??null,
    ambient:heianWalkAmbientAnchor?{spawn:[Math.round(heianWalkAmbientAnchor.spawnX),Math.round(heianWalkAmbientAnchor.spawnZ)],courtZone:heianWalkAmbientAnchor.courtZone}:null};};
+ // 見上げ角を振って、カメラが地面へ潜らないかを数値で確かめる（2026-09-02）。
+// 🚫 heianWalk はモジュールスコープで window から見えないので、必ずこの口を経由する
+ window.__heianGameActions.probePitch=v=>{const p=heianWalk.setPitch(v),c=camera.position;
+  const g=heianWalkGroundY(c.x,c.z),r1=x=>Math.round(x*10)/10;
+  return{pitch:Math.round(p*100)/100,camera:[r1(c.x),r1(c.y),r1(c.z)],ground:r1(g),
+   margin:r1(c.y-g),distance:r1(c.distanceTo(controls.target)),maxPitch:heianWalk.maxPitch};};
+ // 「歩いたら空しか見えない」系の切り分け（2026-09-02）。カメラの向き・near/far・地形メッシュの可視数と、
+// 画面中央のレイキャストで前に何があるかをまとめて返す
+ window.__heianGameActions.inspectRender=()=>{
+  const dir=new THREE.Vector3();camera.getWorldDirection(dir);
+  let meshes=0,visible=0;
+  heianTerrainGroup?.traverse(o=>{if(o.isMesh||o.isInstancedMesh){meshes++;if(o.visible)visible++;}});
+  const rc=new THREE.Raycaster();rc.set(camera.position,dir);rc.far=camera.far;
+  const hits=heianTerrainGroup?rc.intersectObject(heianTerrainGroup,true).slice(0,3):[];
+  const r0=v=>Math.round(v);
+  return{camera:camera.position.toArray().map(r0),target:controls.target.toArray().map(r0),
+   near:camera.near,far:camera.far,fov:camera.fov,aspect:Math.round(camera.aspect*100)/100,
+   pixelRatio:Math.round(renderer.getPixelRatio()*100)/100,size:[vp.clientWidth,vp.clientHeight],
+   lookElevDeg:Math.round(Math.asin(THREE.MathUtils.clamp(dir.y,-1,1))*1800/Math.PI)/10,
+   terrainGroupVisible:!!heianTerrainGroup?.visible,terrainMeshes:meshes,terrainMeshesVisible:visible,
+   centerHits:hits.map(h=>({name:h.object.name||'(無名)',dist:r0(h.distance)})),
+   actor:heianTinRobotRuntime?{visible:!!heianTinRobotRuntime.visible,
+    position:heianTinRobotRuntime.position.toArray().map(r0),
+    bodiesVisible:heianTinRobotRuntime.robotBodies.filter(b=>b.mesh.visible).length}:null};
+ };
  window.__heianGameActions.inspectNearest=()=>({displayId:heianNearestDisplayId,selectedId:heianGameSelectedId,syncIntervalMs:350,hysteresis:1.18,eventNames:[...(window.__heianEventNames||[])]});
  window.__heianGameActions.probeNearestAt=(x,z)=>{controls.target.x=Number(x)||0;controls.target.z=Number(z)||0;heianNearestSyncAt=0;syncHeianNearestLocation(performance.now());return{...window.__heianGameActions.inspectNearest(),title:document.getElementById('heianGameInfoTitle')?.textContent||''};};
  window.__heianGameActions.inspectBlockedAt=(x,z,r=5)=>{const b=heianWalkBlocked(x,z,r);return b?{name:b.name,minX:b.minX,maxX:b.maxX,minZ:b.minZ,maxZ:b.maxZ}:null;};
@@ -17741,7 +17914,7 @@ function startHeianGame(entryMode='overview'){
 //    （2026-09-01）。人数を変えたら1箇所（expectedCrowd）で済むよう定数参照にする
 const infoState=window.__heianGameInfo(),expectedCrowd=2200,expectedSoloWalkers=734,expectedWomen=756,expectedWalking=1353,expectedStanding=847,expectedMusic=false; // 960→1440: 固定配置で無人だった宮城・穀倉院・庶民街区へ、元のrelocate規則（大極殿前136＝朝庭100＋階段南の左右2列36／内裏48＝courtSides／応天門30／朱雀門30／豊楽殿30／穀倉院の荷役36／庶民街区170）を復元（2026-08-27） // 1440→1800: 南北大路（大宮・西洞院・東洞院・堀川・西大宮・東京極・道祖）へ360人（2026-08-30井内さん指示）。// 1800→2200: 大内裏寄りを濃くする追加400人（朱雀120＋南北280）＋通りのalongをbias 1.35/2.4で北へ偏らせた。実測 women756/walking1353/standing847
  const expectedTitle=gameTitle(),expectedSubtitle=entryMode==='drone'?ui('subtitleDrone'):entryMode==='walk'?ui('subtitleWalk'):ui('subtitleTour'),expectedHeaderButtons=[heianLabel(ui('tour'),ui('tourShort')),heianLabel(ui('walk'),ui('walkShort')),heianLabel(ui('musicOff'),ui('musicOffShort')),heianLabel(ui('night'),ui('nightShort')),heianLabel(ui('bird'),ui('birdShort')),heianLabel(ui('photo'),ui('photoShort'))];
- if(!infoState.active||!infoState.hud||infoState.title!==expectedTitle||infoState.seriesTitle!=='HakoniwaKit'||!infoState.titleMark||!infoState.menuButton||infoState.menuOpen||(gateNeeded?!infoState.menuButtonHidden:infoState.menuButtonHidden)||infoState.subtitle!==expectedSubtitle||expectedHeaderButtons.some(label=>!infoState.headerButtons.includes(label))||infoState.headerButtons[0]!==expectedHeaderButtons[0]||infoState.headerButtons[1]!==expectedHeaderButtons[1]||!heianGameDroneButton.classList.contains('primary')||heianGameWalkButton.classList.contains('primary')||(gateNeeded?(!infoState.entryGate||!infoState.headerActionsHidden):(infoState.entryGate||infoState.headerActionsHidden))||!infoState.terrain||!infoState.hoverSuppression?.mapSuppressed||(gateNeeded&&!infoState.hoverSuppression?.entryGateSuppressed)||(infoState.tour?.openingActive&&!infoState.hoverSuppression?.openingSuppressed)||infoState.kamoFordBlocked!==false||infoState.mapTitle!==''||infoState.mapRoads!==22/* 実寸9本+条13本（2026-08-18） */||infoState.mapCanals!==2/* 堀川・西堀川（2026-08-18） */||(infoState.mapPalace!=='大内裏'&&infoState.mapPalace!=='Palace') /* 英語モードでも通す（2026-08-18） */||!infoState.mapPlayer||(entryMode==='walk'?!infoState.mapPlayerVisible:infoState.mapPlayerVisible)||infoState.walkMode!=='tinrobot-third-person'||infoState.viewMode!=='overhead'||infoState.pointerLocked||infoState.cursor==='none'||infoState.crosshair||!infoState.actorReady||(navigator.webdriver&&(infoState.actorSource!=='baked'||infoState.occtRequested))||infoState.actorBodies!==85||infoState.gaitSteps!==10||infoState.skipSteps!==9||infoState.robotOutlineWidth!==1.8||infoState.robotOutlines!==85||!infoState.photoBar||!infoState.photoBarHidden||infoState.photoMode||infoState.walkSurfaces<1||infoState.walkObstacles<500||infoState.walkConnectors!==0/* 段差解消の短い通路6本は撤去（2026-08-19） */||infoState.unsafeLocationSpawns!==0||infoState.ryubidanWalkSteps<6||infoState.locations!==31/* 32→31: 鎮守八幡宮の移動地点がHEIAN_GAME_LOCATIONSから欠落（14822のコメントは6地点を数えるが配列は5地点）。アセットは東寺南大門西に残存＝地点だけ失われた。復活時は32/26へ戻す（2026-08-24） */||infoState.options!==31||(infoState.overviewOption!=='平安京上空'&&infoState.overviewOption!=='Above Heian-kyo') /* 英語モードでも通す（2026-08-18） */||infoState.markers!==25/* 26→25: 鎮守八幡宮の地点欠落に合わせる。復活時は26へ（2026-08-24）。旧: 25→26: 右京北部の官人街（2026-08-20） */||!infoState.tourReady||infoState.tour.routeLength!==19/* 18→19: 朱雀院を追加 */||!infoState.tour.routeIds?.includes('suzakuin')||infoState.tour.suzakuinView?.x!==HEIAN_LANDMARK_SITES.suzakuin.x||Math.abs(infoState.tour.suzakuinView?.z-(HEIAN_LANDMARK_SITES.suzakuin.z-940))>.01||infoState.tour.suzakuinView?.angle!==0||infoState.tour.suzakuinView?.orbit!==.55||!infoState.tour.suzakuinView?.description.includes('相撲')||!infoState.tour.suzakuinView.description.includes('競馬')||infoState.tour.tourStartId!=='rajomon'||infoState.tour.openingLength!==10||infoState.tour.openingHeights?.[1]!==460||infoState.tour.openingHeights?.[2]!==420||infoState.tour.openingHeights?.[3]!==470||infoState.tour.travelLookMode!=='depart-pan-then-destination'||infoState.tour.travelPathMode!=='bezier-arclength-c1-3d'/* 慣性ベジェ移動＋速度一致（2026-08-18） */||infoState.tour.openingLookMode!=='daigokuden-lock-then-late-blend'||infoState.tour.verticalTravelMode!=='cubic-hermite-c1'||infoState.tour.openingPathMode!=='cubic-hermite-c1'||infoState.tour.openingBoundaryMetrics?.some(b=>b.positionError>.001||b.speedDelta>.001||b.tangentAngle>.001)||Math.abs(infoState.tour.tobaLevelOut?.flightPathAngleDeg??99)>1||!infoState.tour.palaceManeuver?.curvedBacktrack||!infoState.tour.palaceManeuver.backwardClimb||infoState.tour.palaceManeuver.turnArc!=='c-curve'||infoState.tour.palaceManeuver.focusTarget!=='daigokuden'||infoState.tour.palaceManeuver.focusHoldUntil<.75||infoState.tour.palaceManeuver.minSpeed<.25||infoState.tour.palaceManeuver.stops!==0||!infoState.tour.continuousFlight||infoState.tour.overviewReturnLookMode!=='city-center-fixed'||infoState.tour.overviewSelectionId!=='overview'||infoState.tour.southEntryIds?.length!==15||['nobles','shinsenen'].some(id=>Math.abs(infoState.tour.routePlan?.[id]?.entryAngle??99)>.000001)||infoState.tour.funaokaExitMode!=='vertical-rise-slide'||!(infoState.tour.funaokaView?.northOffset>0)||!(infoState.tour.funaokaView?.camera?.[2]<infoState.tour.funaokaView?.shrine?.z)||!(infoState.tour.funaokaView?.target?.[2]>infoState.tour.funaokaView?.shrine?.z)||infoState.tour.openingMusic!==true||(entryMode==='overview'?(gateNeeded?(infoState.tour.openingActive||infoState.tour.active||infoState.tour.cruising):!infoState.tour.openingActive):infoState.tour.openingActive)||(entryMode==='drone'?!infoState.tour.active:infoState.tour.active)||(entryMode==='walk'?!infoState.walking:infoState.walking)||!entryStarted||!infoState.tour.finite||!infoState.musicReady||infoState.music?.source!=='procedural-original'||infoState.music.externalAssets!==0||infoState.music.enabled!==false||infoState.music.active!==expectedMusic||(entryMode==='walk'&&(infoState.music.mode!=='walk-gagaku'||!infoState.music.walking))||!infoState.mobReady||infoState.mob?.members!==21||infoState.mob.facilityIntrusions!==0||infoState.mob.oxen!==3||infoState.mob.carts!==3||infoState.mob.attendants!==12||infoState.mob.passengers!==3||infoState.mob.cartBodyColorsDistinct!==3||infoState.mob.trafficDirections!==2||!infoState.mob.finiteTransforms||infoState.mob.groundError>.01||infoState.mob.wheelAngle>=0||infoState.mob.size[0]<40||infoState.mob.size[1]<26||infoState.mob.size[2]<80||infoState.mob.cartStyle!=='inverted-u-tunnel'||!infoState.mob.tunnelShell||infoState.mob.sideWindows!==2||infoState.mob.curtainInset<1.5||infoState.mob.endRise<1.5||infoState.mob.cabinDepth>24.1||infoState.mob.wheelHumanRatio<1.2||infoState.mob.windowClearance<=0||!infoState.mob.segmentedOxLegs||infoState.mob.frontLegFlatness>=.4||infoState.mob.hindLegWidthRatio<=1.15||infoState.mob.bodyAboveAxle<=0||infoState.mob.headroom<17.6||!infoState.mob.tatamiFloor||infoState.mob.passengerFloorGap>0||infoState.mob.passengerFloorGap<-.2||infoState.mob.passengerHeadBodyGap>0||infoState.mob.passengerHeadBodyGap<-.2||infoState.mob.passengerRoofClearance<=0||!infoState.mob.straightShafts||infoState.mob.shaftSlope!==0||!infoState.mob.invertedUYoke||infoState.mob.hubScale<1.9||!infoState.crowdReady||infoState.crowd?.placementMode!=='fixed-common'||infoState.crowd?.layoutVersion!=='common-market-nanajo-shopfront-v2'||!infoState.crowd.fixedSignature||infoState.crowd.suzakuCount!==200/* 80→200: 大内裏寄りを濃くする朱雀の追加120（2026-08-30）に合わせた期待値の直し漏れ（2026-09-01） */||infoState.crowd.marketDistrictCounts?.east!==300||infoState.crowd.marketDistrictCounts?.west!==180||infoState.crowd.shopfrontCount!==80||infoState.crowd.tobaRoadCount!==60||infoState.crowd.nanajoRoadCounts?.east!==160||infoState.crowd.nanajoRoadCounts?.west!==100||infoState.crowd.marketEntranceCounts?.east!==80||infoState.crowd.marketEntranceCounts?.west!==30||infoState.crowd.cohortCounts?.daigokudenCourt!==136||infoState.crowd.cohortCounts?.dairiCourtSides!==48||infoState.crowd.cohortCounts?.otenmonGate!==30||infoState.crowd.cohortCounts?.suzakumonGate!==30||infoState.crowd.cohortCounts?.burakuden!==30||infoState.crowd.cohortCounts?.kokuso!==36||infoState.crowd.cohortCounts?.commonerStreets!==114||infoState.crowd.cohortCounts?.commonerAlleys!==56||infoState.crowd.kokusoCargoWorkers!==56/* 穀倉院36＋鳥羽街道の荷担ぎ20（3人に1人）。cargoRoleの総数なのでこの値（2026-08-29実測） *//* 宮城の配分が0でも「960人いる」で緑になっていた（2026-08-27井内さん「大極殿前に整列してた人もいない」） */||infoState.streetLife.marketPeopleSkipped!==0/* 置けなかった常設人物は0（2026-08-27） */||!window.__heianVideoInfo?.().supported||!window.__heianVideoInfo?.().audioCapable/* 動画撮影とBGM合流の対応（2026-08-27） */||infoState.crowd.facilityIntrusions!==0||infoState.crowd?.collisionAvoidance!=='reverse-on-block'||infoState.crowd?.canalIntrusions!==0||infoState.crowd?.people!==expectedCrowd||infoState.crowd.women!==expectedWomen||infoState.crowd.femaleBangs!==expectedWomen||infoState.crowd.femaleHairCap!==expectedWomen||infoState.crowd.femaleHairCapShape!=='upper-hemisphere'||infoState.crowd.femaleHeadwear!==expectedWomen||infoState.crowd.footForwardOffset<=0||infoState.crowd.walking!==expectedWalking||infoState.crowd.standing!==expectedStanding||infoState.crowd.minHeight>=infoState.crowd.maxHeight||infoState.crowd.drawCalls>17/* 15→17: 穀倉院の背負い荷・手持ち荷を追加（2026-08-21） */||!infoState.courtLife||infoState.courtLife.kemariPlayers!==6||infoState.courtLife.kemariBalls!==1||infoState.courtLife.kemariPlace!=='西朝集堂東側（正面から右）'||infoState.courtLife.kemariClearance<20||infoState.courtLife.courtLadies!==4||infoState.courtLife.ladySpeed>22.1||infoState.courtLife.ladyTrains!==4||infoState.courtLife.ladyYawDirections<2||!infoState.courtLife.finite||!infoState.streetLife||infoState.streetLife.troupes!==16/* 犬4隊・騎馬検非違使2隊・市場行商2隊を含む */||infoState.streetLife.members!==30||infoState.streetLife.soldiers!==8||infoState.streetLife.mounted!==3||infoState.streetLife.porters!==2||infoState.streetLife.cargoParty!==6||infoState.streetLife.southboundOfficer!==1||infoState.streetLife.rajomonRouteTroupes!==2||infoState.streetLife.suzakuCargoCarts!==1||infoState.streetLife.marketCargoCarts!==2||infoState.streetLife.cargoCarts!==4||infoState.streetLife.cargoDeckSize?.[0]!==22||infoState.streetLife.cargoDeckSize?.[1]!==46||infoState.streetLife.marketHandlers!==2||infoState.streetLife.biwaParty!==4||infoState.streetLife.dogs!==4||infoState.streetLife.horses!==3||infoState.streetLife.peddlers!==3||infoState.streetLife.suzakuOfficerTroupes!==1||infoState.streetLife.vendors!==240||infoState.streetLife.marketCustomers!==680||infoState.streetLife.marketPeople!==1320||infoState.streetLife.strollers!==400||infoState.streetLife.marketPeopleByMarket?.eastMarket?.total!==1300||infoState.streetLife.marketPeopleByMarket?.westMarket?.total!==20||infoState.streetLife.marketPeopleDrawCalls!==6||infoState.streetLife.marketPeopleSiteIntrusions!==0||infoState.streetLife.marketPeopleFacilityIntrusions!==0||infoState.streetLife.marketPeopleCanalIntrusions!==0||!infoState.streetLife.marketPeopleVisible||infoState.streetLife.facilityIntrusions!==0||!infoState.streetLife.finiteTransforms||infoState.streetLife.groundError>.01||infoState.streetLife.ambientSpacing<=infoState.mob.ambientSpacing||infoState.streetLife.horseParts<5/* 結合後=胴1+脚pivot4（2026-08-18の描画結合） */||infoState.streetLife.horseHeight<15||infoState.streetLife.suzakuRouteTroupes!==1||infoState.tour.routeOrbits?.rajomon!==-1.15/* 旋回を長く（2026-08-18） */||infoState.tour.routeOrbits?.burakuin!==-3.3/* ぐるっと回ってから内裏へ（2026-08-18） */||!infoState.crowd.finiteTransforms||infoState.crowd.groundError>.01||!infoState.commonerCrowd||infoState.commonerCrowd.people!==expectedCrowd||infoState.commonerCrowd.soloWalkers!==expectedSoloWalkers||infoState.commonerCrowd.location!=='fixed-common'||!infoState.courtCrowds||Object.values(infoState.courtCrowds).some(c=>c.people!==expectedCrowd||c.placementMode!=='fixed-common'||c.fixedSignature!==infoState.crowd.fixedSignature)||!infoState.nobleCrowd||infoState.nobleCrowd.people!==expectedCrowd||infoState.nobleCrowd.placementMode!=='fixed-common'||infoState.nobleCrowd.fixedSignature!==infoState.crowd.fixedSignature||!infoState.nobleCrowd.finiteTransforms||!infoState.kawaraCrowd||infoState.kawaraCrowd.people!==expectedCrowd||infoState.kawaraCrowd.placementMode!=='fixed-common'||infoState.kawaraCrowd.fixedSignature!==infoState.crowd.fixedSignature||!infoState.kawaraCrowd.finiteTransforms||(navigator.webdriver&&(!infoState.horikawaCrowd||infoState.horikawaCrowd.people!==expectedCrowd||infoState.horikawaCrowd.placementMode!=='fixed-common'||infoState.horikawaCrowd.fixedSignature!==infoState.crowd.fixedSignature||infoState.horikawaCrowd.canalIntrusions!==0||!infoState.horikawaCrowd.finiteTransforms))||(entryMode==='walk'&&(!infoState.ambient?.active||infoState.ambient.forwardDistance<400||!infoState.mob.ambientMode||infoState.crowd.ambientMode||infoState.crowd.ambientCohorts.length!==0||infoState.mob.fadePhase!=='in'||infoState.crowd.fadePhase!=='visible'||infoState.crowd.location!=='fixed-common'))
+ if(!infoState.active||!infoState.hud||infoState.title!==expectedTitle||infoState.seriesTitle!=='HakoniwaKit'||!infoState.titleMark||!infoState.menuButton||infoState.menuOpen||(gateNeeded?!infoState.menuButtonHidden:infoState.menuButtonHidden)||infoState.subtitle!==expectedSubtitle||expectedHeaderButtons.some(label=>!infoState.headerButtons.includes(label))||infoState.headerButtons[0]!==expectedHeaderButtons[0]||infoState.headerButtons[1]!==expectedHeaderButtons[1]||!heianGameDroneButton.classList.contains('primary')||heianGameWalkButton.classList.contains('primary')||(gateNeeded?(!infoState.entryGate||!infoState.headerActionsHidden):(infoState.entryGate||infoState.headerActionsHidden))||!infoState.terrain||!infoState.hoverSuppression?.mapSuppressed||(gateNeeded&&!infoState.hoverSuppression?.entryGateSuppressed)||(infoState.tour?.openingActive&&!infoState.hoverSuppression?.openingSuppressed)||infoState.kamoFordBlocked!==false||infoState.mapTitle!==''||infoState.mapRoads!==22/* 実寸9本+条13本（2026-08-18） */||infoState.mapCanals!==2/* 堀川・西堀川（2026-08-18） */||(infoState.mapPalace!=='大内裏'&&infoState.mapPalace!=='Palace') /* 英語モードでも通す（2026-08-18） */||!infoState.mapPlayer||(entryMode==='walk'?!infoState.mapPlayerVisible:infoState.mapPlayerVisible)||infoState.walkMode!=='tinrobot-third-person'||infoState.viewMode!=='overhead'||infoState.pointerLocked||infoState.cursor==='none'||infoState.crosshair||!infoState.actorReady||(navigator.webdriver&&(infoState.actorSource!=='baked'||infoState.occtRequested))||infoState.actorBodies!==85||infoState.gaitSteps!==10||infoState.skipSteps!==9||!(infoState.robotOutlineWidth>=.8&&infoState.robotOutlineWidth<=1.8)/* 線幅は画面幅で0.8〜1.8に可変（2026-09-02） */||infoState.robotOutlines!==85||!infoState.photoBar||!infoState.photoBarHidden||infoState.photoMode||infoState.walkSurfaces<1||infoState.walkObstacles<500||infoState.walkConnectors!==0/* 段差解消の短い通路6本は撤去（2026-08-19） */||infoState.unsafeLocationSpawns!==0||infoState.ryubidanWalkSteps<6||infoState.locations!==31/* 32→31: 鎮守八幡宮の移動地点がHEIAN_GAME_LOCATIONSから欠落（14822のコメントは6地点を数えるが配列は5地点）。アセットは東寺南大門西に残存＝地点だけ失われた。復活時は32/26へ戻す（2026-08-24） */||infoState.options!==31||(infoState.overviewOption!=='平安京上空'&&infoState.overviewOption!=='Above Heian-kyo') /* 英語モードでも通す（2026-08-18） */||infoState.markers!==25/* 26→25: 鎮守八幡宮の地点欠落に合わせる。復活時は26へ（2026-08-24）。旧: 25→26: 右京北部の官人街（2026-08-20） */||!infoState.tourReady||infoState.tour.routeLength!==19/* 18→19: 朱雀院を追加 */||!infoState.tour.routeIds?.includes('suzakuin')||infoState.tour.suzakuinView?.x!==HEIAN_LANDMARK_SITES.suzakuin.x||Math.abs(infoState.tour.suzakuinView?.z-(HEIAN_LANDMARK_SITES.suzakuin.z-940))>.01||infoState.tour.suzakuinView?.angle!==0||infoState.tour.suzakuinView?.orbit!==.55||!infoState.tour.suzakuinView?.description.includes('相撲')||!infoState.tour.suzakuinView.description.includes('競馬')||infoState.tour.tourStartId!=='rajomon'||infoState.tour.openingLength!==10||infoState.tour.openingHeights?.[1]!==460||infoState.tour.openingHeights?.[2]!==420||infoState.tour.openingHeights?.[3]!==470||infoState.tour.travelLookMode!=='depart-pan-then-destination'||infoState.tour.travelPathMode!=='bezier-arclength-c1-3d'/* 慣性ベジェ移動＋速度一致（2026-08-18） */||infoState.tour.openingLookMode!=='daigokuden-lock-then-late-blend'||infoState.tour.verticalTravelMode!=='cubic-hermite-c1'||infoState.tour.openingPathMode!=='cubic-hermite-c1'||infoState.tour.openingBoundaryMetrics?.some(b=>b.positionError>.001||b.speedDelta>.001||b.tangentAngle>.001)||Math.abs(infoState.tour.tobaLevelOut?.flightPathAngleDeg??99)>1||!infoState.tour.palaceManeuver?.curvedBacktrack||!infoState.tour.palaceManeuver.backwardClimb||infoState.tour.palaceManeuver.turnArc!=='c-curve'||infoState.tour.palaceManeuver.focusTarget!=='daigokuden'||infoState.tour.palaceManeuver.focusHoldUntil<.75||infoState.tour.palaceManeuver.minSpeed<.25||infoState.tour.palaceManeuver.stops!==0||!infoState.tour.continuousFlight||infoState.tour.overviewReturnLookMode!=='city-center-fixed'||infoState.tour.overviewSelectionId!=='overview'||infoState.tour.southEntryIds?.length!==15||['nobles','shinsenen'].some(id=>Math.abs(infoState.tour.routePlan?.[id]?.entryAngle??99)>.000001)||infoState.tour.funaokaExitMode!=='vertical-rise-slide'||!(infoState.tour.funaokaView?.northOffset>0)||!(infoState.tour.funaokaView?.camera?.[2]<infoState.tour.funaokaView?.shrine?.z)||!(infoState.tour.funaokaView?.target?.[2]>infoState.tour.funaokaView?.shrine?.z)||infoState.tour.openingMusic!==true||(entryMode==='overview'?(gateNeeded?(infoState.tour.openingActive||infoState.tour.active||infoState.tour.cruising):!infoState.tour.openingActive):infoState.tour.openingActive)||(entryMode==='drone'?!infoState.tour.active:infoState.tour.active)||(entryMode==='walk'?!infoState.walking:infoState.walking)||!entryStarted||!infoState.tour.finite||!infoState.musicReady||infoState.music?.source!=='procedural-original'||infoState.music.externalAssets!==0||infoState.music.enabled!==false||infoState.music.active!==expectedMusic||(entryMode==='walk'&&(infoState.music.mode!=='walk-gagaku'||!infoState.music.walking))||!infoState.mobReady||infoState.mob?.members!==21||infoState.mob.facilityIntrusions!==0||infoState.mob.oxen!==3||infoState.mob.carts!==3||infoState.mob.attendants!==12||infoState.mob.passengers!==3||infoState.mob.cartBodyColorsDistinct!==3||infoState.mob.trafficDirections!==2||!infoState.mob.finiteTransforms||infoState.mob.groundError>.01||infoState.mob.wheelAngle>=0||infoState.mob.size[0]<40||infoState.mob.size[1]<26||infoState.mob.size[2]<80||infoState.mob.cartStyle!=='inverted-u-tunnel'||!infoState.mob.tunnelShell||infoState.mob.sideWindows!==2||infoState.mob.curtainInset<1.5||infoState.mob.endRise<1.5||infoState.mob.cabinDepth>24.1||infoState.mob.wheelHumanRatio<1.2||infoState.mob.windowClearance<=0||!infoState.mob.segmentedOxLegs||infoState.mob.frontLegFlatness>=.4||infoState.mob.hindLegWidthRatio<=1.15||infoState.mob.bodyAboveAxle<=0||infoState.mob.headroom<17.6||!infoState.mob.tatamiFloor||infoState.mob.passengerFloorGap>0||infoState.mob.passengerFloorGap<-.2||infoState.mob.passengerHeadBodyGap>0||infoState.mob.passengerHeadBodyGap<-.2||infoState.mob.passengerRoofClearance<=0||!infoState.mob.straightShafts||infoState.mob.shaftSlope!==0||!infoState.mob.invertedUYoke||infoState.mob.hubScale<1.9||!infoState.crowdReady||infoState.crowd?.placementMode!=='fixed-common'||infoState.crowd?.layoutVersion!=='common-market-nanajo-shopfront-v2'||!infoState.crowd.fixedSignature||infoState.crowd.suzakuCount!==200/* 80→200: 大内裏寄りを濃くする朱雀の追加120（2026-08-30）に合わせた期待値の直し漏れ（2026-09-01） */||infoState.crowd.marketDistrictCounts?.east!==300||infoState.crowd.marketDistrictCounts?.west!==180||infoState.crowd.shopfrontCount!==80||infoState.crowd.tobaRoadCount!==60||infoState.crowd.nanajoRoadCounts?.east!==160||infoState.crowd.nanajoRoadCounts?.west!==100||infoState.crowd.marketEntranceCounts?.east!==80||infoState.crowd.marketEntranceCounts?.west!==30||infoState.crowd.cohortCounts?.daigokudenCourt!==136||infoState.crowd.cohortCounts?.dairiCourtSides!==48||infoState.crowd.cohortCounts?.otenmonGate!==30||infoState.crowd.cohortCounts?.suzakumonGate!==30||infoState.crowd.cohortCounts?.burakuden!==30||infoState.crowd.cohortCounts?.kokuso!==36||infoState.crowd.cohortCounts?.commonerStreets!==114||infoState.crowd.cohortCounts?.commonerAlleys!==56||infoState.crowd.kokusoCargoWorkers!==56/* 穀倉院36＋鳥羽街道の荷担ぎ20（3人に1人）。cargoRoleの総数なのでこの値（2026-08-29実測） *//* 宮城の配分が0でも「960人いる」で緑になっていた（2026-08-27井内さん「大極殿前に整列してた人もいない」） */||infoState.streetLife.marketPeopleSkipped!==0/* 置けなかった常設人物は0（2026-08-27） */||!window.__heianVideoInfo?.().supported||!window.__heianVideoInfo?.().audioCapable/* 動画撮影とBGM合流の対応（2026-08-27） */||infoState.crowd.facilityIntrusions!==0||infoState.crowd?.collisionAvoidance!=='reverse-on-block'||infoState.crowd?.canalIntrusions!==0||infoState.crowd?.people!==expectedCrowd||infoState.crowd.women!==expectedWomen||infoState.crowd.femaleBangs!==expectedWomen||infoState.crowd.femaleHairCap!==expectedWomen||infoState.crowd.femaleHairCapShape!=='upper-hemisphere'||infoState.crowd.femaleHeadwear!==expectedWomen||infoState.crowd.footForwardOffset<=0||infoState.crowd.walking!==expectedWalking||infoState.crowd.standing!==expectedStanding||infoState.crowd.minHeight>=infoState.crowd.maxHeight||infoState.crowd.drawCalls>17/* 15→17: 穀倉院の背負い荷・手持ち荷を追加（2026-08-21） */||!infoState.courtLife||infoState.courtLife.kemariPlayers!==6||infoState.courtLife.kemariBalls!==1||infoState.courtLife.kemariPlace!=='西朝集堂東側（正面から右）'||infoState.courtLife.kemariClearance<20||infoState.courtLife.courtLadies!==4||infoState.courtLife.ladySpeed>22.1||infoState.courtLife.ladyTrains!==4||infoState.courtLife.ladyYawDirections<2||!infoState.courtLife.finite||!infoState.streetLife||infoState.streetLife.troupes!==16/* 犬4隊・騎馬検非違使2隊・市場行商2隊を含む */||infoState.streetLife.members!==30||infoState.streetLife.soldiers!==8||infoState.streetLife.mounted!==3||infoState.streetLife.porters!==2||infoState.streetLife.cargoParty!==6||infoState.streetLife.southboundOfficer!==1||infoState.streetLife.rajomonRouteTroupes!==2||infoState.streetLife.suzakuCargoCarts!==1||infoState.streetLife.marketCargoCarts!==2||infoState.streetLife.cargoCarts!==4||infoState.streetLife.cargoDeckSize?.[0]!==22||infoState.streetLife.cargoDeckSize?.[1]!==46||infoState.streetLife.marketHandlers!==2||infoState.streetLife.biwaParty!==4||infoState.streetLife.dogs!==4||infoState.streetLife.horses!==3||infoState.streetLife.peddlers!==3||infoState.streetLife.suzakuOfficerTroupes!==1||infoState.streetLife.vendors!==240||infoState.streetLife.marketCustomers!==680||infoState.streetLife.marketPeople!==1320||infoState.streetLife.strollers!==400||infoState.streetLife.marketPeopleByMarket?.eastMarket?.total!==1300||infoState.streetLife.marketPeopleByMarket?.westMarket?.total!==20||infoState.streetLife.marketPeopleDrawCalls!==6||infoState.streetLife.marketPeopleSiteIntrusions!==0||infoState.streetLife.marketPeopleFacilityIntrusions!==0||infoState.streetLife.marketPeopleCanalIntrusions!==0||!infoState.streetLife.marketPeopleVisible||infoState.streetLife.facilityIntrusions!==0||!infoState.streetLife.finiteTransforms||infoState.streetLife.groundError>.01||infoState.streetLife.ambientSpacing<=infoState.mob.ambientSpacing||infoState.streetLife.horseParts<5/* 結合後=胴1+脚pivot4（2026-08-18の描画結合） */||infoState.streetLife.horseHeight<15||infoState.streetLife.suzakuRouteTroupes!==1||infoState.tour.routeOrbits?.rajomon!==-1.15/* 旋回を長く（2026-08-18） */||infoState.tour.routeOrbits?.burakuin!==-3.3/* ぐるっと回ってから内裏へ（2026-08-18） */||!infoState.crowd.finiteTransforms||infoState.crowd.groundError>.01||!infoState.commonerCrowd||infoState.commonerCrowd.people!==expectedCrowd||infoState.commonerCrowd.soloWalkers!==expectedSoloWalkers||infoState.commonerCrowd.location!=='fixed-common'||!infoState.courtCrowds||Object.values(infoState.courtCrowds).some(c=>c.people!==expectedCrowd||c.placementMode!=='fixed-common'||c.fixedSignature!==infoState.crowd.fixedSignature)||!infoState.nobleCrowd||infoState.nobleCrowd.people!==expectedCrowd||infoState.nobleCrowd.placementMode!=='fixed-common'||infoState.nobleCrowd.fixedSignature!==infoState.crowd.fixedSignature||!infoState.nobleCrowd.finiteTransforms||!infoState.kawaraCrowd||infoState.kawaraCrowd.people!==expectedCrowd||infoState.kawaraCrowd.placementMode!=='fixed-common'||infoState.kawaraCrowd.fixedSignature!==infoState.crowd.fixedSignature||!infoState.kawaraCrowd.finiteTransforms||(navigator.webdriver&&(!infoState.horikawaCrowd||infoState.horikawaCrowd.people!==expectedCrowd||infoState.horikawaCrowd.placementMode!=='fixed-common'||infoState.horikawaCrowd.fixedSignature!==infoState.crowd.fixedSignature||infoState.horikawaCrowd.canalIntrusions!==0||!infoState.horikawaCrowd.finiteTransforms))||(entryMode==='walk'&&(!infoState.ambient?.active||infoState.ambient.forwardDistance<400||!infoState.mob.ambientMode||infoState.crowd.ambientMode||infoState.crowd.ambientCohorts.length!==0||infoState.mob.fadePhase!=='in'||infoState.crowd.fadePhase!=='visible'||infoState.crowd.location!=='fixed-common'))
   ||(navigator.webdriver&&!['baked','cache'].includes(window.__heianBakedStatus))/* bake忘れで検査が緑になるのを防ぐ。ヘッドレス（webdriver）限定＝実ユーザーはstaleでも警告表示で起動継続（2026-08-18に一度ユーザーの起動を止めてしまった反省） */){// 🚫 自己検査の不一致で起動そのものを止めていた（2026-08-27井内さん「期待値に合ってなくても起動してしまうように」）。
  // 期待値は開発用の物差しであって、街の出来とは別。実際この日は人数を変えて期待値を直し忘れただけで、
  // 街は正常に出来ているのに井内さんが見られなくなった。焼き込みstaleの扱いと同じく、
@@ -17849,9 +18022,17 @@ function terrainYFromSampler(s,x,z){
 function terrainYAt(x,z){return terrainYFromSampler(heianTerrainSampler,x,z);}
 // 簡素門・小屋の切妻屋根。原点は軒の高さ、棟は y=rise・X方向に通る（東西市の門で使っている形）。
 // 町堂（六角堂・因幡堂）の門も同じ形を流用する（2026-09-01井内さん「他の門を流用して直したら？」）
+// 🚫 元の東西市の門のインデックスは**全9面が裏向き**で、法線もすべて内側を向いていた。
+//    MeshLambertMaterial は既定 FrontSide なので全面カリングされ、屋根が抜けて半透明に見えた
+//    （2026-09-02井内さん「門の修正入れたけど、半透明の屋根が付いてた」。東西市の門は高い位置に
+//    あって上から見るため気づかれていなかった）。巻きを反転し、+z斜面の重複面1枚も除いて8枚にする
 function makeHeianSimpleGableGeometry(w,d,rise=18){
+ // 頂点 0..3=軒の四隅（-x-z, +x-z, -x+z, +x+z）、4/5=棟の両端（棟はX方向に通る）
  const ps=[-w/2,0,-d/2, w/2,0,-d/2, -w/2,0,d/2, w/2,0,d/2, -w/2,rise,0, w/2,rise,0];
- const idx=[0,1,4,1,5,4,2,4,5,2,5,3,0,4,2,2,4,3,1,3,5,0,2,1,1,2,3];
+ const idx=[0,4,1, 1,4,5,  // -z側の斜面
+  2,5,4, 2,3,5,            // +z側の斜面
+  0,2,4, 1,5,3,            // 妻面（三角形・左右）
+  0,1,2, 1,3,2];           // 底面
  const geo=new THREE.BufferGeometry();
  geo.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));
  geo.setIndex(idx);geo.computeVertexNormals();return geo;
