@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="8ea2ae88fbde445d23175fe821fc155dbecfdff2a22a47b8fe8e4c7bdbbf5e6f">
+<meta name="heian-release" content="dc7b7bbcc047e720eb57de17486d0da143f7f20e3d2e6233e369e5fba4697ce1">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -14817,6 +14817,18 @@ const HEIAN_NIGHT={
  // ゲーム全景の実測: .10/.28=暗部34%・.06/.18=67%・.04/.12=71%（平均輝度33・昼102）
  sky:0x070e18,ambientSky:0x1e2c42,ambientGround:0x060a10,ambient:0.04,
  moon:0xcfd9ee,moonIntensity:0.12,moonDir:[-0.45,0.72,0.52], // 東の空に高い月（満月想定）
+ // 歩行中だけ建物が見える明るさへ（2026-09-04井内さん「夜の建物、歩きではもう少し見えるようにしたい」）。
+ // 俯瞰は「街全体が明るすぎる・ほとんど暗くていい」（08-18）のままにして、地上に降りたときだけ上げる
+ // 🚫 walkAmbient（HemisphereLight）は 0.13→0.22 へ上げても画面が変わらなかった（実測18.0・輪郭12.9%）。
+ //    半球光の色が暗い（#1e2c42/#060a10）ので、強度×色の実効値が(0.026,0.038,0.057)しかない。
+ //    夜の建物を見せているのは方向光（月光）だけだった。環境光は色味の担当と割り切る
+ // 🚫 方向光（星明かり）を斜めにしても、朔は輪郭12.9%・上弦32.0%と差が残った。同じ強度・同じ向きでも
+ //    月の方位でカメラ側の面が照らされるかが変わるため、方向光では「どこを向いても見える」を作れない。
+ //    歩行中は半球光の色そのものを明るくして環境光を効かせる（強度だけ上げても色が暗いと効かない）
+ walkAmbient:0.30,walkAmbientSky:0x6d94d8,walkAmbientGround:0x1a2430,walkMoonIntensity:0.34,
+ // 月が沈んでいる夜も、星明かり・大気光ぶんの弱い上方光を残す（月光の下限）。
+ // これが無いと月齢0〜4日・22日以降の夜は建物がシルエットだけになる（2026-09-04井内さん指示で追加）
+ skyGlow:0.12,
  // 灯りは黄色く・小さく・弱く: 橙×大スケールだと俯瞰で火事に見える（2026-08-19井内さん指摘）
  fire:0xffd27a,lamp:0xffe6a8,fireScale:420,lampScale:260,glowScale:3600, // glow=全景で大内裏をほのかに見せる被せ（もっと小さく・2026-08-18井内さん）
  roadDim:0.07, // 夜の無灯材質（道・畦など）の減光率。0.14→0.07＝さらに倍暗く（2026-08-30井内さん「夜間の道は今の倍くらい暗くしたい」）
@@ -14832,6 +14844,38 @@ const HEIAN_NIGHT={
  //    2600では d=2194 の篝火が径416＝見かけ11度の火の玉として残った（実測）
  nearScale:{fire:[9000,0.048,1.6],lamp:[7000,0.062,1.6]},
 };
+// 夜の見た目の調整値は焼き込み（geometry）に一切影響しないので、URLと実行中の口から振れるようにする。
+// 🚫 焼き込みキーは script 全文の SHA-256 なので、値をコードで直すと必ず再焼き込み（約2時間）になる
+//    （2026-09-04井内さん「焼き込んだあと、数値だけを修正できないの？」）。ここを通せば焼き直さずに試せる。
+//    決まった値は次に何かで焼くときにコードへ入れる。localStorageへは保存しない（消し忘れで
+//    「なぜか暗い／明るい」が起きるため。試すときは毎回URLに付ける）
+const HEIAN_NIGHT_TUNABLE=Object.freeze(['ambient','moonIntensity','walkAmbient','walkMoonIntensity',
+ 'skyGlow','roadDim','roadDimWalk','fireScale','lampScale','glowScale','glowNearHide',
+ 'walkAmbientSky','walkAmbientGround','ambientSky','ambientGround']);
+const heianTuneNumber=raw=>{const s=String(raw).trim();
+ if(/^(0x|#)/i.test(s)){const n=parseInt(s.replace('#','0x'),16);return Number.isFinite(n)?n:null;}
+ const n=Number(s);return Number.isFinite(n)?n:null;};
+// URL: ?tune=walkAmbient:0.24,roadDimWalk:0.02,walkAmbientSky:%236d94d8
+function applyHeianNightTune(){
+ const q=new URLSearchParams(location.search).get('tune');if(!q)return{};
+ const applied={};
+ for(const pair of q.split(',')){
+  const i=pair.indexOf(':');if(i<1)continue;
+  const k=pair.slice(0,i).trim(),v=heianTuneNumber(pair.slice(i+1));
+  if(v===null||!HEIAN_NIGHT_TUNABLE.includes(k))continue;
+  HEIAN_NIGHT[k]=v;applied[k]=v;
+ }
+ if(Object.keys(applied).length)console.log('HEIAN_TUNE '+JSON.stringify(applied));
+ return applied;
+}
+const heianNightTuneApplied=applyHeianNightTune();
+// 実行中に振る（例: __heianTune({walkAmbient:0.24}) で即反映。色は '#6d94d8' でも 0x6d94d8 でも可）
+window.__heianTune=(obj={})=>{
+ for(const k of HEIAN_NIGHT_TUNABLE)if(k in obj){const v=heianTuneNumber(obj[k]);if(v!==null)HEIAN_NIGHT[k]=v;}
+ if(heianNightRuntime)applyHeianTimeOfDay(heianClock.hour,heianClock.day);
+ return Object.fromEntries(HEIAN_NIGHT_TUNABLE.map(k=>[k,HEIAN_NIGHT[k]]));};
+window.__heianTuneInfo=()=>({url:heianNightTuneApplied,
+ now:Object.fromEntries(HEIAN_NIGHT_TUNABLE.map(k=>[k,HEIAN_NIGHT[k]])),tunable:[...HEIAN_NIGHT_TUNABLE]});
 // ---- 時刻の流れ（2026-08-30井内さん指示「丸1日を再現し、いずれ毎日にして東市西市を15日で替える」）
 // 暦は太陰太陽暦なので day がそのまま月齢になる（1日=朔・15日=望）。東西市の15日交替と満月が同じ day から出る。
 // 季節は夏に固定（旧暦6月＝現在の7月頃の京。日の出4:50・日の入19:12）。
@@ -14857,11 +14901,14 @@ function heianNightLightPoints(){
  const pts=[];
  const push=(x,z,y,kind,scale)=>pts.push({x,z,y,kind,scale});
  // 大内裏: 主要な門の前に篝火を左右一対。朱雀門・応天門・内裏南門・豊楽院門
- for(const[x,z]of[[0,6640],[0,2100],[1725,-160],[-2103,2600]]){push(x-90,z,110,'fire',1.3);push(x+90,z,110,'fire',1.3);} // 内裏南門前は建礼門(1725,-47)の南へ追随（2026-08-19）
+ // 🚫 篝火の高さを110（実寸11m）に置いていたため、地上から見ると門の屋根の高さに火が浮いていた
+ //    （2026-09-04井内さん「朱雀門の屋根に篝火があるのは変」）。遠景で埋もれないよう上げた値だが、
+ //    遠景は glow が担うので不要。篝火の火床は地面で、炎の中心は地面＋1.6m＝16
+ for(const[x,z]of[[0,6640],[0,2100],[1725,-160],[-2103,2600]]){push(x-90,z,16,'fire',1.3);push(x+90,z,16,'fire',1.3);} // 内裏南門前は建礼門(1725,-47)の南へ追随（2026-08-19）
  // 寺・神社・官学・鴻臚館・港: 灯明を1点（港だけ篝火）
  for(const id of['toji','saiji','shinsenen','eastKorokan','westKorokan','daigakuryo','kokuso','daishogun','gojoTenjin','yodotsu','tobatsu']){
   const s=HEIAN_LANDMARK_SITES[id];if(!s)continue;
-  push(s.x,s.z,90,id==='yodotsu'||id==='tobatsu'?'fire':'lamp',1);
+  push(s.x,s.z,id==='yodotsu'||id==='tobatsu'?16:14,id==='yodotsu'||id==='tobatsu'?'fire':'lamp',1); // 90→14/16（灯明は人の手の高さ）
  }
  // 全景用に大内裏をほのかに包む光1枚（門前の篝火だけでは34km離れた全景で見えない）。控えめに
  push(0,0,400,'glow',1);
@@ -14871,9 +14918,26 @@ function heianNightLightPoints(){
  for(let i=0;i<24;i++){
   const x=700+hs(i,11)*10200,z=-5200+hs(i,23)*28000;
   if(hs(i,37)>.5)continue; // 半分に間引く
-  push(x,z,70,'lamp',.6);
+  push(x,z,12,'lamp',.6); // 70→12（邸内の灯明。屋根の上に浮かせない）
  }
  return pts;
+}
+// 月光の強さと向き（2026-09-04）。月の位相（照り）と高度の両方で決める。
+// light: 0=月が無い／沈んでいる、1=満月が高く昇っている。dir: 月のある方角の単位ベクトル（x=東 y=上 z=南）
+// 高度は35°で最大とみなす（京の夏の月はこのあたりまで昇る）。地平線際は薄いので3°から立ち上げる
+function heianMoonLightVector(hour,day){
+ const d2r=Math.PI/180,phi=HEIAN_SKY_LAT*d2r;
+ const ph=(((day-1)%HEIAN_CLOCK_CONFIG.daysPerMonth)/HEIAN_CLOCK_CONFIG.daysPerMonth);
+ const{illum}=heianMoonPhase(day);
+ const[mra,mdec]=heianMoonRaDec(ph),[pa,pd]=heianPrecessRaDec(mra,mdec);
+ const lst=(HEIAN_SKY_LST0+hour*15*1.0027379)%360;
+ const ha=(lst-pa)*d2r,dd=pd*d2r,cd=Math.cos(dd),sd=Math.sin(dd);
+ const alt=Math.asin(THREE.MathUtils.clamp(sd*Math.sin(phi)+cd*Math.cos(phi)*Math.cos(ha),-1,1));
+ const az=Math.atan2(-cd*Math.sin(ha),sd*Math.cos(phi)-cd*Math.sin(phi)*Math.cos(ha));
+ const up=THREE.MathUtils.smoothstep(alt/d2r,3,35); // 地平線下は0
+ return{light:illum*up,illum,altDeg:Math.round(alt/d2r*10)/10,
+  azDeg:Math.round(((az/d2r)+360)%360*10)/10,
+  dir:[Math.sin(az)*Math.cos(alt),Math.sin(alt),-Math.cos(az)*Math.cos(alt)]};
 }
 // 昼夜を切り替える。夜は空・環境光・太陽を差し替え、灯りのスプライトを足す。
 // 🚫 PointLightを数百個置くと描画が破綻するので、灯りは発光スプライト＋弱い環境光で表現する。
@@ -15016,13 +15080,36 @@ function applyHeianTimeOfDay(hour,day=heianClock.day){
   scene.background.copy(ca).lerp(cb,t);
  }
  // 夜の環境光・月光と、灯りのスプライト
- const{illum}=heianMoonPhase(day);
- r.hemi.intensity=HEIAN_NIGHT.ambient*lamp;
- r.moon.intensity=HEIAN_NIGHT.moonIntensity*lamp*(0.35+0.65*illum); // 朔の夜は月明かりが無い
+ // 歩行中は建物の形が読める程度に環境光と月光を上げる（2026-09-04井内さん「夜の建物、歩きでは
+ // もう少し見えるようにしたい」）。俯瞰・ツアーは「ほとんど暗くていい」の指示どおり据え置き。
+ // 道は roadDimWalk で暗いままなので、暗い道と月に照らされた建物の対比になる
+ const walking=!!heianWalk?.active;
+ // 🚫 月光の向きが moonDir 固定で、月が沈んでいても同じだけ照らしていた。朔でも0.35残っていた
+ //    （2026-09-04井内さん「満月なら建物が明るめ、三日月なら暗めも可能なの？」）。
+ //    月の高度・方位を実際の位置から出し、地平線下なら月光を消す。向きも月のある方角から当てる
+ const moon=heianMoonLightVector(hour,day);
+ // 🚫 環境光に月齢係数を掛けて朔の下限を2割上げたが、画面の輝度は16.9→17.3でほぼ変わらなかった
+ //    （2026-09-04実測）。HemisphereLightの色が暗い（#1e2c42/#060a10）ため、強度0.1前後では
+ //    Lambertの建物がほぼ黒のまま。明るさの主役は月光（方向光）側だった。
+ //    設計を分ける: 環境光＝月に依らない最低限の見え（星明かり・大気光）／月光＝月齢と高度で変わる。
+ //    こうすると「月の無い夜も輪郭は見える」「満月の夜は陰影が出て明るい」が両立する
+ r.hemi.intensity=(walking?HEIAN_NIGHT.walkAmbient:HEIAN_NIGHT.ambient)*lamp;
+ r.hemi.color.setHex(walking?HEIAN_NIGHT.walkAmbientSky:HEIAN_NIGHT.ambientSky);
+ r.hemi.groundColor.setHex(walking?HEIAN_NIGHT.walkAmbientGround:HEIAN_NIGHT.ambientGround);
+ // 月光の下限は skyGlow（星明かり）。月が出ていればその方角から、沈んでいれば天頂寄りから当てる
+ const lit=Math.max(HEIAN_NIGHT.skyGlow,moon.light);
+ r.moon.intensity=(walking?HEIAN_NIGHT.walkMoonIntensity:HEIAN_NIGHT.moonIntensity)*lamp*lit;
+ if(moon.light>HEIAN_NIGHT.skyGlow)r.moon.position.set(moon.dir[0]*100000,Math.max(.05,moon.dir[1])*100000,moon.dir[2]*100000);
+ // 🚫 星明かりを真上から当てたら、屋根だけ照らされて壁が暗く、輪郭が判る画素は12.9%のまま
+ //    （同じ強度でも斜めから当たる上弦は32.0%）。全天光に方向は無いが、見せるために斜めへ倒す
+ else{const h=Math.hypot(moon.dir[0],moon.dir[2])||1;
+  r.moon.position.set(moon.dir[0]/h*64000,76000,moon.dir[2]/h*64000);} // 高度約50°の斜め
  for(const s of r.root.children){const base=s.userData.heianBaseOpacity;if(base===undefined)continue;
   s.material.opacity=base*lamp;s.material.needsUpdate=true;}
- // 道・水面の無灯材質は昼色×(1→roadDim)で補間する。歩行中だけ下限を roadDimWalk まで落とす
- const roadFloor=heianWalk?.active?HEIAN_NIGHT.roadDimWalk:HEIAN_NIGHT.roadDim;
+ // 道・水面の無灯材質は昼色×(1→roadDim)で補間する。歩行中だけ下限を roadDimWalk まで落とす。
+ // 🚫 道は MeshBasic でライトの影響を受けないため、月光を月齢に連動させたら「月の無い夜は建物が
+ //    真っ黒なのに道だけ明るい」という逆転が起きた（2026-09-04実測）。道の暗さも月光へ連動させる
+ const roadFloor=(heianWalk?.active?HEIAN_NIGHT.roadDimWalk:HEIAN_NIGHT.roadDim)*(0.85+0.35*moon.light);
  for(const[m,hex]of r.dimmed){const dim=THREE.MathUtils.lerp(1,roadFloor,lamp);m.color.setHex(hex).multiplyScalar(dim);}
  updateHeianStars(hour,day,lamp); // 星空・天の川・月（薄明で消え、薄暮で戻る）
  heianClock.hour=((hour%24)+24)%24;heianClock.day=day;
@@ -15158,6 +15245,35 @@ window.__heianRiverProbe=(x,z)=>{
   at:at.length?{x,z,hover:window.__heianPlaceName?.(x,z)??null,
    terrain:Math.round((window.__heianGroundY?.(x,z)??0)*10)/10,
    topMost:at[0],stack:at}:null};};
+// 名前でメッシュの材質と今の色を引く（2026-09-04）。夜に暗くならない面の切り分け用。
+// inDimmed=false なら setHeianNight の減光対象に入っていない（＝夜でも昼の明るさのまま）
+window.__heianMaterialProbe=(pattern,limit=8)=>{const re=new RegExp(pattern),out=[],seen=new Set();
+ scene.traverse(o=>{if(!o.isMesh&&!o.isInstancedMesh)return;if(out.length>=limit)return;
+  if(!re.test(o.name||''))return;
+  for(const m of(Array.isArray(o.material)?o.material:[o.material])){
+   if(!m||seen.has(m.uuid))continue;seen.add(m.uuid);
+   out.push({name:o.name,type:m.type,color:m.color?'#'+m.color.getHexString():null,
+    map:!!m.map,vertexColors:!!m.vertexColors,
+    inDimmed:!!heianNightRuntime?.dimmed?.some(([mm])=>mm===m)});}});
+ return out;};
+// 名前でメッシュのworld bboxを引く（2026-09-04）。灯りの高さと屋根の高さを突き合わせるのに使う
+window.__heianMeshBox=(pattern,limit=12)=>{const re=new RegExp(pattern),out=[];
+ scene.updateMatrixWorld(true);
+ scene.traverse(o=>{if(!o.isMesh||out.length>=limit||!re.test(o.name||''))return;
+  const b=new THREE.Box3().setFromObject(o),r=v=>Math.round(v*10)/10;
+  out.push({name:o.name,y:[r(b.min.y),r(b.max.y)],x:[r(b.min.x),r(b.max.x)],z:[r(b.min.z),r(b.max.z)]});});
+ return out;};
+// 夜の明るさの実測用。歩行中は建物が見える値へ、月齢と月の高度で月光が変わる（2026-09-04）
+window.__heianNightLevels=()=>{const r=heianNightRuntime;if(!r)return null;
+ const r3=v=>Math.round(v*1000)/1000;
+ const ml=heianMoonLightVector(heianClock.hour,heianClock.day);
+ return{walking:!!heianWalk?.active,hemi:r3(r.hemi.intensity),moon:r3(r.moon.intensity),
+  moonLight:r3(ml.light),moonIllum:r3(ml.illum),moonAltDeg:ml.altDeg,moonAzDeg:ml.azDeg,
+  configured:{ambient:HEIAN_NIGHT.ambient,walkAmbient:HEIAN_NIGHT.walkAmbient,
+   moonIntensity:HEIAN_NIGHT.moonIntensity,walkMoonIntensity:HEIAN_NIGHT.walkMoonIntensity,
+   roadDim:HEIAN_NIGHT.roadDim,roadDimWalk:HEIAN_NIGHT.roadDimWalk},
+  lights:r.root.children.filter(s=>s.userData.heianBaseOpacity!==undefined).slice(0,4)
+   .map(s=>({y:Math.round(s.position.y*10)/10,scale:Math.round(s.scale.x)}))};};
 // 篝火・灯明の近距離スケールの実測用。今のカメラから近い順に距離と実スケールを返す（2026-08-30）
 window.__heianLightNearProbe=()=>{const list=heianNightRuntime?.root?.userData?.heianNearSprites;if(!list)return null;
  return{camera:[camera.position.x,camera.position.y,camera.position.z].map(v=>Math.round(v)),count:list.length,
