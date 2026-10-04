@@ -342,7 +342,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:['nobles','street'],who:'従者',t:'お車の後ろは、牛の尻しか見えん'},
 // ---- ロボに向けて（近くにいるとき）
 {at:['street','commoners'],who:'庶民',if:'robot',t:'な、なんじゃその鉄の童は…'},
-{at:['street','commoners'],who:'庶民',if:'robot',t:'唐から来た絡繰か？ よう動くのう'},
+{at:['street','commoners'],who:'庶民',if:'robot',t:'唐から来た作り物か？ よう動くのう'},
 {at:['street','commoners'],who:'庶民',if:'robot',t:'お主、どこの国の者だ。言葉は通じるか'},
 {at:['street','commoners','kamo'],who:'童',if:'robot',t:'ねえ、頭の棒は何？ 触ってもいい？'},
 {at:['street','commoners','kamo'],who:'童',if:'robot',t:'目が光っとる！ 夜も見えるの？'},
@@ -504,8 +504,8 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'street',who:'旅人',t:'伊勢から来た。都の水は国より冷たいのう'},
 {at:'street',who:'旅人',t:'宿の主に銭を渡したら、嫌な顔をされた。布で払えとさ'},
 {at:'street',who:'行商',t:'丹波から炭を担いで来た。重いが売れる'},
-{at:'street',who:'行商',t:'大原の女は薪を頭に載せて売りに来る',n:'大原女は後代の呼び名（推定）'},
-{at:'street',who:'行商',t:'桂の鮎売りは女の仕事さ。朝が早い',n:'桂女（推定）'},
+{at:'street',who:'行商',t:'北の山里の女が、薪を負うて売りに来る',n:'大原女は後代の呼び名（推定）'},
+{at:'street',who:'行商',t:'桂川の鮎は、朝のうちに売らんと弱る',n:'桂女（推定）'},
 // ---- 船岡山・郊外の話（井内さんの例「船岡山に登ってみたか？」）
 {at:'street',who:'庶民',t:'船岡山に登ってみたか？ 都が碁盤の目に見えるぞ'},
 {at:'street',who:'庶民',t:'船岡山の上から、朱雀大路が一本の帯に見える'},
@@ -683,7 +683,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'rajomon',who:'僧',t:'門の下で行き倒れた者を弔いました'},
 {at:'south',who:'旅人',t:'作り道は淀の津からまっすぐ。迷いようがない'},
 {at:'south',who:'人夫',t:'鳥羽の津で米を降ろして、ここから担ぐ'},
-{at:'south',who:'行商',t:'山崎の油を売りに来た。都は油をよく使う'},
+{at:'south',who:'行商',t:'山崎の津から、荏胡麻の油を担いで来た'},
 // ---- 季節・時刻（どこでも）
 {at:'any',who:'庶民',if:'sakura',t:'桜が散る前に、嵯峨野へ行きたいのう'},
 {at:'any',who:'女',if:'spring',t:'桜襲の衣、今年は誰が着るのかしら'},
@@ -734,7 +734,7 @@ window.HEIAN_LINES={version:2,terms:{
 // ---- ロボに向けて（追加）
 {at:['street','commoners'],who:'庶民',if:'robot',t:'お主、飯は食うのか？ 何を食う'},
 {at:['street','commoners'],who:'庶民',if:'robot',t:'その体、雨に濡れても錆びんのか'},
-{at:['street','commoners'],who:'女',if:'robot',t:'あら、腕が動いた。からくり人形ね'},
+{at:['street','commoners'],who:'女',if:'robot',t:'あら、腕が動いた。作り物の人形ね'},
 {at:['toji','saiji','rokakudo','street'],who:'僧',if:'robot',t:'物の怪なら、経で退散するはず…せんな'},
 {at:['daidairi','shoin','suzaku'],who:'官人',if:'robot',t:'どこの国の献上品だ。帳簿に載っておらんぞ'},
 {at:['horikawa','daidairi','rajomon','street'],who:'人夫',if:'robot',t:'力はありそうだな。荷を担いでくれんか'},
@@ -1149,7 +1149,7 @@ dialogs:[
 //      if のある対話は同じ人の普段の対話より先に選ばれる。節の set で状態を進める（進むだけ）
 {id:'maigo-start',char:'okina_katari',if:'q:maigo<1',title:'昔語りの翁',start:'s',nodes:{
  s:{t:'おお、鉄の童…すまんが、孫の小太郎を見かけなんだか。昔語りの途中で、ふっと消えてしもうた',c:[['探してみる','ok'],['どんな子？','who'],['今は手が離せない','no']]},
- who:{t:'七つの男の子じゃ。猫と舟が好きでな、見ればすぐ走り出す。茶の衣を着とる',c:[['探してみる','ok'],['今は手が離せない','no']]},
+ who:{t:'七つの男の子じゃ。猫と舟が好きでな、見ればすぐ走り出す。橡色の衣を着とる',c:[['探してみる','ok'],['今は手が離せない','no']]},
  ok:{t:'ありがたい。市の売り子なら、何か見とるかもしれん。わしはここで待っとる',set:'maigo=1',c:[['行ってくる','bye']]},
  no:{t:'そうか…いや、無理を言うた',end:true},
  bye:{t:'頼んだぞ',end:true}}},
@@ -1165,7 +1165,7 @@ dialogs:[
  oni4:{t:'村の者は驚いたが、誰も追い出さなんだ。…姿より、何をしたかで人は決まる、という話じゃよ。お主も、似たようなもんじゃろう',c:[['ありがとう','bye']]},
  bye:{t:['また来いよ。小太郎も待っとる','次は、お主の話も聞かせてくれ'],end:true}}},
 {id:'maigo-clue1',who:['売り子','客','庶民'],at:['eastMarket'],if:'q:maigo=1',title:'東市の人',start:'s',nodes:{
- s:{t:'茶の衣の男の子？ ああ、黒い猫を追って北の端のほうへ駆けてったよ。菊女さんの干物の店のあたりだ',set:'maigo=2',c:[['ありがとう','bye']]},
+ s:{t:'橡色の衣の男の子？ ああ、黒い猫を追って北の端のほうへ駆けてったよ。菊女さんの干物の店のあたりだ',set:'maigo=2',c:[['ありがとう','bye']]},
  bye:{t:'見つかるといいね',end:true}}},
 {id:'maigo-clue2',char:'kikume',if:'q:maigo=2',title:'菊女',start:'s',nodes:{
  s:{t:'黒い猫？ うちに居ついた子だね。あの子なら、干物の匂いを追って堀川の荷舟のほうへよく行くよ',set:'maigo=3',c:[['堀川へ行ってみる','bye']]},
@@ -1744,9 +1744,9 @@ people:[
  family:"紀伊に母",
  story:"高野の山で修行を始め、東寺に移った。塔の心柱を百人で立てた話を老僧から聞くのが好き。西寺の賢心とは、東寺と西寺の張り合いを冗談にする仲",
  recent:["塔の修理の足場","講堂の仏さまのお身拭い","堀川から届いた材木"],
- wants:"いつか高野の山で、大師の御廟にお参りすること",
+ wants:"いつか高野の山で、空海さまの御廟にお参りすること",
  day:[[4,6,"toji","朝の勤行"],[6,17,"toji","掃除"],[17,4,"toji","夜"]],
- lines:{"朝の勤行":["南無大師遍照金剛…"],"掃除":["金堂の床は、毎日拭いても埃が積もる","塔の心柱を百人で立てたそうです"],"夜":["経を三巻、今夜のうちに"]},
+ lines:{"朝の勤行":["南無遍照金剛…"],"掃除":["金堂の床は、毎日拭いても埃が積もる","塔の心柱を百人で立てたそうです"],"夜":["経を三巻、今夜のうちに"]},
  intro:["東寺の沙弥、蓮観と申します","経の暗誦と、お堂の掃除が務めです","紀伊の生まれ。高野の山で修行を始めました","塔の心柱は、百人で綱を引いて立てたそうですよ","いつか高野の御廟にお参りしたいのです"],
  knows:{"kenshin":"西寺の賢心さまは、西寺の塔のほうが高いと言い張ります","uomaro":"堀川の船頭さんが、塔の修理の材木を運んでくれました"},
  kb:{"dom":{"仏事":2,"学問":1},"lens":"信心","src":["kenshin","zenne","shakyosei"]},
@@ -3671,3 +3671,1670 @@ L.say.push(
  {at:'street',who:'童',when:'afternoon',t:'日が暮れる前に帰れって、母さまが言うの',n:'架空'}
 );
 })();
+
+// 着手案24：とりとめのない話（天気・空と星・酒・食い物・暮らしの小言・暑さ・虫と鳥・行事・病）― 2026-10-04 下書き。2026-10-04 20:09 heian-lines.js に入れた
+// 井内さん「特にセリフのない人向けの、あんまり何かに接続しなそうな、天気、星、酒、食い物とかの話しかしないパターン」「芋粥って美味しいらしいね、とか」
+// 話し手は群衆（名の無い町の人・人夫・客・売り子・童・官人）。名前のある住人は自分の lines を言うので、ここは使わない
+// kind:'zatsu'＝頼みごと・噂・話題（TOPICS）のどれにもつながらない印。本体は読まなくてよい（読むなら、深掘りの「〇〇とは？」を付けない、に使える）
+// 今の一言には天気（rain・cloudy・clear）の条件の行が1つも無い ⇒ 雨と曇りの日に、はじめて天気の話が出る
+// 場所は at:'any' にしない（最初の不満「どこでも同じ話」）。町なか・市・荷の道・大内裏に分けた
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+L.say.push(
+ {at:['street','commoners'],who:'庶民',if:'rain',t:'よう降るのう。屋根が持つかの',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'rain',t:'洗い物が乾かん。困ったもんだ',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',if:'rain',t:'雨じゃ荷が濡れる。今日は休みじゃ',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'売り子',if:'rain',t:'この雨じゃ、客の足も遠のくよ',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',if:'rain',t:'水たまりで遊んだら、母ちゃんに叱られた',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'rain',t:'雨の日は、膝が痛うてかなわん',kind:'zatsu'},
+ {at:['daidairi'],who:'官人',if:'rain',t:'雨の日の出仕は、沓が泥だらけになる',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'cloudy',t:'雲が低い。昼から降るかもしれん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'cloudy',t:'降るのか降らんのか、はっきりせん空だね',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'客',if:'cloudy',t:'降らんうちに、買うて帰ろう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'morning',if:'clear',t:'よう晴れた。洗い物日和じゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'morning',if:'clear',t:'お天道さまが気持ちええね',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'noon',if:'clear',t:'日が高うなった。汗が止まらん',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dusk',if:'clear',t:'夕焼けがきれいだ。明日も晴れるぞ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'暑うて、何もする気が起きん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'summer',t:'打ち水でもせんと、やっとられんね',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'afternoon',if:'summer',t:'夕立が来そうな雲じゃ。早う帰ろう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'winter',t:'冷えるのう。手がかじかむ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'morning',if:'winter',t:'今朝は井戸の水が冷とうて冷とうて',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'autumn',t:'朝晩、だいぶ涼しゅうなったのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'spring',t:'日が長うなった。夕餉の支度が遅れるよ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',t:'今夜は星がよう見える',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',when:'night',t:'流れ星を見た！ ほんとだって',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'night',t:'あれが天の川かね。白い帯みたいだ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',if:'summer',t:'牽牛と織女は、もうじき逢えるのう',kind:'zatsu',n:'七夕の乞巧奠は宮中で行われた（通説）'},
+ {at:['street','commoners'],who:'庶民',when:'night',t:'北の空の動かん星を見て、道を知るんだと',kind:'zatsu',n:'北辰（北極星）（通説）'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'night',t:'星を数えとったら、眠うなった',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',if:'fullMoon',t:'月が明るうて、影が濃いのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'night',if:'fullMoon',t:'こんな月の夜は、寝るのが惜しいね',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',when:'night',if:'fullMoon',t:'月に兎がおるって、ほんと？',kind:'zatsu',n:'月の兎は『今昔物語集』などに見える説話。古くからの言い伝え（推定）'},
+ {at:['street','commoners'],who:'庶民',when:'night',if:'newMoon',t:'月が無い夜は、星がよけいに多い',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dawn',t:'明けの明星が光っとる。もうひと仕事か',kind:'zatsu',n:'明星（金星）'},
+ {at:['street','commoners'],who:'女',when:'dusk',t:'宵の明星が出た。夕餉にしよう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dusk',t:'仕事のあとの一杯が、たまらんのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',t:'糟湯酒でもすすって、寝るとするか',kind:'zatsu',n:'糟湯酒＝酒糟を湯に溶いたもの。『万葉集』貧窮問答歌（確か）'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'dusk',t:'今日の駄賃は、ぜんぶ酒に消えそうだ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',t:'濁り酒は、冷やより温めたのがええ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'night',t:'亭主がまた飲んだくれて帰ってきた',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',if:'winter',t:'寒い夜は、酒がいちばんの薬じゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'酒は飲んでも、飲まれるなと言うがのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'従者',when:'night',t:'お供の帰りに、一杯だけ。一杯だけな',kind:'zatsu'},
+ {at:['daidairi'],who:'官人',when:'dusk',t:'宴の酒は、上等すぎて味が分からん',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'客',when:'dusk',t:'糟女の婆さんの小屋で、一杯ひっかけるか',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'芋粥ってのは、美味いらしいのう',kind:'zatsu',n:'芋粥＝山の芋を甘葛の汁で煮た粥。大臣の大饗の料理（推定）。五位の侍が芋粥を飽きるほど食いたいと言った話は『今昔物語集』（12世紀の書・基経の頃の話として伝わる）＝町の噂として'},
+ {at:['street','commoners'],who:'庶民',t:'一度でええ、芋粥を腹いっぱい食うてみたい',kind:'zatsu',n:'同上'},
+ {at:['eastMarket','westMarket'],who:'客',t:'芋粥は、大臣さまの宴に出るんだと。甘葛で煮るそうな',kind:'zatsu',n:'甘葛（あまずら）＝ツタの樹液を煮詰めた甘味料（通説）'},
+ {at:['street','commoners'],who:'女',t:'甘葛の汁は甘いんだって。舐めてみたいね',kind:'zatsu',n:'甘葛（通説）'},
+ {at:['street','commoners'],who:'庶民',when:'morning',t:'朝の粥が薄うて、昼まで持たん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'dusk',t:'今夜の汁は、菜っ葉だけだよ',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',when:'afternoon',t:'腹へった…唐菓子が食べたい',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'noon',t:'干し飯を水でふやかして食う。これが昼飯よ',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',t:'強飯を腹いっぱい食える日は、めったにない',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'冷やした瓜は、何よりのご馳走じゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'鮎の塩焼き、一度でいいから丸ごと食いたい',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'autumn',t:'栗を拾うてきた。焼いて食べよう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'autumn',t:'新米の季節じゃ。…わしらの口に入るのは先だがの',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'winter',t:'熱い汁が、腹に沁みるのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'spring',t:'若菜を摘んできた。羹にしよう',kind:'zatsu',n:'若菜（通説）'},
+ {at:['eastMarket','westMarket'],who:'客',t:'干した鯛を見たら、腹が鳴った',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'客',t:'若狭の鯖は、塩が効いとって美味い',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'塩が高うなって、漬け菜も作れん',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'鮑なんぞ、一生口に入らんじゃろうな',kind:'zatsu'},
+ {at:['daidairi'],who:'官人',when:'noon',t:'今日の昼は、また干した鰹か',kind:'zatsu',n:'堅魚（干した鰹）は調の品（通説）'},
+ {at:['street','commoners'],who:'童',t:'餅が食べたいなあ。正月まで遠いや',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'醤をちょっと付けるだけで、飯が進むんだよ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'morning',t:'ゆうべは蚊に食われて、眠れなんだ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'近ごろ、腰が重うてかなわん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'隣の猫が、また軒で寝とる',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dawn',t:'鶏が鳴く前に目が覚めてしもうた',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'針に糸が通らん。歳かね',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'afternoon',t:'昼寝がしたい。…せんがの',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',t:'蝉の抜け殻、十も見つけた',kind:'zatsu'}
+);
+// 掛け合い（2人）。本体の掛け合いは at が1つの文字列（ctx.tags.has(t.at)）・who の並びが話し手の順（同じ種類なら2回書く）
+L.talk.push(
+ {at:'street',if:'rain',who:['庶民','庶民'],lines:[[0,'また雨か'],[1,'三日続きじゃ。蛙ばかり喜んどる']],kind:'zatsu'},
+ {at:'street',when:'night',who:['庶民','庶民'],lines:[[0,'あの星、昨夜より明るうないか'],[1,'酒のせいじゃ。わしも明るう見える']],kind:'zatsu'},
+ {at:'street',who:['庶民','庶民'],lines:[[0,'芋粥ってのは、どんな味じゃろうな'],[1,'甘いんだと。…想うだけで腹が鳴るわ']],kind:'zatsu'},
+ {at:'eastMarket',when:'dusk',who:['客','客'],lines:[[0,'一杯やっていくか'],[1,'銭がない。…見るだけにしとこう']],kind:'zatsu'},
+ {at:'street',if:'summer',who:['女','女'],lines:[[0,'暑いねえ'],[1,'暑いねえ。…言うたら、よけい暑うなった']],kind:'zatsu'},
+ {at:'street',when:'noon',who:['人夫','人夫'],lines:[[0,'昼は何じゃ'],[1,'干し飯じゃ。昨日も、明日もな']],kind:'zatsu'},
+ {at:'street',when:'night',if:'fullMoon',who:['女','女'],lines:[[0,'ええ月だねえ'],[1,'月はええが、蚊がうるさい']],kind:'zatsu'},
+ {at:'street',if:'winter',who:['庶民','庶民'],lines:[[0,'寒いのう'],[1,'寒い。…熱い汁が飲みたいのう']],kind:'zatsu'}
+);
+// ---- 2026-10-04 追加：暑さ・日照り（この頃は暖かい時代）・虫と鳥・季節の行事・病の小言・食い物と酒と天気の追加
+L.say.push(
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'また日照りか。井戸の水が浅うなった',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'summer',t:'水汲みの列が、毎朝長うなる',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'noon',if:'summer',t:'この暑さで荷を担ぐのは、地獄じゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'爺さまの頃より、夏が長うなった気がする',kind:'zatsu',n:'7〜9世紀は温暖で、高温・乾燥・干ばつが多かったとされる（古川柳蔵「気候変動とイノベーション」2020）。町の人の実感として'},
+ {at:['street','commoners'],who:'女',when:'noon',if:'summer',t:'日の高いうちは、外に出たくないね',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',if:'summer',t:'堀川で水浴びしたい！',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',if:'summer',t:'夜になっても、ちっとも涼しゅうならん',kind:'zatsu'},
+ {at:['daidairi'],who:'官人',if:'summer',t:'宮中には氷室の氷が上がるそうな。羨ましい',kind:'zatsu',n:'氷室の氷を宮中へ献じる（『日本書紀』仁徳紀に見える古い習わし・通説）'},
+ {at:['daidairi'],who:'官人',if:'summer',t:'束帯は暑うてかなわん。誰が決めたのか',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'売り子',if:'summer',t:'この暑さじゃ、干物より先にわしが干上がる',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'田の水が足りんと、里の兄から便りが来た',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'summer',t:'扇で扇いでも、熱い風が来るだけだよ',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',when:'night',if:'summer',t:'蛍がおった！ 堀川のほうに、たんと',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'night',if:'autumn',t:'松虫が鳴いとる。秋だねえ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dawn',if:'summer',t:'ほととぎすが鳴いた。今年初めてじゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'morning',if:'spring',t:'鶯が鳴いとる。まだ下手くそだけど',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dusk',if:'autumn',t:'雁が渡っていく。もう秋も深いのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'rain',t:'蛙がやかましい。雨が嬉しいんじゃろ',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',t:'烏に干し飯を取られた！',kind:'zatsu'},
+ {at:['eastMarket','westMarket'],who:'売り子',t:'雀がまた米をついばみに来よる',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'summer',t:'蝿を追うのに、手が休まらん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'軒に燕が巣をかけたよ。縁起がええね',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'spring',t:'賀茂の祭が近い。見物の場所を取らにゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',if:'summer',t:'五月五日には、軒に菖蒲を挿さなくちゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'autumn',t:'七月は寺で盂蘭盆の供養じゃ。親の分も',kind:'zatsu',n:'盂蘭盆会は奈良時代から（通説）'},
+ {at:['street','commoners'],who:'女',when:'night',if:'summer',t:'今夜は七夕。糸を供えて、針仕事の上達を',kind:'zatsu',n:'乞巧奠（宮中・通説）。町の人の習いとしては推定'},
+ {at:['street','commoners'],who:'庶民',if:'winter',t:'年の暮れには、宮中で鬼やらいがあるそうな',kind:'zatsu',n:'追儺（大晦日・宮中）'},
+ {at:['street','commoners'],who:'童',if:'winter',t:'正月が来たら、餅が食える！',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'歯が痛うて、飯が噛めん',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'子が咳をしとる。五条の巫に祓うてもらおうか',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'ゆうべ食うた魚に当たったか、腹がしぶる',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'熱が出たり引いたり。厄介なもんじゃ',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',t:'肩の皮がむけた。荷の縄が食い込む',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'目がかすむ。灯し油がもったいなくて',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'winter',t:'あかぎれが痛い。水仕事はつらい',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',t:'蘇ってのは、牛の乳を煮詰めたもんだと',kind:'zatsu',n:'蘇は諸国から貢進された乳製品（通説）'},
+ {at:['eastMarket','westMarket'],who:'客',t:'蒜を食うたら、三日は人に寄るなと言われた',kind:'zatsu',n:'蒜（ひる・にんにくの類）（通説）'},
+ {at:['street','commoners'],who:'女',if:'summer',t:'茄子をもろうた。漬けておこう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'autumn',t:'柿が色づいた。干し柿にせにゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'童',if:'autumn',t:'椎の実を拾うた。炒ったら美味いんだ',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'dusk',t:'今夜は鰯が一匹ある。贅沢じゃ',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',t:'糯米を蒸して、粽を作ろうかね',kind:'zatsu',n:'粽（ちまき）は『和名類聚抄』（10世紀前半）に見える（推定）'},
+ {at:['street','commoners'],who:'庶民',when:'dusk',if:'summer',t:'暑い日の酒は、すぐ回る',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'night',t:'糟女の婆さんの酒は、薄いが安い',kind:'zatsu'},
+ {at:['street','commoners'],who:'女',when:'dusk',t:'酒の匂いがする。また寄り道したね',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'rain',t:'雷が鳴った。北野のほうに落ちたかの',kind:'zatsu',n:'北野は地名。天満宮（947）とは関係ない'},
+ {at:['street','commoners'],who:'女',if:'rain',t:'雨漏りがひどい。桶が足りん',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'dawn',t:'朝霧が深い。東山が見えん',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'winter',t:'雪がちらついとる。今年は早いのう',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',if:'autumn',t:'野分が来るぞ。屋根に石を載せとけ',kind:'zatsu',n:'野分＝秋の大風'}
+);
+L.talk.push(
+ {at:'street',if:'summer',who:['庶民','庶民','庶民'],lines:[[0,'暑いのう'],[1,'爺さまの頃は、もうちっと涼しかった'],[2,'…爺さまも、同じことを言うとったわ']],kind:'zatsu'},
+ {at:'street',when:'dusk',if:'summer',who:['女','女','女'],lines:[[0,'井戸がまた浅うなった'],[1,'雨乞いをしとるそうな。神泉苑で'],[2,'降るといいねえ。洗い物が溜まる一方だ']],kind:'zatsu'},
+ {at:'street',when:'night',if:'summer',who:['童','童'],lines:[[0,'蛍、何匹捕まえた？'],[1,'七つ！ …あ、二つ逃げた']],kind:'zatsu'},
+ {at:'street',who:['庶民','庶民'],lines:[[0,'歯が痛い'],[1,'塩を擦り込め。わしはそれで治った']],kind:'zatsu'}
+);
+})();
+
+// 着手案26：雷の昔話（2026-10-04 下書き。2026-10-04 20:23 heian-lines.js に入れた）
+// 井内さん「雷の昔話を足す」。900年にある書・伝えだけを使う：
+//   『日本霊異記』（景戒・弘仁年間810〜824に成る。興福寺に延喜四年＝904年の写本が残る）上巻第一「雷を捉へし縁」（小子部栖軽）・上巻第三「雷の憙を得て、子を生ましめて強き力ある縁」（道場法師）
+//   『山城国風土記』逸文の賀茂別雷命（丹塗矢）。風土記は8世紀。逸文は鎌倉時代の書に引かれて残る＝話そのものが900年の都で語られていたかは推定
+//   🚫 使わない：道真＝雷神（930の清涼殿落雷以後）・「くわばら」・「雷にへそを取られる」（江戸の終わりから）
+// A 古丸の昔語りに1話（katari の最初の節の選択肢に足す。選択肢4つまでの決まり＝着手案23 が入れば、話題は順に回る）
+// B 言い伝え（場所の一言。n に「説話」「縁起」の語＝本体の HEIAN_LORE_RE に合い、「言い伝えを聞く」で出る）
+// C 言葉の解説（terms。「〇〇とは？」）
+// D 雨の日の一言
+// E 既存の掛け合いの直し（考証の誤り）
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+// ---- A 古丸：雷を捕らえた男
+{const d=L.dialogs.find(q=>q.id==='katari');
+ if(d){const s=d.nodes.s;s.c.splice(3,0,['雷を捕らえた男の話','i1']);
+  Object.assign(d.nodes,{
+   i1:{t:'昔、雄略の帝に仕えた栖軽という男がおった。ある日、空で雷が鳴ると、帝が「あの雷を迎えて来られるか」と仰せになった',c:[['それで？','i2'],['ほかの話','s']]},
+   i2:{t:'栖軽は赤い鉢巻きを締め、赤い旗の鉾を持って馬を走らせた。辻に立って「天の鳴る神よ、帝がお呼びじゃ」と叫んだのじゃ',c:[['来たの？','i3']]},
+   i3:{t:'雷は本当に落ちてきた。神官が輿に乗せて宮へ運ぶと、雷はぴかぴか光る。帝は恐ろしゅうなって、元の所へ返させたそうな',c:[['それで終わり？','i4']]},
+   i4:{t:'栖軽が死ぬと、帝は墓に「雷を捕らえし栖軽の墓」と書かせた。怒った雷が墓に落ちたが、柱の裂け目に挟まって、また捕まった',c:[['雷が？','i5']]},
+   i5:{t:'七日七夜、動けんかったそうな。…それで、そこを雷の丘と呼ぶ。飛鳥の話じゃ。寺の坊さまの書いた書にもある',c:[['ほかの話も聞く','s'],['ありがとう','bye']]}});}
+ else console.warn('着手案26: 古丸の昔語り（katari）が無い');}
+// ---- B 言い伝え（場所の一言・条件なし）
+L.say.push(
+ {at:'kamo',who:'庶民',t:'上の社の神さまは、雷の神さまだと聞いた',n:'賀茂別雷命（山城国風土記逸文の説話）。上賀茂神社の祭神'},
+ {at:'kamo',who:'女',t:'川上から赤い矢が流れてきて、娘が身ごもったんだと',n:'丹塗矢の説話（山城国風土記逸文）。生まれた子が賀茂別雷命。900年の都で語られていたかは推定'},
+ {at:'kamo',who:'庶民',t:'その御子は、屋根を破って天へ昇ったそうな',n:'賀茂別雷命の昇天（山城国風土記逸文の説話）'},
+ {at:['toji','saiji'],who:'僧',t:'雷の申し子が法師になった話を、ご存じか',n:'道場法師（日本霊異記 上巻第三の説話）'},
+ {at:['toji','saiji'],who:'僧',t:'その法師は鐘楼の鬼を退け、田に水を引いたと',n:'道場法師（日本霊異記 上巻第三の説話）。元興寺の童子のとき鬼を退けた'},
+ {at:'rajomon',who:'旅人',t:'飛鳥には、雷を捕らえた丘があると聞いた',n:'雷丘（日本霊異記 上巻第一の説話）'}
+);
+// ---- D 雨の日の一言（町なか・寺）
+L.say.push(
+ {at:['street','commoners'],who:'童',if:'rain',t:'雷を縄でくくった人がおるって、ほんと？',kind:'zatsu',n:'小子部栖軽（日本霊異記 上巻第一）を町の子が聞きかじった形'},
+ {at:['street','commoners'],who:'庶民',if:'rain',t:'鳴る神さまも、たまには地に落ちるそうな',kind:'zatsu',n:'日本霊異記の雷の説話（上巻第一・第三）'},
+ {at:['street','commoners'],who:'女',if:'rain',t:'雷が子を授けてくれた話、婆さまがしとった',kind:'zatsu',n:'道場法師（日本霊異記 上巻第三）'},
+ {at:['toji','saiji'],who:'僧',if:'rain',t:'雷の鳴る日は、経を読む声も大きゅうなる',kind:'zatsu'}
+);
+// ---- C 言葉の解説
+Object.assign(L.terms,{
+ sugaru:{q:'栖軽とは？',keys:['栖軽','雷の丘','雷丘'],rel:['ryoiki','dojo'],
+  t:['小子部栖軽（ちいさこべのすがる）は、雄略の帝（5世紀）に仕えたと伝わる人。帝の言いつけで、鳴る雷を辻で呼び、宮へ運んだという。','死後、墓に「雷を捉えし栖軽の墓」と記すと、怒った雷が落ちて柱に挟まり、また捕らえられた。その地を雷の丘（雷丘・飛鳥）と呼ぶ、と『日本霊異記』の巻頭の話は語る。'],
+  n:'日本霊異記 上巻第一「雷を捉へし縁」（説話）'},
+ dojo:{q:'道場法師とは？',keys:['道場法師','雷の申し子'],rel:['ryoiki','sugaru'],
+  t:['敏達の帝の世、尾張の農夫が田に水を引いていると、雷が小さな子の姿で落ちてきた。命乞いをする雷に、農夫が楠の舟に水を張ってやると、雷はそれに乗って天へ昇り、お礼に子を授けた。','生まれた子は頭に蛇を二巻きつけた姿で、力が強かった。元興寺の童子になって鐘楼の鬼を退け、のちに出家して道場法師と呼ばれた。'],
+  n:'日本霊異記 上巻第三（説話）'},
+ ryoiki:{q:'日本霊異記とは？',keys:['霊異記','坊さまの書いた書'],rel:['sugaru','dojo'],
+  t:['薬師寺の僧・景戒が、善い行い・悪い行いの報いを示す不思議な話を集めた書。正しくは『日本国現報善悪霊異記』。','雄略の帝の世から平安のはじめまで、百十余りの話を年の順に並べる。弘仁年間（810〜824）にまとまった、この国でいちばん古い説話集。'],
+  n:'日本霊異記。興福寺に延喜四年（904）の写本が残る'},
+ wakeikazuchi:{q:'賀茂別雷とは？',keys:['雷の神さま','赤い矢','丹塗矢','別雷'],rel:['ryoiki'],go:'kamo',
+  t:['上賀茂の社の神、賀茂別雷命（かもわけいかづちのみこと）。','玉依日売が石川の瀬見の小川（賀茂川）で遊んでいると、川上から丹塗りの矢が流れてきた。持ち帰って床に置くと身ごもり、男の子が生まれた。子は成長して、祖父が開いた宴で「父と思う人に酒を」と言われると、屋根を突き破って天へ昇った――という。'],
+  n:'山城国風土記逸文の説話（逸文は鎌倉時代の書に引かれて残る）。900年の都での語られ方は推定'}
+});
+// ---- E 既存の掛け合いの直し（at:'daidairi'）
+//   🚫 今の「筑紫の右大臣さまのこと、聞いたか／…雷が多いのは、あのお方の」は、昌泰三年（900）には成り立たない。
+//      道真はまだ都の右大臣（筑紫へ下るのは901年）。雷を道真の祟りと結びつけるのは930年の清涼殿落雷以後（900-910年はゲームで祟りを出さない方針）
+//   ⇒ 同じ掛け合いの台詞を、900年の内裏の空気に替える（雷が多い・物忌みの札が増える）。「しっ、ここで口にするな」の間合いは残す
+{const t=L.talk.find(q=>q.lines?.[0]?.[1]==='筑紫の右大臣さまのこと、聞いたか');
+ if(t)t.lines=[[0,'今年は雷が多いのう'],[1,'しっ、陰陽寮の者が聞いておる'],[0,'…また物忌みの札が増えるわ'],[1,'だから言うなと']];}
+})();
+
+// 着手案27：飛梅を変のあとの噂に回す（2026-10-04 20:40 入れた）
+//   🚫 900年の都で「主は筑紫へ」「梅が主を追って飛んだ」は言えない（道真はまだ右大臣・左遷は901年正月）。
+//   「東風吹かば」の歌は『拾遺和歌集』（1006年ごろ）に載る。梅が飛んだという話はさらに後の世の言い伝え（推定）。
+//   変のあとの噂は 着手案27_飛梅を変のあとの噂に_2026-10-04.md に置いた（本体が時代の段＝heianPhase を読めるようになってから入れる）
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+ const rep=(a,t,n)=>{const s=L.say.find(x=>x.t===a);if(s){s.t=t;s.n=n;}};
+ rep('この邸の主は筑紫へ…。梅だけが残された','右大臣さまの家の邸じゃ。春は梅が見事でな','菅原家の邸（菅原院）。道真は梅を好んだ（菅家文草に梅の詩が多い）');
+ rep('東風が吹けば、この梅も主を思い出すでしょう','東風が吹くと、この梅の香が邸じゅうに満ちます','東風吹かば（901年に都を発つときの歌・拾遺和歌集）は変のあとへ回した（着手案27）');
+ rep('紅梅殿の梅は、主を追って筑紫へ飛んだという','紅梅殿の梅は、右大臣さまがことのほか愛でておられる','道真の邸・紅梅殿。飛梅の言い伝えは変のあと、さらに後の世（着手案27）');
+})();
+
+// 着手案28：物の怪をこわがる人たち（2026-10-04 21時に入れた・井内さん「物の怪でめっちゃビビってる人の話も入れよう」）
+// 考証：「物怪（もののけ）」の字は9世紀の国史に見える（続日本後紀・三代実録。はじめは怪しい兆しの意、のちに人に憑く霊の意）＝推定。
+//   宴の松原の鬼＝日本三代実録 仁和3年（887）8月17日条（13年前の実話として皆が知っている）。鬼一口＝伊勢物語（原型）6段の芥川。狐の妻＝日本霊異記 上巻第二。
+//   方違え・物忌み・夜行の夜・尊勝陀羅尼・加持は、ゲームの既存の仕組み・台詞とそろえる。
+//   🚫 使わない：道真の怨霊・晴明・「百鬼夜行」の語（要確認）・付喪神（室町の絵巻）・鳴弦（記録の年を確かめていない）・口笛の禁（後世）
+//   kind:'kowagari'（本体は読まない・目印）。台詞はどれも、怖がる人と、笑う人・強がる人の組み合わせ
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+L.say.push(
+// ---- 怖がりの官人（大内裏・松原）
+ {at:'matsunohara',who:'官人',when:['dusk','night'],t:'ま、松原は通らん。遠回りでも朝堂院の側を行く',kind:'kowagari',n:'宴の松原の鬼（三代実録 887）'},
+ {at:'matsunohara',who:'官人',t:'松の下に美しい男がおっても、決してついて行くな',kind:'kowagari',n:'三代実録 仁和3年8月17日条（男に誘われた女が手足だけになった）'},
+ {at:'daidairi',who:'官人',when:'dusk',t:'宿直の番が回ってきた…。今夜は寝ずに経を唱える',kind:'kowagari'},
+ {at:'daidairi',who:'官人',t:'昨夜、廊の向こうで誰かが呼んだ。返事はせなんだぞ',kind:'kowagari',n:'推定（呼ばれても答えない）'},
+ {at:'efu',who:'衛士',when:'night',t:'灯を消すな。消えたら、わしは逃げるからな',kind:'kowagari'},
+ {at:'efu',who:'衛士',when:'night',t:'今の物音は猫じゃ。猫ということにしておけ',kind:'kowagari'},
+// ---- 邸の女房・従者
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'女房',when:'night',t:'妻戸がひとりでに鳴りました…姫さまを起こさないで',kind:'kowagari'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'女房',t:'姫さまのお熱、物の怪のせいでしょうか。加持の僧を呼ばねば',kind:'kowagari',n:'病を物の怪のしわざとし、僧が加持した（通説）'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'女房',when:'night',t:'几帳の陰に何かいる気がして、ひと晩じゅう扇を握っておりました',kind:'kowagari'},
+ {at:'nobles',who:'従者',when:'night',t:'塀の上を白いものが走った！ …鷺か。鷺だな',kind:'kowagari'},
+ {at:'nobles',who:'従者',t:'物忌みの日に門を叩く者は、たとえ殿の使いでも入れぬ決まりだ',kind:'kowagari',n:'物忌み（推定）'},
+ {at:'kokyu',who:'女房',when:'night',t:'局の外を衣ずれの音が通ったの。誰もいないはずなのに',kind:'kowagari'},
+// ---- 町の人
+ {at:['street','commoners'],who:'庶民',when:'dusk',t:'うちの婆さまは、日が落ちたら厠にも一人で行けん',kind:'kowagari'},
+ {at:['street','commoners'],who:'女',when:'night',t:'夜道で名を呼ばれても、振り向いちゃいけないよ',kind:'kowagari',n:'推定（俗信）'},
+ {at:['street','commoners'],who:'庶民',t:'隣の亭主、物の怪に憑かれたと言うて三日寝とる。二日酔いじゃろ',kind:'kowagari'},
+ {at:['street','commoners'],who:'女',t:'物の怪に憑かれた娘さん、僧が祈ったら別の人の声で喋ったって',kind:'kowagari',n:'物の怪の調伏（通説・推定）'},
+ {at:['street','commoners'],who:'童',when:'night',t:'鬼がひと口で食うって、ほんと？ …寝られん',kind:'kowagari',n:'鬼一口（伊勢物語6段・芥川）'},
+ {at:['ukyo','ukyoNorth'],who:'庶民',when:['dusk','night'],t:'右京の空き家に灯が見えた。誰も住んどらんのに',kind:'kowagari',n:'右京の荒廃（推定）'},
+ {at:['ukyo','ukyoNorth'],who:'女',t:'きれいな娘を嫁にしたら、狐だったって話、あれ本当かね',kind:'kowagari',n:'日本霊異記 上巻第二（狐の妻）'},
+ {at:'tsuji',who:'庶民',when:'night',t:'辻を夜に渡るときは、祠に手を合わせてから。三べんじゃ',kind:'kowagari'},
+ {at:'modoribashi',who:'庶民',when:'night',t:'夜にこの橋を渡ると、後ろから足音がついてくるそうな',kind:'kowagari',n:'架空'},
+ {at:'rajomon',who:'旅人',when:'night',t:'羅城門の下で寝るのか？ わしは市の軒先へ行く',kind:'kowagari'},
+ {at:'kawaranoin',who:'家司',when:'night',t:'奥の塗籠には近づくな。わしも近づかん',kind:'kowagari',n:'河原院の霊の噂（説話＝噂）'},
+ {at:'horikawa',who:'人夫',when:'night',t:'夜の川に白いものが浮いとった。…布であってくれ',kind:'kowagari'},
+// ---- 信心で身を守る
+ {at:['toji','saiji','rokakudo'],who:'庶民',t:'尊勝陀羅尼の札、もう一枚おくれ。家の者の分も',kind:'kowagari',n:'尊勝陀羅尼（本体の夜行と同じ）'},
+ {at:['toji','saiji','rokakudo'],who:'僧',t:'物の怪を恐れて来る方が、近ごろ多うございます',kind:'kowagari'},
+ {at:'onmyo',who:'官人',t:'今朝の夢が悪い。物忌みにすべきか、陰陽寮に聞いてくる',kind:'kowagari',n:'夢と物忌み（推定）'},
+ {at:'tenyaku',who:'官人',t:'物の怪だと騒ぐ前に、まず脈を診せよ。…と、言うてはおるがな',kind:'kowagari',n:'医と怪異観が並んでいた（通説）'},
+// ---- 鉄の童を物の怪と間違える
+ {at:['street','commoners','nobles'],who:'庶民',if:'robot',when:'night',t:'ひっ…も、物の怪！ …なんだ、鉄の童か。驚かすな',kind:'kowagari'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'女房',if:'robot',when:'night',t:'御簾の外に、光る目が…。ああ、あの鉄のお子',kind:'kowagari'},
+ {at:'efu',who:'衛士',if:'robot',when:'night',t:'止まれ！ 名を名乗れ！ …名乗らんのか。名乗らんのだな',kind:'kowagari'},
+ {at:['street','commoners'],who:'童',if:'robot',t:'鉄の子が一緒なら、夜道もこわくないや',kind:'kowagari'}
+);
+L.talk.push(
+ {at:'matsunohara',when:['dusk','night'],who:['官人','官人'],lines:[[0,'ここを抜ければ近道だ'],[1,'松原だぞ。三代実録を読んでおらんのか'],[0,'…遠回りしよう'],[1,'うむ、それがよい']],kind:'kowagari',n:'三代実録 仁和3年8月'},
+ {at:'efu',when:'night',who:['衛士','衛士'],lines:[[0,'おい、今、松原のほうで声がせなんだか'],[1,'せん。何も聞こえん'],[0,'声が震えておるぞ'],[1,'寒いだけじゃ。夏でも寒いのじゃ']],kind:'kowagari'},
+ {at:['nobles','estate_tokihira','estate_michizane'],when:'night',who:['女房','女房'],lines:[[0,'…いま、何か通りませんでした？'],[1,'やめて。言わないで'],[0,'灯をもう一つ'],[1,'二つにしましょう']],kind:'kowagari'},
+ {at:['street','commoners'],when:'dusk',who:['庶民','庶民'],lines:[[0,'今夜は夜行の夜だ。早う帰れ'],[1,'わしは怖いものなど無い'],[0,'なら一人で辻を通ってみい'],[1,'…今夜はやめとく']],kind:'kowagari',n:'夜行の夜（本体の夜行日とそろえる）'},
+ {at:['street','commoners'],who:['女','女'],lines:[[0,'うちの人、夜は厠に私を起こすのよ'],[1,'まあ。大の男が'],[0,'鬼より私のほうが怖いくせに'],[1,'それは違いない']],kind:'kowagari'},
+ {at:'kawaranoin',when:'night',who:['家司','従者'],lines:[[0,'奥の見回り、おまえが行け'],[1,'家司さまこそ'],[0,'わしは年じゃ'],[1,'わしは若すぎて、霊に好かれます']],kind:'kowagari',n:'河原院の霊の噂（説話＝噂）'},
+ {at:['toji','saiji','rokakudo'],who:['庶民','僧'],lines:[[0,'物の怪に効く経を、いちばん強いのを'],[1,'経に強い弱いはございません'],[0,'では、いちばん長いのを'],[1,'…それなら般若経が六百巻']],kind:'kowagari',n:'大般若経六百巻'},
+ {at:['street','commoners'],if:'robot',when:'night',who:['庶民','童'],lines:[[0,'ぎゃっ！ 物の怪じゃ！'],[1,'鉄の子だよ、おっちゃん'],[0,'…し、知っとったわ'],[1,'腰、抜けてるよ']],kind:'kowagari'},
+ {at:'onmyo',who:['官人','官人'],lines:[[0,'今年はもう物忌みが二十日を超えた'],[1,'それでは出仕できぬではないか'],[0,'できぬ。それが狙いじゃ'],[1,'…物の怪より、おぬしが怪しい']],kind:'kowagari'},
+ {at:'ukyo',when:'dusk',who:['庶民','女'],lines:[[0,'あの空き家、また女の声がした'],[1,'狐でしょ'],[0,'狐が琴を弾くか'],[1,'…今夜は戸を閉めて寝ましょ']],kind:'kowagari'}
+);
+})();
+
+// 着手案29：国へ帰る人夫と、都に居ついた者たち（2026-10-04 22時に入れた・井内さん「諸国から荷を運んできた人夫のうち、国へ帰ろうと旅立つもの、
+//   平安京で浮浪者となって同郷の仲間と道端で寝て暮らすもの…庶民の暮らしをもう少し厚く」）
+// 考証：
+//   運脚＝調庸を都へ運ぶ百姓。往き帰りの食は自分持ち。和銅五年（712）の詔に、役を終えて郷へ帰る者が食に尽き、道で飢えて溝に転がる者が多いとある（続日本紀）
+//   調の納めの期限は、近い国は十月、中ほどの国は十一月、遠い国は十二月の末まで（賦役令）＝夏の都にいる運脚は、遅れた者・突き返された者・居ついた者（推定）
+//   納めた布が悪いと突き返される＝大蔵・民部の検め（推定）。本貫を離れて他国にとどまる者を「浮浪」と呼んだ（律令の語）
+//   承和九年（842）、悲田院の者に鴨の河原などの髑髏五千五百余を焼き埋めさせた（続日本後紀）＝河原で死ぬ者が多かった。悲田院・施薬院は900年にある
+//   既存の住人とそろえる：運脚の初男（備中）・広足（三河）・運脚の宿の国継・陸奥の馬曳き・河原の婆
+//   🚫 使わない：草鞋（呼び名を確かめていない）・茶・傘・念仏の勧め（空也は903年以後）・非人（この意味の語は後の世）・方言のまね（国の名で言い分ける）
+//   kind:'furo'（本体は読まない・目印）
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+L.say.push(
+// ---- A 国へ帰る者（夜明け・朝の羅城門と朱雀大路）
+ {at:'rajomon',who:'人夫',when:['dawn','morning'],t:'やっと納めた。これで国へ帰れる。上総まで二十日だ',kind:'furo',n:'上総は東海道の遠国（推定の日数）'},
+ {at:'rajomon',who:'人夫',when:['dawn','morning'],t:'帰りの糧は、干し飯がひと袋。足りるかのう',kind:'furo',n:'往き帰りの食は自分持ち（運脚）'},
+ {at:'rajomon',who:'人夫',when:'dawn',t:'門を出たら振り返るな。振り返ると帰りたくなくなる',kind:'furo'},
+ {at:['rajomon','suzaku'],who:'人夫',when:['dawn','morning'],t:'都の土産は、針を三本。娘が喜ぶ',kind:'furo'},
+ {at:['rajomon','suzaku'],who:'旅人',when:'morning',t:'山崎までは連れがある。そこから先は一人だ',kind:'furo'},
+ {at:'suzaku',who:'人夫',when:'morning',t:'来たときは十人だった。帰るのは六人',kind:'furo',n:'運脚の道中の死（続日本紀などに記事）'},
+ {at:'suzaku',who:'人夫',when:['dawn','morning'],t:'帰ったら、もう田植えはすんどるじゃろう',kind:'furo'},
+ {at:'okura',who:'人夫',t:'布は納まった。…受け取りの札を失くしたら、国司さまに叱られる',kind:'furo',n:'納めたしるし（推定）'},
+// ---- B 帰れない者（突き返された・糧が尽きた・居ついた）
+ {at:'okura',who:'人夫',t:'布の幅が足らんと突き返された。国へ帰っても織り直せとは…',kind:'furo',n:'調布の検め（推定）'},
+ {at:'okura',who:'人夫',t:'納めの期限はとうに過ぎた。帰れば罰、残れば飢え',kind:'furo',n:'調の期限は遠い国で十二月末（賦役令）。夏まで残るのは遅れた者（推定）'},
+ {at:['street','commoners'],who:'人夫',t:'糧が尽きた。日雇いの口があれば、どこでも行く',kind:'furo'},
+ {at:['street','commoners'],who:'人夫',t:'国の戸籍には、まだわしの名があるはずじゃ',kind:'furo',n:'本貫を離れた者＝浮浪（律令の語）'},
+ {at:['street','commoners'],who:'人夫',t:'帰っても、田は兄のもの。ここで担ぎをするほうがましだ',kind:'furo'},
+ {at:'horikawa',who:'人夫',t:'荷舟の揚げなら毎朝ある。国の者を三人、ここで食わせとる',kind:'furo'},
+ {at:'horikawa',who:'人夫',when:'morning',t:'今朝も伊予の者が来て、仕事はないかと聞いていった',kind:'furo'},
+// ---- C 道端で寝る（同郷の仲間）
+ {at:'rajomon',who:'人夫',when:['dusk','night'],t:'門の下は雨がしのげる。ただ、場所は早い者勝ちじゃ',kind:'furo'},
+ {at:'rajomon',who:'庶民',when:'night',t:'楼の下は、東国の者と西国の者で、寝る側が分かれとる',kind:'furo',n:'架空'},
+ {at:['toji','saiji'],who:'人夫',when:['dusk','night'],t:'寺の築地の陰なら、朝に粥が出ることもある',kind:'furo',n:'寺の施し（推定）'},
+ {at:['eastMarket','westMarket'],who:'人夫',when:'night',t:'市の軒先は、店じまいのあとだけ借りられる',kind:'furo'},
+ {at:['eastMarket','westMarket'],who:'売り子',when:'morning',t:'ほら起きな、店を開けるんだよ。…あんた、どこの国の人だい',kind:'furo'},
+ {at:'kamo',who:'人夫',when:['dusk','night'],t:'河原は広いが、夜は冷える。国の者で固まって寝る',kind:'furo'},
+ {at:'kamo',who:'女',t:'河原には、行き倒れも多いのさ。悲田院の者が運んでいく',kind:'furo',n:'承和九年（842）悲田院に鴨の河原などの髑髏を焼き埋めさせた（続日本後紀）'},
+ {at:['ukyo','ukyoNorth'],who:'人夫',when:'night',t:'右京の空き家に美濃の者が五人。屋根は半分しかないがの',kind:'furo',n:'右京の荒廃（推定）'},
+ {at:['street','commoners'],who:'人夫',when:'night',t:'国の言葉が聞こえると、つい寄っていってしまう',kind:'furo'},
+ {at:['street','commoners'],who:'人夫',when:'dusk',t:'今夜はどこで寝る。…武蔵の者は、朱雀の門の脇だそうな',kind:'furo'},
+// ---- D 町の人から見た彼ら
+ {at:['street','commoners'],who:'庶民',t:'道端で寝とるのは、たいがい国から荷を担いできた者よ',kind:'furo'},
+ {at:['street','commoners'],who:'女',t:'あの人たちにも、国で待つ妻や子がおるんだろうね',kind:'furo'},
+ {at:['street','commoners'],who:'庶民',t:'残った者が盗みを働くと言うが、腹が減れば誰でもそうなる',kind:'furo'},
+ {at:'street',who:'検非違使',t:'道に寝る者が増えた。夜回りのたびに追い立てておる',kind:'furo'},
+ {at:['street','commoners'],who:'庶民',when:'morning',t:'朝の辻で、また一人冷たくなっとった',kind:'furo'},
+ {at:['toji','saiji'],who:'僧',t:'施しの粥に並ぶのは、半ばが国の者でございます',kind:'furo',n:'寺の施し（推定）'},
+ {at:'eastMarket',who:'売り子',t:'国の者は、塩と針だけ買って帰る。都の物は高いからね',kind:'furo'},
+ {at:'commoners',who:'庶民',t:'国継さんの宿に泊まれるのは、まだ銭のある者だけさ',kind:'furo',n:'運脚の宿の国継（既存の住人）'},
+// ---- E 鉄の童を見て
+ {at:['rajomon','street'],who:'人夫',if:'robot',t:'鉄の童か。おぬしは国へ帰らんでよいのか',kind:'furo'},
+ {at:['rajomon','kamo'],who:'人夫',if:'robot',when:'night',t:'おぬしも寝るところが無いのか。…こっちへ来い、詰めてやる',kind:'furo'},
+ {at:['street','commoners'],who:'人夫',if:'robot',t:'鉄なら腹も減らんのじゃろ。うらやましい',kind:'furo'}
+);
+L.talk.push(
+ {at:'rajomon',when:['dawn','morning'],who:['人夫','人夫'],lines:[[0,'おぬしも帰るのか'],[1,'ああ。三河までだ'],[0,'わしは残る。国に田がない'],[1,'…達者でな']],kind:'furo'},
+ {at:'rajomon',when:'dawn',who:['人夫','人夫'],lines:[[0,'これ、国の母に'],[1,'布の切れ端か'],[0,'都の市で買うた。…それしか買えなんだ'],[1,'渡しておく。必ずな']],kind:'furo'},
+ {at:'rajomon',when:'night',who:['人夫','人夫'],lines:[[0,'おぬし、どこの国じゃ'],[1,'備中'],[0,'わしは備後。隣じゃ'],[1,'なら、今夜はここで並んで寝よう']],kind:'furo'},
+ {at:'kamo',when:'night',who:['人夫','人夫'],lines:[[0,'国では今ごろ、草取りじゃな'],[1,'言うな。帰りとうなる'],[0,'帰ればええ'],[1,'帰りの糧が無い']],kind:'furo'},
+ {at:['street','commoners'],when:'dusk',who:['人夫','人夫'],lines:[[0,'今日の稼ぎは'],[1,'米が二合'],[0,'なら、二人で一合ずつ'],[1,'…明日はおぬしが稼げよ']],kind:'furo'},
+ {at:'okura',who:['人夫','官人'],lines:[[0,'この布でお納めを'],[1,'幅が足らん。持って帰れ'],[0,'国まで二十日でございます'],[1,'決まりは決まりじゃ']],kind:'furo',n:'調布の検め（推定）'},
+ {at:['toji','saiji'],when:'morning',who:['人夫','僧'],lines:[[0,'粥をもう一杯…'],[1,'一人一杯です。後ろにまだ並んでおる'],[0,'国の仲間が、熱で起きられんで'],[1,'…では、その人の分を']],kind:'furo'},
+ {at:['street','commoners'],who:['庶民','女'],lines:[[0,'門の下の連中、また増えたな'],[1,'追い出せとでも言うの'],[0,'いや…わしの親父も、昔は運脚じゃった'],[1,'なら、粥でも持っていこうかね']],kind:'furo'},
+ {at:'street',when:'night',who:['検非違使','人夫'],lines:[[0,'ここで寝るな。どこの者だ'],[1,'越前でございます'],[0,'越前の者は東の河原へ行け'],[1,'…あそこは冷えるのです']],kind:'furo'},
+ {at:['eastMarket','westMarket'],when:'morning',who:['売り子','人夫'],lines:[[0,'軒を貸した代わりに、水を汲んでおくれ'],[1,'へい、喜んで'],[0,'国はどこだい'],[1,'陸奥で。…遠うございます']],kind:'furo'}
+);
+})();
+
+// 着手案30：ほかの庶民の暮らし（2026-10-04 22時過ぎに入れた・井内さん「ほかの庶民の暮らしも足す」）
+// 河原の暮らし・日雇い・市の下働き・子守・洗い女・炊女・邸の下人・井戸端・借りと質・火の用心・弔い
+// 考証：出挙（稲を春に貸し秋に利をつけて返す）は律令の制。公出挙の利は五割、私出挙は十割を限りとした（雑令）＝推定を交えて台詞に
+//   鳥辺野・化野は葬送の地（既存の郊外の地図）。鴨川の洪水は9世紀の国史にたびたび見える（防鴨河使）＝推定
+//   🚫 茶・傘・草鞋・味噌・醤油・豆腐・念仏（空也903以後）・非人。kind:'kurashi'（目印）
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+L.say.push(
+// ---- 河原の暮らし
+ {at:'kamo',who:'洗い女',when:['dawn','morning'],t:'朝の水がいちばん冷たくて、いちばんよく落ちる',kind:'kurashi'},
+ {at:'kamo',who:'洗い女',t:'邸の衣は、汚すと叱られる。洗うのは私なのに',kind:'kurashi'},
+ {at:'kamo',who:'洗い女',t:'石の上で叩いて、また叩いて。腕だけ太くなる',kind:'kurashi'},
+ {at:'kamo',who:'庶民',t:'河原の小屋は、大水が出たら流される。また建てるだけよ',kind:'kurashi',n:'鴨川の洪水（防鴨河使が置かれた）＝推定'},
+ {at:'kamo',who:'庶民',when:'dusk',t:'河原で拾った流木が、今夜の薪だ',kind:'kurashi'},
+ {at:'kamo',who:'童',t:'河原の石、平たいのを探してるの。水の上を跳ねるやつ',kind:'kurashi'},
+// ---- 日雇い
+ {at:['street','commoners'],who:'人夫',when:'dawn',t:'夜明けの辻に立っとれば、誰かが雇いに来る',kind:'kurashi'},
+ {at:['street','commoners'],who:'人夫',when:['dawn','morning'],t:'今日の口は、築地の土運び。米一升なら上々だ',kind:'kurashi'},
+ {at:['street','commoners'],who:'人夫',when:'dusk',t:'一日担いで、もらえたのは米が三合。明日も立つか',kind:'kurashi'},
+ {at:'horikawa',who:'人夫',t:'材木の筏は、足を滑らせたら命がない。賃がいいのはそのためだ',kind:'kurashi'},
+// ---- 市の下働き
+ {at:['eastMarket','westMarket'],who:'童',when:['dawn','morning'],t:'店の前を掃いて、水を撒くのが朝の仕事',kind:'kurashi'},
+ {at:['eastMarket','westMarket'],who:'童',t:'店番してると、干物をひとつもらえるんだ',kind:'kurashi'},
+ {at:['eastMarket','westMarket'],who:'庶民',t:'市の荷を運ぶと、駄賃のかわりに売れ残りをくれる',kind:'kurashi'},
+ {at:['eastMarket','westMarket'],who:'売り子',when:'dusk',t:'市が閉まったら、店をたたんで車に積む。ここからが重い',kind:'kurashi'},
+// ---- 子守・母
+ {at:['street','commoners'],who:'童',t:'弟をおぶってると、遊びに混ぜてもらえない',kind:'kurashi'},
+ {at:['street','commoners'],who:'童',t:'泣きやまない。…ほら、鉄の子が来たよ。見てごらん',kind:'kurashi'},
+ {at:['street','commoners'],who:'女',t:'上の子に下の子を任せて、市へ。帰るまで無事でいて',kind:'kurashi'},
+ {at:['street','commoners'],who:'女',when:'night',t:'やっと寝た。今のうちに糸を紡がないと',kind:'kurashi'},
+// ---- 炊女・邸の下人
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'炊女',when:'dawn',t:'殿が起きられる前に、竈の火を起こしておかねば',kind:'kurashi'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'炊女',t:'お客の多い日は、米を何度研いでも足りない',kind:'kurashi'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:'炊女',t:'殿の残りの膳が、私らのご馳走よ',kind:'kurashi'},
+ {at:'nobles',who:'下人',t:'主の機嫌は、朝の空より読みにくい',kind:'kurashi'},
+ {at:'nobles',who:'下人',when:['dawn','morning'],t:'朝いちばんに井戸の水を、邸じゅうの甕に',kind:'kurashi'},
+ {at:'nobles',who:'下人',t:'正月にいただく衣が、一年の楽しみでな',kind:'kurashi',n:'推定'},
+// ---- 井戸端・ご近所
+ {at:['street','commoners'],who:'女',when:'morning',t:'井戸の順番、また隣のかみさんに抜かされた',kind:'kurashi'},
+ {at:['street','commoners'],who:'女',t:'向かいの家、また夫婦喧嘩。昨夜は鍋が飛んだそうな',kind:'kurashi'},
+ {at:['street','commoners'],who:'庶民',t:'隣の犬が、うちの干し魚をくわえていった',kind:'kurashi'},
+ {at:['street','commoners'],who:'女',t:'塩を少し貸しておくれ。市が開いたら返すから',kind:'kurashi'},
+// ---- 借りと質
+ {at:['street','commoners'],who:'庶民',t:'春に借りた稲は、秋に倍にして返せと。倍だぞ',kind:'kurashi',n:'私出挙の利は十割を限りとした（雑令）＝推定'},
+ {at:['street','commoners'],who:'女',t:'冬の衣を質に入れた。夏のうちに取り戻せるかね',kind:'kurashi',n:'質（推定）'},
+ {at:['ukyo','ukyoNorth'],who:'庶民',t:'借りが返せず、田を手放した者がまた一人',kind:'kurashi'},
+// ---- 火の用心・弔い
+ {at:['street','commoners'],who:'庶民',when:'night',t:'竈の火、ちゃんと埋めたか。隣に燃え移ったら一町焼ける',kind:'kurashi'},
+ {at:['street','commoners'],who:'女',t:'隣の爺さま、ゆうべ亡くなった。鳥辺野へ送るって',kind:'kurashi',n:'鳥辺野＝葬送の地'},
+ {at:['ukyo','ukyoNorth'],who:'庶民',t:'貧しい家は、野辺まで運ぶ人を雇う銭もない',kind:'kurashi'},
+// ---- 鉄の童を見て
+ {at:['street','commoners'],who:'女',if:'robot',t:'鉄の子や、水を汲むのを手伝っておくれ',kind:'kurashi'},
+ {at:'kamo',who:'洗い女',if:'robot',t:'おまえは洗わずにすむから楽だねえ。…錆びるのかい',kind:'kurashi'}
+);
+L.talk.push(
+ {at:['street','commoners'],when:'dawn',who:['人夫','庶民'],lines:[[0,'今日の口はあるか'],[1,'築地の土運びが五人'],[0,'わしと、同じ国の者を四人'],[1,'よし、ついてこい']],kind:'kurashi'},
+ {at:'kamo',who:['洗い女','洗い女'],lines:[[0,'この袍、墨がついとる'],[1,'若殿の手習いでしょ'],[0,'落ちんかったら私の落ち度'],[1,'灰汁をもう少し濃くしよう']],kind:'kurashi',n:'灰汁で洗う（推定）'},
+ {at:['street','commoners'],when:'morning',who:['女','女'],lines:[[0,'あんた、昨夜の声は何'],[1,'うちの人が酒を飲んで帰ってきて'],[0,'鍋が飛んだって'],[1,'飛ばしたのは私よ']],kind:'kurashi'},
+ {at:['street','commoners'],who:['童','童'],lines:[[0,'弟、また泣いとる'],[1,'おぶって走れば笑うよ'],[0,'走ったら母ちゃんに叱られる'],[1,'じゃあ、ゆっくり走ろう']],kind:'kurashi'},
+ {at:['nobles','estate_tokihira','estate_michizane'],who:['炊女','下人'],lines:[[0,'薪が足らん。割っておくれ'],[1,'さっき割った'],[0,'お客が十人増えたの'],[1,'…割ってくる']],kind:'kurashi'},
+ {at:['eastMarket','westMarket'],when:'dusk',who:['売り子','童'],lines:[[0,'今日はよう働いた。ほれ'],[1,'干物！ 二つ？'],[0,'ひとつは母さんにな'],[1,'うん、ひとつは母さんに']],kind:'kurashi'},
+ {at:['street','commoners'],who:['庶民','庶民'],lines:[[0,'秋に稲を返せと言われとる'],[1,'いくら借りた'],[0,'一束'],[1,'なら二束じゃな。…覚悟しとけ']],kind:'kurashi',n:'私出挙（推定）'},
+ {at:'kamo',when:'dusk',who:['庶民','女'],lines:[[0,'川の水が濁ってきた。上で雨じゃ'],[1,'小屋の物を高いところへ'],[0,'今度は流されんとええが'],[1,'流されたら、また建てるだけよ']],kind:'kurashi'},
+ {at:['street','commoners'],when:'night',who:['女','庶民'],lines:[[0,'火は埋めた？'],[1,'埋めた'],[0,'ほんとに？'],[1,'…見てくる']],kind:'kurashi'},
+ {at:['street','commoners'],who:['女','女'],lines:[[0,'塩を少し貸しておくれ'],[1,'この前の分は'],[0,'市が開いたら、いっしょに返す'],[1,'その言葉、三度目よ']],kind:'kurashi'}
+);
+})();
+
+// 着手案31：居ついた者と庶民の住人（名前のある人・呼び名だけの人を混ぜる）2026-10-04 22:21 heian-lines.js の末尾に入れた（台帳 residents.json には未登録）
+// 井内さん「居着いたもの、他の住民も名前はあったりなかったりでいいのではないか」
+//   三つの層：①名前のある住人（初男・広足など）②呼び名だけの住人（筑紫の使い・河原の婆の形＝name に呼び名）③群衆（名なし・着手案29/30の一言）
+//   呼び名だけの人は、intro で名を言わない理由を一言で（名乗らない・忘れた・国に置いてきた）
+// 入れ方：会話データの末尾で people に足す（台帳から作り直しても消えない位置）。台帳 residents.json にも同じ人を足すかは別に決める
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+const add=p=>{if(!L.people.some(q=>q.id===p.id))L.people.push(p);};
+// ① 呼び名だけ：羅城門の下の男（備後）
+add({id:"rajomon_otoko",name:"羅城門の下の男",who:"人夫",age:41,model:"羅城門の楼の下で寝起きする、備後から来た元の運脚",bind:{"at":"rajomon","who":["人夫","庶民"],"r":2000},
+ from:"備後国",home:"羅城門の楼の下（西の柱の陰）",work:"日雇いの担ぎ。仕事のない日は門の下で寝ている",
+ family:"備後に妻がいた。三年帰っていない",
+ story:"三年前に調の布を担いできて、帰りの糧を盗まれた。働いて銭を貯めては、そのたびに病や雨で失う。いまは門の下の西国の者たちのまとめ役のようになっている",
+ recent:["備中の初男どのと、国の話をした","門の下の場所を、東国の者と取り合った","朝の辻で、また一人冷たくなっていた"],
+ wants:"一度でいい、国の妻の顔を見ること",
+ day:[[5,8,"rajomon","起きる"],[8,16,"street","担ぎ"],[16,19,"rajomon","戻る"],[19,5,"rajomon","寝る"]],
+ lines:{"起きる":["門の下は朝が早い。番の衛士に蹴り起こされる","西の柱の陰が、わしの寝床だ"],"担ぎ":["今日の口はあった。米二合だ","担ぎの口は、若い者から決まっていく"],"戻る":["今日は東国の者が多い。詰めてもらわんと","帰りの糧を貯めて、三年だ"],"寝る":["備後の言葉が聞こえると眠れる","門の下でも、雨がしのげりゃ御殿よ"]},
+ intro:["名か。国に置いてきた。羅城門の下の男でいい","備後から布を担いできた。もう三年前じゃ","帰りの糧を盗まれてな。それきりよ","門の下の西国の者は、わしが場所を割り振っとる","一度でいい、国の妻の顔を見たい"],
+ knows:{"hatsuo":"備中の初男どのは隣の国じゃ。早う帰れと言うてある","hirotari":"三河の広足どのは、布が黴びて帰れんらしい。わしと同じ道を行かんとええが","kizukai":"材木運びの乙麻呂どのが、ときどき口を回してくれる"},
+ kb:{"dom":{"旅":3,"治安":1},"lens":"実直","src":["hatsuo","hirotari","kizukai"]},
+ axis:{"mibun":"寄る辺の無い者","house":null,"tachiba":"中立","chusei":null}});
+// ① 名前あり：田麻呂（越前・都に居ついて堀川の揚げ人夫に）
+add({id:"tamaro",name:"田麻呂",who:"人夫",age:26,model:"越前から運脚で来て、そのまま堀川の荷揚げに居ついた男",bind:{"at":"horikawa","who":["人夫"],"r":1500},
+ from:"越前国",home:"堀川の材木置き場の小屋（太丸の口ききで借りている）",work:"堀川の荷舟の荷揚げ",
+ family:"越前に父と兄。田は兄が継ぐ",
+ story:"運脚で上ってきたが、国へ帰っても自分の田は無い。太丸に拾われて荷揚げを覚え、都に居つくことにした。国の戸籍にはまだ名が残っているはずだと、ときどき気にする",
+ recent:["太丸さんに筏の乗り方を習った","伊予の者が仕事はないかと聞きに来た","夜回りに、越前の者は東の河原へ行けと言われた"],
+ wants:"いつか自分の舟を持つこと",
+ day:[[5,12,"horikawa","荷揚げ"],[12,14,"eastMarket","昼","marketDay"],[12,14,"westMarket","昼","offDay"],[14,18,"horikawa","荷揚げ"],[18,5,"horikawa","小屋"]],
+ lines:{"荷揚げ":["この材木、越前の山のより軽い","足を滑らせたら命がない。だから賃がいい"],"昼":["市で塩を少し。国の父にいつか送る","都の市は、何でもあるが何でも高い"],"小屋":["国では、帰らん者は死んだことにされるそうな","兄は怒っとるかのう"]},
+ intro:["越前の田麻呂だ。いまは堀川で荷を揚げとる","運脚で来て、そのまま居ついた","国へ帰っても、わしの田は無いでな","太丸さんに拾われた。命の恩人だ","いつか自分の舟を持って、越前まで川を上ってみたい"],
+ knows:{"niage":"太丸さんは口は悪いが、飯を分けてくれる","onimaru":"あの放免には、夜に二度追い立てられた","rajomon_otoko":"羅城門の下の男は、国へ帰れと言う。わしは帰らん"},
+ kb:{"dom":{"旅":2,"市":1},"lens":"田舎","src":["niage","hirotari"]},
+ axis:{"mibun":"旅の者","house":null,"tachiba":"中立","chusei":null}});
+// ② 呼び名だけ：美濃の男（右京の空き家の五人の頭）
+add({id:"mino_otoko",name:"美濃の男",who:"人夫",age:35,model:"右京の空き家に、同じ美濃の者四人と住みついている男",bind:{"at":"ukyo","who":["人夫","庶民"],"r":2000},
+ from:"美濃国",home:"右京の空き家（屋根が半分しかない）",work:"日雇い。右京の田の手伝いもする",
+ family:"美濃の者が四人。みな国から来た仲間",
+ story:"調を納めたあと、同じ郷の四人と帰りそびれて、右京の空き家に住みついた。夜に灯をともすので、町の者には物の怪の灯と噂されている",
+ recent:["空き家の灯が物の怪だと噂されとるらしい","田人の爺さまが、草取りの口をくれた","放免に、ここを出ていけと言われた"],
+ wants:"五人そろって、秋までに国へ帰ること",
+ day:[[5,8,"ukyo","朝"],[8,17,"ukyoPaddies","田"],[17,5,"ukyo","空き家"]],
+ lines:{"朝":["五人で粥を一鍋。米は一合ずつ出し合う","名乗るほどの者じゃない。美濃の男で通っとる"],"田":["右京の田は、美濃の田より水が少ない","草取りなら、国でさんざんやった"],"空き家":["灯をともすと物の怪だと言われる。消すと暗い","屋根が半分でも、五人おれば寒うない"]},
+ intro:["名か。美濃の男でいい。仲間もそう呼ぶ","同じ郷の者四人と、この空き家におる","調を納めて、帰りそびれた","夜の灯は、わしらの灯だ。物の怪ではない","秋までに、五人そろって国へ帰りたい"],
+ knows:{"tahito":"田人の爺さまは、余所者にも口をくれる","onimaru":"あの放免は、出ていけと言いながら見逃してくれる"},
+ kb:{"dom":{"旅":2,"治安":1},"lens":"実直","src":["tahito","onimaru"]},
+ axis:{"mibun":"寄る辺の無い者","house":null,"tachiba":"中立","chusei":null}});
+// ① 名前あり：真砂（鴨の河原の洗い女）
+add({id:"masago",name:"真砂",who:"女",age:31,model:"鴨の河原で邸の衣を洗う女",bind:{"at":"kamo","who":["女"],"r":1500},
+ from:"山城国（京の下町）",home:"左京の下町、河原に近い長屋",work:"邸から預かった衣を鴨の河原で洗う",
+ family:"夫は日雇い。子が三人",
+ story:"娘のころから河原で洗い物をしている。どの邸の衣がいちばん汚れるかを知っている。河原の婆にときどき粥を分ける",
+ recent:["若殿の袍に墨がついとった","上で雨が降ったのか、川が濁った","河原の婆が、今朝は私を娘と呼んだ"],
+ wants:"子のうち一人でいい、邸に仕えさせたい",
+ day:[[5,12,"kamo","洗い"],[12,14,"commoners","昼"],[14,17,"kamo","干す"],[17,5,"commoners","家"]],
+ lines:{"洗い":["朝の水がいちばんよく落ちる","石で叩いて、灰汁で揉んで、また叩く"],"昼":["昼は子に粥を食べさせに、いったん家へ","井戸の順番、また抜かされた"],"干す":["衣を干すときは、風の向きを見る","邸の衣は、汚すと叱られる。洗うのは私なのに"],"家":["やっと寝た。今のうちに糸を紡がないと","亭主は今日も米二合。まあいいほうよ"]},
+ intro:["真砂だよ。河原で洗い物をしとる","娘のころから、この河原さ","どの邸の衣がいちばん汚れるか、知っとるよ","河原の婆さまに、ときどき粥を分けてる","子のうち一人でも、邸に仕えさせたいね"],
+ knows:{"kawara_baba":"婆さまは今朝、私を娘と呼んだ。それでもいいさ","tamaro":"越前の若いのは、よう働くが洗い物は下手"},
+ kb:{"dom":{"邸":1,"市":1},"lens":"実直","src":["kawara_baba"]},
+ axis:{"mibun":"町の者","house":null,"tachiba":"中立","chusei":null}});
+// ② 呼び名だけ：子守の娘（真砂の上の娘・十歳）
+add({id:"komori",name:"子守の娘",who:"童",age:10,model:"弟をおぶって下町を歩く、洗い女の娘",bind:{"at":"commoners","who":["女","庶民"],"r":1500},
+ from:"京の下町",home:"左京の下町、河原に近い長屋（真砂の家）",work:"弟の子守と、母の手伝い",
+ family:"母は洗い女の真砂。弟が二人",
+ story:"母が河原に出ているあいだ、いちばん下の弟をおぶっている。遊びに混ぜてもらえないのが不満。鉄の童を見せると弟が泣きやむのを知っている",
+ recent:["弟が鉄の童を見て笑った","比比丘女に混ぜてもらえなかった","母さんが干物をひとつくれた"],
+ wants:"弟をおろして、一日じゅう遊ぶこと",
+ day:[[6,17,"commoners","子守"],[17,6,"commoners","家"]],
+ lines:{"子守":["弟をおぶってると、遊びに混ぜてもらえない","泣きやまない。…鉄の子が来たら笑うのに"],"家":["母さん、まだ帰らない","弟が寝たら、私も寝る"]},
+ intro:["名前？ 子守の娘でいいよ。みんなそう呼ぶ","母さんは河原で洗い物","弟、重いんだよ","鉄の子を見せると、弟が泣きやむの","いつか弟をおろして、一日じゅう遊びたい"],
+ knows:{"masago":"母さんは、怒ると石で衣を叩く音が大きくなる"},
+ kb:{"dom":{"市":1},"lens":"子ども","src":["masago"]},
+ axis:{"mibun":"町の者","house":null,"tachiba":"中立","chusei":null}});
+})();
+
+// クエスト脚本「帰るか残るか」（kaeru）― 2026-10-04 22:26 heian-lines.js の末尾に入れた
+// 運脚の四つの行く末（初男＝帰る・広足＝迷う・田麻呂＝居ついた・羅城門の下の男＝帰りそびれた）を一つの頼みごとにした
+// 頼む人＝羅城門の下の男（rajomon_otoko・着手案31）。初男の帰りの糧＝国継（宿の主）。広足の黴びた布＝三つの道（老松に干し直しを頼む／田麻呂の舟の銭を借りて買い足す／太丸の口ききで都に残る）
+// 最後に、羅城門の下の男自身が帰るか残るかを、鉄の童の一言で決める（初男の備中と男の備後は隣の国）
+// 本体で要るもの：HEIAN_QUEST_NAMES に kaeru:'帰るか残るか'（1行・無くても動く）
+// 状態 kaeru：1受けた 9済んだ ／ kr_h（初男の糧）：1国継に頼みに行く 2糧を得た 3初男に渡した ／ kr_way（広足の道）：1干し直し 2買い足し 3残る ／ kr_b（広足）：2片づいた 3広足が腹を決めた ／ kr_o（男）：1帰る 2残る
+// 決まり：状態は上げるだけ・最初の一言で印を付けない・選択肢は4つまで
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ======== 羅城門の下の男（頼む人）
+{id:'kr-o-go',char:'rajomon_otoko',if:'q:kr_o=1',title:'羅城門の下の男',start:'s',nodes:{
+ s:{t:['明日の朝、初男どのと発つ。…荷は、この布袋ひとつじゃ','三年ぶりに、備後の土を踏む。妻がまだ待っておるかは知らんがの'],c:[['門の下の皆は？','a'],['気をつけて','bye']]},
+ a:{t:'西国の者の場所割りは、田麻呂どのに頼んだ。あれは帰らん男じゃから、ちょうどよい',end:true},
+ bye:{t:'おぬしのおかげよ。…鉄の童、おぬしも、いつか帰るところへ帰れよ',end:true}}},
+{id:'kr-o-stay',char:'rajomon_otoko',if:'q:kr_o=2',title:'羅城門の下の男',start:'s',nodes:{
+ s:{t:['初男どのは、夜明けに発った。わしは見送っただけじゃ','門の下に、今朝もまた国の者が来た。場所を割り振ってやらねば'],c:[['後悔してない？','a'],['またね','bye']]},
+ a:{t:'せんと言えば嘘になる。…じゃが、ここで誰かが場所を割らねば、弱い者から雨に打たれる',end:true},
+ bye:{t:'おう。門の下は、いつでも空けておく',end:true}}},
+{id:'kr-o-end',char:'rajomon_otoko',if:'q:kaeru=1&q:kr_h>=3&q:kr_b>=3',title:'羅城門の下の男',start:'s',nodes:{
+ s:{t:'初男どのは糧がそろった。広足どのも腹を決めたそうな。…ようやってくれた',c:[['あなたは？','a']]},
+ a:{t:'わしか。…初男どのが言うんじゃ。備中と備後は隣、山崎から先もいっしょに歩かんかと',c:[['初男さんと帰っては','go'],['門の下の皆には、あなたが要る','stay']]},
+ go:{t:'…そうか。そうじゃな。三年、帰る道ばかり思うておった。明日の朝、発つ',set:['kr_o=1','kaeru=9'],end:true},
+ stay:{t:'…ああ。わしが帰ったら、誰が場所を割る。初男どのには、妻への言づてを頼むとしよう',set:['kr_o=2','kaeru=9'],end:true}}},
+{id:'kr-o-wait',char:'rajomon_otoko',if:'q:kaeru=1',title:'羅城門の下の男',start:'s',nodes:{
+ s:{t:['初男どのは帰りの糧が足らん。宿の国継どのなら、何とかしてくれるかもしれん','広足どのは、黴びた布を抱えて朱雀大路を行ったり来たりしとる','どっちも、わしと同じ道を行かせとうない'],end:true}}},
+{id:'kr-start',char:'rajomon_otoko',if:'q:kaeru<1',title:'羅城門の下の男',start:'s',nodes:{
+ s:{t:'鉄の童か。…ちょうどええ。門の下におると、帰る者と帰れん者がよう見える',c:[['どういうこと？','a'],['また今度','no']]},
+ a:{t:'備中の初男どのは、荷を納めたが帰りの糧が三日分しかない。三河の広足どのは、布が黴びて突き返された',c:[['それで？','b']]},
+ b:{t:'わしは三年前、帰りの糧を盗まれて、それきりここよ。…二人を、わしと同じにはしとうない。手を貸してくれんか',c:[['手伝う','ok'],['また今度','no']]},
+ ok:{t:'ありがたい。初男どのは朱雀大路を荷と歩いとる。広足どのは、たいがい大路で迷うておる',set:'kaeru=1',end:true},
+ no:{t:'そうか。…門の下は逃げん。気が向いたら来てくれ',end:true}}},
+
+// ======== 初男（帰りの糧）
+{id:'kr-h-go',char:'hatsuo',if:'q:kr_o=1',title:'初男',start:'s',nodes:{
+ s:{t:['羅城門の下の男どのと、明日の朝に発つ。山崎から先も、二人なら心強い','備後と備中は隣じゃ。男どのの妻にも、わしが先に知らせてやれる'],end:true}}},
+{id:'kr-h-done',char:'hatsuo',if:'q:kr_h>=3',title:'初男',start:'s',nodes:{
+ s:{t:['干し飯がひと袋。これで国まで歩ける','国の子らに、鉄の童の話をしてやろう。誰も信じんじゃろうがの'],end:true}}},
+{id:'kr-h-get',char:'hatsuo',if:'q:kr_h=2',title:'初男',start:'s',nodes:{
+ s:{t:'…国継どのの干し飯か？ わしに？',c:[['帰りの糧に','a']]},
+ a:{t:'ありがたい…。これで、道で倒れずにすむ。国の子らの顔が、また見られる',set:'kr_h=3',c:[['気をつけて','bye']]},
+ bye:{t:'おう。羅城門の下の男どのにも、礼を言うておいてくれ',end:true}}},
+{id:'kr-h-wait',char:'hatsuo',if:'q:kr_h=1',title:'初男',start:'s',nodes:{
+ s:{t:['国継どのは何と言うておった','宿代もかさむ。早う発ちたいが、糧が無うてはな'],end:true}}},
+{id:'kr-h-ask',char:'hatsuo',if:'q:kaeru>=1&q:kr_h<1',title:'初男',start:'s',nodes:{
+ s:{t:'羅城門の下の男どのの使いか。…荷は納めた。じゃが、帰りの糧が三日分しかない',c:[['国まで何日？','a']]},
+ a:{t:'二十日。来るときに、一人倒れた。…食い物は自分持ちでな。銭も、宿代で消えた',c:[['宿の国継さんに頼んでみる','b'],['また来る','bye']]},
+ b:{t:'国継どのか。あの人なら、話くらいは聞いてくれるじゃろう',set:'kr_h=1',end:true},
+ bye:{t:'すまんの',end:true}},
+ n:'運脚の往き帰りの食は自分持ち（続日本紀 和銅五年の詔に、帰る途中で飢える者の記事＝記憶による）'},
+
+// ======== 国継（宿の主）
+{id:'kr-yado',char:'yadonushi',if:'q:kr_h=1',title:'国継',start:'s',nodes:{
+ s:{t:'初男どのの帰りの糧か。…宿の米を干したのが、ひと袋ある。ただで、とはいかんがの',c:[['何をすればいい？','a'],['また来る','bye']]},
+ a:{t:'井戸の水を、宿の甕に汲んでくれ。二十人分の粥を炊くのに、朝から足りんのよ',c:[['汲む','b']]},
+ b:{t:'…鉄の童は疲れんのか。甕がみな満ちた。ほれ、干し飯じゃ。初男どのに渡してやれ',set:'kr_h=2',end:true},
+ bye:{t:'宿は逃げん',end:true}}},
+
+// ======== 広足（黴びた布・三つの道）
+{id:'kr-b-after3',char:'hirotari',if:'q:kr_b>=3&q:kr_way=3',title:'広足',start:'s',nodes:{
+ s:{t:['堀川の荷揚げは、肩が抜けそうじゃ。…じゃが飯は食える','国の娘には、初男どのに言づてを頼んだ。父は都で働いとる、とな'],end:true}}},
+{id:'kr-b-after',char:'hirotari',if:'q:kr_b>=3',title:'広足',start:'s',nodes:{
+ s:{t:['布は納まった。明日、三河へ発つ','娘の顔が、ようやく見られる。…鈴鹿の雨には、もう降られとうない'],end:true}}},
+{id:'kr-b-fin1',char:'hirotari',if:'q:kr_b=2&q:kr_way=1',title:'広足',start:'s',nodes:{
+ s:{t:'倉守の爺さまが灰汁で洗うて干してくれた。検めの役人も、これなら、と受け取ってくれた',c:[['よかった','a']]},
+ a:{t:'国司さまに叱られずにすむ。…この恩は、三河の布で返さんとな',set:'kr_b=3',end:true}}},
+{id:'kr-b-fin2',char:'hirotari',if:'q:kr_b=2&q:kr_way=2',title:'広足',start:'s',nodes:{
+ s:{t:'田麻呂どのが、舟を買うための銭を貸してくれた。市で布を買い足して、納められた',c:[['よかった','a']]},
+ a:{t:'あの男の舟が遠のいた。…三河へ帰ったら、必ず布で返す。そう伝えてくれ',set:'kr_b=3',end:true}}},
+{id:'kr-b-fin3',char:'hirotari',if:'q:kr_b=2&q:kr_way=3',title:'広足',start:'s',nodes:{
+ s:{t:'太丸どのが、荷揚げの口をくれた。田麻呂どのの隣で寝てよいと',c:[['それでいいの？','a']]},
+ a:{t:'黴びた布を抱えて国へ帰るより、都で稼いで娘に送るほうがええ。…そう決めた',set:'kr_b=3',end:true}}},
+{id:'kr-b-wait',char:'hirotari',if:'q:kr_way>=1&q:kr_b<2',title:'広足',start:'s',nodes:{
+ s:{t:['どうなった。…待つのには慣れとるが、宿代がな','決めたことじゃ。あとは、うまく運ぶのを祈るだけよ'],end:true}}},
+{id:'kr-b-ask',char:'hirotari',if:'q:kaeru>=1&q:kr_way<1',title:'広足',start:'s',nodes:{
+ s:{t:'羅城門の下の男どのの使いか。…見てくれ、この布。鈴鹿の雨で黴びて、もう布ではないそうな',c:[['大蔵の倉守に干し直しを頼む','w1'],['市で布を買い足す','w2'],['都に残る道もある','w3'],['もう少し考える','bye']]},
+ w1:{t:'老松の爺さまか。布の乾かし方を教えてくれたことがある。…頼んでみてくれるか',set:'kr_way=1',end:true},
+ w2:{t:'買い足す銭など、どこにも…。いや、堀川の田麻呂どのが、舟の銭を貯めとると言うておった',set:'kr_way=2',end:true},
+ w3:{t:'残る、か。…田麻呂どのは堀川で荷を揚げとる。太丸どのに口をきいてもらえるか',set:'kr_way=3',end:true},
+ bye:{t:'そうじゃな。…わしも、もう少し大路を歩いて考える',end:true}},
+ n:'調の布の検めと突き返しは推定。灰汁で洗う・干し直す＝推定'},
+
+// ======== 三つの道の先
+{id:'kr-oimatsu',char:'oimatsu',if:'q:kr_way=1&q:kr_b<2',title:'老松',start:'s',nodes:{
+ s:{t:'三河の広足の布か。…黴は表だけじゃ。灰汁で洗うて、風の通る倉の陰で干せば落ちる',c:[['検めは通る？','a']]},
+ a:{t:'検めの役人には、わしから言うておく。倉守は鍵は持たんが、布の良し悪しは誰より知っとる',set:'kr_b=2',end:true}}},
+{id:'kr-tamaro',char:'tamaro',if:'q:kr_way=2&q:kr_b<2',title:'田麻呂',start:'s',nodes:{
+ s:{t:'広足どのの布か。…わしの舟の銭が、少しある。それで布が買えるなら',c:[['借りていい？','a'],['舟の銭でしょう','b']]},
+ a:{t:'ええ。国へ帰れる者は、帰ればええ。わしは帰らん。だから急がん',set:'kr_b=2',end:true},
+ b:{t:'舟は、来年でも再来年でもええ。…国へ帰れる者が帰れんのは、見とうない',set:'kr_b=2',end:true}}},
+{id:'kr-niage',char:'niage',if:'q:kr_way=3&q:kr_b<2',title:'太丸',start:'s',nodes:{
+ s:{t:'三河の者を荷揚げにだと？ …田麻呂が一人前になったで、ちょうど一人分空いとる',c:[['頼める？','a']]},
+ a:{t:'足を滑らせたら命はない。それでええなら、明日の朝から来い。寝床は田麻呂の隣じゃ',set:'kr_b=2',end:true}}}
+]);
+L.say.push(
+ {at:'suzaku',who:'人夫',if:'q:kaeru=1',t:'三河の男が、黴びた布を抱えて行ったり来たりしとる',n:'広足'},
+ {at:'commoners',who:'庶民',if:'q:kr_h>=2',t:'国継の宿で、鉄の童が甕に水を汲んどったそうな'},
+ {at:'rajomon',who:'人夫',if:'q:kr_o=1',t:'門の下の西の柱の主が、国へ帰るそうな'},
+ {at:'rajomon',who:'人夫',if:'q:kr_o=2',t:'西の柱の男は残ったそうな。…場所を割る者がおらんと困る'},
+ {at:'horikawa',who:'人夫',if:'q:kr_way=3&q:kr_b>=2',t:'三河から来た新入りが、荷揚げで肩を痛めとる'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_恋敵の足止め_2026-10-03.js（residents/ の下書きをそのまま）
+// クエスト脚本「恋敵の足止め」（koi_jama）― 2026-10-03 下書き。heian-lines.js にはまだ入れていない
+// 入れ方：heian-lines.js 末尾に、この IIFE をそのまま足す（紅の値・常夏の文と同じ形）。
+// 本体（index.html）で要るのは1行だけ：HEIAN_QUEST_NAMES に koi_jama:'恋敵の足止め' を足す（トースト表示用）。
+// 人：依頼主＝伴若成（kemari_youth）、恋敵＝良岑秀方（kurodo）、女の家＝東三条殿（取り次ぎ＝小宰相 kosaisho）。姫君は名を出さない（創作）
+// 道（正解は1）：1＝陽明門→近衛大路を東→西洞院大路を南→西の小門／2＝待賢門→中御門大路を東→堀川小路を南／3＝郁芳門→大炊御門大路を東→東洞院大路を南
+// 状態（2026-10-04 直し：本体は状態を上げることしかできないので、戻す書き方をやめた。結末＝20、恋敵に知らせた負け＝15）
+// 状態 koi_jama：1調べ中 2道を決めた 3手立てを決めた 4夜を待つ 5足止め成功 7失敗 8露見 6・11〜14文の筋 13恋敵に知らせた 9終わり
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 依頼
+{id:'kj-start',char:'kemari_youth',if:'q:koi_jama<1',title:'伴若成',start:'s',nodes:{
+ s:{t:'ありよう…いや、今日は鞠どころではない。鉄の童、頼みがある。誰にも言うなよ',c:[['聞くよ','a'],['また今度','no']]},
+ a:{t:'東三条殿に身を寄せる姫君のもとへ、良岑秀方が通い始めた。もう二晩だ。次の夜が三晩目になる',c:[['三晩目だと何が？','b']]},
+ b:{t:'三晩続けて通えば、婿と認められる。…あいつの口の軽さで、あの方を幸せにできるものか',c:[['どうしてほしいの？','c'],['人の恋路は邪魔できない','no2']]},
+ c:{t:'三晩目の夜、あいつを道で止めてくれ。内裏を出てどの道を行くか、まずそれを突き止めてほしい',c:[['調べてみる','ok'],['考えさせて','no']]},
+ ok:{t:'恩に着る。門の衛士、町の子、坊長…夜の道を知る者に聞け。わしは昼は鞠場におる',set:'koi_jama=1',end:true},
+ no:{t:'…そうか。鞠でも蹴って忘れるか',end:true},
+ no2:{t:'わかっておる。わかっておるが…',end:true}},
+ n:'通い婚と三日目の夜は通説。三日夜の餅など儀の記録は10世紀後半以降が中心なので、900年の形は推定。人物の恋は創作'},
+
+// ---- 道を決める（依頼主）。正解の選択肢は最長にせず、1番目にも置かない
+{id:'kj-wait',char:'kemari_youth',if:'q:koi_jama=1',title:'伴若成',start:'s',nodes:{
+ s:{t:['道はわかったか','秀方め、今日も殿上で浮かれておったぞ'],c:[
+  ['郁芳門から大炊御門を東、東洞院を南へ','r3'],
+  ['陽明門から近衛を東、西洞院を南へ','r1'],
+  ['待賢門から中御門を東、堀川を南へ','r2'],
+  ['やめよう、秀方どのは本気だ','turn',{if:'q:kj_makoto>=2'}],
+  ['まだ調べる','bye']]},
+ r1:{t:'陽明門から近衛を東、西洞院を南へ、か。よし',set:['kj_route=1','koi_jama=2'],c:[['手立てを考える','way']]},
+ r2:{t:'待賢門から堀川べりを南へ、か。よし',set:['kj_route=2','koi_jama=2'],c:[['手立てを考える','way']]},
+ r3:{t:'郁芳門から東洞院を南へ、か。よし',set:['kj_route=3','koi_jama=2'],c:[['手立てを考える','way']]},
+ way:{t:'さて、どう止める。手荒なことはならんぞ。わしの名に傷がつく',c:[
+  ['陰陽師に、方角が塞がりと言わせる','w1'],['辻に死人が出たと噂を流す','w2'],
+  ['辻に盗賊が出ると検非違使に告げる','w3'],['供の童を菓子で手なずける','w4']]},
+ w1:{t:'陰陽師どのか。口の堅い方だが…',set:['kj_way=1','koi_jama=3'],c:[['頼みに行く','go']]},
+ w2:{t:'噂か。町の子なら、半日で辻じゅうに広めよう',set:['kj_way=2','koi_jama=3'],c:[['頼みに行く','go']]},
+ w3:{t:'検非違使に辻を改めさせるか。…大ごとにはするなよ',set:['kj_way=3','koi_jama=3'],c:[['頼みに行く','go']]},
+ w4:{t:'童か。供の童は陽明門の前で殿を待っておるはずだ',set:['kj_way=4','koi_jama=3'],c:[['頼みに行く','go']]},
+ go:{t:'頼んだぞ。三晩目の夜は、次の亥の刻だ',set:'koi_jama=3',end:true},
+ turn:{t:'…わかっておる。あいつは口は軽いが、歌だけは三度も書き直す男だ',set:'koi_jama=6',c:[['どうする？','turn2']]},
+ turn2:{t:'わしも、わしの文を書く。止めるのはやめだ。勝っても負けても、それだけは自分でやる',c:[['届けるよ','letter']]},
+ letter:{t:'東三条殿の小宰相どのに渡してくれ。…鞠より重い文だ',set:'koi_jama=11',end:true},
+ bye:{t:'急いでくれ。三晩目は待ってくれん',end:true}},
+ n:'陽明門・待賢門・郁芳門は大内裏の東の面の門（通説）。通り名の一部は後の呼び名を含む（推定）。道筋は創作'},
+
+{id:'kj-way2',char:'kemari_youth',if:'q:koi_jama=2',title:'伴若成',start:'s',nodes:{
+ s:{t:'手立ては決まったか',c:[
+  ['陰陽師に、方角が塞がりと言わせる','w1'],['辻に死人が出たと噂を流す','w2'],
+  ['辻に盗賊が出ると検非違使に告げる','w3'],['供の童を菓子で手なずける','w4'],['もう少し考える','bye']]},
+ w1:{t:'陰陽師どのか。口の堅い方だが…',set:['kj_way=1','koi_jama=3'],c:[['頼みに行く','go']]},
+ w2:{t:'噂か。町の子なら、半日で辻じゅうに広めよう',set:['kj_way=2','koi_jama=3'],c:[['頼みに行く','go']]},
+ w3:{t:'検非違使に辻を改めさせるか。…大ごとにはするなよ',set:['kj_way=3','koi_jama=3'],c:[['頼みに行く','go']]},
+ w4:{t:'童か。供の童は陽明門の前で殿を待っておるはずだ',set:['kj_way=4','koi_jama=3'],c:[['頼みに行く','go']]},
+ go:{t:'頼んだぞ。三晩目の夜は、次の亥の刻だ',set:'koi_jama=3',end:true},
+ bye:{t:'手荒なことはならんぞ',end:true}}},
+
+{id:'kj-wait3',char:'kemari_youth',if:'q:koi_jama=3',title:'伴若成',start:'s',nodes:{
+ s:{t:['頼んだ相手には会えたか','三晩目の夜まで、もう間がないぞ'],c:[['やめよう、秀方どのは本気だ','turn',{if:'q:kj_makoto>=2'}],['手立てがうまくいかない','give'],['また来る','bye']]},
+ give:{t:'…断られたか。もうよい、止めるのはやめだ。わしは、わしの文を書く',set:'koi_jama=6',c:[['届けるよ','letter']]},
+ turn:{t:'…わかっておる。あいつは口は軽いが、歌だけは三度も書き直す男だ。止めるのはやめだ。わしの文を書く',set:'koi_jama=6',c:[['届けるよ','letter']]},
+ letter:{t:'東三条殿の小宰相どのに渡してくれ。…鞠より重い文だ',set:'koi_jama=11',end:true},
+ bye:{t:'急いでくれ。三晩目は待ってくれん',end:true}}},
+{id:'kj-wait4',char:'kemari_youth',if:'q:koi_jama=4',title:'伴若成',start:'s',nodes:{
+ s:{t:['今夜だ。…眠れそうにない','鞠が足につかん。今夜のことばかり考えておる'],end:true}}},
+{id:'kj-wait13',char:'kemari_youth',if:'q:koi_jama=13',title:'伴若成',start:'s',nodes:{
+ s:{t:'…何か、わしに隠しておらんか',end:true}}},
+{id:'kj-turn',char:'kemari_youth',if:'q:koi_jama=6',title:'伴若成',start:'s',nodes:{
+ s:{t:'文は書けた。小宰相どのに届けてくれるか',c:[['届けるよ','letter']]},
+ letter:{t:'…鞠より重い文だ。頼む',set:'koi_jama=11',end:true}}},
+
+// ---- 手がかり（正しい道を指すのは衛士・雀丸・小宰相。坊長は堀川を消す。戯丸は外れ）
+{id:'kj-eji',who:['衛士'],at:['yomeimon'],if:'q:koi_jama>=1&q:koi_jama<4&q:kj_eji<2',title:'陽明門の衛士',start:'s',nodes:{
+ s:{t:['何用だ','門は日が落ちたら閉める。用があるなら今のうちだ'],c:[['蔵人の良岑どのは、どの門から帰る？','k'],['何でもない','bye']]},
+ k:{t:'良岑どのか。近ごろは日が傾くと、この陽明門から出られる。待賢門のほうが家に近かろうに',set:'kj_eji=2',c:[['なぜだろう','w']]},
+ w:{t:'さあな。若い殿方が遠回りするわけは、たいてい一つよ',end:true},
+ bye:{t:'うろうろするな',end:true}},
+ n:'門が日の入りに閉まるのは本体に実装済み。秀方は門が閉まる前に出て、夜を待って通う筋'},
+
+{id:'kj-suzu',char:'suzumemaru',if:'q:koi_jama>=1&q:koi_jama<3&q:kj_suzu<2',title:'雀丸',start:'s',nodes:{
+ s:{t:'鉄の童！ 何か使いある？',c:[['夜、狩衣の殿さまを見なかった？','k'],['またね','bye']]},
+ k:{t:'見た見た！ 使いの帰りにね。童に松明を持たせて、近衛と西洞院の辻を南へ曲がってった。毎晩だよ',set:'kj_suzu=2',c:[['ありがとう','bye']]},
+ bye:{t:'夜の路地は、昼と別の顔だよ',end:true}}},
+
+{id:'kj-bocho',char:'bocho',if:'q:koi_jama>=1&q:koi_jama<4&q:kj_bocho<2',title:'坊長',start:'s',nodes:{
+ s:{t:'見慣れぬ者は坊長に届けよ…なんだ、鉄の童か',c:[['夜の堀川べりはどう？','k'],['何でもない','bye']]},
+ k:{t:'坊長の寄り合いで聞いた。近ごろ堀川べりは夜盗が出る。若い殿方は、あそこは通らん',set:'kj_bocho=2',c:[['ありがとう','bye']]},
+ bye:{t:'火の用心だ',end:true}},
+ n:'坊長は京の坊ごとの長（令の定め）。夜盗の話は創作'},
+
+{id:'kj-sangaku',char:'sangaku',if:'q:koi_jama>=1&q:koi_jama<4&q:kj_sangaku<2',title:'戯丸',start:'s',nodes:{
+ s:{t:'さあさあ…おや、鉄の童。噂を買いに来たか',c:[['蔵人の良岑どのの夜の道を知らない？','k'],['またね','bye']]},
+ k:{t:'あの色男なら、大炊御門を東へ行くのを見たぞ。…たぶんな。いや、きっとだ',set:'kj_sangaku=2',c:[['ほんとう？','w']]},
+ w:{t:'わしの話は半分に聞け、とよく言われる。なぜだろうな',end:true},
+ bye:{t:'国々の噂なら売るほどある',end:true}},
+ n:'外れの手がかり。戯丸の語り癖（盛る）のとおり'},
+
+{id:'kj-kosai',char:'kosaisho',if:'q:koi_jama>=1&q:koi_jama<4&q:kj_kosai<2',title:'小宰相',start:'s',nodes:{
+ s:{t:'あら、鉄の童。姫君への文なら、わたくしを通してね',c:[['蔵人どのは、どの門から入るの？','k'],['何でもない','bye']]},
+ k:{t:'…西洞院に面した西の小門よ。開けておくのが、わたくしの役目。次にお見えになれば三晩目',set:'kj_kosai=2',c:[['姫君は？','h']]},
+ h:{t:'お文を胸に抱いて眠っておられるわ。…どなたかの差し金なら、あきらめなさいと伝えて',end:true},
+ bye:{t:'お邸の前で、あまりうろつかないでね',end:true}},
+ n:'東三条殿は二条大路の南・西洞院大路の東とされる（本体の位置どおり）。小門の位置は創作'},
+
+{id:'kj-warabe',who:['牛飼童','童','従者'],at:['yomeimon'],if:'q:koi_jama>=1&q:koi_jama<3&q:kj_makoto<2',title:'供の童',start:'s',nodes:{
+ s:{t:'…あ、からくりの童。殿をお待ちしてるんだ',c:[['どこへ行く殿さま？','k'],['じゃあね','bye']]},
+ k:{t:'内緒だよ。殿は毎晩、歌を三度も書き直してから出かけるんだ。口は軽いけど、あの姫君にだけは本気',set:'kj_makoto=2',c:[['そうなんだ','bye']]},
+ bye:{t:'殿が戻られたら、松明を持たなきゃ',end:true}},
+ n:'これを聞くと、依頼主に「やめよう」と言える'},
+
+// ---- 手立てを頼む
+{id:'kj-w1',char:'koreyuki',if:'q:koi_jama=3&q:kj_way=1',title:'日下部是行',start:'s',nodes:{
+ s:{t:'方角の吉凶か。何を知りたい',c:[['今夜は南東が塞がりと、蔵人どのに言ってほしい','k'],['やっぱりやめる','no']]},
+ k:{t:'占いを曲げよと？ ならぬ。それに良岑どのは、わしの占いの客でもある',c:[['そこを何とか','k2']]},
+ k2:{t:'聞かなかったことにはできん。…恋の勝ち負けを、暦に押しつけるでない',set:'koi_jama=8',end:true},
+ no:{t:'それがよい。吉方を知りたくなったら、また来るがよい',end:true}},
+ n:'方違え・方塞がりは9世紀後半には行われていたとされる（推定）。本体の陰陽師の吉方（omenDir）とは別の、作り話の頼み'},
+
+{id:'kj-w2',char:'suzumemaru',if:'q:koi_jama=3&q:kj_way=2',title:'雀丸',start:'s',nodes:{
+ s:{t:'死人が出たって触れ回るの？ どこの辻で？',c:[['あの殿さまの通る辻で','k'],['やっぱりやめる','no']]},
+ k:{t:'わかった。夕方までに辻じゅうに言っとく。…ほんとは誰も死んでないんだよね？',set:'koi_jama=4',end:true},
+ no:{t:'なんだ。駄賃はまた今度ね',end:true}},
+ n:'人の死の穢れは三十日（延喜式・臨時祭。それ以前の式にも同じ趣旨の定めがあったとされる＝900年は推定）。死人の出た辻を避けるのは演出'},
+
+{id:'kj-w3',who:['検非違使'],if:'q:koi_jama=3&q:kj_way=3',title:'検非違使',start:'s',nodes:{
+ s:{t:'何だ。届け出か',c:[['今夜、ある辻に盗賊が出ると聞いた','k'],['何でもない','no']]},
+ k:{t:'まことか。…よし、今宵は亥の刻にその辻に立とう。通る者は一人残らず改める',set:'koi_jama=4',end:true},
+ no:{t:'用もないのに検非違使を呼び止めるな',end:true}},
+ n:'検非違使の夜の見回りは既存の対話（kebiishi-stop）と同じ。うその届け出は創作の筋'},
+
+{id:'kj-w4',who:['牛飼童','童','従者'],at:['yomeimon'],if:'q:koi_jama=3&q:kj_way=4',title:'供の童',start:'s',nodes:{
+ s:{t:'唐菓子？ くれるの？',c:[['今夜、松明を湿らせておいて','k'],['殿に、今夜は道に気をつけてと伝えて','warn'],['やっぱりいい','no']]},
+ k:{t:'…それはできないよ。殿は毎晩、歌を三度も書き直して出かけるんだ。邪魔したら殿が泣いちゃう',set:'kj_makoto=2',c:[['わかった','no']]},
+ warn:{t:'気をつけて？ うん、伝えるね。…からくりの童は優しいんだね',set:'koi_jama=13',end:true},
+ no:{t:'じゃあね。菓子はもらっとく',end:true}}},
+
+// ---- 夜が明けて（小宰相から聞く）
+{id:'kj-ok',char:'kosaisho',if:'q:koi_jama=4&q:kj_route=1',title:'小宰相',start:'s',nodes:{
+ s:{t:'昨夜、蔵人どのはお見えにならなかったの。辻で足止めされたとか。姫君は朝まで小門を見ておられた',set:'koi_jama=5',c:[['…そうなんだ','e']]},
+ e:{t:'三晩目が来なければ、縁は切れたも同じ。…世の中は、うまくいかないものね',set:'kj_ok=1',end:true}},
+ n:'三日目の夜に続く露顕（ところあらわし）の儀は通説。記録は10世紀後半以降が中心（推定）'},
+
+{id:'kj-ng',char:'kosaisho',if:'q:koi_jama=4&q:kj_route>=2',title:'小宰相',start:'s',nodes:{
+ s:{t:'昨夜、蔵人どのがお見えになったわ。三晩目よ。今朝は家じゅうで婿どのを迎える支度なの',set:'koi_jama=7',end:true}}},
+
+{id:'kj-bocho2',char:'bocho',if:'q:koi_jama>=5&q:kj_way=2&q:kj_bocho2<1',title:'坊長',start:'s',nodes:{
+ s:{t:'辻に死人が出たと騒ぎになったが、誰も死んでおらなんだ。噂の出どころを探しておる',set:'kj_bocho2=2',c:[['…さあ','e']]},
+ e:{t:'穢れの噂は、うそでも人を縛る。軽々しく流すものではない',end:true}}},
+
+// ---- 結末（依頼主）
+{id:'kj-done',char:'kemari_youth',if:'q:koi_jama=5',title:'伴若成',start:'s',nodes:{
+ s:{t:'聞いたぞ！ 秀方は三晩目に来られなんだ。…よくやった',c:[['姫君は朝まで泣いていたって','a'],['よかったね','b']]},
+ a:{t:'…泣いて？ わしは、あの方を泣かせたかったわけでは…',c:[['どうする？','c']]},
+ b:{t:'うむ。…だが、なぜか鞠が足につかん',c:[['姫君は泣いていたよ','a']]},
+ c:{t:'わしの文を書く。勝ったからではない。泣かせた詫びだ。届けてくれるか',c:[['届けるよ','letter']]},
+ letter:{t:'小宰相どのに渡してくれ。…鞠より重い文だ',set:'koi_jama=11',end:true}}},
+
+{id:'kj-lose',char:'kemari_youth',if:'q:koi_jama=7',title:'伴若成',start:'s',nodes:{
+ s:{t:['そうか、秀方は三晩目を越えたか','…負けた。三晩、歩き通したあいつの勝ちだ'],set:'koi_jama=20',c:[['残念だったね','e']]},
+ e:{t:'鞠でも蹴るか。ありよう！ …落としたな',end:true}}},
+{id:'kj-lose2',char:'kemari_youth',if:'q:koi_jama=15',title:'伴若成',start:'s',nodes:{
+ s:{t:['秀方は、童の知らせで早めに出たそうな。…わしの負けだ','知らせた者がおるらしい。…まあよい、三晩目はあいつのものだ'],set:'koi_jama=20',c:[['残念だったね','e']]},
+ e:{t:'鞠でも蹴るか。ありよう！ …落としたな',end:true}}},
+
+{id:'kj-roken',char:'kemari_youth',if:'q:koi_jama=8',title:'伴若成',start:'s',nodes:{
+ s:{t:'陰陽師どのから秀方の耳に入った。殿上で笑い者だ。…頼んだのは、わしだ',set:'koi_jama=20',c:[['ごめんね','e']]},
+ e:{t:'お主のせいではない。人の恋を占いで止めようとした、わしの浅はかさよ',end:true}}},
+
+{id:'kj-warned',char:'kurodo',if:'q:koi_jama=13',title:'良岑秀方',start:'s',nodes:{
+ s:{t:'童から聞いた。道に気をつけよ、と。…伴の差し金か。礼を言う。今宵は早めに出る',set:'koi_jama=15',end:true}},
+ n:'恋敵に知らせると、依頼主には負けの結末になる'},
+
+{id:'kj-kurodo',char:'kurodo',if:'q:kj_ok=1&q:kj_kurodo<1&q:koi_jama>=20',title:'良岑秀方',start:'s',nodes:{
+ s:{t:'三晩目の夜、辻で足止めされた。…縁がなかったのだ。これは内緒だが、まだ文は書いておる',set:'kj_kurodo=2',end:true}}},
+
+// ---- 文の筋（足止めのあと、または「やめよう」のあと）
+{id:'kj-letter',char:'kosaisho',if:'q:koi_jama=11',title:'小宰相',start:'s',nodes:{
+ s:{t:'伴どのの文？ …お預かりするわ',set:'koi_jama=12',c:[['返事はもらえる？','w']]},
+ w:{t:'姫君は、どなたの文もきちんとお読みになる方。少し待って',end:true}}},
+
+{id:'kj-reply',char:'kosaisho',if:'q:koi_jama=12',title:'小宰相',start:'s',nodes:{
+ s:{t:'姫君からのお返しよ。伴どのに渡して',set:'koi_jama=14',c:[['受け取る','e']]},
+ e:{t:'歌が一首。…読めばわかるわ。わたくしは何も言わない',end:true}}},
+
+{id:'kj-final',char:'kemari_youth',if:'q:koi_jama=14',title:'伴若成',start:'s',nodes:{
+ s:{t:'返しの歌か！ …読んでくれ。手が震えてならん',c:[['読む','p']]},
+ p:{t:'「鞠のごと　空に上がれる　君が文　落ちむところを　我は知らずも」',c:[['…','q']]},
+ q:{t:'鞠のように空へ上がった文の、落ちる先は知らぬ、か。断りの歌だ。…だが、うまい',set:'koi_jama=20',c:[['うまいの？','r']]},
+ r:{t:'鞠になぞらえて、わしに恥をかかせぬ断り方よ。…この歌は、一生の宝にする',end:true}},
+ n:'返しの歌は新作（当時の形の五七五七七）'}
+]);
+})();
+
+// ---- 1.87 投入: クエスト脚本_夜行の知らせ_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「夜行の知らせ」（yako）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 土台：本体 1.82 の百鬼夜行（忌夜行日・丑の刻・二条大宮の辻。見ると gate:hyakki が付く）。この脚本は、見たことを陰陽寮に知らせる頼みごと。
+// 入れ方：heian-lines.js 末尾に、この IIFE をそのまま足す。本体で要るのは1行：HEIAN_QUEST_NAMES に yako:'夜行の知らせ' を足す。
+// 人：頼む人＝暦生の保臣（yasuomi）、知らせる先＝陰陽師の日下部是行（koreyuki）。噂の出どころ＝雀丸・円照（戻橋）、坊長・戯丸（五条）
+// 行列はごく稀にしか出ない（月に1夜あるかないか）。行列に行き合えなくても、噂を二つ確かめれば済む作り
+// 状態 yako：1受けた 9済み ／ yk_real：2行列を正しく知らせた ／ yk_r1・yk_r2：1噂を聞いた 2出どころを確かめた 3知らせた ／ yk_rule：決まりを聞いた ／ yk_after：行列の礼を聞いた
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 保臣：済んだ（行列を知らせた）。if のある対話は上から先に選ばれるので、済んだ方を先に置く
+{id:'yk-done-real',char:'yasuomi',if:'q:yako=1&q:yk_real>=2',title:'暦生・保臣',start:'s',nodes:{
+ s:{t:'是行さまから聞いた。…まことに行列に行き合うたのだな。よう戻った',set:'yako=9',c:[['陀羅尼を唱える人がいた','a']]},
+ a:{t:'尊勝陀羅尼じゃ。札を身に付けておれば難を逃れる、と言う。…お主には要らなんだようだが',set:'yk_after=2',c:[['なぜ平気だったんだろう','b']]},
+ b:{t:'是行さまの式盤にも、お主の相は出ぬ。物の怪にも、お主は見えなんだのかもしれぬ',end:true}},
+ n:'尊勝陀羅尼で百鬼夜行を逃れる話は『大鏡』（藤原師輔）など後世の説話。師輔はまだ生まれていないので名は出さない'},
+// ---- 保臣：済んだ（噂を二つ確かめた）
+{id:'yk-done-hito',char:'yasuomi',if:'q:yako=1&q:yk_r1>=3&q:yk_r2>=3',title:'暦生・保臣',start:'s',nodes:{
+ s:{t:'戻橋の鬼は円照さまの加持の帰り、五条の影は戯丸の稽古か。…怪しいことの多くは、人のしわざよ',set:'yako=9',c:[['本物はいないの？','a']]},
+ a:{t:'それはわからぬ。寮の記録には、人では説けぬものも残っておる。夜行日の丑の刻、二条の辻には近づくでないぞ',end:true}}},
+// ---- 保臣：済んだあとで行列を知らせた
+{id:'yk-after',char:'yasuomi',if:'q:yako=9&q:yk_real>=2&q:yk_after<2',title:'暦生・保臣',start:'s',nodes:{
+ s:{t:'聞いたぞ。お主、とうとう行列に行き合うたそうな。…寮の記録に、鉄の童の名が一行増えた',set:'yk_after=2',end:true}}},
+// ---- 保臣：頼む
+{id:'yk-start',char:'yasuomi',if:'q:yako<1',title:'暦生・保臣',start:'s',nodes:{
+ s:{t:'陰陽寮の暦生、保臣と申す。…鉄の童、お主は夜も歩けて、物怖じもせぬと聞く。頼みがある',c:[['聞くよ','a'],['また今度','no']]},
+ a:{t:'寮では、都の怪しいことを書き留めて占い、慎むべきを奏する。近ごろ夜の噂が多すぎて、手が回らぬ',c:[['どんな噂？','b']]},
+ b:{t:'戻橋に鬼の列が出た、五条の辻で角のある影が跳ねた…そして百鬼の行列。是行さまに知らせてくれぬか',c:[['引き受ける','ok'],['百鬼の行列なら見た','seen',{if:'gate:hyakki'}],['怖いからやめる','no']]},
+ ok:{t:'かたじけない。噂は、坊長どのや町の子に聞けば出どころが知れよう。是行さまは陰陽寮におられる',set:'yako=1',c:[['行列のことも教えて','rule']]},
+ seen:{t:'まことか！ …ならば是行さまに、見たままを申し上げてくれ。どこで、いつ、何を見たか',set:'yako=1',c:[['わかった','bye']]},
+ rule:{t:'寮に伝わるところでは、行列の出る夜は月ごとに決まっておる。正月・二月は子の日、三月・四月は午の日',c:[['ほかの月は？','rule2']]},
+ rule2:{t:'五・六月は巳、七・八月は戌、九・十月は未、十一・十二月は辰。その夜の丑の刻に、大路を行くと言う',set:'yk_rule=1',c:[['どこを通るの？','rule3']]},
+ rule3:{t:'寮の古い者は、二条の大路が大宮の大路と交わるあたりを避けよと言う。…わしは見たことがない。見たくもない',end:true},
+ no:{t:'無理もない。夜は慎むがよい',end:true},
+ bye:{t:'見たことを、忘れぬうちにな',end:true}},
+ n:'夜行日の決まりは『口遊』（源為憲・970）の忌夜行日（本体1.82と同じ）。900年の陰陽寮で同じ決まりだったかは推定。二条大宮の辻は『大鏡』の説話（後世）から本体が選んだ場所。保臣の頼みは創作'},
+// ---- 保臣：調べ中
+{id:'yk-wait',char:'yasuomi',if:'q:yako=1',title:'暦生・保臣',start:'s',nodes:{
+ s:{t:['噂の出どころは知れたか','是行さまには、もう申し上げたか'],c:[['行列の出る夜を、もう一度','rule'],['また来る','bye']]},
+ rule:{t:'正月・二月は子の日、三・四月は午、五・六月は巳、七・八月は戌、九・十月は未、十一・十二月は辰。その夜の丑の刻じゃ',c:[['ありがとう','bye']]},
+ bye:{t:'夜は灯を持って歩かれよ。…お主には要らぬか',end:true}}},
+
+// ---- 噂1：戻橋の鬼の列（雀丸 → 円照）
+{id:'yk-r1',char:'suzumemaru',if:'q:yako=1&q:yk_r1<1',title:'雀丸',start:'s',nodes:{
+ s:{t:'鉄の童！ 聞いた？ 戻橋を夜、鬼の列が渡ってったんだって。火がゆらゆら揺れてたって',set:'yk_r1=1',c:[['誰が見たの？','a']]},
+ a:{t:'長屋の兄ちゃん。夜中に目が覚めて、窓から見たって。…ほんとかなあ',end:true}}},
+{id:'yk-r1-enjo',char:'enjo',if:'q:yako=1&q:yk_r1=1',title:'円照',start:'s',nodes:{
+ s:{t:'戻橋の鬼の列？ …ほう、そう見えたか',c:[['何か知ってるの？','a']]},
+ a:{t:'あれはわしじゃ。病人の邸で夜の加持をして、童らに松明を持たせて橋を渡った。読経が鬼の唸りに聞こえたかの',set:'yk_r1=2',c:[['なんだ','b']]},
+ b:{t:'戻橋は、日が暮れると気味の悪い橋じゃ。人の噂が、よけいに鬼を連れてくる',end:true}},
+ n:'夜の加持祈祷は通説。円照の話は創作'},
+// ---- 噂2：五条の辻の角のある影（坊長 → 戯丸）
+{id:'yk-r2',char:'bocho',if:'q:yako=1&q:yk_r2<1',title:'坊長',start:'s',nodes:{
+ s:{t:'鉄の童か。五条の辻で、夜な夜な角のある影が跳ねておると、長屋の者が眠れぬと言うてくる',set:'yk_r2=1',c:[['見に行ってみる','a']]},
+ a:{t:'物の怪なら陰陽寮、盗人なら検非違使。…坊長の手には負えん',end:true}}},
+{id:'yk-r2-sangaku',char:'sangaku',if:'q:yako=1&q:yk_r2=1',title:'戯丸',start:'s',nodes:{
+ s:{t:'角の影？ …ははあ、見られておったか',c:[['あなたなの？','a']]},
+ a:{t:'鬼の面で、新しい舞の稽古をしておった。昼にやると、客に手の内が知れるのでな',set:'yk_r2=2',c:[['長屋の人が怖がってるよ','b']]},
+ b:{t:'怖がらせてこその鬼の舞よ。…とはいえ、坊長どのに叱られる前に場所を変えるか',end:true}},
+ n:'散楽に面を使う芸があったかは推定。戯丸の稽古は創作'},
+
+// ---- 是行に知らせる：行列（本体 1.82 の行列を見た＝gate:hyakki）。済んだあとでも知らせられる
+//      三つの問いの正解の位置は 3・1・2 番目。正解を一番長い選択肢にしない
+{id:'yk-real',char:'koreyuki',if:'q:yako>=1&gate:hyakki&q:yk_real<2',title:'陰陽師・是行',start:'s',nodes:{
+ s:{t:'行列に行き合うたと？ …座れ。見たままを申せ。まず、どこで見た',c:[['七条と朱雀の辻で','x2'],['一条戻橋の上で','x2'],['二条と大宮の辻で','a2']]},
+ a2:{t:'…やはりそこか。刻は',c:[['丑の刻、真夜中','a3'],['戌の刻、日暮れのあと','x3'],['寅の刻、夜明け前','x3']]},
+ x2:{t:'…ふむ。刻は',c:[['丑の刻、真夜中','x3'],['戌の刻、日暮れのあと','x3'],['寅の刻、夜明け前','x3']]},
+ a3:{t:'何を見た',c:[['松明を掲げた牛車の長い列','x4'],['青白い火と黒い影の列','ok'],['鬼の面をかぶった者たち','x4']]},
+ x3:{t:'何を見た',c:[['松明を掲げた牛車の長い列','x4'],['青白い火と黒い影の列','x4'],['鬼の面をかぶった者たち','x4']]},
+ x4:{t:'…式盤の示すところと合わぬ。見間違いか、思い違いか。よう思い出してから、また来なされ',end:true},
+ ok:{t:'…式盤も、そう示しておる。夜行日の丑の刻、二条大宮。お主が見たのは、物の怪の行列に違いない',set:'yk_real=2',c:[['記録に残るの？','ok2']]},
+ ok2:{t:'残す。だが、軽々しく人に語るでない。聞いた者が夜を恐れる。…それに、お主の話は誰も信じまい',end:true}},
+ n:'陰陽寮が怪異を占ったことは延喜年間の記録にもある（物怪の卜）。行列の場所・刻・姿は本体1.82（二条大宮・丑の刻・黒い影と鬼火）に合わせた'},
+// ---- 是行に知らせる：噂1
+{id:'yk-r1-report',char:'koreyuki',if:'q:yako=1&q:yk_r1=2',title:'陰陽師・是行',start:'s',nodes:{
+ s:{t:'戻橋の鬼の列の噂、出どころは知れたか',c:[['橋の下に棲む狐たちの火','x'],['本物の物の怪どもの行列','x'],['加持帰りの僧と松明','ok']]},
+ x:{t:'…それは、誰に聞いた話じゃ。出どころを確かめてから申せ',end:true},
+ ok:{t:'円照どのか。読経の声も、夜の橋では唸りに聞こえる。…人のしわざと記しておこう',set:'yk_r1=3',end:true}}},
+// ---- 是行に知らせる：噂2
+{id:'yk-r2-report',char:'koreyuki',if:'q:yako=1&q:yk_r2=2',title:'陰陽師・是行',start:'s',nodes:{
+ s:{t:'五条の辻の、角のある影はどうであった',c:[['鬼の面で稽古する散楽師','ok'],['羅城門の楼から下りてきた鬼','x'],['屋根の上を伝って逃げる盗人','x']]},
+ x:{t:'…それは、誰に聞いた話じゃ。出どころを確かめてから申せ',end:true},
+ ok:{t:'戯丸か。あやつの鬼は、物の怪より人を怖がらせる。…これも人のしわざと記しておく',set:'yk_r2=3',end:true}}}
+]);
+// ---- 町の一言（済んだあとの噂）
+L.say.push(
+ {at:'modoribashi',who:'庶民',if:'q:yk_r1>=3',t:'戻橋の鬼の列は、坊さまの松明だったそうな'},
+ {at:['street','commoners'],who:'庶民',if:'q:yk_r2>=3',t:'五条の角の影は、散楽師の稽古だったとか。人騒がせな'},
+ {at:['street','commoners'],who:'庶民',if:'q:yk_real>=2',t:'鉄の童が百鬼の行列に行き合うて、平気で帰ってきたそうな'},
+ {at:'onmyo',who:'官人',if:'q:yk_real>=2',t:'寮の記録に、鉄の童の名が載ったそうだ。前代未聞よ'}
+);
+})();
+/* 本体に yakoDay（今日が夜行日か・次の夜行日）を足したら入れる選択肢（保臣の yk-wait の s に足す）：
+ ['今夜は夜行日？','day'] ／ day:{t:'@yakoDay',c:[['ありがとう','bye']]}
+*/
+
+// ---- 1.87 投入: クエスト脚本_夜の女車の供_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「夜の女車の供」（yoguruma）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 入れ方：heian-lines.js 末尾に、この IIFE をそのまま足す。本体で要るのは1行：HEIAN_QUEST_NAMES に yoguruma:'夜の女車の供' を足す。
+// 人：頼む人＝大納言家の家司・豊原貞道（dainagon_keishi）。乗る人＝姫君の乳母「大輔」（創作・住人ではない・名は女房名）。行き先＝六角堂（行誉）
+//     続松＝炭売りの竹丸（犬丸の兄）、方角＝陰陽師の是行、供＝放免の鬼丸 か 小藤太（どちらか一人）、堀川の噂＝坊長
+// ⚠ 対話の条件（if）には頼みごとの状態しか書けない（夜かどうかは書けない）。道中は「その夜」として対話の中で語る。日付の仕組みが入れば、出立を夜だけにできる
+// 状態 yoguruma：1受けた 5着いた 9済んだ（着いた） 7引き返した 8済んだ（引き返した）
+//      yg_taimatsu：2続松を得た ／ yg_hou：2方角を聞いた ／ yg_oni・yg_kotota：2供が決まった ／ yg_bocho：2堀川の噂を聞いた
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 貞道：済んだあと（上から先に選ばれるので、終わりの方を先に置く）
+{id:'yg-done',char:'dainagon_keishi',if:'q:yoguruma=5',title:'豊原貞道',start:'s',nodes:{
+ s:{t:'大輔どのが無事に戻られた。姫君の熱も、明け方に下がったそうな。…鉄の童、礼を言う',set:'yoguruma=9',c:[['よかった','a']]},
+ a:{t:'礼の品を…と言うても、鉄の童に何が要る。そうじゃ、贈り物の目録の書き方を教えてやろう。一日かかるがな',end:true}}},
+{id:'yg-fail',char:'dainagon_keishi',if:'q:yoguruma=7',title:'豊原貞道',start:'s',nodes:{
+ s:{t:'女車は戻った。大輔どのは「わたくしの不覚」と仰せだ。…気に病むな。夜参りは、また吉い夜にすればよい',set:'yoguruma=8',end:true}}},
+// ---- 貞道：出立（続松がそろったら）。道中はこの対話の中で語る
+//      道の三択：正解は「東洞院の大路」（いつでも）と「堀川べり」（供がいれば）。「西洞院」は南西＝塞がり
+{id:'yg-go',char:'dainagon_keishi',if:'q:yoguruma=1&q:yg_taimatsu>=2',title:'豊原貞道',start:'s',nodes:{
+ s:{t:'続松はそろったな。今宵、亥の刻に大輔どのの女車が出る。六角堂まで、どの道を行く',c:[
+  ['堀川べりを南へ下り、三条で東へ','h'],
+  ['西洞院を下り、南西から回り込む','w'],
+  ['東洞院の大路を南へまっすぐ','e'],
+  ['まだ支度が足りない','bye']]},
+ e:{t:'東洞院の大路。月の下に車の影が長い。…辻で検非違使が槍を立てた。「止まれ。この刻限に、どこの車だ」',c:[
+  ['大納言家の者と名乗り、文を見せる','e2'],['鉄の童が前へ出る','e3']]},
+ e2:{t:'「…大納言家か。通れ。ただし夜歩きは慎めと、家司どのに伝えよ」',c:[['先を急ぐ','arr']]},
+ e3:{t:'「お主、噂の鉄の童か。鉄の童が供をする車なら、盗人も寄るまい。…行け」',c:[['先を急ぐ','arr']]},
+ w:{t:'西洞院を下りかけたところで、簾の内から大輔どのの声がした。「今宵、南西は塞がりではありませぬか」',c:[
+  ['大丈夫です、近道です','wf'],
+  ['是行さまもそう言っていた。道を変える','s',{if:'q:yg_hou>=2'}]]},
+ wf:{t:'「…なりませぬ。塞がりを犯しては、祈りが届きませぬ」女車は、邸へ引き返していった',set:'yoguruma=7',end:true},
+ h:{t:'堀川べりは暗い。続松の火が水に揺れる。…柳の陰に、人影が三つ',c:[
+  ['鬼丸どの、あれは？','h1',{if:'q:yg_oni>=2'}],
+  ['小藤太、あれは？','h2',{if:'q:yg_kotota>=2'}],
+  ['（そのまま進む）','hf']]},
+ h1:{t:'「盗人の見張りよ。…おい、放免の鬼丸だ。顔を見せろ」人影は、ばらばらに散って消えた',c:[['先を急ぐ','arr']]},
+ h2:{t:'「なんだ、賭場の連中だ。おうい、今夜はよせ、大納言家の車だぞ」人影は笑って道をあけた',c:[['先を急ぐ','arr']]},
+ hf:{t:'人影がこちらへ来る。牛が怯えて足を止め、簾の内で大輔どのが息を呑んだ。「…戻りましょう」',set:'yoguruma=7',end:true},
+ arr:{t:'六角堂の灯が見えた。堂の前で行誉さまが待っておられる。大輔どのは夜通し、姫君のために祈られた',set:'yoguruma=5',end:true},
+ bye:{t:'支度ができたら来てくれ。亥の刻までは待つ',end:true}},
+ n:'夜の外出に続松（松明）を持つ供を連れること、方違え・方塞がりは通説（900年の方塞がりの形は推定）。東洞院・西洞院・堀川は本体の通り名。六角堂は町の堂（本体の地点）。夜参りの話は創作'},
+// ---- 貞道：頼む・待つ
+{id:'yg-start',char:'dainagon_keishi',if:'q:yoguruma<1',title:'豊原貞道',start:'s',nodes:{
+ s:{t:'鉄の童か。…頼みがある。今宵、夜に出る車の供が足りぬ',c:[['どんな車？','a'],['また今度','no']]},
+ a:{t:'姫君の乳母、大輔どのが六角堂へ夜参りに出られる。姫君が熱を出されてな。続松持ちの童が、二人とも寝込んだ',c:[['手伝う','ok'],['夜に女車は危なくない？','b']]},
+ b:{t:'危ない。だから灯と、腕の立つ供が要る。…鉄の童なら、夜目が利こう',c:[['手伝う','ok'],['また今度','no']]},
+ ok:{t:'続松を手に入れてくれ。炭売りなら、山の松を持っておろう。夜道に顔の利く供も、もう一人欲しい',set:'yoguruma=1',c:[['方角は大丈夫？','hou']]},
+ hou:{t:'方角か…陰陽寮の是行どのに聞いておくがよい。夜参りで方を犯せば、祈りも無駄になる',end:true},
+ no:{t:'そうか。…どちらの宴に出るか迷うより、困ったことよ',end:true}}},
+{id:'yg-wait',char:'dainagon_keishi',if:'q:yoguruma=1',title:'豊原貞道',start:'s',nodes:{
+ s:{t:['続松はまだか','供は放免でも従者でもよい。夜道を知る者を'],end:true}}},
+
+// ---- 続松：竹丸（東市の炭売り・犬丸の兄）
+{id:'yg-take',char:'takemaru',if:'q:yoguruma=1&q:yg_taimatsu<2',title:'竹丸',start:'s',nodes:{
+ s:{t:'続松？ あるとも。小野の山の、脂の多い松の根を割ったやつだ。雨でも消えにくい',set:'yg_taimatsu=2',c:[['いくら？','a']]},
+ a:{t:'大納言家の使い？ 弟の犬丸の主家じゃないか。…ただでいい。犬丸に、たまには里へ帰れと言うといてくれ',end:true}},
+ n:'松の脂の多い所を割って束ねたものを続松（ついまつ）と言った（通説）。竹丸と犬丸が兄弟なのは台帳どおり'},
+
+// ---- 方角：是行
+{id:'yg-hou',char:'koreyuki',if:'q:yoguruma=1&q:yg_hou<2',title:'陰陽師・是行',start:'s',nodes:{
+ s:{t:'大納言家の乳母どのの夜参りか。生まれの年は伺うておる。…式盤によれば、今宵は南西が塞がりじゃ',set:'yg_hou=2',c:[['どの道を行けばいい？','a']]},
+ a:{t:'六角堂は邸から南。南西へ回り込む道は避け、南へまっすぐ下りなされ',end:true}},
+ n:'その人の生まれで方角の吉凶が変わる、という扱いは推定。本体の吉方（omenDir＝日で決まる）とは別の、この夜だけの占い'},
+
+// ---- 供：鬼丸（放免）か小藤太（どちらか一人）
+{id:'yg-oni',char:'onimaru',if:'q:yoguruma=1&q:yg_oni<2&q:yg_kotota<2',title:'鬼丸',start:'s',nodes:{
+ s:{t:'夜の供？ 放免を雇うお邸は珍しいな',c:[['夜道に顔が利くと聞いた','a'],['やっぱりいい','no']]},
+ a:{t:'堀川べりの盗人の見張りなら、みんな顔見知りよ。…酒一献で引き受けよう',set:'yg_oni=2',end:true},
+ no:{t:'そうか。放免はどこでも嫌われる',end:true}},
+ n:'放免は検非違使の下働き（罪を許された者がなる）。既存の住人どおり'},
+{id:'yg-kotota',char:'kotota',if:'q:yoguruma=1&q:yg_oni<2&q:yg_kotota<2',title:'小藤太',start:'s',nodes:{
+ s:{t:'大納言家の夜の供？ …藤次さんには内緒だぞ。右大臣家の者がよその家の供なんて',c:[['頼むよ','a'],['やっぱりいい','no']]},
+ a:{t:'夜の路地なら、俺の庭だ。賭場の連中も、みんな顔見知りさ',set:'yg_kotota=2',end:true},
+ no:{t:'ならいい。今夜は一番だけ、双六を…',end:true}}},
+
+// ---- 噂：坊長（堀川べり）
+{id:'yg-bocho',char:'bocho',if:'q:yoguruma=1&q:yg_bocho<2',title:'坊長',start:'s',nodes:{
+ s:{t:'夜の女車で堀川べりを？ 近ごろ盗人の見張りが立つ。行くなら、夜の路地に顔の利く者を連れていけ',set:'yg_bocho=2',end:true}}},
+
+// ---- 行誉：着いた翌日（貞道に知らせる前）
+{id:'yg-rokakudo',char:'rokakudo_so',if:'q:yoguruma=5',title:'六角堂の行誉',start:'s',nodes:{
+ s:{t:'昨夜の女車の供か。大輔どのの祈りは、観音さまに届いたであろう。…鉄の童の灯は、よう目立っておった',end:true}}}
+]);
+L.say.push(
+ {at:'nobles',who:'従者',if:'q:yoguruma=9',t:'大納言家の女車に、鉄の童が供をしたそうな'},
+ {at:'rokakudo',who:'僧',if:'q:yoguruma=9',t:'夜参りの女車が、鉄の童の灯で来たそうな'},
+ {at:['street','commoners'],who:'庶民',if:'q:yg_oni>=2&q:yoguruma=9',t:'放免の鬼丸が、珍しく人の供をしたとか'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_来ない魚売り_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「来ない魚売り」（monouri）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 『市と物売りの会話_設計』4節（邸を回る物売りの道筋）のクエスト。入れ方：heian-lines.js 末尾にこの IIFE を足す。本体で要るのは1行：HEIAN_QUEST_NAMES に monouri:'来ない魚売り' を足す
+// 物売り＝干魚売りの媼「磯女」（創作・住人ではない）。いつもの道筋：菊女の家で干物を受け取る → 中納言家の厨 → 東三条殿 → 紅梅殿 → 陣
+// 今朝は、紅梅殿の保行さまに鮑を頼まれていたので、道筋を逆に回った（東三条殿 → 紅梅殿 → 中納言家のつもり）。紅梅殿を出て堀川を渡るところで足をくじいた
+// 人：頼む人＝中納言家の雑色・黒麻呂（東市）。手がかり＝菊女（干物の店）→ 小宰相（東三条殿）→ 保行（紅梅殿）→ 魚麻呂（堀川の船頭）
+// 状態 monouri：1受けた 5籠を届けた 6商売敵に回ってもらった 9済んだ ／ mn_kiku・mn_kosai・mn_yasu：2聞いた ／ mn_found：2媼を見つけた
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 黒麻呂：済んだ（終わりの方を先に）
+{id:'mn-done',char:'kuromaro',if:'q:monouri=5',title:'黒麻呂',start:'s',nodes:{
+ s:{t:'磯女の婆さまの干物、昼の膳に間に合ったそうだ。厨の枝女さんが、鉄の童に礼をと',set:'monouri=9',c:[['婆さまの足は？','a']]},
+ a:{t:'魚麻呂の舟で七条まで送ってもろうたと。…十日もすりゃ、また勝手口に来るさ',end:true}}},
+{id:'mn-done2',char:'kuromaro',if:'q:monouri=6',title:'黒麻呂',start:'s',nodes:{
+ s:{t:'今朝は海藻売りの磯丸が、婆さまの干物も持って回ってきた。…厨は助かったが、婆さまは面白くなかろうな',set:'monouri=9',c:[['道を取られる？','a']]},
+ a:{t:'さあな。磯丸は「足が治るまでだ」と言うとったが。物売りの道は、一度取られると戻らんこともある',end:true}}},
+// ---- 黒麻呂：頼む・待つ
+{id:'mn-start',char:'kuromaro',if:'q:monouri<1',title:'黒麻呂',start:'s',nodes:{
+ s:{t:'鉄の童か。困った。中納言家の勝手口に、今朝は魚売りの婆さまが来なんだ',c:[['魚売り？','a'],['また今度','no']]},
+ a:{t:'磯女という干魚売りの媼さ。毎朝、北の邸町の厨を順に回る。それが今朝に限って来ん。昼の膳の汁の実が無い',c:[['探してみる','ok'],['市で買えばいいのでは','b']]},
+ b:{t:'それで俺が東市へ来た。だが厨の枝女さんは「婆さまの干物でないと」と言う。…それに、婆さまの身が心配だ',c:[['探してみる','ok']]},
+ ok:{t:'婆さまは、明け方に東市の菊女の家で干物を受け取ってから回る。まず菊女に聞いてくれ',set:'monouri=1',end:true},
+ no:{t:'そうか。…汁の実は、干し大根で我慢してもらうか',end:true}},
+ n:'邸の勝手口まで物売りが来る形は推定。磯女・磯丸は創作'},
+{id:'mn-wait',char:'kuromaro',if:'q:monouri=1',title:'黒麻呂',start:'s',nodes:{
+ s:{t:['婆さまは見つかったか','いつもの道は、中納言家、東三条殿、紅梅殿、それから大内裏の陣だ'],end:true}}},
+
+// ---- 菊女：受け取りには来た。道筋のこと
+{id:'mn-kiku',char:'kikume',if:'q:monouri=1&q:mn_kiku<2',title:'菊女',start:'s',nodes:{
+ s:{t:'磯女さん？ 今朝もちゃんと来たよ。干した鯵と、鮑をひと連なり。鮑は頼まれ物だって',set:'mn_kiku=2',c:[['誰に頼まれたの？','a'],['いつもの道を教えて','b']]},
+ a:{t:'さあね、お邸の名までは言わないよ。物売りの得意先は、物売りの宝さ。…でも、鮑なんて買うのは大臣家くらいだね',c:[['いつもの道を教えて','b']]},
+ b:{t:'中納言家の厨、東三条殿、紅梅殿、陣。…でも今朝は「重い物から先に下ろす」と言うてたよ',end:true}}},
+// ---- 小宰相：東三条殿には来た
+{id:'mn-kosai',char:'kosaisho',if:'q:monouri=1&q:mn_kosai<2',title:'小宰相',start:'s',nodes:{
+ s:{t:'魚売りの媼？ ええ、今朝は珍しく早う参りましたよ。厨の者が、いつもより一刻も早いと驚いておりました',set:'mn_kosai=2',c:[['それからどこへ？','a']]},
+ a:{t:'「紅梅殿へ急ぐ」と。…鮑を待っておられる方がいる、とか。女房には関わりのないこと',end:true}}},
+// ---- 保行：紅梅殿にも来た。帰りは川のほうへ
+{id:'mn-yasu',char:'yasuyuki',if:'q:monouri=1&q:mn_yasu<2',title:'保行',start:'s',nodes:{
+ s:{t:'鮑の媼か。たしかに参った。殿が客を招かれるので、わしが頼んでおいたのだ',set:'mn_yasu=2',c:[['そのあとは？','a']]},
+ a:{t:'中納言家へ戻ると言うて、西の門から出た。近道に、堀川の橋を渡ると言うておったが…',c:[['堀川へ行ってみる','b']]},
+ b:{t:'あの橋は板が一枚浮いておる。年寄りの足には危ないと、坊長に言うたのだがな',end:true}},
+ n:'紅梅殿は道真の邸（本体の地点）。道真本人は出さず、家司の保行が応じる。客を招くのは創作'},
+// ---- 魚麻呂：見つけた。どうするか
+{id:'mn-found',char:'uomaro',if:'q:monouri=1&q:mn_yasu>=2',title:'魚麻呂',start:'s',nodes:{
+ s:{t:'婆さまを探しとるのか。ここだ、舟の中だ。橋で足をくじいてな、わしが拾い上げた',c:[['大丈夫？','a']]},
+ a:{t:'「歩けんことはない、中納言家が待っとる」と言うて聞かんのよ。…籠はここにある',c:[['籠を中納言家へ届ける','go'],['海藻売りに頼んで回ってもらう','iso'],['婆さまと一緒に歩く','walk']]},
+ go:{t:'婆さま、鉄の童が籠を持っていってくれるとさ。…「勝手口の枝女さんに、遅うなってすまんと」だと',set:['monouri=5','mn_found=2'],end:true},
+ iso:{t:'磯丸か。あいつなら同じ道を回っとる。…婆さま、渋い顔だが、「足が治るまでなら」と言うとる',set:['monouri=6','mn_found=2'],end:true},
+ walk:{t:'その足で北の邸町まで？ 昼までに着かん。…婆さまも「それは無理じゃ」と笑っとる。ほかの手を考えな',c:[['籠を中納言家へ届ける','go'],['海藻売りに頼んで回ってもらう','iso']]}},
+ n:'堀川には荷舟と船頭がいた（本体・住人どおり）。橋の板の話は創作'},
+// ---- 手がかりの順を飛ばしたとき（保行に聞く前に魚麻呂へ行った）
+{id:'mn-early',char:'uomaro',if:'q:monouri=1&q:mn_yasu<2',title:'魚麻呂',start:'s',nodes:{
+ s:{t:'魚売りの婆さま？ さあな、川の上からじゃ、邸町の勝手口までは見えん。…今朝は橋の上で、何やら騒いどったが',end:true}}}
+]);
+L.say.push(
+ {at:'nobles',who:'炊女',if:'q:monouri=1',t:'今朝の魚売りの婆さまは遅いねえ。汁の実が無いよ'},
+ {at:'horikawa',who:'人夫',if:'q:monouri=1',t:'橋の上で、年寄りが転んだらしい。籠の干物が散らばっとった'},
+ {at:'nobles',who:'炊女',if:'q:monouri=9',t:'磯女の婆さまの干物は、やっぱり旨いねえ'},
+ {at:'horikawa',who:'人夫',if:'q:monouri=9',t:'あの橋の板、ようやく打ち直したそうな'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_右京の夜番_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「右京の夜番」（yoban）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 『地形クエスト集』の4「市の商人の家の夜番」。入れ方：heian-lines.js 末尾にこの IIFE を足す。本体で要るのは1行：HEIAN_QUEST_NAMES に yoban:'右京の夜番' を足す
+// 既存の「干物盗人」（nusumi＝東市・検非違使と京職の張り合い）とは別の話。こちらは右京の空き家と垣を伝う盗人の道を読む
+// 人：頼む人＝西市の刀禰（nishi_toji）。守る家＝米六（kome_akindo）の右京の家（月の前半は淀・鳥羽へ買い付けで留守）
+//     手がかり＝田人（畑の足跡）・益女（空き家に住み着いた者）・鬼丸（盗人の通る道の決まり）
+// 状態 yoban：1受けた 5検非違使へ 6働き口を頼んだ 8見逃した → 9済んだ ／ yb_tahito・yb_masu・yb_oni・yb_kome：2聞いた ／ yb_miss：1見張りを外した
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 刀禰：済んだ（終わりの方を先に）
+{id:'yb-done-kebi',char:'nishi_toji',if:'q:yoban=5',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'重実どのが、あの子を連れていった。…米は戻った。戻ったが、市の者は誰も喜んでおらん',set:'yoban=9',c:[['母親は？','a']]},
+ a:{t:'施薬院へ運ばれたと聞いた。…盗人を挙げるのが夜番の務めじゃ。お主は間違うておらん',end:true}}},
+{id:'yb-done-work',char:'nishi_toji',if:'q:yoban=6',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'米六が、あの子を俵運びに使うと言うた。「盗むほどの腕があるなら、担ぐ腕もあろう」とな',set:'yoban=9',c:[['母親は？','a']]},
+ a:{t:'益女が薬草を持って空き家へ通うとる。…右京は寂れたが、まだ人の手はある',end:true}}},
+{id:'yb-done-let',char:'nishi_toji',if:'q:yoban=8',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'米六が戻って、俵がひとつ足りんと騒いどる。…夜番は、何も見なんだそうじゃな',set:'yoban=9',c:[['……','a']]},
+ a:{t:'まあよい。一俵で済んだと思えばな。…次の夜も来るようなら、わしにも考えがある',end:true}}},
+// ---- 刀禰：夜番（田人の足跡を聞いたら）。見張る所の三択：正解は2番目「裏の空き家との垣の破れ」
+{id:'yb-night',char:'nishi_toji',if:'q:yoban=1&q:yb_tahito>=2',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:['今宵が夜番じゃ。米六の家は七条の南。鍵は預かっておる。どこで見張る','昨夜は外れたな。今宵はどこで見張る'],c:[
+  ['表の小路に面した門の陰で','gate'],
+  ['裏の空き家との垣の破れで','ok'],
+  ['畑へ下りる溝のほとりで','ditch'],
+  ['まだ支度が要る','bye']]},
+ gate:{t:'門の陰は静かだった。犬の遠吠えだけ。…夜が明けて蔵を見ると、俵がひとつ減っていた',set:'yb_miss=1',c:[['明日の夜、もう一度','bye']]},
+ ditch:{t:'溝のほとりで蛙が鳴きやまぬ。…明け方、垣のほうで何かを引きずる音がした。駆けつけたが、もう誰もいない',set:'yb_miss=1',c:[['明日の夜、もう一度','bye']]},
+ ok:{t:'丑の刻。垣の破れから、小さな影がすべり込んだ。蔵の戸を開け、俵を引きずっていく',c:[['飛び出して捕まえる','catch'],['（黙って後をつける）','follow'],['「待て」と声をかける','call']]},
+ catch:{t:'押さえると、骨ばった男の子だった。十ばかり。「放せ…母さんが」',c:[['母さん？','who']]},
+ call:{t:'影が凍りついた。俵から手を放し、振り返る。痩せた男の子だ。「…食う物が、無いんだ」',c:[['どこから来たの？','who']]},
+ follow:{t:'影は俵を引いて垣を抜け、隣の空き家へ。中から咳が聞こえる。筵の上に女が臥せ、幼子が縋っている',c:[['声をかける','who']]},
+ who:{t:'丹波から逃げてきたという。田が日照りで、租を納められず、母と弟を連れて都へ。母は病で動けない',c:[
+  ['刀禰に話し、働き口を頼む','work'],
+  ['米を少し分けて、見逃す','let'],
+  ['検非違使に引き渡す','kebi']]},
+ kebi:{t:'夜明けを待って、刀禰に知らせた。刀禰は黙って頷き、重実どのを呼びにやった',set:'yoban=5',end:true},
+ work:{t:'男の子は俵を蔵へ戻した。「…担ぐのなら、得意だ」刀禰には、明るくなってから話そう',set:'yoban=6',end:true},
+ let:{t:'俵の米を少し、男の子の袖に入れてやった。男の子は何も言わずに、空き家の闇へ消えた',set:'yoban=8',end:true},
+ bye:{t:'丑の刻に来られよ。…盗人は、人の寝入りばなを狙うものじゃ',end:true}},
+ n:'市の刀禰（市人の長）は推定。浮浪・逃亡した百姓が都へ流れ込んだことは通説（9世紀の太政官符など）。右京が寂れていく様子は推定（『池亭記』は982年で後の世）。話は創作'},
+// ---- 刀禰：頼む・待つ
+{id:'yb-start',char:'nishi_toji',if:'q:yoban<1',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'鉄の童か。西市の刀禰じゃ。…右京の市人の家で、夜に米や布が抜かれる。もう三軒目でな',c:[['どんな盗み？','a'],['また今度','no']]},
+ a:{t:'錠は壊さず、戸も破らん。いつの間にか俵がひとつ、布がひと巻、無うなっとる。…次は米六の家じゃろう',c:[['どうして米六の家？','b']]},
+ b:{t:'米六は月の前半、淀へ買い付けに出て家が空く。蔵には米がある。裏は空き家と垣つづきじゃ',c:[['夜番をする','ok'],['検非違使には？','kebi']]},
+ kebi:{t:'重実どのは左京の夜回りで手一杯よ。右京まで回ってくるのは、三晩に一度。…市のことは、市でな',c:[['夜番をする','ok'],['また今度','no']]},
+ ok:{t:'頼む。盗人がどこから入るか、見当をつけてから来てくれ。右京の畑なら田人、空き家のことなら益女が詳しい',set:'yoban=1',end:true},
+ no:{t:'そうか。…右京は、夜が長い',end:true}}},
+{id:'yb-wait',char:'nishi_toji',if:'q:yoban=1',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:['盗人の入り口の見当はついたか','右京の畑なら田人、空き家なら益女、盗人の決まりなら放免の鬼丸じゃ'],end:true}}},
+
+// ---- 手がかり：田人（足跡）＝夜番の鍵
+{id:'yb-tahito',char:'tahito',if:'q:yoban=1&q:yb_tahito<2',title:'田人',start:'s',nodes:{
+ s:{t:'夜の盗人？ …そういえば、畑に毎朝、小さな足跡がある。瓜は盗られとらんのに',c:[['どこから来る足跡？','a']]},
+ a:{t:'溝のほうからじゃない。七条の空き家の垣の破れから出て、畑を突っ切っとる。…子どもの足くらいの大きさだ',set:'yb_tahito=2',c:[['子ども？','b']]},
+ b:{t:'瓜を盗らん子どもの盗人か。…腹が減っとるなら、瓜から盗りそうなもんだがな',end:true}}},
+// ---- 手がかり：益女（空き家）
+{id:'yb-masu',char:'masume',if:'q:yoban=1&q:yb_masu<2',title:'益女',start:'s',nodes:{
+ s:{t:'右京の空き家？ このところ、また人が住み着いたよ。七条の南のあたり。夜も灯を点けない家さ',set:'yb_masu=2',c:[['どんな人？','a']]},
+ a:{t:'見たことはないけど、咳が聞こえる。…病人がいるなら、薬草を持っていってやりたいがね。足跡なら、畑の田人さんに聞きな',end:true}},
+ n:'右京の空き家に流れ者が住み着く話は、住人の鮎女・益女の近況（recent）と同じ'},
+// ---- 手がかり：鬼丸（盗人の道）
+{id:'yb-oni',char:'onimaru',if:'q:yoban=1&q:yb_oni<2',title:'鬼丸',start:'s',nodes:{
+ s:{t:'盗人の通る道？ 元は盗人の俺に聞くか。…いいだろう',c:[['教えて','a']]},
+ a:{t:'大路は検非違使が回るから通らん。小路も門の前は避ける。犬のいる家もな。空き家と垣を伝って、裏から入るのさ',set:'yb_oni=2',c:[['錠を壊さないのは？','b']]},
+ b:{t:'壊せば音がする。垣の破れや、塀の崩れから入れば、錠なんぞ要らん。…右京は崩れた塀だらけだ',end:true}},
+ n:'放免は罪を許されて検非違使の下働きになった者（通説）'},
+// ---- 手がかり：米六（家の主・月の後半は西市にいる）
+{id:'yb-kome',char:'kome_akindo',if:'q:yoban=1&q:yb_kome<2',title:'米六',start:'s',nodes:{
+ s:{t:'わしの家の夜番を？ …刀禰も心配性じゃ。だがありがたい。蔵には俵が十ある',set:'yb_kome=2',c:[['家のつくりは？','a']]},
+ a:{t:'表は小路に門。裏は空き家と垣つづき、その先が田人の畑と溝じゃ。…裏の垣は、去年の大雨で一か所崩れたまま',end:true}}}
+]);
+L.say.push(
+ {at:'westMarket',who:'売り子',if:'q:yoban=1',t:'右京で、また夜の間に俵が消えたそうな'},
+ {at:'westMarket',who:'売り子',if:'q:yoban=9',t:'米六さんの家の夜番、鉄の童がしたんだって'},
+ {at:'westMarket',who:'売り子',if:'q:yoban=9',t:'右京の盗みは、ぱたりと止んだね'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_羅城門の柱_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「羅城門の柱」（fushin）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 『地形クエスト集』の1「普請の資材集め」＋2「炊き出しで人手を集める」。入れ方：heian-lines.js 末尾にこの IIFE を足す。本体で要るのは1行：HEIAN_QUEST_NAMES に fushin:'羅城門の柱' を足す
+// 既存の「西寺の屋根」（瓦の銭の工面）とは別の話。こちらは資材を「どこから・どの道で」運ぶかを地図で解く
+// 人：頼む人＝番匠の頭・真柄（banjo・羅城門）。材木＝乙麻呂（kizukai・鳥羽から運ぶ人夫）・魚麻呂（uomaro・堀川の船頭）
+//     瓦＝瓦次（kawaraji）。炊き出し＝刀自（toji_ouna・羅城門の北）が炊く。米＝米六（kome_akindo）、塩＝早苗（sanae）
+// 状態 fushin：1受けた 9済んだ ／ fs_zai：2材木の道が決まった ／ fs_kawara：2瓦の道が決まった ／ fs_kome・fs_shio：2そろった ／ fs_kayu：2粥が出た
+//      fs_uo・fs_oto：1話を聞いた（手がかり）
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 真柄：柱を立てる（三つそろったら）。上から先に選ばれるので、終わりの方を先に置く
+{id:'fs-build',char:'banjo',if:'q:fushin=1&q:fs_zai>=2&q:fs_kawara>=2&q:fs_kayu>=2',title:'番匠・真柄',start:'s',nodes:{
+ s:{t:'材木は作り道から、瓦は東京極から、人夫は刀自の粥で二十人。…そろうたな。今日、西の柱を替える',c:[['手伝う','a']]},
+ a:{t:'古い柱を支え木で浮かせて、抜く。新しい柱を、綱で起こす。…鉄の童、綱の端を持て。せえの',c:[['（綱を引く）','b']]},
+ b:{t:'柱が立った。楼の軋みが止んだぞ。…これで野分が来ても、門は倒れん。少なくとも、わしの生きとるうちはな',set:'fushin=9',c:[['よかった','c']]},
+ c:{t:'木工寮の米が届いたら、米六と早苗に返しに行く。…お主の名は、普請の帳面には書けんがな',end:true}},
+ n:'羅城門は弘仁7年（816）に大風で倒れて建て直され、天元3年（980）に倒れてからは再建されなかった（日本紀略）。900年は立っている。柱を替える普請の手順は推定。話は創作'},
+// ---- 真柄：材木の道を決める。三択の正解は3番目（長さ14・16・14字）
+{id:'fs-zai',char:'banjo',if:'q:fushin=1&q:fs_zai<2',title:'番匠・真柄',start:'s',nodes:{
+ s:{t:['柱にする材木を、どこから、どの道で運ぶ。決まったか','材木の道は見当がついたか。柱は長さ三丈、牛車二台がかりじゃ'],c:[
+  ['丹波の材を、堀川の荷舟で南へ','x1'],
+  ['近江の材を、三条の大路を西へ引く','x2'],
+  ['淀の材を、鳥羽の作り道で北へ','ok'],
+  ['まだ調べている','bye']]},
+ x1:{t:'堀川は左京を流れる川じゃ。羅城門には通じとらん。舟から揚げて、また車に積み替えるのか',c:[['考え直す','s']]},
+ x2:{t:'都を東から西へ横切って、また南へ下る。三丈の材を引いてか？ 牛が先に潰れるわ',c:[['考え直す','s']]},
+ ok:{t:'そうじゃ。淀の津から鳥羽を通って作り道をまっすぐ北へ上れば、羅城門の真下に着く。乙麻呂に頼もう',set:'fs_zai=2',c:[['瓦と人手は？','next']]},
+ next:{t:'瓦は瓦次に聞け。人手は…人夫は来る。だが木工寮の米が遅れて、食わせてやれん。食えぬ者は来ぬ',end:true},
+ bye:{t:'材木なら、運ぶ者に聞くのがいちばんじゃ。鳥羽の乙麻呂、堀川の魚麻呂',end:true}},
+ n:'鳥羽の作り道は羅城門から南へ鳥羽へ延びる道（通説）。淀の津には西国や川の上の国の荷が上った（通説）。堀川で材木を運んだのも通説'},
+{id:'fs-wait',char:'banjo',if:'q:fushin=1',title:'番匠・真柄',start:'s',nodes:{
+ s:{t:['瓦は瓦次じゃ。北の瓦屋から運ぶ道を、あやつと決めてくれ','人夫に食わせる粥を、誰か炊いてくれる者はおらんか。米と塩は掛けで借りるしかない','刀自の婆さまは、昔、門の普請の飯炊きをしたと聞く'],end:true}}},
+{id:'fs-start',char:'banjo',if:'q:fushin<1',title:'番匠・真柄',start:'s',nodes:{
+ s:{t:'鉄の童か。見上げてみろ、楼の西の柱。根が腐って、風が吹くと門が軋む',c:[['直さないの？','a'],['また今度','no']]},
+ a:{t:'直したい。だが木工寮の手当てが遅い。野分の前に替えねば、この門は倒れる。昔、一度倒れた門じゃ',c:[['何が要る？','b']]},
+ b:{t:'三つじゃ。柱の材木、楼の瓦、それから人手。材木と瓦は、どこから、どの道で運ぶかが肝心よ',c:[['手伝う','ok'],['また今度','no']]},
+ ok:{t:'頼む。まず材木じゃ。運ぶ者に聞け。鳥羽の乙麻呂、堀川の魚麻呂。どちらの道が羅城門に近いか',set:'fushin=1',end:true},
+ no:{t:'そうか。…倒れてから騒いでも遅いんじゃがな',end:true}},
+ n:'番匠（宮の普請に上る大工）は住人どおり。木工寮・修理職が都の造営・修理を担った（通説）'},
+
+// ---- 材木の手がかり：乙麻呂（鳥羽）・魚麻呂（堀川）
+{id:'fs-oto',char:'kizukai',if:'q:fushin=1&q:fs_oto<1',title:'乙麻呂',start:'s',nodes:{
+ s:{t:'柱の材木？ 淀の津には、川の上の国から筏で材が下ってくる。そこから鳥羽まで車、鳥羽からは作り道を北へまっすぐだ',set:'fs_oto=1',c:[['羅城門まで？','a']]},
+ a:{t:'作り道は羅城門の真下に着く。曲がり角がひとつも無い。三丈の材でも引ける。…わしの毎日の道さ',end:true}}},
+{id:'fs-uo',char:'uomaro',if:'q:fushin=1&q:fs_uo<1',title:'魚麻呂',start:'s',nodes:{
+ s:{t:'丹波の材なら、わしの舟で堀川を下れる。檜のいい材だ',set:'fs_uo=1',c:[['羅城門まで行ける？','a']]},
+ a:{t:'羅城門？ 堀川は左京の川だ、朱雀大路の東を流れとる。舟は七条あたりで揚げる。羅城門まで陸を引くなら、鳥羽からの道のほうが早いぞ',end:true}}},
+
+// ---- 瓦：瓦次。三択の正解は1番目（長さ14・14・12字）
+{id:'fs-kawara',char:'kawaraji',if:'q:fushin=1&q:fs_kawara<2',title:'瓦次',start:'s',nodes:{
+ s:{t:'羅城門の楼の瓦か。木工寮の瓦なら、北の栗栖野の瓦屋で焼いとる。…割れ物だ。運ぶ道を誤ると、着く頃には半分が欠ける',c:[['どの道で運ぶ？','q']]},
+ q:{t:'栗栖野は都の北東。羅城門は南の端。さて、どう運ぶ',c:[
+  ['東京極を南へ下り、九条で西へ','ok'],
+  ['朱雀大路を北の端から南へまっすぐ','x1'],
+  ['鴨川の河原を下って南へ','x2']]},
+ x1:{t:'朱雀大路の北の端は朱雀門じゃ。その先は宮城。瓦の車が大内裏の中を通れるものか',c:[['考え直す','q']]},
+ x2:{t:'河原は石だらけだ。車が跳ねて、瓦が割れる。それに、雨が来れば水が出る',c:[['考え直す','q']]},
+ ok:{t:'それよ。都の東の端を南へ下って、九条大路を西へ。道は長いが平らで、割れが少ない。車は二日がかりだな',set:'fs_kawara=2',end:true}},
+ n:'延喜式（木工寮）に栗栖野・小野の瓦屋が見える（通説）。大内裏の中を荷車が抜けられないのは、宮城の門の決まりから（推定）'},
+
+// ---- 炊き出し：米（米六）・塩（早苗）・刀自が炊く
+{id:'fs-kome',char:'kome_akindo',if:'q:fushin=1&q:fs_kome<2',title:'米六',start:'s',nodes:{
+ s:{t:'羅城門の普請の粥か。人夫が二十人なら、十日で米が一石は要る',c:[['掛けで貸してほしい','a']]},
+ a:{t:'木工寮の米が来たら返すと？ …真柄の親方の普請なら、取りっぱぐれはなかろう。二俵、刀自の小屋へ届けよう',set:'fs_kome=2',end:true}},
+ n:'雇われた人夫には功（賃）と食（米・塩）が出た（延喜式の雇夫の規定・通説）。量は推定'},
+{id:'fs-shio',char:'sanae',if:'q:fushin=1&q:fs_shio<2',title:'早苗',start:'s',nodes:{
+ s:{t:'粥の塩？ 力仕事の人夫には、塩を利かせなきゃ倒れるよ',c:[['掛けで頼める？','a']]},
+ a:{t:'羅城門なら、うちの塩を運ぶ浜成も毎日くぐる門さ。…一斗、掛けでいい。倒れられたら困るからね',set:'fs_shio=2',end:true}}},
+{id:'fs-kayu',char:'toji_ouna',if:'q:fushin=1&q:fs_kome>=2&q:fs_shio>=2&q:fs_kayu<2',title:'刀自',start:'s',nodes:{
+ s:{t:'米も塩も届いたよ。…若い頃、この門の普請で飯を炊いたのさ。母に連れられてね',c:[['炊いてくれる？','a']]},
+ a:{t:'炊くとも。大鍋に湯を立てて、朝と夕に二度。粥の匂いがすれば、人夫は勝手に集まる',set:'fs_kayu=2',c:[['昔の普請は？','b']]},
+ b:{t:'あの頃は門が一度倒れたあとでね。都じゅうから人が来た。…今度は倒れる前に直すんだ。えらいもんさ',end:true}},
+ n:'刀自（72歳）の若い頃は840年代。816年に倒れた門の再建の時期は要確認（ここでは「倒れたあとの普請」とぼかした）'},
+{id:'fs-kayu-ask',char:'toji_ouna',if:'q:fushin=1&q:fs_kayu<2',title:'刀自',start:'s',nodes:{
+ s:{t:'人夫の粥？ 炊くのはいいが、米も塩も無いよ。米なら西市の米六、塩なら東市の早苗だね。掛けで頼んでごらん',end:true}}}
+]);
+L.say.push(
+ {at:'rajomon',who:'人夫',if:'q:fushin=1',t:'羅城門の普請、粥が出るなら行くがな'},
+ {at:'rajomon',who:'人夫',if:'q:fs_kayu>=2',t:'刀自の婆さまの粥は、塩がよう利いとる'},
+ {at:'rajomon',who:'旅人',if:'q:fushin=9',t:'羅城門の柱、新しい木の匂いがするのう'},
+ {at:['street','commoners'],who:'庶民',if:'q:fushin=9',t:'羅城門の西の柱を替えたそうな。もう軋まんと'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_鞠の会_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「鞠の会」（kemari_kai）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 『地形クエスト集』の3「蹴鞠の会」。続けた数で招かれる邸の格が変わる（20＝五位の家・50＝中納言家・100＝右大臣家）
+// 入れ方：heian-lines.js 末尾にこの IIFE を足す。本体で要るのは1行：HEIAN_QUEST_NAMES に kemari_kai:'鞠の会' を足す
+// 数を数える仕組みは本体に無いので、稽古は「五つの場面の作法」を対話で選ぶ形にした。正しい作法を選ぶほど続く数が伸びる（10→20→35→50→100）
+// 人：教える人＝伴若成（kemari_youth・朝堂院の蹴鞠）。招く家＝伴の家（若成の叔父・五位・創作）／中納言家（兵衛の乳母 hyoe_menoto・小鷹丸）／右大臣家（家司の保行 yasuyuki・紅梅殿）
+// 実在の公卿には新しい言動をさせない。邸の主は「奥におられる」
+// 状態 kemari_kai：1教わった 9初めて会に出た ／ km_best：続いた数（大きい方が残る）／ km_t20・km_t50・km_t100：1招きを聞いた ／ km_go20・km_go50・km_go100：2会に出た
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 若成：招きの知らせ（上から先に選ばれるので、高い格を先に置く）
+{id:'km-t100',char:'kemari_youth',if:'q:km_best>=100&q:km_t100<1',title:'伴若成',start:'s',nodes:{
+ s:{t:'百だと！ …大内裏じゅうの噂だ。右大臣家の家司の保行どのが、邸の鞠の会に鉄の童を、と言うてきた',set:'km_t100=1',c:[['右大臣家に？','a']]},
+ a:{t:'殿は学問の方で、鞠はなさらん。邸の若い家人どもの楽しみよ。…紅梅殿の保行どのを訪ねてくれ',end:true}}},
+{id:'km-t50',char:'kemari_youth',if:'q:km_best>=50&q:km_t50<1',title:'伴若成',start:'s',nodes:{
+ s:{t:'五十続いたそうだな。中納言家の兵衛の乳母どのから文が来た。若君が、鉄の童の鞠を見たいと仰せだと',set:'km_t50=1',c:[['中納言家に？','a']]},
+ a:{t:'若君はまだ七つ。乳母子の小鷹丸と鞠で遊ぶのがお好きでな。…乳母どのを訪ねてくれ',end:true}}},
+{id:'km-t20',char:'kemari_youth',if:'q:km_best>=20&q:km_t20<1',title:'伴若成',start:'s',nodes:{
+ s:{t:'二十続いたか！ よし、叔父の家の鞠の会に来い。五位の家だが、庭はそこそこ広い',set:'km_t20=1',c:[['いつ行けるの？','a']]},
+ a:{t:'会は月に一度。いつでも連れていく。稽古に来たときに言え',end:true}}},
+// ---- 入口：見物の官人（2026-10-04 直し）。若成には恋敵の足止めの入口があるので、入口を二つ持たせない（『クエスト同士の重なり』）
+{id:'km-start',who:['官人'],at:['kemari'],if:'q:kemari_kai<1',title:'蹴鞠の見物の官人',start:'s',nodes:{
+ s:{t:'鉄の童、さっきから鞠ばかり見ておるな。…蹴ってみたいか',c:[['蹴ってみたい','a'],['鉄の足で？','b'],['見ているだけでいい','no']]},
+ b:{t:'鞠は鹿の革だ。鉄の足で思いきり蹴れば、潰れるか、宮城の外まで飛ぶか。…だから、力を抜くことを覚えるのよ',c:[['蹴ってみたい','a']]},
+ a:{t:'習うなら、あの若いのじゃ。伴の若成どの。決まりは三つ。鞠を地に落とさぬ。蹴る前に声を掛ける。人に回すときは正面へ、取りやすい高さで',set:'kemari_kai=1',c:[['数を競うの？','c']]},
+ c:{t:'皆で続けた数を数える。二十で一人前、五十で上手、百で都の噂じゃ。上手には、邸の会から声が掛かる',c:[['若成に頼む','s2']]},
+ s2:{t:'若成どのに声を掛けよ。稽古は政の合間、昼のうちだけじゃ',end:true},
+ no:{t:'見るのも鞠のうちよ',end:true}},
+ n:'蹴鞠は900年ごろの宮廷にも行われた（推定）。鞠庭の作法・掛け声・家ごとの流儀が固まるのは後の世で、ここでは「声を掛ける」までに留める'},
+// ---- 若成：稽古（五つの場面。正しい作法なら続く）。正解の位置は 2・1・3・2・1。正解を一番長い選択肢にしない
+{id:'km-keiko',keep:true,char:'kemari_youth',if:'q:kemari_kai>=1&q:km_best<100',title:'伴若成',start:'s',nodes:{
+ s:{t:['さあ、輪に入れ。…いくぞ','今日こそ続けるぞ。…いくぞ'],c:[['（輪に入る）','k1'],['叔父の家の会へ行く','go',{if:'q:km_t20>=1&q:km_go20<2'}],['今日はやめておく','bye']]},
+ k1:{t:'鞠が高く上がって、こちらへ落ちてくる',c:[
+  ['左の足で、強く蹴り返す','f1'],
+  ['声を掛けて、右の足で受ける','k2'],
+  ['両の手で、そっと鞠を受け止める','f0']]},
+ k2:{t:'…十。次の鞠は、勢いよく低く飛んでくる',set:'km_best=10',c:[
+  ['足の甲で勢いを殺し、足もとへ','k3'],
+  ['すぐに高く、思いきり蹴り上げる','f2'],
+  ['身をかわして、鞠をやり過ごす','f2']]},
+ k3:{t:'…二十。若成が「回せ！」と叫ぶ',set:'km_best=20',c:[
+  ['いちばん近い者へ、低く速く','f3'],
+  ['自分でもう一度、蹴り上げる','f3'],
+  ['若成の正面へ、胸の高さで','k4']]},
+ k4:{t:'…三十五。風が出た。鞠が東へ流れていく',set:'km_best=35',c:[
+  ['流れる先へ、走って追いかける','f4'],
+  ['風上に一歩寄って、待つ','k5'],
+  ['風の止むまで、足を止める','f4']]},
+ k5:{t:'…五十！ 鞠が、朝集堂の軒のほうへ高く逸れた',set:'km_best=50',c:[
+  ['追わず、軒に近い者に声で任す','k6'],
+  ['軒の下へ、まっすぐ飛び込む','f5'],
+  ['鉄の腕を長く伸ばして、軒から払う','f5']]},
+ k6:{t:'軒の下の官人が受けた。そこから先は、輪が一つの体のように動いた。…八十、九十…百！ 見物の官人がどっと沸いた',set:'km_best=100',c:[['（息をつく）','w100']]},
+ w100:{t:'若成「百だ…百続いたぞ！ 鉄の童、お主は鞠の神か」',end:true},
+ f0:{t:'「手で受けるな！」…鞠は手の中。数えるまでもない。若成が頭を抱えた',end:true},
+ f1:{t:'鉄の足に鞠が当たって、ぽん、と高い音。鞠は朝集堂の屋根を越えていった。…拾いに行くのは、お主だぞ',end:true},
+ f2:{t:'鞠が足もとを抜けて、地に落ちた。「…十か。勢いのある鞠は、まず殺すのよ」',end:true},
+ f3:{t:'鞠は若成の頭の上を越えて落ちた。「二十。回すときは、相手の正面へ、取りやすい高さだと言うたろう」',end:true},
+ f4:{t:'追いつく前に、鞠は砂の上。「三十五。風の日は、鞠の来る所で待つのだ」',end:true},
+ f5:{t:'鞠は軒に当たって跳ね、誰も届かぬ所へ。「五十！ …惜しい。一人で全部取ろうとするな。鞠は皆で続けるものよ」',end:true},
+ bye:{t:'そうか。鞠は逃げん。…わしもな',end:true},
+ go:{t:'叔父は右京の三条に住む。…いや、わしが連れていく。鞠の会では、まず主に挨拶だ。主の前で蹴るときは、主に鞠を回すのを忘れるな',c:[['わかった','party']]},
+ party:{t:'叔父の庭。四人で輪になる。叔父に鞠が回った。叔父の足もとは、少し危うい',c:[
+  ['叔父の取りやすい高さに、やさしく返す','p1'],
+  ['叔父の前を越して、ほかの者へ回す','p2'],
+  ['叔父が落とす前に、こちらで先に蹴り上げる','p3']]},
+ p1:{t:'叔父が受けて、高く蹴り上げた。「おお、続いた！」…叔父はその日いちばん上機嫌だった',set:['km_go20=2','kemari_kai=9'],end:true},
+ p2:{t:'叔父の顔が曇った。…会のあと若成に「主に回せと言うたろう」と小突かれた',set:['km_go20=2','kemari_kai=9'],end:true},
+ p3:{t:'鞠は続いたが、叔父は黙ってしまった。「…鉄の童は、うまいのう」声が、少しも嬉しそうでない',set:['km_go20=2','kemari_kai=9'],end:true},}},
+// ---- 若成：百を出したあと
+{id:'km-master',keep:true,char:'kemari_youth',if:'q:km_best>=100',title:'伴若成',start:'s',nodes:{
+ s:{t:['鉄の童か。また百を見せてくれ。…いや、見物が多すぎて、政が止まる','百の鉄の童が来たぞ！ …と、皆が仕事の手を止める。困ったもんだ'],c:[['叔父の家の会へ行く','go',{if:'q:km_t20>=1&q:km_go20<2'}],['また来る','bye']]},
+ bye:{t:'うむ。鞠の神が来ると、皆の足が軽くなる',end:true},
+ go:{t:'叔父は右京の三条に住む。…いや、わしが連れていく。鞠の会では、まず主に挨拶だ。主の前で蹴るときは、主に鞠を回すのを忘れるな',c:[['わかった','party']]},
+ party:{t:'叔父の庭。四人で輪になる。叔父に鞠が回った。叔父の足もとは、少し危うい',c:[
+  ['叔父の取りやすい高さに、やさしく返す','p1'],
+  ['叔父の前を越して、ほかの者へ回す','p2'],
+  ['叔父が落とす前に、こちらで先に蹴り上げる','p3']]},
+ p1:{t:'叔父が受けて、高く蹴り上げた。「おお、続いた！」…叔父はその日いちばん上機嫌だった',set:['km_go20=2','kemari_kai=9'],end:true},
+ p2:{t:'叔父の顔が曇った。…会のあと若成に「主に回せと言うたろう」と小突かれた',set:['km_go20=2','kemari_kai=9'],end:true},
+ p3:{t:'鞠は続いたが、叔父は黙ってしまった。「…鉄の童は、うまいのう」声が、少しも嬉しそうでない',set:['km_go20=2','kemari_kai=9'],end:true},}},
+
+// ---- 中納言家（五十）：兵衛の乳母。若君に花を持たせる
+{id:'km-50',char:'hyoe_menoto',if:'q:km_t50>=1&q:km_go50<2',title:'兵衛の乳母',start:'s',nodes:{
+ s:{t:'鉄の童どの、ようこそ。殿は奥におられます。若君と小鷹丸が、庭でお待ちかねですよ',c:[['庭へ出る','a']]},
+ a:{t:'若君は七つ。鞠を蹴っても、膝の高さまでしか上がらない。小鷹丸が、はらはらと見ている',c:[
+  ['若君の足もとへ、ころがすように','ok'],
+  ['高く上げて、百の技を見せる','x'],
+  ['小鷹丸と二人で、続けてみせてやる','y']]},
+ ok:{t:'若君が蹴った鞠を、鉄の童が受けて、また足もとへ。…七つ続いた。若君は「鉄の童に勝った！」と大はしゃぎ',set:['km_go50=2','kemari_kai=9'],c:[['（礼をする）','ok2']]},
+ ok2:{t:'乳母「若君が、あんなにお笑いになるのは久しぶり。…殿にも申し上げておきます。奥で、お聞きになっておられましたよ」',end:true},
+ x:{t:'見事に百。…だが若君は、途中で泣き出した。「鞠が、わたしのところへ来ない」',set:['km_go50=2','kemari_kai=9'],c:[['若君に鞠を渡す','ok']]},
+ y:{t:'小鷹丸と鉄の童で三十続いた。若君は手を叩いていたが、やがて、つまらなそうに柱にもたれた',set:['km_go50=2','kemari_kai=9'],c:[['若君を輪に入れる','ok']]}},
+ n:'中納言家は屋内（interior:chunagon）。主の中納言には言動をさせない。若君と小鷹丸は台帳どおり'},
+
+// ---- 右大臣家（百）：保行。紅梅殿の家人の会
+{id:'km-100',char:'yasuyuki',if:'q:km_t100>=1&q:km_go100<2',title:'保行',start:'s',nodes:{
+ s:{t:'鉄の童か。よう来た。殿は奥で書を見ておられる。…鞠の音は聞こえておろう。今日は家人どもの会じゃ',c:[['庭へ出る','a']]},
+ a:{t:'紅梅殿の庭。家人の若い者が八人。皆、鉄の童の百を見ようと、目が輝いている',c:[
+  ['八人に一つずつ、順に回す','ok'],
+  ['一人で蹴り続けて、百を見せる','x'],
+  ['いちばん上手な者とだけ続ける','x']]},
+ ok:{t:'鞠は八人の間を巡り、また巡った。…百二十。家人どもは息を切らして笑った',set:['km_go100=2','kemari_kai=9'],c:[['（礼をする）','ok2']]},
+ ok2:{t:'保行「奥から、殿の『よき音であった』とのお言葉じゃ。…鞠は皆で続けるもの、と若成どのも言うておったろう」',end:true},
+ x:{t:'見事な百。…だが家人どもは、輪の外で手を叩くだけになった。保行が苦笑した。「これでは見世物じゃ」',set:['km_go100=2','kemari_kai=9'],c:[['皆に鞠を回す','ok']]}},
+ n:'紅梅殿は道真の邸。道真本人は姿を見せず、言葉は家司を通して一言だけ（創作の言葉）。家人の鞠の会は創作'}
+]);
+L.say.push(
+ {at:'kemari',who:'官人',if:'q:km_best>=20&q:km_best<50',t:'鉄の童が、鞠を二十続けたそうな'},
+ {at:'kemari',who:'官人',if:'q:km_best>=50&q:km_best<100',t:'鉄の童の鞠、五十続いたとか。わしより上手い'},
+ {at:['kemari','daidairi'],who:'官人',if:'q:km_best>=100',t:'鉄の童が鞠を百続けたと。政より鞠の噂ばかりだ'},
+ {at:'kobaiden',who:'家司',if:'q:km_go100>=2',t:'紅梅殿の鞠の会、家人どもがまだ話しておる'}
+);
+})();
+
+// ---- 1.87 投入: クエスト脚本_西市の立て直し_2026-10-04.js（residents/ の下書きをそのまま）
+// クエスト脚本「西市の立て直し」（nishiichi_tatenaoshi）― 2026-10-04 下書き。heian-lines.js にはまだ入れていない
+// 『物語脚本_2026-10-02』の物語2を書き直した版。手立てを三つから一つ選ぶ：①品の融通 ②鉄の童の客寄せ（2026-10-04井内さん案） ③邸への売り込み
+// 入れ方：heian-lines.js 末尾にこの IIFE を足す。本体で要るのは1行：HEIAN_QUEST_NAMES に nishiichi_tatenaoshi:'西市の立て直し' を足す
+// 🔧 旧案の「綾女（kinu_akindo）」は誤り：kinu_akindo は東市の絹と綾の店の「桑女」。綾女（ayame）は機織り。ここでは桑女にした
+// 人：嘆く人＝鮎女（ayume）。まとめ役＝西市の刀禰（nishi_toji）。①桑女（kinu_akindo）・茨田広成（ichitsukasa）・益女（masume）
+//     ②鮎女の店で客寄せ ③大納言家の家司・豊原貞道（dainagon_keishi）
+// 状態 nishiichi_tatenaoshi：1受けた 2融通を選んだ 3客寄せを選んだ 4売り込みを選んだ 8手立てが済んだ 9済んだ
+//      ni_way：1融通 2客寄せ 3売り込み（結末の言い分け）／ ni_kuwa・ni_tsukasa：2聞いた ／ ni_yose：1しくじった
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+// つなぎの足し方（2026-10-04・『クエスト同士の重なり』3B）。本体の対話の選び方が直るまでの間だけ。
+// 進行中の対話＝先頭へ／入口（q:xxx<1 だけ）＝「終わらない対話」の手前へ／終わらない対話（keep:true）＝末尾へ。どの脚本でも同じ関数を使う
+const put=window.__heianQPut||(window.__heianQPut=(L,ds)=>{const ent=d=>/^q:\w+<1$/.test(d.if||'');
+ const front=ds.filter(d=>!ent(d)&&!d.keep),mid=ds.filter(d=>ent(d)&&!d.keep),back=ds.filter(d=>d.keep);
+ L.dialogs.unshift(...front);const k=L.dialogs.findIndex(d=>d.keep);if(k<0)L.dialogs.push(...mid);else L.dialogs.splice(k,0,...mid);L.dialogs.push(...back);});
+put(L,[
+// ---- 刀禰：済んだ（手立てごとの結末。上から先に選ばれるので、終わりの方を先に置く）
+{id:'ni-done1',char:'nishi_toji',if:'q:nishiichi_tatenaoshi=8&q:ni_way=1',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'益女の薬草を買いに、東市の客が西まで足を運ぶようになった。…西市は、まだ死なぬよ',set:'nishiichi_tatenaoshi=9',c:[['よかった','a']]},
+ a:{t:'益女と菊女が半月ずつ東西を行き来する。あれが二つの市の、細い縁の糸よ',end:true}}},
+{id:'ni-done2',char:'nishi_toji',if:'q:nishiichi_tatenaoshi=8&q:ni_way=2',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'鮎女の店の前に、朝から人だかりじゃ。「鉄の童が鮎を掴んだ店はどこだ」とな。…見物でも、来てくれれば品は目に入る',set:'nishiichi_tatenaoshi=9',c:[['毎日は来られないよ','a']]},
+ a:{t:'わかっとる。噂は残る。…あとは、来た客を手ぶらで帰さぬのが市の者の腕よ',end:true}}},
+{id:'ni-done3',char:'nishi_toji',if:'q:nishiichi_tatenaoshi=8&q:ni_way=3',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'大納言家が西市で錦を買うた、と邸町の噂じゃ。今朝は中納言家の雑色まで、錦屋を覗きに来おった',set:'nishiichi_tatenaoshi=9',c:[['よかった','a']]},
+ a:{t:'東市に無い品は、西市にある。…それを知らせる者が、今まで誰もおらなんだのよ',end:true}}},
+// ---- 刀禰：手立てを選ぶ（鮎女に聞いたあと）
+{id:'ni-plan',char:'nishi_toji',if:'q:nishiichi_tatenaoshi=1',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:'鮎女から聞いたか。…客を呼び戻す手は、わしも考えておる。三つある。お主なら、どれを選ぶ',c:[
+  ['東市の店と、品を融通しあう','p1'],
+  ['鉄の童が店の前で客を寄せる','p2'],
+  ['邸の家司に、西市の品を勧める','p3'],
+  ['もう少し考える','bye']]},
+ p1:{t:'西市の品を、東市の店にも少し置かせてもらう。東市の絹屋の桑女は、話のわかる女だ',set:['nishiichi_tatenaoshi=2','ni_way=1'],end:true},
+ p2:{t:'お主が？ …ははあ、都じゅうが鉄の童を見たがっておる。見物が集まれば、品も目に入る。まずは鮎女の店でやってみよ',set:['nishiichi_tatenaoshi=3','ni_way=2'],end:true},
+ p3:{t:'錦・綾・鞍は、東市には無い。邸の家司どのに知ってもらえば…大納言家の貞道どのは、贈り物の差配に悩んでおると聞く',set:['nishiichi_tatenaoshi=4','ni_way=3'],end:true},
+ bye:{t:'急がぬ。…だが、急がねば西市が先に倒れる',end:true}},
+ n:'市の刀禰（市人のまとめ役）は推定。右京・西市の衰えは10世紀の傾向（推定）'},
+{id:'ni-wait',char:'nishi_toji',if:'q:nishiichi_tatenaoshi>=2&q:nishiichi_tatenaoshi<8',title:'西市の刀禰',start:'s',nodes:{
+ s:{t:['融通の話なら東市の桑女じゃ','客寄せなら、鮎女の店でな','錦の売り込みなら、大納言家の貞道どのじゃ'],end:true}}},
+// （刀禰の入口の対話は置かない。入口を置くと、刀禰の「右京の夜番」の頼みを塞ぐ＝『クエスト同士の重なり』）
+
+// ---- 鮎女：嘆く（入口）／客寄せの場
+{id:'ni-start',char:'ayume',if:'q:nishiichi_tatenaoshi<1',title:'鮎女',start:'s',nodes:{
+ s:{t:'鉄の童かい。…見てごらん、昼を過ぎても鮎が桶に残ってる。西市は年々さびしくなるね',c:[['どうして客が減ったの？','a'],['また今度','no']]},
+ a:{t:'右京に住む人が減って、左京の人は東市で済ませる。こっちまで歩いてくる用が無いのさ',c:[['何かできることは？','b']]},
+ b:{t:'刀禰さんが、何か手を考えてるらしいよ。…頼りにしてるのかい、って顔だね。してるよ、少しはね',set:'nishiichi_tatenaoshi=1',c:[['刀禰に会う','bye']]},
+ no:{t:'そうかい。…売れ残りは、うちの晩のおかずさ',end:true},
+ bye:{t:'刀禰さんは市の真ん中の、布の店にいるよ',end:true}}},
+// 客寄せ：三択の正解は2番目（長さ16・13・14）
+{id:'ni-yose',char:'ayume',if:'q:nishiichi_tatenaoshi=3',title:'鮎女',start:'s',nodes:{
+ s:{t:['刀禰さんから聞いたよ。鉄の童が客寄せだって？ …やってみな','また来てくれたのかい。今日はどうする'],c:[['（店の前に立つ）','a'],['また今度','no']]},
+ a:{t:'「鉄の童だ！」と子どもが叫ぶ。たちまち人だかり。…さて、何をしてみせる',c:[
+  ['腕をくるくる回して、踊ってみせる','x1'],
+  ['桶の鮎を掴んで、高く掲げる','ok'],
+  ['鉄の声で「鮎だよ」と呼ばわる','x2']]},
+ x1:{t:'見物は大喜び。…だが日が傾くと、皆そのまま帰っていった。鮎は一尾も売れていない。鮎女「見世物じゃないんだよ」',set:'ni_yose=1',c:[['もう一度','a'],['また今度','no']]},
+ x2:{t:'鉄の声が市じゅうに響いた。子どもが泣き出し、隣の店の牛が暴れた。…人だかりは、すっと引いてしまった',set:'ni_yose=1',c:[['もう一度','a'],['また今度','no']]},
+ ok:{t:'鉄の手の中で、鮎がまだ跳ねる。「鉄に掴まれても跳ねとる！」「活きがいいぞ」…桶の鮎が、見る間に減っていく',c:[['（続ける）','ok2']]},
+ ok2:{t:'日暮れ前に、桶は空になった。鮎女「売り切れなんて、何年ぶりだろうね。…見せるのは鉄の童、売るのは鮎さ」',set:'nishiichi_tatenaoshi=8',end:true},
+ no:{t:'いつでもおいで。鮎は毎朝、桂から来るからね',end:true}},
+ n:'市で人を集めて物を売る形は推定。鮎女と夫の鵜飼は台帳どおり。客寄せの話は創作'},
+
+// ---- ①融通：桑女（東市・月の前半）→ 広成（筋を通す）か、黙って小さく始める
+{id:'ni-kuwa',char:'kinu_akindo',if:'q:nishiichi_tatenaoshi=2&q:ni_kuwa<2',title:'桑女',start:'s',nodes:{
+ s:{t:'西市の品を、うちの店に？ …東市司がいい顔をせぬだろうね。でも、丹波の薬草は東市の客も欲しがる',set:'ni_kuwa=2',c:[['東市司に断りを入れる','tsu'],['黙って小さく始める','him']]},
+ tsu:{t:'筋を通すなら、史生の茨田広成どのに。几帳面な人だが、理があれば頷く',end:true},
+ him:{t:'…まあ、小さく始めるぶんには。西市の益女に、薬草を少し回してもらうよ',set:'nishiichi_tatenaoshi=8',end:true}},
+ n:'東西の市はそれぞれ市司が管した（通説）。店の融通の話は創作'},
+{id:'ni-tsukasa',char:'ichitsukasa',if:'q:nishiichi_tatenaoshi=2&q:ni_kuwa>=2',title:'東市司の史生',start:'s',nodes:{
+ s:{t:'西市と品を融通したい、と。…市の掟に背かぬなら、止めはせぬ。むしろ、両市が栄えるが筋だ',set:['ni_tsukasa=2','nishiichi_tatenaoshi=8'],c:[['かたじけない','a']]},
+ a:{t:'西市の刀禰には、昔世話になった。…とは、本人には言うな',end:true}}},
+
+// ---- ③売り込み：貞道。三択の正解は3番目（長さ14・15・13）
+{id:'ni-sada',char:'dainagon_keishi',if:'q:nishiichi_tatenaoshi=4',title:'豊原貞道',start:'s',nodes:{
+ s:{t:'西市の品を？ …ちょうど困っておった。左大臣家の宴への贈り物じゃ。東市の香や絹は、皆が贈るので重なる',c:[['西市の品なら','a']]},
+ a:{t:'右大臣家にも角が立たぬ品でなければならん。…鉄の童、西市の何を勧める',c:[
+  ['厨で喜ばれる、醤の大きな甕を','x1'],
+  ['宴にそのまま使える、新しい土器','x2'],
+  ['法会の幡にもなる、西市の錦','ok']]},
+ x1:{t:'醤か…厨の者は喜ぶが、宴の贈り物としては格が足りん。殿の名で贈るものだぞ',c:[['考え直す','a']]},
+ x2:{t:'土器は一度使えば捨てる物じゃ。贈り物が宴のあとで捨てられては、殿の顔が立たん',c:[['考え直す','a']]},
+ ok:{t:'錦か。宴にも、寺への寄進にも回せる。どちらの大臣家に贈っても、角は立たん。…よし、西市で二巻求めよう',set:'nishiichi_tatenaoshi=8',c:[['西市の錦屋は喜ぶよ','b']]},
+ b:{t:'ほかの家司どもにも言うておこう。「錦は西市に限る」とな。…わしの手柄にしてよいか',end:true}},
+ n:'錦・綾・鞍は西市の札の品（本体 HEIAN_MARKET_GOODS・着手案7）。貴族間の贈答は通説。話は創作。実在の大臣には言動をさせない'}
+]);
+L.say.push(
+ {at:'westMarket',who:'売り子',if:'q:nishiichi_tatenaoshi<1',t:'鮎女さんの桶、今日も昼過ぎまで鮎が残っとる'},
+ {at:'westMarket',who:'売り子',if:'q:nishiichi_tatenaoshi=1',t:'刀禰さんが、市の立て直しを考えとるそうな'},
+ {at:'westMarket',who:'客',if:'q:nishiichi_tatenaoshi=9&q:ni_way=2',t:'鉄の童が鮎を掴んだ店はどこだ'},
+ {at:'westMarket',who:'売り子',if:'q:nishiichi_tatenaoshi=9&q:ni_way=2',t:'うちの店にも、鉄の童に立ってもらいたいもんだ'},
+ {at:'eastMarket',who:'売り子',if:'q:nishiichi_tatenaoshi=9&q:ni_way=2',t:'西市は、鉄の童を客寄せに使うたそうな。抜け目がない'},
+ {at:['suzaku','rajomon'],who:'庶民',if:'q:nishiichi_tatenaoshi=9&q:ni_way=2',t:'散楽の連中が、鉄の童に客を取られたと嘆いとる'},
+ {at:'westMarket',who:'売り子',if:'q:nishiichi_tatenaoshi=9&q:ni_way=1',t:'東市の桑女さんの店に、うちの薬草が並んどるよ'},
+ {at:'nobles',who:'従者',if:'q:nishiichi_tatenaoshi=9&q:ni_way=3',t:'錦は西市に限る、と家司どのが言うておった'},
+ {at:'westMarket',who:'売り子',if:'q:nishiichi_tatenaoshi=9',t:'このところ、西市にも人が戻ってきたねえ'}
+);
+})();
+
+// ---- 1.87 投入: 着手案15_頼みごとの出る順_2026-10-04.js（residents/ の下書きをそのまま）
+// 着手案15：頼みごとの出る順（段と発動条件）― 2026-10-04 下書き。heian-lines.js・本体にはまだ入れていない
+// 頼みごとの入口（if:'q:xxx<1' の対話）に、段（tier）と発動条件を足す。条件は if に & でつなぐ
+// done>=N は本体の heianQuestCond に1行足す（名前のある頼みごとのうち、9 まで済んだ数）。gate:・q: は今の本体のまま読める
+// 段：1＝ちょっとした頼み（1〜3人・近場・昼）／2＝聞き込み（4〜7人）／3＝夜の頼み・道の判断／4＝物語（発動条件のあるもの）
+(function(){
+const L=window.HEIAN_LINES; if(!L) return;
+const T=[
+ ['saki-start','',1], // 朱雀門の前の3人で済む（1か所）
+ ['koi-start','',1], // 後宮と朱雀門の2人（2か所）。常夏の物語の入口
+ ['nusumi-start','',1], // 菊女・重実・官人。東市のまわり
+ ['shio-start','',1], // 米六・浜成・早苗
+ ['yuura-teach','',1], // 巫に教わるだけ（1か所）
+ ['km-start','',1], // 見物の官人に声をかけられ、稽古へ（稽古はいつでも）
+ ['maigo-start','done>=1',2], // 5人の聞き込み。歩いて人をつなぐ練習
+ ['koibumi-start','done>=1',2], // 内裏の門で止められる→歌を直す。終えると内裏の門籍
+ ['saiji-start','done>=1',2], // 西寺と瓦屋
+ ['mn-start','done>=1',2], // 物売りの道筋を逆にたどる（5人）
+ ['ni-start','done>=2',2], // 手立て三択。鉄の童の客寄せ
+ ['fs-start','q:shio_kai>=9',2], // 米六と顔なじみになってから（米の場面で塞がない）。道の三択×2
+ ['yami-start','q:nusumi>=9',3], // 干物盗人のあとで菊女が打ち明ける（菊女の詰まりが解ける）。夜の七条。終えると邸の門籍
+ ['yb-start','q:nishiichi_tatenaoshi>=9',3], // 西市を立て直した鉄の童なら、と刀禰が頼む（刀禰の詰まりも解ける）。夜
+ ['yg-start','gate:tei',3], // 邸に顔が利くようになってから（闇市の噂のあと）。夜の道の三択
+ ['yk-start','done>=4',3], // 忌夜行日の丑の刻。行列を見なくても済む
+ ['kj-start','q:km_best>=20&done>=4',3], // 鞠の稽古で若成と二十続けた仲。夜の道を突き止める。いちばん長い（29本）
+ ['beni-start','done>=5',4],
+ ['beni-start-after','done>=5',4], // 変のあとの版（着手案13）。着手案13 を先に読み込むこと // 9人の聞き込みで大臣家の影に気づく。昌泰の変の前触れ（変のあとは振り返る版）
+ ['am-start','done>=4',4], // 日照りの日だけ（本体の天気）。亀卜と式占
+];
+for(const [id,c,tier] of T){const d=L.dialogs.find(q=>q.id===id);if(!d){console.warn('着手案15: 入口が無い',id);continue;}
+ d.tier=tier;if(c)d.if=d.if?d.if+'&'+c:c;}
+})();
+// ---- 段0：日々の小さな頼み（いつでも・1か所のお使い・毎日入れ替わる）。名前付きの住人どうしの届け物 58件（2026-10-04 12→58）
+// 条件（すべて省略可）：h＝頼む人に話しかけられる刻（[時,時]）／mk＝市の日（east＝月の前半・west＝後半）／season・month／era（段）／from（[年,月,日]から）／gate（門籍）
+//   頼む人と届け先が、その刻・市の日に一日の予定（game.day）のどこかに居ることを確かめ済み（58件すべて）
+// 本体の選び方：
+//   1) その日に条件の合う頼みから、日の番号で決まる乱数で3件を選ぶ（同じ日は同じ顔ぶれ）。同じ頼む人は1日1件。前の日と同じ頼みは避ける
+//   2) 頼む人に話しかけると、ふだんの対話の最初の選択肢に「何か届ける物は？」が出る（h の刻だけ）。預かると HUD に品の名
+//   3) 届け先に話しかけると thanks を言い、なじみ度（najimi）を頼む人・届け先の両方に1足す
+//   記録：localStorage heian-chores {day, picked:[...], carry:'…', done:[...]}。日が変わると消える（預かったまま日が変われば「明日でもよい」と持ち越す）
+(function(){const L=window.HEIAN_LINES;if(!L)return;L.chores=[
+ {from:'kikume',to:'toji',item:'若狭の干物を二枚',ask:'藤次さん、毎度。…膝の具合はどうだい、と伝えて',thanks:'菊女の干物か。…膝は相変わらずだと言うておけ',mk:'east',era:'<tojitsu'},
+ {from:'takemaru',to:'inumaru',item:'炭をひと束',ask:'弟に渡してくれ。牛小屋の夜は冷える',thanks:'兄ちゃんの炭だ！ 黒麻呂も喜ぶ'},
+ {from:'kome_akindo',to:'sanae',item:'米の量りの升',ask:'早苗に返してくれ。借りたままだった',thanks:'升が戻った。…米六さん、また塩をつけにしたね'},
+ {from:'uomaro',to:'kikume',item:'川の小魚',ask:'干すなら菊女のところだ。届けてくれ',thanks:'堀川の小魚かい。干せば三日でいい味になる'},
+ {from:'fumimaro',to:'kogiku',item:'手本の字を書いた紙',ask:'小菊に。今日は「水」の字だ',thanks:'「水」…さんずいは三つ。よし、覚えた',h:[18,20]},
+ {from:'kamiya',to:'fumimaro',item:'書き損じの紙の束',ask:'学生どのに。裏は使える',thanks:'ありがたい。灯し油より紙のほうが惜しいのです'},
+ {from:'bocho',to:'yasumaro',item:'坊の火の用心の触れ',ask:'朱雀門の衛士にも伝えておいてくれ',thanks:'火の用心か。篝火の番は、わしの役目だ'},
+ {from:'kawaraji',to:'banjo',item:'割れの少ない瓦を一枚',ask:'番匠に見本を。栗栖野の土だと言え',thanks:'いい焼きだ。…羅城門の屋根に使えるか見てみよう'},
+ {from:'masume',to:'kikume',item:'乾かした薬草',ask:'菊女さんに。冷えに効く',thanks:'助かるよ。朝の仕込みで手が冷えてね'},
+ {from:'ayume',to:'kinu_akindo',item:'桂川の鮎を一尾',ask:'錦屋の桑女さんに。いつもの礼だ',thanks:'鮎かい。…今日は錦より、こっちのほうが嬉しいね',season:'summer'},
+ {from:'kuromaro',to:'kikume',item:'東市の空き店の噂',ask:'菊女に伝えてくれ。隣が空いたと',thanks:'隣が？ …塩鯖を並べる台を、もう一つ置けるね'},
+ {from:'kenshin',to:'kawaraji',item:'瓦の礼の経一巻',ask:'瓦屋に。屋根の礼だ',thanks:'坊さまから？ …字は読めんが、神棚に置いとく'},
+ {from:'mochime',to:'inumaru',item:'餅と湯',ask:'犬丸に。干し飯は、もう食べちまったろう',thanks:'餅だ！ …藤次のおやじには内緒な',h:[8,11]},
+ {from:'shigezane',to:'eimon_jo',item:'ゆうべの夜回りの書付',ask:'紀の尉どのに。七条の辻のことを書いた',thanks:'七条でまた賽の音か。…わかった、人を回す',h:[6,14]},
+ {from:'kenshin',to:'renkan',item:'朱を入れた経の写し',ask:'東寺の蓮観に。読み違えの多い所に印を付けた',thanks:'朱がこんなに…。今日は暗誦をやり直します',h:[7,15]},
+ {from:'shakyosei',to:'kamiya',item:'経の紙の注文',ask:'紙屋院に。来月の経の紙を三十枚',thanks:'三十枚か。漉き舟を一つ空けておこう'},
+ {from:'okina_katari',to:'kotaro',item:'握り飯',ask:'孫の小太郎に。堀川で遊んでおるはずじゃ',thanks:'じいちゃんの握り飯！ …塩がきいてる',h:[8,17]},
+ {from:'kusushi',to:'miko',item:'薬の包み',ask:'五条の巫に。祓いのあとに飲ませよ、と',thanks:'葛木さまから。…祓いと薬は、両の手じゃ'},
+ {from:'tsurayuki',to:'nyobo_yomi',item:'歌を一首',ask:'小式部どのに。物語の合間に読んでくれと',thanks:'紀の若殿の歌…女房がたが写したがるわ',h:[6,14],gate:'kokyu'},
+ {from:'eshi',to:'nishikibe',item:'屏風の柄の下絵',ask:'錦部の刀自に。唐草の下絵だ',thanks:'この線なら織れる。…墨丸どのは手が早いね'},
+ {from:'kaji',to:'hida_hirotari',item:'頼まれた釘',ask:'木工寮の広成に。数を確かめてくれ',thanks:'鉄の釘を、鉄の童が。…数はちょうどだ'},
+ {from:'kaji',to:'banjo',item:'研ぎ直した鑿',ask:'番匠の真柄に。刃を立て直した',thanks:'よう切れる。柱の継ぎ目はこれでいける',h:[5,19]},
+ {from:'hamanari',to:'sanae',item:'塩舟の知らせ',ask:'早苗に。今度の舟は三日遅れると',thanks:'三日…。値が上がる前に言うてくれて助かる'},
+ {from:'toji_ouna',to:'hatsuo',item:'草鞋をひと足',ask:'備中の運脚に。帰りの道は長いから',thanks:'国まで二十日。…足が助かる',h:[8,13]},
+ {from:'yadonushi',to:'hirotari',item:'宿の割符',ask:'三河の広足に。今夜の寝床はとってある',thanks:'ありがたい。…宿賃は布で払えるか、聞いてくれ',h:[6,12]},
+ {from:'chidori',to:'ayame',item:'余った糸',ask:'綾女に。撚りの残りだけど',thanks:'千鳥さんの糸は撚りがいい。助かるよ',h:[9,17]},
+ {from:'someshi',to:'akane',item:'染めた布の見本',ask:'紅屋の茜女に。この紅で染めると、こんな色',thanks:'淡いね…紅花の餅を、もう半分足そう'},
+ {from:'tsugejo',to:'zoushime',item:'女房がたの櫛',ask:'後宮の小蝶に。注文の櫛だ',thanks:'柘植の櫛…。局の皆さま、待ってらしたの',gate:'kokyu'},
+ {from:'hiwada',to:'kawaraji',item:'檜皮の余り',ask:'瓦屋の瓦次に。焚きつけにでも',thanks:'檜皮は火のつきがいい。窯が喜ぶ'},
+ {from:'takuhatsu_so',to:'zenne',item:'托鉢の米を少し',ask:'西市の善恵に。今日は多くいただいた',thanks:'道信どのから…。沙弥にも、ありがたい',h:[7,16]},
+ {from:'rokakudo_so',to:'chidori',item:'願かけの札',ask:'千鳥に。子の咳がよくなるように',thanks:'行誉さまの札…。枕の下に入れておきます',h:[7,17]},
+ {from:'tadatsune',to:'kaji',item:'ゆるんだ弓の金具',ask:'鍛冶の金丸に。明日の手結までに',thanks:'左近衛の舎人どのの…。明日の朝までに'},
+ {from:'gakunin',to:'kemari_youth',item:'笛の約束の念押し',ask:'伴の若成どのに。鞠の会で笛を吹く日を確かめて',thanks:'…そうだった！ 月の十日だ。忘れておった'},
+ {from:'myobo',to:'geki',item:'律の条の写し',ask:'外記の小野どのに。先例の条を写しました',thanks:'よう写した。…字は、もう少し大きく'},
+ {from:'sansei',to:'yasuomi',item:'月の入りの算',ask:'陰陽寮の保臣に。この算、合っているか見てほしい',thanks:'…一刻ずれておる。月の大小を数え違えたな'},
+ {from:'okura_shi',to:'masanari',item:'調の帳面の写し',ask:'民部省の真成どのに。備中の布の数が合わん',thanks:'またか。…運脚の初男に聞いてみよう',h:[6,12]},
+ {from:'korekiyo',to:'kikume',item:'院の宴の干物の注文',ask:'菊女に。宴の干物を三十',thanks:'三十！ …塩鯖も足しておくよ',h:[12,17],mk:'east'},
+ {from:'nishi_toji',to:'kome_akindo',item:'升改めの触れ',ask:'米六に。量りの升を改める日が来た',thanks:'升改めか。…早苗の升を返しておいてよかった',mk:'west'},
+ {from:'ichitsukasa',to:'akane',item:'値の札',ask:'紅屋に。紅の値を書き改めよ',thanks:'改めるのはいいが、紅花が来ないんですよ',mk:'east'},
+ {from:'masume',to:'seyakuin',item:'熱冷ましの草',ask:'施薬院の萩女に。よく乾かした',thanks:'益女さんの草はよく効く。…病人が多くてね',h:[12,17.5],mk:'west'},
+ {from:'ako',to:'hyoe_menoto',item:'お産の帯の結び方',ask:'兵衛の乳母どのに。新しいお子の帯のこと',thanks:'阿古どのの結びなら安心。…姫さまには内緒よ',gate:'tei'},
+ {from:'kawara_baba',to:'miko',item:'河原の白い石',ask:'五条の巫に。河原で拾うた',thanks:'きれいな石。…祓いの場に置こう'},
+ {from:'kotota',to:'sugoroku',item:'借りた賽',ask:'賽丸に返してくれ。…負けたぶんは来月だ',thanks:'来月、来月。…小藤太の来月は来ないんだ',h:[19,23],era:'<tojitsu'},
+ {from:'sakeuri',to:'sugoroku',item:'濁り酒の小瓶',ask:'賽丸に。つけは三つたまっとると言え',thanks:'三つ？ …四つだったはずだが。黙っとこう',h:[16,19]},
+ {from:'iwamaru',to:'masumi',item:'山の湧き水の知らせ',ask:'神泉苑の真澄に。山の湧き水が細っておる',thanks:'山がか…。池も減っておる。雨乞いの支度をせねば',season:'summer'},
+ {from:'harukaze',to:'fumimaro',item:'渤海の詩の写し',ask:'大学寮の学生に。前に来た渤海の使いの詩だ',thanks:'異国の詩…！ 韻の踏み方が違う',h:[6,15]},
+ {from:'tahito',to:'kikume',item:'若菜',ask:'菊女に。正月の若菜だ。羹に入れな',thanks:'若菜の羹…。正月らしくなった',mk:'east',month:1},
+ {from:'kamo_negi',to:'kosaisho',item:'祭の葵',ask:'東三条殿の小宰相どのに。姫さまのお車に',thanks:'葵…！ 賀茂の祭が来たのね',month:4},
+ {from:'tahito',to:'bocho',item:'軒に挿す菖蒲',ask:'坊長に。五月五日の分だ',thanks:'菖蒲か。坊の家々に配っておこう',month:5},
+ {from:'tahito',to:'fumimaro',item:'瓜を一つ',ask:'学生どのに。勉学の喉に',thanks:'瓜…！ 仕送りの来ない日の、何よりのご馳走',season:'summer'},
+ {from:'iwamaru',to:'okina_katari',item:'船岡山の栗',ask:'古丸の爺さまに。拾うたばかりだ',thanks:'栗か。…孫と焼いて食おう',season:'autumn'},
+ {from:'takemaru',to:'kikume',item:'冬の炭',ask:'菊女さんに。冬は干物も凍るから',thanks:'火鉢の炭が切れてたんだ。ありがたい',season:'winter'},
+ {from:'chidori',to:'miko',item:'子の熱の礼の糸',ask:'五条の巫に。熱が下がった礼だ',thanks:'よかったのう。…夕占の言葉のとおりじゃ',season:'winter'},
+ {from:'kikume',to:'toji',item:'干物を一枚おまけ',ask:'藤次さんに。…顔が暗いから',thanks:'…すまんな。奥方さまの膳に一枚、わしに一枚',h:[12,13.5],mk:'east',era:'>=tojitsu'},
+ {from:'kotota',to:'toji',item:'孫への唐菓子',ask:'藤次さんに。孫の土産だと。…俺からとは言うな',thanks:'…小藤太か。包みの結びでわかる。あやつは結びが下手だ',h:[19,21],era:'>=yoha'},
+ {from:'yasuyuki',to:'tsukushi',item:'殿の衣を一枚',ask:'筑紫の使いに。…文は付けぬ。衣だけだ',thanks:'大宰府の官舎まで、確かに。…表には出しませぬ',era:'>=chokugo'},
+ {from:'ichitsukasa',to:'kikume',item:'新しい銭の見本',ask:'菊女に。延喜の通宝という新しい銭だ',thanks:'新しい銭かい。…前の銭と、何枚で替えるんだね',mk:'east',from:[907,11,1]},
+ {from:'fumimaro',to:'kogiku',item:'祝いの手本',ask:'小菊に。今日は「喜」の字だ。大学頭さまが戻られた',thanks:'「喜」…むずかしい。でも、きれいな字',from:[906,10,1]}];})();
+/* 本体（index.html）heianQuestCond に足す1行：
+ if((m=/^done>=(\d+)$/.exec(p)))return Object.keys(HEIAN_QUEST_NAMES).filter(k=>!k.includes(':')&&heianQuestGet(k)>=9).length>=+m[1];
+
+ ※恋敵の足止め（koi_jama）は途中の段に 11〜14 を使い、終わりが 15（負け）・20（成功）。数えるときは koi_jama だけ 15 以上で済みとする：
+   const HEIAN_QUEST_DONE={koi_jama:15}; …heianQuestGet(k)>=(HEIAN_QUEST_DONE[k]||9)
+ ※夕占（yuura）は 1 で終わるので数えない（知るだけ）。鞠の会（kemari_kai）は百の招きで 9＝稽古の途中は数えない
+*/
+
+// ---- 1.87 投入: 着手案32_踊りの輪の台詞_2026-10-04.js（residents/ の下書きをそのまま）
+// 着手案32：踊りの輪の台詞（2026-10-04 下書き。heian-lines.js にはまだ入れていない）
+// 井内さん「踊っているうちに周囲の人も踊りに加わっていく。そうなった時の会話も踊ってることに関連したものにしたい」
+// 本体の踊り（1.85〜1.87）：鉄の童が3回踊ると近くの人が加わる（heianDanceAlong）・4人を超えると笛（龍笛）と笙の囃子方が出る（heianFueStart）
+// 新しい条件（本体の heianSpeechCond に5つ足す＝指示書）。足すまでは default:false で一行も出ない＝先に入れても壊れない
+//   odori    : 近くで踊りの輪ができている（鉄の童か誰かが踊っている）
+//   odoriSelf: この話し手が踊っている
+//   odoriMiru: 輪ができているが、この話し手は踊っていない（見物）
+//   fue      : 笛の囃子が鳴っている
+//   fueSelf  : この話し手が笛（または笙）を吹いている
+// 場所は at:'any'（踊りはどこでも起きる）。掛け合いは at が文字列でないと出ない（本体の掛け合いの選び方は ctx.tags.has(t.at)）ので any にした
+// 考証：踏歌（正月の宮中の行事）・歌垣・催馬楽・散楽は900年にある。龍笛・笙は雅楽の楽器。
+//   🚫 田楽（永長の大田楽1096など11世紀以後）・念仏踊り（空也の後・さらに後の世）・盆踊り・白拍子（12世紀）は使わない
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+const S=(who,iff,t,n)=>{const o={at:'any',who,if:iff,t,kind:'odori'};if(n)o.n=n;return o;};
+L.say.push(
+// ---- 踊っている人（odoriSelf）
+ S('庶民','odoriSelf','足が勝手に動く。鉄の童のせいじゃ'),
+ S('庶民','odoriSelf','こうか？ こうか！ わははは'),
+ S('庶民','odoriSelf','腰が痛いのに、止まらん'),
+ S('女','odoriSelf','袖を振るのよ。ほら、こう'),
+ S('女','odoriSelf','若いころは、歌垣でよう踊ったもの',"歌垣（古くからの男女の歌の掛け合い）"),
+ S('女','odoriSelf','市の帰りなのに、籠を置いて踊ってしまった'),
+ S('童','odoriSelf','くるっと回るの！ 鉄の子みたいに'),
+ S('童','odoriSelf','見て見て、母ちゃん、跳べた！'),
+ S('人夫','odoriSelf','荷を担ぐより、こっちのほうが楽しい'),
+ S('人夫','odoriSelf','国の祭りの踊りを思い出した'),
+ S('売り子','odoriSelf','店番のはずが…まあ、客寄せになるか'),
+ S('客','odoriSelf','買い物に来たのに、何をしとるのか'),
+ S('官人','odoriSelf','こ、これは…踏歌の稽古じゃ。そういうことにせよ','踏歌（正月の宮中の行事）'),
+ S('官人','odoriSelf','袍の裾を踏むな。わしの袍じゃ'),
+ S('衛士','odoriSelf','番の途中じゃが…少しだけじゃ'),
+ S('従者','odoriSelf','殿に見られたら叱られる。見られなければよい'),
+ S('女房','odoriSelf','まあ、はしたない…でも楽しゅうございます'),
+ S('学生','odoriSelf','博士に見つかったら、論語を百遍じゃ'),
+ S('僧','odoriSelf','経を唱える足が…いえ、何でもございませぬ'),
+ S('牛飼童','odoriSelf','牛は止めてきた。ちょっとだけだぞ'),
+ S('旅人','odoriSelf','都の踊りは、国の踊りと違うのう'),
+// ---- 見物（odoriMiru）
+ S('庶民','odoriMiru','おうおう、輪ができとる。何の祭りじゃ'),
+ S('庶民','odoriMiru','鉄の童が踊ると、皆つられるのう'),
+ S('庶民','odoriMiru','あの婆さま、ようあんなに跳ねる'),
+ S('女','odoriMiru','うちの人まで踊っとる。仕事はどうしたの'),
+ S('女','odoriMiru','手拍子なら、私にもできる'),
+ S('童','odoriMiru','ぼくも入れて！ 入れてってば'),
+ S('客','odoriMiru','市より、こっちのほうが人が多い'),
+ S('売り子','odoriMiru','踊るなら、うちの前で踊っとくれ。人が寄る'),
+ S('官人','odoriMiru','大路で踊るとは何事か。…いや、楽しそうではあるが'),
+ S('官人','odoriMiru','検非違使が来る前に、散ったほうがよいぞ'),
+ S('衛士','odoriMiru','道をふさぐな。…踊りながらでよいから、端へ寄れ'),
+ S('僧','odoriMiru','これも仏の御心でしょうか。…わかりませぬ'),
+ S('女房','odoriMiru','扇の陰から見るだけですわ。見るだけ'),
+ S('従者','odoriMiru','殿の車が通るぞ。…まだ遠いか。なら、よい'),
+ S('人夫','odoriMiru','荷を下ろしたら、わしも混ざる'),
+ S('学生','odoriMiru','散楽の一座かと思った','散楽（唐から伝わった曲芸・物まね）'),
+ S('牛飼童','odoriMiru','牛まで足踏みしとる'),
+// ---- 囃子（fue・fueSelf）
+ S('庶民','fueSelf','笛なら少しは吹ける。昔、寺の楽人の下働きでな','龍笛'),
+ S('女','fueSelf','笙は吹くのが難しいのよ。息を吸っても鳴るの','笙は吸っても吐いても鳴る'),
+ S('人夫','fueSelf','国の祭りの笛の節じゃ。都の者にわかるかの'),
+ S('庶民','fue','笛まで鳴りだした。こりゃ祭りじゃ'),
+ S('女','fue','あの笛、雅楽寮の人みたいに上手','雅楽寮（900年にある役所）'),
+ S('官人','fue','龍笛に笙か。誰が持ち出したのだ'),
+ S('童','fue','ぴーひゃら、ぴーひゃら'),
+ S('僧','fue','笙の音は、極楽の鳥の声とも申します','迦陵頻伽の声にたとえる（推定）'),
+// ---- 鉄の童へ（odori・robot）
+ S('庶民','odori','鉄の童、もう一度回ってくれ！'),
+ S('女','odori','あの鉄の子、踊りの師匠かね'),
+ S('童','odori','鉄の子についていけばいいんだよ')
+);
+L.talk.push(
+ {at:'any',if:'odoriSelf',who:['庶民','庶民'],lines:[[0,'おぬしも踊っとるのか'],[1,'おぬしこそ'],[0,'鉄の童が悪い'],[1,'そうじゃ、鉄の童が悪い']],kind:'odori'},
+ {at:'any',if:'odoriSelf',who:['女','女'],lines:[[0,'こんなに踊ったの、娘のとき以来'],[1,'私は初めてよ'],[0,'うそ。うまいじゃない'],[1,'見よう見まねよ']],kind:'odori'},
+ {at:'any',if:'odoriMiru',who:['官人','官人'],lines:[[0,'止めるべきか'],[1,'止めて、恨まれるのはわしらじゃ'],[0,'では見ておるか'],[1,'…足だけ少し、動いてしまうな']],kind:'odori'},
+ {at:'any',if:'odoriMiru',who:['女','童'],lines:[[0,'あんたも踊っておいで'],[1,'母ちゃんは？'],[0,'私は…見とる'],[1,'うそだ、足が動いてる']],kind:'odori'},
+ {at:'any',if:'odoriSelf',who:['人夫','人夫'],lines:[[0,'国では、秋に田の神さまの前で踊った'],[1,'わしの国もじゃ'],[0,'都で踊るとは思わなんだ'],[1,'国の者に話しても、信じんぞ']],kind:'odori'},
+ {at:'any',if:'fue',who:['庶民','女'],lines:[[0,'笛まで出てきた'],[1,'笙もよ'],[0,'誰が持っとったんじゃ'],[1,'さあ。踊りが呼んだんでしょ']],kind:'odori'},
+ {at:'any',if:'odoriMiru',who:['衛士','庶民'],lines:[[0,'こら、何の騒ぎだ'],[1,'鉄の童が踊ったら、皆が'],[0,'鉄の童が？'],[1,'ほれ、あれじゃ。…衛士どのも、足が']],kind:'odori'},
+ {at:'any',if:'odoriSelf',who:['童','童'],lines:[[0,'くるっ！'],[1,'くるっ！'],[0,'目が回ったあ'],[1,'もう一回！']],kind:'odori'}
+);
+})();
+/* ==== 本体（index.html）に足すもの＝Kiro向け ====
+// ① heianSpeechCond の switch に5つ（default の前）
+  case'odori':return heianDanceNear();
+  case'odoriSelf':return heianDanceIs(cand);
+  case'odoriMiru':return heianDanceNear()&&!heianDanceIs(cand);
+  case'fue':return !!heianFue;
+  case'fueSelf':return !!heianFue&&!!cand&&cand.key?.[0]==='c'&&[heianFue.q,heianFue.sho].includes(heianCrowdRuntime?.people[Number(cand.key.slice(1))]);
+// ② 関数2つ（heianDanceDur の近く）
+function heianDanceIs(cand){if(!cand)return false;const now=performance.now()/1000;
+ if(cand.key?.[0]==='c'){const q=heianCrowdRuntime?.people[Number(cand.key.slice(1))];return!!q&&q.danceT!=null&&now-q.danceT>=0&&now-q.danceT<heianDanceDur(q);}
+ if(cand.obj){const g=heianBowGroups.find(g=>g.obj===cand.obj&&g.kind==='dance');return!!g&&now-g.t0>=0&&now-g.t0<heianDanceDur(g);}return false;}
+function heianDanceNear(){const now=performance.now()/1000;for(const d of heianDancers){const t0=d.obj?d.t0:d.danceT;if(t0!=null&&now-t0>=0&&now-t0<heianDanceDur(d))return true;}return false;}
+// ③ heianSpeechSayLine の wLine：踊りの行は重く（踊っている間は踊りの話が主になる）
+  const wLine=s=>heianSpeechFresh(s.t)*(/^(odori|fue)/.test(s.if||'')?8:s.if&&s.if!=='marketDay'&&s.if!=='offDay'?3:1)*(s.when?4:1);
+// ④ 掛け合い：踊りの間は掛け合いの割合を上げる（任意）
+  if(Math.random()<(heianDanceNear()?.5:HEIAN_SPEECH.talkRate)&&...
+*/
