@@ -43,16 +43,21 @@
 - 日録（聞き書き帳の「日録」）: 一日ごとに、天気・歩いた所・会った人・聞いた話・夜の月を短い文で書く。撮影モードで撮った絵もその日に並ぶ
 - たどる（T・上の「たどる」）: 遷都（794）から延長（926）までの都の年表。いま（昌泰三年）に印があり、これより後の出来事は「これから先」として薄く出る。「くわしく」で解説を読み、場所のある出来事はそこへ移れる
 - 眺める（上の「眺める」）: ドローンツアー・俯瞰・撮影モードと、5つの定位置（南から・北から・左京上空・右京上空・真上）
-- 地図: 歩いている間は、行った所と話で聞いた所だけが出る（最初は羅城門・朱雀大路・東市・西市）。ツアーと俯瞰では全部
+- 地図: 歩いている間は、行った所と話で聞いた所だけが出る（最初は羅城門・朱雀大路・東市・西市）。聞いただけの所は薄い印。現在地の扇が見ている向き。ツアーと俯瞰では全部
+- 発見: 歩いて着いた所で「発見」の札が出る（44か所）。数は聞き書き帳の「場所」「日録」で見られる。ドローンや一瞬の移動では発見にならない
+- 町の人: 1人から1日に聞ける話には限りがあり、通って顔なじみになるほど多く話す。人ごとに知っている話題が違い、よその土地の言い伝えは「行って聞け」と勧め、詳しい解説は僧や学のある人が話す。散策に入ると「今日の都」で天気と市を迎える
 - 言い伝えや出来事の語（浄蔵・御霊会・応天門の変など）が出たら「〇〇とは？」で解説を読み、話の地点へ歩いて行ける。史実に寄せた話には出典を添える
 - 頼みごと: 迷子・恋文・闇市・紅の値・干物盗人・塩の買い付け・西寺の屋根・常夏の文・恋敵の足止め・夜行の知らせ・夜の女車の供・来ない魚売り・右京の夜番・羅城門の柱・鞠の会・西市の立て直し・帰るか残るか など。済ませた数に応じて、次の頼みが出てくる
 - 門籍: 頼みごとを済ませると、内裏・後宮の廊・貴族の邸の中へ入れるようになる
 
 ### 暦・時刻・空
-- 昌泰三年の暦（二月二十五日から）。1日は実時間24分。閉じている間も日付は進み、続きから始まる
+- 本当の暦（大の月・小の月・閏月）で、昌泰三年二月二十五日から延喜二十二年（922）まで進む。1日は実時間24分（歩いている間は48分）。進むのは遊んでいる間だけで、閉じると続きから始まる
+- 「たどる」から節目の日（七夕・冬のはじめ・大晦日・昌泰の変の前の日・改元の日・時平が亡くなる日）へ時を進められる（戻れない）。改元などは暦が進めばその日に自動で起き、札で知らせる
+- 時代の段: 昌泰の変（901年正月二十五日）のあとは、町の人の話・居場所・頼みごとが替わる（道真の車は出ない、藤次は待つお方のいない石に座る など）。早蕨のように、あとの年に都へ来る人もいる
 - 東市と西市は半月交替で開き、午の刻に開いて日の入り前に閉まる
 - 季節で太陽の道・日の出日の入り・星空が変わり、草木は梅・桜・若葉・紅葉・枯れ木と移る。月は満ち欠けし、星官（中国式の星座）の線と名前も出せる
-- 天気（晴・曇・雨）。夜は篝火と灯明、牛車の供の松明だけが明るい。忌夜行日の丑の刻には、二条大宮の辻にまれに百鬼夜行が出る
+- 天気（晴・曇・雨）は日ごとに変わる。雨の日は細い雨の筋・濡れていく道・水たまりの波紋。通りの人は走って帰り、立っている人は軒下や門の下で雨宿りする。市の売り子は屋根の奥へ下がり、客は店の軒下へ寄る
+- 夜は篝火と灯明、牛車の供の松明だけが明るい。忌夜行日の丑の刻には、二条大宮の辻にまれに百鬼夜行が出る
 
 ### 都の姿
 - 朱雀大路（幅約84m）と条坊の街路、坊城と坊門、堀川・西堀川、側溝と柳の並木
@@ -104,6 +109,9 @@
 | 1.91 | 朱雀門を羅城門と同じ寸法に。翔鸞楼・栖鳳楼の後ろの屋根を薄く。上の操作を ☰ の横へ |
 | 1.92 | 日録（一日ごとの短い記録と撮った絵） |
 | 1.93 | 上の帯を 歩く・眺める・たどる・聞き書き帳 に。眺める（ツアー・俯瞰・撮影・定位置）、たどる（都の年表・T） |
+| 1.94 | 発見（歩いて着いた所・○／44か所）と地図の見ている向き、今日の都、なじみ度、1人が話す量と知っている話を絞る |
+| 1.96 | 時代の段（昌泰の変・延喜の世などで町の人の話・居場所・頼みごとが替わる）、節目の日の知らせ、たどるから延喜二十二年までの節目へ進める、歩く所で地図を京域／郊外に切り替え、夜の雨の波紋 |
+| 1.95 | 雨（筋・道が濡れる・波紋・走って帰る人・軒下と門の下の雨宿り）、市の人もしぐさに応える、本当の暦（大の月・小の月・閏月・延喜二十二年まで）と節目の日へ進む、会話の追加（物売り・学生・唐物の商人など） |
 
 ## 内容
 
@@ -209,10 +217,13 @@ The calendar moves on with the days you play, and you continue where you left of
 - **Notebook (N)**: who said what, when and where is noted automatically. Search a word to see different people's versions side by side — and where they disagree. Browse by person or place, and pin what matters. There is no quest list or progress counter.
 - **Timeline (T)**: the capital's history from its founding in 794 to 926. The present year (900) is marked; later events are shown faded as "yet to come", since nobody here knows them yet. Open "More" for a short explanation, or jump to the place where it happened.
 - **View**: the drone tour, the overview, photo mode and five fixed views (from the south, from the north, over the east and west halves, and straight down).
+- **Discoveries**: walk up to a place to discover it (44 in all); the count is in the notebook's Places and Diary tabs. The drone and quick travel don't count. Places you have only heard of are faded on the map, and a fan on your marker shows which way you are looking.
+- **Townspeople**: each person tells only so much a day, and more as you become familiar. Everyone knows different things; they send you elsewhere for tales of other places, and monks and learned people give the fuller explanations. "The city today" greets you with the weather and the market.
 - **Diary**: a tab in the notebook. Each day gets a few short sentences — the weather, where you walked, whom you met, what you heard, the moon that night — together with the pictures you took in photo mode.
 - **Map**: while walking, the map shows only places you have visited or heard about (at first: Rajomon Gate, Suzaku Avenue and the two markets). The tour and overview show everything.
 - **Errands**: a lost boy, love letters, a black market, the rising price of rouge, a dried-fish thief, a night watch, a kickball party, reviving the West Market and more. Finishing errands opens new ones and gets your name on the gate lists of the palace and the mansions.
-- **Calendar and sky**: the reconstructed calendar of the year 900 (a day lasts 24 minutes). Plum, cherry, new leaves, autumn colors and bare trees follow the months; the moon waxes and wanes; Chinese constellations can be shown. Sun, clouds and rain; at night only bonfires, lamps and torches light the streets, and on rare unlucky nights a parade of spirits crosses the Nijo–Omiya crossroads.
+- **Calendar and sky**: the real lunar calendar (long and short months, leap months) runs from 900 to 922; a day lasts 24 minutes (48 while walking), and time passes only while you play. From the Timeline you can move ahead to turning points (Tanabata, early winter, New Year's Eve, the eve of the Shotai Incident, the change of era, Tokihira's death). After the Shotai Incident of 901 the townspeople's talk, whereabouts and errands change with the times, and newcomers arrive in later years.
+- **Rain**: thin streaks, roads that slowly darken, ripples in puddles; people run home or shelter under eaves and gates, market sellers step back under their roofs. Plum, cherry, new leaves, autumn colors and bare trees follow the months; the moon waxes and wanes; Chinese constellations can be shown. Sun, clouds and rain; at night only bonfires, lamps and torches light the streets, and on rare unlucky nights a parade of spirits crosses the Nijo–Omiya crossroads.
 - **The city**: Suzaku Avenue and the street grid, the Palace Precinct (the Hall of State with Otenmon Gate and its towers, the Banquet Hall, the Inner Palace, 40 office compounds, the stables), the temples Toji and Saiji with their pagodas, the Korokan guesthouses, the Shinsen-en garden, nobles' mansions with cart sheds and stables, townhouses and market stalls; outside the city, 22 shrines and temples, river beds, rice fields laid out on the old land grid, Ogura Pond, and the roads to the capital traced from the terrain.
 - **City life**: nobles' ox carts leave their sheds on a timetable, travelers and carts come and go at the city gates, and people wash, cook, draw water, sweep and gossip. Oxen, horses, dogs, cats and birds.
 - Photo mode and video recording (R), light-and-shadow or line drawing, music and sound effects on/off, speech on/off, Japanese/English (all lines are translated in English mode, with extra background notes), and touch controls on phones.
