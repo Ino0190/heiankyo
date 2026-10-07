@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="ce0de3ca0547953b0c90015436f060efdbd6e4b85818260374dff97c92d2f21a">
+<meta name="heian-release" content="f2326e7b4ee7ac7c1cc68703cd9ccb24eff89b361748ffaad2dee49b6dee3cb3">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -407,6 +407,7 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-trace .nb-jumps button{min-height:32px;padding:2px 12px;font:inherit;font-size:14px;background:#f1e8d6;color:#5a4632;border:1px solid rgba(96,76,52,.3);border-radius:4px;cursor:pointer}
 .heian-trace .nb-jumps button:disabled{opacity:.45;cursor:default}
 .heian-trace .nb-more{margin:6px 0 0;padding:8px 10px;background:#f1e8d6;line-height:1.7}
+#heianGameHud.heian-hints-off .heian-dialog-hint,#heianGameHud.heian-hints-off .heian-interior-btn{display:none} /* H か右クリックで案内を消す（2026-10-07） */
 #heianGameHud:has(.heian-game-actions.open) .heian-dialog-hint,#heianGameHud:has(.heian-notebook) .heian-dialog-hint{display:none} /* メニュー・帳面を開いている間は「E：話しかける」を出さない */
 .heian-game-map{position:absolute;left:16px;top:104px;width:300px;padding:14px;background:rgba(17,24,32,.9);border:1px solid #68737e;pointer-events:auto}
 .heian-game-map label{display:block;margin-bottom:8px;color:#d8dee5;font-size:14px}
@@ -560,12 +561,9 @@ body.heian-photo-active .heian-sky-label{display:none!important}
  font-size:15px;line-height:1.6;color:#cfe0f0;background:rgba(20,28,37,.86);padding:8px 14px}
 #bhsBuildHint.on{display:block}
 </style>
-<script type="importmap">
-{"imports":{
-"three":"https://unpkg.com/three@0.160.0/build/three.module.js",
-"three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/",
-"manifold-3d":"https://unpkg.com/manifold-3d@3.5.1/manifold.js"
-}}
+<script>
+// 公開物: 既定は同梱の vendor。file:// だけ CDN（ローカル確認用）
+(()=>{const imports=location.protocol==='file:'?{"three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/", "manifold-3d": "https://unpkg.com/manifold-3d@3.5.1/manifold.js"}:{"three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/", "manifold-3d": "./vendor/manifold-3d/manifold.js"};const s=document.createElement('script');s.type='importmap';s.textContent=JSON.stringify({imports});document.currentScript.after(s);})();
 </script>
 </head>
 <body>
@@ -1405,15 +1403,43 @@ function createHeianWalkController(host){
   const cp=Math.cos(pitch);return out.set(-Math.sin(yaw)*cp,Math.sin(pitch),-Math.cos(yaw)*cp);
  }
  function lookHeading(){return Math.atan2(-Math.sin(yaw),-Math.cos(yaw));}
+ // 三人称のズームは「ロボの体全体が画角に入る」距離までとする（2026-10-07井内さん「歩くモードでズームした時にロボットの体も見えなくなる。体が見える画角でズームしていってほしい」）。
+ // host.actorSize()＝{height（足元から頭・アンテナまで）,width}。足元と頭の2点がカメラの縦の画角の 90%、体の幅が横の画角の 90% に収まる最短距離を返す
+ // （視線は pitch＋frameLift。ロボは target の真下〜真上に立つ）。測れない間は 0＝従来どおり
+ const fitF=new THREE.Vector3(),fitA=new THREE.Vector3(),fitU=new THREE.Vector3(),fitV=new THREE.Vector3(),fitUp=new THREE.Vector3(0,1,0);
+ // ズーム距離 d の「遠さ」0〜1（blendNear 以下＝0・blendFar 以上＝1）。0 に近いほど注視点をロボの胴の高さへ、視線の持ち上げを 0 へ
+ const blendNear=host.zoomBlendNear??40,blendFar=host.zoomBlendFar??130;
+ // 2026-10-07 井内さん「歩くのズーム、胸の黄色い丸を中心にズームしたらどうか。今、ズームさせると画角が妙な感じに曲がる」:
+ //   🚫 旧は寄るほど注視点を胴の中心へ、視線の持ち上げ（frameLift）を 0 へ連続的に変えていたため、ズームの間カメラの向きが回り続けて画角が曲がって見えた。
+ //   ⇒ 注視点は常にロボの胸のメーター盤（背丈の約 .57）、視線の持ち上げも一定。ズームは注視点へ向かって寄るだけ（向きは変わらない）。
+ //   zoomBlend は呼び出し側の式を残すため常に 1（遠い側の値）を返す
+ const chestRatio=host.chestRatio??.57;
+ const zoomBlend=d=>1;
+ const targetHeightAt=(zt,size)=>size?.height?size.height*chestRatio:followTargetHeight;
+ function bodyFitDistance(){
+  const size=thirdPerson?host.actorSize?.():null;if(!size?.height)return 0;
+  const cam=host.getCamera();if(!cam?.isPerspectiveCamera)return 0;
+  const tanV=Math.tan(THREE.MathUtils.degToRad(cam.fov/2)),halfV=Math.atan(tanV)*.9,halfH=Math.atan(tanV*(cam.aspect||1))*.9;
+  direction(fitF);
+  for(let d=Math.max(cameraMinDistance,minZoomDistance*.5);d<maxZoomDistance;d*=1.03){
+   // 寄るほど視線の持ち上げ（frameLift）と注視点の高さをロボの中心へ寄せる（aimCamera と同じ式）＝体が画面の真ん中に来るので、より近くまで体全体が入る
+   const zt=zoomBlend(d),lift=frameLift*zt,cp=Math.cos(pitch+lift),tH=targetHeightAt(zt,size),feet=-tH,head=size.height-tH;
+   fitA.set(-Math.sin(yaw)*cp,Math.sin(pitch+lift),-Math.cos(yaw)*cp);fitU.copy(fitUp).addScaledVector(fitA,-fitUp.dot(fitA)).normalize();
+   let ok=true;for(const y of[feet,head]){fitV.copy(fitF).multiplyScalar(d);fitV.y+=y;if(Math.abs(Math.atan2(fitV.dot(fitU),fitV.dot(fitA)))>halfV){ok=false;break;}}
+   if(ok&&Math.atan((size.width||0)/2/d)<=halfH)return d;
+  }
+  return maxZoomDistance;
+ }
  function aimCamera(){
   const camera=host.getCamera();camera.up.set(0,1,0);direction();
   if(thirdPerson){
-   controls.target.copy(actorPosition).add(new THREE.Vector3(0,followTargetHeight,0));
+   const actorSz=host.actorSize?.(),zdist=Math.max(overheadDistance,bodyFitDistance()),zt=zoomBlend(zdist),liftNow=frameLift*zt;
+   controls.target.copy(actorPosition).add(new THREE.Vector3(0,targetHeightAt(zt,actorSz),0));
    // 🚫 camera は target から forward の逆方向へ置くので、上を向く（pitch>0）とカメラは真下へ回り込む。
    //    pitch=.4 でも target より35下＝地面の26下で、土の中から見上げる絵になっていた
    //    （2026-09-02井内さん「空を見たいので上に向けると地面の下にカメラがいってしまう」）。
    //    視線（yaw/pitch）は保ったまま距離だけ詰めて、地面＋clearanceより下へ行かせない
-   const t=terrain();let dist=overheadDistance;
+   const t=terrain();let dist=zdist; // 体全体が入る距離より寄せない
    if(t?.groundY){
     for(let i=0;i<4;i++){
      const px=controls.target.x-forward.x*dist,pz=controls.target.z-forward.z*dist,g=t.groundY(px,pz);
@@ -1433,7 +1459,7 @@ function createHeianWalkController(host){
     if(Number.isFinite(g))camera.position.y=Math.max(camera.position.y,g+cameraClearance);}
    // 視線だけ frameLift 上へ振る＝ロボが画面の下寄りに写り、上に屋根並みが入る
    //（2026-09-26井内さん「自分を画面の下側に置くと建物の屋根まで画角に入る」）。カメラの位置は変えない
-   if(frameLift){const cp=Math.cos(pitch+frameLift);camera.lookAt(camera.position.x-Math.sin(yaw)*cp,camera.position.y+Math.sin(pitch+frameLift),camera.position.z-Math.cos(yaw)*cp);return;}
+   if(liftNow){const cp=Math.cos(pitch+liftNow);camera.lookAt(camera.position.x-Math.sin(yaw)*cp,camera.position.y+Math.sin(pitch+liftNow),camera.position.z-Math.cos(yaw)*cp);return;}
   }
   else controls.target.copy(camera.position).addScaledVector(forward,10);
   camera.lookAt(controls.target);
@@ -1561,7 +1587,7 @@ function createHeianWalkController(host){
  function onWheel(event){
   if(!active)return;event.preventDefault();event.stopPropagation();
   const factor=Math.exp(THREE.MathUtils.clamp(event.deltaY,-240,240)*.0018);
-  overheadDistance=THREE.MathUtils.clamp(overheadDistance*factor,minZoomDistance,maxZoomDistance);aimCamera();host.onZoomChange?.(overheadDistance);
+  overheadDistance=THREE.MathUtils.clamp(overheadDistance*factor,Math.min(maxZoomDistance,Math.max(minZoomDistance,bodyFitDistance())),maxZoomDistance);aimCamera();host.onZoomChange?.(overheadDistance);
  }
  function dispose(){
   stop();button?.remove();button=null;document.removeEventListener('keydown',onKeyDown);document.removeEventListener('keyup',onKeyUp);
@@ -1579,7 +1605,9 @@ function createHeianWalkController(host){
 (function(){
  if(location.hash!=='#heiangame'||window.parent===window)return;
  const attempt=Number(new URLSearchParams(location.search).get('attempt')||0);
- const post=data=>window.parent.postMessage({...data,attempt},'*');
+ // 親とは同一オリジン（heiankyo/ と CadKit/）。file:// はオリジンが 'null' で宛先指定できないので '*' のまま（2026-10-07 セキュリティ指摘）
+ const PARENT_ORIGIN=location.protocol==='file:'?'*':location.origin;
+ const post=data=>window.parent.postMessage({...data,attempt},PARENT_ORIGIN);
  let notified=false;
  const notify=message=>{if(notified)return;notified=true;post({type:'heian-error',message:String(message||'平安京の初期化に失敗しました').slice(0,300)});};
  const HEIAN_EVENT_NAMES=new Set(['first_input','place_select','tour_start','tour_end','walk_start','walk_end','night_toggle','music_toggle']);
@@ -1589,7 +1617,8 @@ function createHeianWalkController(host){
  addEventListener('pointerdown',firstInput,{passive:true,capture:true});addEventListener('wheel',firstInput,{passive:true,capture:true});
  addEventListener('error',event=>notify(event.error?.message||event.message));
  // 親ページ側のクリックをuser gestureとして受け取り、音楽のAudioContextを再開する（2026-08-16）。
- addEventListener('message',event=>{if(event.source!==window.parent||!event.data)return;
+ // file:// では location.origin が 'file://'、message の event.origin は 'null'（Chrome）。両方を同一オリジンとして扱う
+ addEventListener('message',event=>{if(event.source!==window.parent||!(event.origin===location.origin||(location.protocol==='file:'&&event.origin==='null'))||!event.data)return;
   if(event.data.type==='heian-activate')window.__heianGameActions?.resumeMusic?.();
   // 親（起動画面）からの日英切替。表示文字列だけ張り替える（2026-08-18井内さん指示）
   if(event.data.type==='heian-lang')window.__heianGameActions?.setLang?.(event.data.lang);});
@@ -1625,7 +1654,7 @@ if(!HEIAN_VIEW_HASHES.has(location.hash)&&!await ensureManifold()){
 }
 
 // B-repエンジン: OCCT。移植中は回転体プロジェクトだけで使い、Manifold経路も残す。
-const OCCT_CDN='https://cdn.jsdelivr.net/npm/opencascade.js@2.0.0-beta.b5ff984/dist/';
+const OCCT_CDN='about:invalid/';
 let OCCT=null,OCCT_SOURCE='未読込',OCCT_LOAD=null;
 async function loadOCCT(){
  try{
@@ -12560,6 +12589,9 @@ const HEIAN_HIWADA_LIP=3;
 function heianRoofPurlinRise(L,S,slope,style,pX,pZ){const rise=Math.round(S/2*slope),knee=.55,rh=(L-S)/2,hb=.42*rise,dz=heianRoofProfileY(0,rise,pZ/(S/2),knee);
  const dx=style==='yosemune'?heianRoofProfileY(0,rise,(pX-rh)/(S/2),knee):(()=>{const gw=rh+(L/2-rh)*.35;return pX<=gw?rise:hb*(L/2-pX)/(L/2-gw);})();return Math.min(dz,dx);}
 function heianBandPurlinRise(h,W,D,pX,pZ){const t=Math.min(2*h,W/2-6,D/2-6),sx=.45*t,f=q=>q>=t?h:q>=sx?.42*h+.58*h*(q-sx)/(t-sx):.42*h*q/sx;return Math.min(f(D/2-pZ),f(W/2-pX));}
+// 応天門・会昌門の2層目（上屋根）を小さく（2026-10-07井内さん「2層目は少し小さくしようか。最初に作ってくれたようなのが本式かもしれない」）。
+//  上屋根 幅 w+90→w+68・奥行 144→120（旧の非重層門に近い比）。羅城門など他の重層門は従来のまま（羅城門屋根の奥行検査 144 を保つ）
+const heianGate2Small=(label,monumental)=>!!monumental&&/^(会昌門|応天門)/.test(label);
 // 楼閣の高さ表（2026-09-25井内さん「五重塔があれだけ美しくなったのでこの辺もすごくしたいね」＝蒼龍楼・白虎楼・翔鸞楼・栖鳳楼）。
 // 🚫 旧は白壁の箱に中実の屋根を直に載せただけ（軒下は平らな底・組物も垂木も無し・軒は直線）。五重塔・重層門と並ぶと玩具に見えた。
 // ⇒ 重層門（HEIAN_GATE2）と同じ流儀: 壁の天端に三手先（q=.6・積み19.9）→ 丸桁に地垂木が載る高さから軒を逆算 → 板の屋根（hollow）＋二軒垂木＋隅反り。
@@ -12570,18 +12602,30 @@ function heianBandPurlinRise(h,W,D,pX,pZ){const t=Math.min(2*h,W/2-6,D/2-6),sx=.
 //   翔鸞楼・栖鳳楼の身屋: 下層 9〜53（柱68角）→ 三手先 → 腰屋根（帯 108角 高12）→ 楼上48角（高20）→ 三手先 → 入母屋 112×92（旧124×92。
 //     妻側の丸桁が妻の肩より内に来るよう長手を詰めた＝垂木が丸桁から浮かない）
 const HEIAN_TOWER=Object.freeze((()=>{const q=.6,st=4.8*q,rr=.9*q,shell=4,stack=heianMitesakiStackHeight(q),eaveAt=(top,r,sh=shell,rad=rr)=>Math.round(top-r+sh+2*rad);
- const oWall=59,oEave=eaveAt(oWall+stack,heianRoofPurlinRise(132,112,.45,'yosemune',42+3*st,36+3*st));
- const cq=.35,cst=4.8*cq,crr=.9*cq,cShell=3,cSize=46*2/3,cLowY=oEave+17,cLowH=21,cTopY=cLowY+cLowH,cTopH=18,cWallTop=cTopY+cTopH,
-  cEave=eaveAt(cWallTop+heianMitesakiStackHeight(cq),heianRoofPurlinRise(68,68*2/3,.8,'irimoya',cSize/2+3*cst,cSize/2+3*cst),cShell,crr);
- const ornate={wall:oWall,eave:oEave,cq,cst,cShell,cSize,cLowY,cLowH,cTopY,cTopH,cWallTop,cEave,turretY:oEave+6,turretH:23,turretEave:oEave+29};
- const pWall=59,pLowEave=eaveAt(pWall+stack,heianBandPurlinRise(14,132,112,42+3*st,36+3*st)),pUpFloor=pLowEave+14,pUpTop=pUpFloor+24,
-  pUpEave=eaveAt(pUpTop+stack,heianRoofPurlinRise(124,92,.9,'irimoya',36+3*st,29+3*st));
- const plain={wall:pWall,lowEave:pLowEave,lowTop:pLowEave+14,upFloor:pUpFloor,upTop:pUpTop,upEave:pUpEave};
+ // 2026-10-07 井内さん「蒼龍楼・白虎楼の1階がもう少し広く、周囲に軒先が伸びて柱があるのかも（平安神宮の写真）→ その分屋根が広がる」:
+ //   身舎（壁 84×72・柱 ±42,±36）の外に庇の柱列を oP=12 だけ外へ回し（±54,±48）、三手先と大寄棟の屋根はその柱列に載せる。
+ //   軒の出（丸桁から軒先）は従来と同じ 15.4 のまま、屋根は 132×112 → 156×136。棟の長さ（L−S）/2=10 は変えない。
+ //   大寄棟の棟が .45×(S/2) ぶん高くなる（+5.4）ので、棟に立つ中央楼・稜線小櫓は oRise=5 だけ上げて見え高さを保つ
+ const oP=12,oL=132+2*oP,oS=112+2*oP,oX=42+oP,oZ=36+oP,oRise=Math.round(.45*oP);
+ // 壁 59→53（白壁の上の赤い上小壁を 14→8 に削って 1層目の屋根と上の櫓を 6 下げる）。身舎は 64×52（庇の柱との間 22＝人が通れる幅）
+ //   中央の下櫓 21→26（二重の高欄の上段を 5 上げる＝下段の高欄と離す。井内さん「くっつきすぎ」）
+ // 2026-10-07 井内さん「一層目の高さも7割くらいに。今大極殿より目立つが実際は大極殿より低いはず」: 壁 53→40（柱の高さ 42→29＝約7割）。
+ //   主塔も高さ7割（下櫓 26→18・上櫓 18→13）・幅7割（46×2/3→×.7）。二層目の屋根（中央上櫓・稜線小櫓）は1.3倍（中央 68→88、小櫓 42×28→55×36）
+ const oWall=40,oIW=64,oID=52,oEave=eaveAt(oWall+stack,heianRoofPurlinRise(oL,oS,.45,'yosemune',oX+3*st,oZ+3*st));
+ const cq=.35,cst=4.8*cq,crr=.9*cq,cShell=3,cSize=46*2/3*.7,cLowY=oEave+17+oRise,cLowH=18,cTopY=cLowY+cLowH,cTopH=13,cWallTop=cTopY+cTopH,
+  cRoofL=78/* 2026-10-07 井内さん「上の屋根が微妙に大きい」: 88→78 */,cRoofS=cRoofL*2/3,tRoofL=55,tRoofS=36,
+  cEave=eaveAt(cWallTop+heianMitesakiStackHeight(cq),heianRoofPurlinRise(cRoofL,cRoofS,.8,'irimoya',cSize/2+3*cst,cSize/2+3*cst),cShell,crr);
+ const ornate={cRoofL,cRoofS,tRoofL,tRoofS,wall:oWall,iw:oIW,id:oID,eave:oEave,roofL:oL,roofS:oS,px:oX,pz:oZ,rise:oRise,cq,cst,cShell,cSize,cLowY,cLowH,cTopY,cTopH,cWallTop,cEave,turretY:oEave+6+oRise,turretH:23,turretEave:oEave+29+oRise};
+ // 2026-10-07 井内さん「豊楽殿の脇の楼閣も全体的に高さを7割に」: 下層の柱 48→34（壁 59→45）・腰屋根の帯 14→10・楼上の壁 24→17・上屋根の勾配 .9→.7。平面は変えない
+ const pSlope=.7,pWall=45,pLowEave=eaveAt(pWall+stack,heianBandPurlinRise(10,132,112,42+3*st,36+3*st)),pUpFloor=pLowEave+10,pUpTop=pUpFloor+17,
+  pUpEave=eaveAt(pUpTop+stack,heianRoofPurlinRise(124,92,pSlope,'irimoya',36+3*st,29+3*st));
+ const plain={wall:pWall,lowEave:pLowEave,lowTop:pLowEave+10,upFloor:pUpFloor,upTop:pUpTop,upEave:pUpEave,slope:pSlope};
  // 翔鸞楼・栖鳳楼を約1割低く（2026-10-02井内さん「もう少し背が低いと全体のバランスをとれるかも1割くらい」）。
  // 棟160→約145: 下層の柱 53→44・楼上の壁 20→14。組物・屋根の勾配・平面は変えない（三手先の積みと垂木の納まりを崩さない）
- const wWall=44,wLowEave=eaveAt(wWall+stack,heianBandPurlinRise(12,108,108,34+3*st,34+3*st)),wUpFloor=wLowEave+12,wUpTop=wUpFloor+14,
-  wUpEave=eaveAt(wUpTop+stack,heianRoofPurlinRise(112,92,.9,'irimoya',24+3*st,24+3*st));
- const wing={wall:wWall,lowEave:wLowEave,lowTop:wLowEave+12,upFloor:wUpFloor,upTop:wUpTop,upEave:wUpEave,roofL:112,roofS:92};
+ // 2026-10-07 井内さん「応天門の左右の楼閣も全体を7割くらいの高さに」: 下層の柱 35→25（壁 44→34）・腰屋根の帯 12→9・楼上の壁 14→10・上屋根の勾配 .9→.7。平面は変えない
+ const wSlope=.7,wWall=34,wLowEave=eaveAt(wWall+stack,heianBandPurlinRise(9,108,108,34+3*st,34+3*st)),wUpFloor=wLowEave+9,wUpTop=wUpFloor+10,
+  wUpEave=eaveAt(wUpTop+stack,heianRoofPurlinRise(112,92,wSlope,'irimoya',24+3*st,24+3*st));
+ const wing={wall:wWall,lowEave:wLowEave,lowTop:wLowEave+9,upFloor:wUpFloor,upTop:wUpTop,upEave:wUpEave,roofL:112,roofS:92,slope:wSlope};
  // 寺の鐘楼・経蔵: 柱通り 72×62・柱の天端 51 → 三手先 q=.45（積み14.9）→ 入母屋 122×94（勾配.88）。旧は軒59の中実
  const tq=.45,tst=4.8*tq,tWall=51,tEave=eaveAt(tWall+heianMitesakiStackHeight(tq),heianRoofPurlinRise(122,94,.88,'irimoya',36+3*tst,31+3*tst),shell,.9*tq);
  const temple={q:tq,st:tst,hx:36,hz:31,wall:tWall,eave:tEave};
@@ -13237,15 +13281,28 @@ function heianKit(){
   }
   // 2026-09-25 五重塔・重層門の水準へ（HEIAN_TOWER の注記）。下層の壁・柱は据え置き、壁の天端から上を組み直す
   const T=HEIAN_TOWER,SH=T.shell,st=T.st,Y=v=>v+yOffset;
-  const floorY=-1+yOffset,baseTop=floorY+12,lowerH=48,wallTop=baseTop+lowerH;
-  parts.push(box(cx,cz,120,108,floorY-5,9,label+'基壇下段'));
-  parts.push(box(cx,cz,104,92,floorY+4,8,label+'基壇上段'));
-  wallBox(parts,cx,cz,84,72,baseTop,lowerH,label+'下層');
-  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*42,cz+sz*36,baseTop,lowerH,2,label+'下層角柱'));
-  for(const x of[-21,0,21])for(const z of[-36,36])parts.push(col(cx+x,cz+z,baseTop,lowerH,2,label+'下層壁面柱'));
-  for(const x of[-42,42])for(const z of[-18,0,18])parts.push(col(cx+x,cz+z,baseTop,lowerH,2,label+'下層壁面柱'));
-  formalFacade(parts,cx,cz,84,72,baseTop,wallTop-4,label+'下層','S',2,4); // 南面の中央2間に朱扉（柱割り4間）
-  mitesakiEaves(parts,cx,cz,42,36,[-42,-21,0,21,42],[-18,0,18],wallTop,T.q,label+'下層'); // 下層の柱の真上に三手先
+  // 朝堂院楼（ornate）は 2026-10-07 井内さん「1層目の屋根を若干低く。白壁の上の赤い部分を削る」で壁 48→42（白 34 は据え置き・赤の上小壁 14→8）。
+  // さらに「内殻の柱と壁をコンパクトに。壁と屋根を支える柱の間を人が歩ける雰囲気に」で、身舎の壁を 84×72→64×52（庇の柱 ±54×±48 との間 22）
+  const floorY=-1+yOffset,baseTop=floorY+12,lowerH=ornate?T.ornate.wall-12+1:T.plain.wall-11,wallTop=baseTop+lowerH;
+  const IW=ornate?T.ornate.iw:84,ID=ornate?T.ornate.id:72,ihx=IW/2,ihz=ID/2;
+  // 朝堂院楼（ornate）は庇の柱列（±54,±48）を回すので基壇を外へ広げる（2026-10-07）
+  const upW=ornate?2*T.ornate.px+20:104,upD=ornate?2*T.ornate.pz+20:92; // 上段: 柱列の外へ各10（ornate のみ）
+  parts.push(box(cx,cz,upW+16,upD+16,floorY-5,9,label+'基壇下段'));
+  parts.push(box(cx,cz,upW,upD,floorY+4,8,label+'基壇上段'));
+  if(ornate){const wh=Math.round(lowerH*.8);parts.push(box(cx,cz,IW,ID,baseTop,wh,label+'下層内壁'),box(cx,cz,IW,ID,baseTop+wh,lowerH-wh,label+'下層内壁上小壁'));}
+  else wallBox(parts,cx,cz,84,72,baseTop,lowerH,label+'下層');
+  for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*ihx,cz+sz*ihz,baseTop,lowerH,2,label+'下層角柱'));
+  for(const x of[-ihx/2,0,ihx/2])for(const z of[-ihz,ihz])parts.push(col(cx+x,cz+z,baseTop,lowerH,2,label+'下層壁面柱'));
+  for(const x of[-ihx,ihx])for(const z of[-ihz/2,0,ihz/2])parts.push(col(cx+x,cz+z,baseTop,lowerH,2,label+'下層壁面柱'));
+  formalFacade(parts,cx,cz,IW,ID,baseTop,wallTop-4,label+'下層','S',2,4); // 南面の中央2間に朱扉（柱割り4間）
+  if(!ornate)mitesakiEaves(parts,cx,cz,42,36,[-42,-21,0,21,42],[-18,0,18],wallTop,T.q,label+'下層'); // 下層の柱の真上に三手先
+  else{
+   // 庇の柱列（2026-10-07）: 身舎の壁の外（±54×±48）に柱を回し、三手先と大寄棟はこの柱に載せる。柱間は桁行 27・梁行 24
+   const OX=T.ornate.px,OZ=T.ornate.pz,xs=[-OX,-OX/2,0,OX/2,OX],zs=[-OZ/2,0,OZ/2];
+   for(const x of xs)for(const sz of[-1,1])parts.push(col(cx+x,cz+sz*OZ,baseTop,lowerH,2.2,label+'下層庇柱'));
+   for(const z of zs)for(const sx of[-1,1])parts.push(col(cx+sx*OX,cz+z,baseTop,lowerH,2.2,label+'下層庇柱'));
+   mitesakiEaves(parts,cx,cz,OX,OZ,xs,zs,wallTop,T.q,label+'下層');
+  }
   const soriRaise=(L,S)=>{const rs=heianCornerSoriSpec(L,S);return(dx,dz)=>heianSoriLiftCorner(dx,dz,rs);};
   // 風鐸: 屋根の四隅の軒先の下に吊る（五重塔と同じ）
   const futaku=(x,z,L,S,eave,sh,lb,t=1)=>{const rs=heianCornerSoriSpec(L,S);for(const sx of[-1,1])for(const sz of[-1,1]){const dx=L/2-3*t,dz=S/2-3*t,yTop=eave-sh+heianSoriLiftCorner(dx,dz,rs);
@@ -13271,18 +13328,19 @@ function heianKit(){
    for(const x of[-12,12])for(const s of[-1,1])parts.push(col(cx+x,cz+s*29,uy-1,ut-uy+1,1.8,label+'楼上間柱')); // 3間（詳細kitの正面扉 columnBays=3 と同じ割り）
    mitesakiEaves(parts,cx,cz,36,29,[-36,-12,12,36],[0],ut,T.q,label+'楼上');
    const L=124,S=92,e=Y(P.upEave);
-   const{soffitTop:s2}=irimoyaRafters(parts,cx,cz,L,S,e,.9,36,29,36+3*st,29+3*st,T.q,label+'楼上',{pitch:T.pitch,shell:SH,sori:false,raise:soriRaise(L,S)});
+   const{soffitTop:s2}=irimoyaRafters(parts,cx,cz,L,S,e,P.slope,36,29,36+3*st,29+3*st,T.q,label+'楼上',{pitch:T.pitch,shell:SH,sori:false,raise:soriRaise(L,S)});
    parts.push(box(cx,cz,70,56,ut,s2-ut,label+'楼上軒下小舞'));
-   parts.push(roof(cx,cz,L,S,e,label+'東西棟入母屋屋根','irimoya',.9,1,false,{hollow:SH,cornerSori:true,curve:HEIAN_ROOF_CURVE_TRIAL}));
-   irimoyaGableDeco(parts,cx,cz,L,S,e,.9,label,{shell:SH});
+   parts.push(roof(cx,cz,L,S,e,label+'東西棟入母屋屋根','irimoya',P.slope,1,false,{hollow:SH,cornerSori:true,curve:HEIAN_ROOF_CURVE_TRIAL}));
+   irimoyaGableDeco(parts,cx,cz,L,S,e,P.slope,label,{shell:SH});
    futaku(cx,cz,L,S,e,SH,label+'楼上');return;
   }
   // 朝堂院楼（白虎楼・蒼龍楼）: 三手先の上に板の大寄棟＋垂木。中央楼・小櫓は大寄棟の軒からの相対高さを保つ
   const O=T.ornate,e1=Y(O.eave);
-  {const{soffitTop}=irimoyaRafters(parts,cx,cz,132,112,e1,.45,42,36,42+3*st,36+3*st,T.q,label+'一階',{pitch:T.pitch,shell:SH,sori:false,style:'yosemune',raise:soriRaise(132,112)});
-   parts.push(box(cx,cz,82,70,wallTop,soffitTop-wallTop,label+'下層軒下小舞'));}
-  parts.push(roof(cx,cz,132,112,e1,label+'一階大寄棟屋根','yosemune',.45,1,false,{hollow:SH,cornerSori:true}));
-  futaku(cx,cz,132,112,e1,SH,label+'一階');
+  const RL=O.roofL,RS=O.roofS,OX=O.px,OZ=O.pz;
+  {const{soffitTop}=irimoyaRafters(parts,cx,cz,RL,RS,e1,.45,OX,OZ,OX+3*st,OZ+3*st,T.q,label+'一階',{pitch:T.pitch,shell:SH,sori:false,style:'yosemune',raise:soriRaise(RL,RS)});
+   parts.push(box(cx,cz,2*OX-2,2*OZ-2,wallTop,soffitTop-wallTop,label+'下層軒下小舞'));}
+  parts.push(roof(cx,cz,RL,RS,e1,label+'一階大寄棟屋根','yosemune',.45,1,false,{hollow:SH,cornerSori:true}));
+  futaku(cx,cz,RL,RS,e1,SH,label+'一階');
   // 朝堂院の上載せ5櫓だけ、白壁70%・朱小壁30%を丸めず固定する。
   const ornateWall=(x,z,w,d,y,h,name)=>{const lower=h*.7;parts.push(box(x,z,w,d,y,lower,name+'内壁'));parts.push(box(x,z,w,d,y+lower,h-lower,name+'内壁上小壁'));};
   // 中央楼と周囲4塔は壁幅を2/3にし、下端だけ下げて棟高を維持したまま大屋根へ差し込む。
@@ -13293,10 +13351,13 @@ function heianKit(){
   ornateWall(cx,cz,centralSize,centralSize,topY,centralUpperH,label+'中央上櫓');
   for(const sx of[-1,1])for(const sz of[-1,1])parts.push(col(cx+sx*centralSize/2,cz+sz*centralSize/2,topY,centralUpperH,1.8,label+'中央上櫓角柱'));
   // 中央上櫓の縁・高欄（下櫓との境）。縁の下は下櫓の壁から出した腰組の肘木で受ける
-  deck(cx,cz,cs/2,cs/2,topY,5,label+'中央上櫓');
+  deck(cx,cz,cs/2,cs/2,topY+3,5,label+'中央上櫓');
+  // 中央の二層の楼に高欄が二重（2026-10-07井内さん「中央の2階の楼閣に高欄が二重」・平安神宮の写真）。
+  // 上の高欄は下櫓と上櫓の境。もう1段を大屋根の棟から立ち上がる下櫓の足元に回す（縁の下は大寄棟の面から腰組の束で受ける）
+  {const hd=RS/2,R=.45*hd;deck(cx,cz,cs/2,cs/2,e1+R+4.5,5,label+'中央下櫓',(dx,dz)=>e1+R*(1-Math.max(Math.abs(dz)/hd,(Math.abs(dx)-10)/hd)));}
   for(const s of[-1,1])for(let k=-2;k<=2;k++){parts.push(box(cx+k*cs/4,cz+s*(cs/2+2),2.2,4,topY-4,2.5,label+'中央上櫓腰組組物肘木'),box(cx+s*(cs/2+2),cz+k*cs/4,4,2.2,topY-4,2.5,label+'中央上櫓腰組組物肘木'));}
   mitesakiEaves(parts,cx,cz,cs/2,cs/2,[-cs/2,0,cs/2],[0],cWallTop,O.cq,label+'中央上櫓');
-  {const cL=68,cS=68*2/3,ce=Y(O.cEave);
+  {const cL=O.cRoofL,cS=O.cRoofS,ce=Y(O.cEave);
    const{soffitTop}=irimoyaRafters(parts,cx,cz,cL,cS,ce,.8,cs/2,cs/2,cs/2+3*O.cst,cs/2+3*O.cst,O.cq,label+'中央上櫓',{pitch:4,shell:O.cShell,sori:false,raise:soriRaise(cL,cS)});
    parts.push(box(cx,cz,cs-2,cs-2,cWallTop,soffitTop-cWallTop,label+'中央上櫓軒下小舞'));
    parts.push(roof(cx,cz,cL,cS,ce,label+'中央上櫓屋根','irimoya',.8,.8,false,{hollow:O.cShell,cornerSori:true,curve:HEIAN_ROOF_CURVE_TRIAL}));
@@ -13311,9 +13372,9 @@ function heianKit(){
    parts.push(box(x,z,turretSize+2,turretSize+2,turretY+turretH-2.5,2.5,label+'稜線小櫓頭貫梁'));
    // 縁と高欄（2026-09-26井内さん「周囲の小型の楼4つにも手すりがついていると豪華」）。大屋根から出た壁の中ほど（屋根の内側の縁の高さ）に回し、
    // 下は大寄棟の面（棟半長10・半奥行56・勾配.45の直線近似）から腰組の束で受ける
-   deck(x,z,turretSize/2,turretSize/2,e1+17.5,3.5,label+'稜線小櫓',(dx,dz)=>e1+56*.45*(1-Math.max(Math.abs(z-cz+dz)/56,(Math.abs(x-cx+dx)-10)/56)),.6);
-   parts.push(roof(x,z,42,28,Y(O.turretEave),label+'稜線小櫓屋根','irimoya',.7,.8,false,{cornerSori:true}));
-   futaku(x,z,42,28,Y(O.turretEave),0,label+'稜線小櫓',.6);
+   deck(x,z,turretSize/2,turretSize/2,e1+17.5+O.rise,3.5,label+'稜線小櫓',(dx,dz)=>e1+(RS/2)*.45*(1-Math.max(Math.abs(z-cz+dz)/(RS/2),(Math.abs(x-cx+dx)-10)/(RS/2))),.6);
+   parts.push(roof(x,z,O.tRoofL,O.tRoofS,Y(O.turretEave),label+'稜線小櫓屋根','irimoya',.7,.8,false,{cornerSori:true}));
+   futaku(x,z,O.tRoofL,O.tRoofS,Y(O.turretEave),0,label+'稜線小櫓',.6);
   }
  };
  // 扁額（殿舎名の額・文字なし・2026-08-19井内さん指示「主な楼門・大堂に軒の下の額を」）。
@@ -13329,7 +13390,7 @@ function heianKit(){
  // 重層門（朱雀門・応天門・会昌門・羅城門）。一階を従来の1.6倍に嵩上げ（梁下面67mm・2026-08-17井内さん指示）。
  const gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{
   // 梁行は2間=前・中央・後の3柱列。中心・高さは維持し、旧奥行から前後各4だけ広げる。
-  const lowerD=64,baseD=88,lowerRoofD=monumental?120:108,upperD=monumental?64:52,oldRoofD=monumental?136:80,upperRoofD=oldRoofD+8,upperSlope=.9*oldRoofD/upperRoofD;
+  const lowerD=64,baseD=88,lowerRoofD=monumental?120:108,upperD=monumental?64:52,oldRoofD=monumental?(heianGate2Small(label,monumental)?118:136):80,upperRoofD=oldRoofD+8,upperUW=heianGate2Small(label,monumental)?68:90,upperSlope=.9*oldRoofD/upperRoofD;
   parts.push(box(cx,cz,w+30,baseD,-1,7,label+'基壇'));
   // 袖壁は端の柱から2本目の柱まで正確に埋める（幅30固定だと柱間隔s=w/nが30を超える門で
   // 2本目に届かず隙間が出ていた・2026-08-17井内さん指摘）
@@ -13369,12 +13430,13 @@ function heianKit(){
   rail(cx,cz-railZ,w+16,2,railY,2,'北手摺');rail(cx,cz+railZ,w+16,2,railY,2,'南手摺');rail(cx-w/2-7,cz,2,railZ*2,railY,2,'西手摺');rail(cx+w/2+7,cz,2,railZ*2,railY,2,'東手摺');
   for(const x of[-w/2-7,-w/4,0,w/4,w/2+7])for(const z of[-railZ,railZ])rail(cx+x,cz+z,2,2,G.upperFloor,9,'束');for(const x of[-w/2-7,w/2+7])for(const z of[-railZ/2,0,railZ/2])rail(cx+x,cz+z,2,2,G.upperFloor,9,'束');
   mitesakiEaves(parts,cx,cz,w/2,upperD/2,colXs,[0],G.upperTop,G.q,label); // 楼上: 壁の天端に1階と同じ柱割り
-  {const L=w+90,S=upperRoofD,eave=G.upperEave;
+  {const L=w+upperUW,S=upperRoofD,eave=G.upperEave;
    const rs=heianCornerSoriSpec(L,S),{soffitTop}=irimoyaRafters(parts,cx,cz,L,S,eave,upperSlope,w/2,upperD/2,w/2+3*st,upperD/2+3*st,G.q,label,{pitch:PITCH,shell:SH,raise:(dx,dz)=>heianSoriLiftCorner(dx,dz,rs)});
-   parts.push(box(cx,cz,w-2,upperD-2,G.upperTop,soffitTop-G.upperTop,label+'軒下小舞')); // 壁の四隅の真上の屋根裏まで塞ぐ
+   // 2026-10-07 井内さん「応天門に赤い線／会昌門にもある」: 上屋根を小さくして（w+68・奥行120）屋根が低くなり、この箱の天端の縁が屋根面から顔を出して赤い線に見えた。小さい門だけ天端を5下げる
+   parts.push(box(cx,cz,w-2,upperD-2,G.upperTop,soffitTop-G.upperTop-(heianGate2Small(label,monumental)?5:0),label+'軒下小舞')); // 壁の四隅の真上の屋根裏まで塞ぐ
    parts.push(roof(cx,cz,L,S,eave,label+'屋根',undefined,upperSlope,1,true,{hollow:SH,cornerSori:true}));
    irimoyaGableDeco(parts,cx,cz,L,S,eave,upperSlope,label,{shell:SH});} // 妻を塞いで妻飾り（2026-09-25）
-  parts.push(...shibi(cx,cz,w+90,upperRoofD,G.upperEave,label,upperSlope)); // 奥行拡張後も棟高を維持
+  parts.push(...shibi(cx,cz,w+upperUW,upperRoofD,G.upperEave,label,upperSlope)); // 奥行拡張後も棟高を維持
   plaque(parts,cx,cz+upperD/2+3*st+1,G.upperTop+1,label,1.2); // 楼上南面の扁額。組物（三手先）の前・軒下へ（2026-09-26井内さん「額は軒下の組物のあたりにあるべき」）
  };
  // 庭木（左近の桜・右近の橘など）: 幹＋回転体の樹冠（松と同じ流儀）。s=大きさ倍率
@@ -13413,7 +13475,7 @@ function heianKit(){
  };
  // 柱梁架構。内側の白壁を縮め、外周に等間隔の朱柱・朱梁・朱軒裏を見せる。
  const colFrames=new Map(); // label → 柱割り（formalFacade が扉を柱間へ合わせるため・1.56）
- const columnFrame=(parts,cx,cz,w,d,y0,eave,label,overhang=14)=>{const nx=Math.max(2,Math.ceil(w/36)),nz=Math.max(2,Math.ceil(d/36));colFrames.set(label,{cx,cz,w,d,nx,nz});for(let i=0;i<=nx;i++){const x=cx-w/2+w*i/nx;parts.push(col(x,cz-d/2,y0,eave-y0,1.8,label+'柱'));parts.push(col(x,cz+d/2,y0,eave-y0,1.8,label+'柱'));}for(let i=1;i<nz;i++){const z=cz-d/2+d*i/nz;parts.push(col(cx-w/2,z,y0,eave-y0,1.8,label+'柱'));parts.push(col(cx+w/2,z,y0,eave-y0,1.8,label+'柱'));}parts.push(box(cx,cz-d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx,cz+d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx-w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx+w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx,cz,w+overhang,d+overhang,eave-1,1,label+'軒裏'));};
+ const columnFrame=(parts,cx,cz,w,d,y0,eave,label,overhang=14,nxOv=null,nzOv=null)=>{const nx=nxOv||Math.max(2,Math.ceil(w/36)),nz=nzOv||Math.max(2,Math.ceil(d/36));colFrames.set(label,{cx,cz,w,d,nx,nz});for(let i=0;i<=nx;i++){const x=cx-w/2+w*i/nx;parts.push(col(x,cz-d/2,y0,eave-y0,1.8,label+'柱'));parts.push(col(x,cz+d/2,y0,eave-y0,1.8,label+'柱'));}for(let i=1;i<nz;i++){const z=cz-d/2+d*i/nz;parts.push(col(cx-w/2,z,y0,eave-y0,1.8,label+'柱'));parts.push(col(cx+w/2,z,y0,eave-y0,1.8,label+'柱'));}parts.push(box(cx,cz-d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx,cz+d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx-w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx+w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx,cz,w+overhang,d+overhang,eave-1,1,label+'軒裏'));};
  // 白壁の上約3割は朱塗りの小壁（板）にする（2026-08-17井内さん指示=瓦屋根の建物の白壁上部は赤い板がリアル）
  const wallBox=(parts,cx,cz,w,d,y0,h,label)=>{const lower=Math.max(2,Math.round(h*.7));parts.push(box(cx,cz,w,d,y0,lower,label+'内壁'));if(h-lower>0)parts.push(box(cx,cz,w,d,y0+lower,h-lower,label+'内壁上小壁'));};
  // 正式殿舎・楼上の共通正面。板扉、内法長押、欄間格子を南面（必要時は四方）へ付加する。
@@ -13472,7 +13534,21 @@ function heianKit(){
  // opts.eaves（朝堂院・豊楽院の殿舎だけ・2026-09-25）: 柱の上に平三斗、軒裏に二軒の垂木。軒裏の平らな板（columnFrame の overhang 50）はやめる
  const colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{if(!noBase)parts.push(box(cx,cz,w+18,d+18,y0-6,12,label+'基壇'));const floorY=y0+6,eaveH=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);parts.push(box(cx,cz,w+8,d+8,floorY,2,label+'床'));// 🚫 壁高を-8にすると上端がeaveH-6で止まり、軒裏の板（eaveH-1）との間に5mm＝実寸50cmの帯が全周で開く。
 // そこから反対側が透けて「奥の壁がない」ように見えていた（2026-08-24井内さん指摘）。板の下端まで壁を上げる
-wallBox(parts,cx,cz,w-3.6,d-3.6,floorY+2,Math.max(4,eaveH-floorY-3),label);columnFrame(parts,cx,cz,w,d,floorY+2,eaveH,label,opts.eaves?2:50);
+wallBox(parts,cx,cz,w-3.6,d-3.6,floorY+2,Math.max(4,eaveH-floorY-3),label);
+  // opts.sideDoors（朝堂十二堂・朝集堂・2026-10-07井内さん「十二堂にも豊楽殿のようにいくつか柱と柱の間に扉を設置したい。その前には階段がある。階段が前後に3つずつ」）:
+  //   長手の2面（前後）の柱間3か所へ両開きの朱扉と欄間格子、その前へ3段の階段。3か所が左右対称に並ぶよう長手の柱間数を奇数にする
+  const sd=!!opts.sideDoors,alongXh=w>=d,longLh=alongXh?w:d,oddN=len=>{const m=Math.max(2,Math.ceil(len/36));return m%2===0?m+1:m;};
+  columnFrame(parts,cx,cz,w,d,floorY+2,eaveH,label,opts.eaves?2:50,sd&&alongXh?oddN(w):null,sd&&!alongXh?oddN(d):null);
+  if(sd&&longLh>=200){ // 朝集堂・修式堂系（長手240）が 240 未満の扱いで扉が付かなかった（2026-10-07井内さん「東西朝集堂にも十二堂と同じように扉を」）→ 200 以上
+   const n=oddN(longLh),pitch=longLh/n,half=(alongXh?d:w)/2,dy0=floorY+3,dy1=eaveH-9,doorH=Math.max(8,(dy1-dy0)*.8)/* 2026-10-07 井内さん「十二堂の扉が低い」.58→.8 */,leaf=Math.max(3,(pitch-3.6)/2-1),off=leaf/2+.35,
+    bays=[...new Set([0,1,2].map(j=>Math.round((j+1)*n/4-.5)))],sw=Math.min(pitch-6,36),
+    Bx=(u,v,lu,lv,yy,h,nm)=>parts.push(alongXh?box(cx+u,cz+v,lu,lv,yy,h,label+nm):box(cx+v,cz+u,lv,lu,yy,h,label+nm));
+   for(const fc of[-1,1])for(const bi of bays){const u=-longLh/2+pitch*(bi+.5);
+    for(const s of[-1,1])Bx(u+s*off,fc*(half-.7),leaf,2.4,dy0,doorH,'正面朱扉');
+    for(const q of[-.28,0,.28])Bx(u+pitch*q,fc*(half-.3),1.4,1.8,dy0+doorH+3,Math.max(2,dy1-dy0-doorH-4),'正面欄間格子');
+    // 階段: 基壇の縁（half+9）から外へ3段（1段 6 ずつ張り出し、1.7 ずつ下がる）。幅は柱間に収める
+    for(let i=0;i<3;i++){const ext=6*(i+1),top=floorY-1.7*(i+1),bot=y0-6;Bx(u,fc*(half+8.5+ext/2),sw,ext+.5,bot,top-bot,'階段 / 段'+(i+1));}}
+  }
   if(opts.eaves)hallEaves(parts,cx,cz,w,d,eaveH,Math.round(Math.round(rise*1.28)*1.5),label);
   const alongX=w>=d,S=alongX?d:w,L=alongX?w:d,riseF=Math.round(Math.round(rise*1.28)*1.5)-1,hf=S/2,fillPts=c0=>heianRoofProfilePoints(c0,hf,eaveH,riseF,.45);
   if(alongX)parts.push(run({type:'extrude',mode:'new',depth:L,sketchId:addSketchData('side',cx-L/2,[{type:'poly',closed:true,pts:fillPts(-cz)}]).id},label+'妻小壁'));
@@ -14431,6 +14507,7 @@ function paintHeianArchitecture(label){
  if(!colorAsset){paintHeianGround();return;}
  const innerIds=new Set(groups.find(g=>g.name==='内裏')?.idxs||[]),singleInner=label==='内裏';
  const templeAsset=/^(東寺|西寺)/.test(label),suzakuinAsset=/^朱雀院/.test(label);
+ const glazedAsset=/^(大極殿|朝堂院|豊楽院)/.test(label),glazedIdx=new Set(groups.filter(g=>/^(大極殿|朝堂院|豊楽院)/.test(g.name)).flatMap(g=>g.idxs||[]));
  for(const b of bodies){const n=b.name;let color;
   if(n.startsWith('地面'))color=label==='大内裏'?HEIAN_DAIDAIRI_GRAVEL:SHINDEN_PART_PALETTE.ground;
   else if(n.startsWith('水面'))color=SHINDEN_PART_PALETTE.water;
@@ -14443,7 +14520,8 @@ function paintHeianArchitecture(label){
   else if(/竜尾壇旗(?:竿|横木)/.test(n))color=SHINDEN_PART_PALETTE.column;
   else if(/朱欄干|朱扉|朱長押|欄間格子|懸魚/.test(n))color='#a64032'; // 懸魚は丹塗り（2026-09-25・漆喰色の白い板に見えていた）
   else if(/緑釉/.test(n))color='#3f674f';
-  else if(/詳細隅棟|詳細隅鬼|棟瓦/.test(n))color=SHINDEN_PART_PALETTE.roofTile; // 詳細隅鬼＝五重塔の隅棟の先の鬼瓦（1.76）
+  // 緑釉瓦の建物（朝堂院・大極殿・豊楽院）の棟は屋根と同じ緑に統一（2026-10-07 井内さん「緑の瓦屋根の建物の棟は緑で統一して」）
+  else if(/詳細隅棟|詳細隅鬼|棟瓦/.test(n))color=(glazedAsset||glazedIdx.has(b.colorIdx))?'#3f674f':SHINDEN_PART_PALETTE.roofTile; // 詳細隅鬼＝五重塔の隅棟の先の鬼瓦（1.76）
   // 塀の笠（k.wallSegment）。瓦笠は瓦色、板葺笠は木の色。🚫 判定に無いと最後のelseで漆喰色＝白い板に見える（2026-09-11）
   else if(/瓦笠/.test(n))color=SHINDEN_PART_PALETTE.roofTile;
   else if(/板葺笠/.test(n))color=SHINDEN_PART_PALETTE.roof;
@@ -14463,6 +14541,7 @@ function paintHeianArchitecture(label){
   else if(/風鐸|梵鐘|鐘吊金具/.test(n))color='#5c6b52'; // 青銅の風鐸・梵鐘（梵鐘は規則が無く漆喰色だった）
   else if(/撞木/.test(n))color=SHINDEN_PART_PALETTE.floor; // 鐘楼の撞木は白木。🚫 下の /木/（樹木）に当たると緑になる
   else if(/^五重塔.*板扉/.test(n))color='#a64032'; // 塔の板扉は丹塗り
+  else if(/^(大極殿|小安殿|延休堂|含嘉堂|顕章堂|昌福堂|含章堂|承光堂|延禄堂|明礼堂|修式堂|暉章堂|永寧堂|康楽堂|西朝集堂|東朝集堂).*上小壁/.test(n)||/^大極殿.*軒下朱小舞/.test(n))color=SHINDEN_PART_PALETTE.plaster; // 朝堂院の殿舎（大極殿・小安殿・朝堂十二堂・朝集堂）は扉より上も白壁（2026-10-07「白に揃える」） // 扉より上の壁は白（2026-10-07井内さん「扉より上の壁を赤くしているところは白い壁に。柱などは赤でOK」）。軒下朱小舞＝梁の上から屋根裏までの壁（平安神宮の写真も白壁。2026-08-24の「赤ですよね？」を白へ戻す）
   else if(/小壁/.test(n))color=(singleInner||(label==='大内裏'&&innerIds.has(b.colorIdx))||suzakuinAsset)?'#463b33':'#a64032'; // 内裏と朱雀院は黒褐色の上小壁。朱雀院だけ真っ赤になる回帰を防ぐ
   // 通肘木・長押・横架材・小舞・連子は規則に無く、最後のelseで漆喰色になっていた。
   // 軒下や欄間まわりの木部が白い梁のように見える原因（2026-08-24井内さん「赤ですよね？」）
@@ -14580,11 +14659,22 @@ function makeRajomonDetailed(label='羅城門（詳細表現採用）'){const st
 function makeRajomonCurrent(){return HEIAN_HERITAGE_DETAIL_ADOPTED?makeRajomonDetailed():makeRajomon();}
 // 朝堂院詳細版の共通部品。瓦面・形式別の棟・軒桁・垂木・組物を共通化する。
 function buildChodoinDetailHall(k,parts,cx,cz,w,d,y0,eave,rise,label,noBase=false){
- const{box,col,detailedTileRoof}=k,floorY=y0+6,roofY=floorY+Math.max(42,Math.round((eave-floorY+6)*1.75)),nx=Math.max(2,Math.ceil(w/70)),nz=Math.max(2,Math.ceil(d/70));
+ // 2026-10-07 井内さん「十二堂にも豊楽殿のようにいくつか柱と柱の間に扉を設置したい。その前には階段がある。階段が前後に3つずつ」:
+ //   長手の2面（前後）に、柱間の中の3か所へ両開きの朱扉を置き、その前に3段の階段を付ける。3か所が左右対称に並ぶよう、長手の柱間数を奇数にする（長さ240以上の殿舎）
+ const{box,col,detailedTileRoof}=k,alongX=w>=d,longL=alongX?w:d,bayN=(len,isLong)=>{const n=Math.max(2,Math.ceil(len/70));return isLong&&longL>=200&&n%2===0?n+1:n;},
+  floorY=y0+6,roofY=floorY+Math.max(42,Math.round((eave-floorY+6)*1.75)),nx=bayN(w,alongX),nz=bayN(d,!alongX);
  if(!noBase)parts.push(box(cx,cz,w+18,d+18,y0-6,12,label+'詳細基壇'));parts.push(box(cx,cz,w+8,d+8,floorY,2,label+'詳細床'),box(cx,cz,w-4,d-4,floorY+2,roofY-floorY-11,label+'詳細外周白壁'),box(cx,cz,w-4,d-4,roofY-9,8,label+'詳細上小壁'));
  for(let i=0;i<=nx;i++)for(const s of[-1,1])parts.push(col(cx-w/2+w*i/nx,cz+s*d/2,floorY+2,roofY-floorY-2,1.8,label+'詳細外周柱'));
  for(let i=1;i<nz;i++)for(const s of[-1,1])parts.push(col(cx+s*w/2,cz-d/2+d*i/nz,floorY+2,roofY-floorY-2,1.8,label+'詳細外周柱'));
  for(const s of[-1,1])parts.push(box(cx,cz+s*d/2,w+4,3,roofY-13,4,label+'詳細長押'),box(cx+s*w/2,cz,3,d,roofY-13,4,label+'詳細長押'));
+ if(longL>=200){
+  const n=alongX?nx:nz,pitch=longL/n,half=(alongX?d:w)/2,doorH=Math.round((roofY-floorY-11)*.82),leaf=Math.max(3.5,(pitch-3.6)/2-1),off=leaf/2+.35,
+   bays=[...new Set([0,1,2].map(j=>Math.round((j+1)*n/4-.5)))],sw=Math.min(pitch-6,36),B=(u,v,lu,lv,yy,h,nm)=>parts.push(alongX?box(cx+u,cz+v,lu,lv,yy,h,label+nm):box(cx+v,cz+u,lv,lu,yy,h,label+nm));
+  for(const face of[-1,1])for(const bi of bays){const u=-longL/2+pitch*(bi+.5);
+   for(const s of[-1,1])B(u+s*off,face*(half-.7),leaf,2.4,floorY+2,doorH,'正面朱扉');
+   // 階段（基壇の縁 half+9 から外へ3段。段ごとに1.7ずつ下がり、地面（基壇の底）まで）
+   for(let i=0;i<3;i++){const ext=6*(i+1),top=floorY-1.7*(i+1),bot=y0-6;B(u,face*(half+8.5+ext/2),sw,ext+.5,bot,top-bot,'階段 / 段'+(i+1));}}
+ }
  detailedTileRoof(parts,cx,cz,w,d,roofY,label+'詳細切妻瓦屋根','gable',.9,{rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',gableWall:true});
 }
 function buildChodoinDetailGate(k,parts,cx,cz,w,d,label,lift=0){
@@ -14597,7 +14687,7 @@ function buildChodoinDetailMajorGate(k,cx,cz,w,label,parts,monumental=false,colu
  k.gate2(cx,cz,w,label,parts,monumental,columnCount);if(!monumental)return;
  // 高さは HEIAN_GATE2。組物・軒桁は gate2 本体の三手先（2026-09-23）
  const G=HEIAN_GATE2;k.bandRidges(parts,cx,cz,w+58,120,G.lowerEave,G.lowerTop,label+'下屋根',{cornerSori:true});
- k.detailedTileRoof(parts,cx,cz,w+90,144,G.upperEave,label+'屋根','irimoya',.85,{surface:false,rank:'major',samples:3,green:true,wall:[w,64],eaves:false/* 垂木も gate2 本体（2026-09-24） */,cornerSori:true/* 隅反り（2026-09-25） */});
+ k.detailedTileRoof(parts,cx,cz,heianGate2Small(label,monumental)?w+68:w+90,heianGate2Small(label,monumental)?126:144,G.upperEave,label+'屋根','irimoya',.85,{surface:false,rank:'major',samples:3,green:true,wall:[w,64],eaves:false/* 垂木も gate2 本体（2026-09-24） */,cornerSori:true/* 隅反り（2026-09-25） */});
 }
 function buildChodoinDetailTower(k,parts,cx,cz,label,yOffset=0,palatial=false,ornate=false){
  k.tower(parts,cx,cz,label,yOffset,palatial,ornate);if(!(palatial&&ornate))return;
@@ -14605,9 +14695,9 @@ function buildChodoinDetailTower(k,parts,cx,cz,label,yOffset=0,palatial=false,or
  const O=HEIAN_TOWER.ornate,o={surface:false,rank:'tower',green:true,eaves:false,sori:false,cornerSori:true};
  // k.tower は中心だけ変換して実寸で組む。重ねる屋根も nat（中心だけ変換）で呼ぶ（2026-09-27）
  const T=(dx,dz,w,d,...r)=>k.nat?k.nat('detailedTileRoof',parts,cx,cz,dx,dz,w,d,...r):k.detailedTileRoof(parts,cx+dx,cz+dz,w,d,...r);
- T(0,0,132,112,O.eave+yOffset,label+'一階大寄棟屋根','yosemune',.45,o);
- T(0,0,68,68*2/3,O.cEave+yOffset,label+'中央上櫓屋根','irimoya',.8,{...o,ridgeR:HEIAN_TOWER_RIDGE_R.center});
- for(const sx of[-1,1])for(const sz of[-1,1])T(sx*37,sz*30,42,28,O.turretEave+yOffset,label+'稜線小櫓屋根','irimoya',.7,{...o,samples:1,ridgeR:HEIAN_TOWER_RIDGE_R.turret});
+ T(0,0,O.roofL,O.roofS,O.eave+yOffset,label+'一階大寄棟屋根','yosemune',.45,o);
+ T(0,0,O.cRoofL,O.cRoofS,O.cEave+yOffset,label+'中央上櫓屋根','irimoya',.8,{...o,ridgeR:HEIAN_TOWER_RIDGE_R.center});
+ for(const sx of[-1,1])for(const sz of[-1,1])T(sx*37,sz*30,O.tRoofL,O.tRoofS,O.turretEave+yOffset,label+'稜線小櫓屋根','irimoya',.7,{...o,samples:1,ridgeR:HEIAN_TOWER_RIDGE_R.turret});
 }
 // 楼閣の上の屋根の棟の太さ（2026-09-26井内さん「屋根のサイズに対して、この楼閣の棟が太すぎる」）。棟の半径は屋根の大きさに依らず2.2だった
 const HEIAN_TOWER_RIDGE_R={center:.5,turret:.32}; /* 2026-09-27井内さん「小さくて凝った造りなので細工も細く」: .6/.45→.5/.32 */
@@ -14618,7 +14708,7 @@ const HEIAN_TOWER_RIDGE_R={center:.5,turret:.32}; /* 2026-09-27井内さん「�
 // 座標は大内裏基準（z1560..4955）。単体アセットではshiftKitで中央へ寄せる
 function buildChodoin(k,cho,dai,options={}){
  const{run,box,col,gable:solidGable,gableRoof,columnFrame,colonnadeHall,watari,openGallery,tower,gate2,band,roof}=k,detail=!!options.detail,daigokudenDetail=detail||!!options.daigokudenDetail;
- const gable=detail?(...args)=>buildChodoinDetailHall(k,...args):(p,cx,cz,w,d,y0,eave,rise,label,noBase=false)=>colonnadeHall(p,cx,cz,w,d,y0,eave,rise,label,noBase,{eaves:true}/* 平三斗・垂木（2026-09-25） */),majorGate=detail?(...args)=>buildChodoinDetailMajorGate(k,...args):gate2,palaceTower=detail?(...args)=>buildChodoinDetailTower(k,...args):tower;
+ const gable=detail?(...args)=>buildChodoinDetailHall(k,...args):(p,cx,cz,w,d,y0,eave,rise,label,noBase=false)=>colonnadeHall(p,cx,cz,w,d,y0,eave,rise,label,noBase,{eaves:true,sideDoors:true}/* 平三斗・垂木（2026-09-25）。十二堂・朝集堂は前後に扉3か所と階段（2026-10-07） */),majorGate=detail?(...args)=>buildChodoinDetailMajorGate(k,...args):gate2,palaceTower=detail?(...args)=>buildChodoinDetailTower(k,...args):tower;
  // 複廊。床＋柱列＋朱梁＋瓦屋根で柱間を通れる。
  // outer（2026-09-26井内さん「朝堂院の外周の回廊は、外側の柱の位置で壁があるはず。じゃないと門を閉める意味がない」）:
  //   外側の柱通り（中心から 26/2−4=9）に白壁を床上から梁下まで張る。値は壁のある側の向き（axis='z' なら ±x、'x' なら ±z）。
@@ -14749,7 +14839,7 @@ function buildChodoin(k,cho,dai,options={}){
    const n=label+m.suffix;
    cho.push(box(m.x,m.z,80,80,-1,8,n+'基壇'));
    cho.push(box(m.x,m.z,68,68,7,2,n+'床'));
-   {const WW=HEIAN_TOWER.wing.wall;cho.push(box(m.x,m.z,62,62,9,WW-24,n+'内壁'));cho.push(box(m.x,m.z,62,62,WW-15,13,n+'内壁上小壁'));} // 柱の天端に合わせる（旧 29・38 固定＝柱53のとき）
+   {const WW=HEIAN_TOWER.wing.wall,wh=Math.round((WW-11)*.65);cho.push(box(m.x,m.z,62,62,9,wh,n+'内壁'));cho.push(box(m.x,m.z,62,62,9+wh,WW-2-9-wh,n+'内壁上小壁'));} // 柱の天端に合わせる（旧 29・38 固定＝柱53のとき）
    // 2026-09-25 井内さん「五重塔があれだけ美しくなったのでこの辺もすごくしたいね」（栖鳳楼外側北身屋の画像）。
    // 🚫 旧は柱の上に軒裏の板、その上に楼上の箱、それを 124×92 の中実の入母屋1枚で覆うだけ（楼上は屋根の下に半分隠れた箱）。
    // ⇒ 二重の楼: 下層の柱の上に三手先 → 腰屋根（板の帯＋垂木）→ 縁・高欄 → 楼上 → 三手先 → 板の入母屋＋垂木＋妻飾り。高さは HEIAN_TOWER.wing
@@ -14784,13 +14874,13 @@ function buildChodoin(k,cho,dai,options={}){
    for(const s of[-1,1]){cho.push(col(m.x,m.z+s*24,uy-1,ut-uy+1,1.6,n+'楼上間柱'),col(m.x+s*24,m.z,uy-1,ut-uy+1,1.6,n+'楼上間柱'));}
    k.mitesakiEaves(cho,m.x,m.z,24,24,[-24,0,24],[0],ut,q,n+'楼上');
    // 上屋根は東西棟（1.89 で戻した）。🚫 1.67〜1.88 は南北棟（alongZ）＝2階が2つ並んでいた頃に2つの屋根に見せるための手だった
-   {const L=WG.roofL,S=WG.roofS,e=WG.upEave+m.up,{soffitTop}=k.irimoyaRafters(cho,m.x,m.z,L,S,e,.9,24,24,24+3*st,24+3*st,q,n+'楼上',{pitch:PITCH,shell:SH,sori:false,raise:raiseOf(L,S)});
+   {const L=WG.roofL,S=WG.roofS,e=WG.upEave+m.up,{soffitTop}=k.irimoyaRafters(cho,m.x,m.z,L,S,e,WG.slope,24,24,24+3*st,24+3*st,q,n+'楼上',{pitch:PITCH,shell:SH,sori:false,raise:raiseOf(L,S)});
     cho.push(box(m.x,m.z,46,46,ut,soffitTop-ut,n+'楼上軒下小舞'));
-    cho.push(roof(m.x,m.z,L,S,e,n+'東西棟入母屋屋根','irimoya',.9,1,false,{hollow:SH,cornerSori:true,curve:HEIAN_ROOF_CURVE_TRIAL}));
-    k.irimoyaGableDeco(cho,m.x,m.z,L,S,e,.9,n,{shell:SH});
-    if(detail)k.detailedTileRoof(cho,m.x,m.z,L,S,e,n+'東西棟入母屋屋根','irimoya',.9,{surface:false,rank:'tower',samples:2,green:true,eaves:false,sori:false,cornerSori:true});
+    cho.push(roof(m.x,m.z,L,S,e,n+'東西棟入母屋屋根','irimoya',WG.slope,1,false,{hollow:SH,cornerSori:true,curve:HEIAN_ROOF_CURVE_TRIAL}));
+    k.irimoyaGableDeco(cho,m.x,m.z,L,S,e,WG.slope,n,{shell:SH});
+    if(detail)k.detailedTileRoof(cho,m.x,m.z,L,S,e,n+'東西棟入母屋屋根','irimoya',WG.slope,{surface:false,rank:'tower',samples:2,green:true,eaves:false,sori:false,cornerSori:true});
     // 遠景版の棟（妻の肩から肩まで蒲鉾形・色は棟瓦）と両端の鬼板
-    else{const gw=(L-S)/2+(L/2-(L-S)/2)*.35,apex=e+Math.round(S/2*.9),r=3;cho.push(k.ridgeBar({x:m.x-gw,y:apex,z:m.z},{x:m.x+gw,y:apex,z:m.z},r,n+'楼上棟瓦'));
+    else{const gw=(L-S)/2+(L/2-(L-S)/2)*.35,apex=e+Math.round(S/2*WG.slope),r=3;cho.push(k.ridgeBar({x:m.x-gw,y:apex,z:m.z},{x:m.x+gw,y:apex,z:m.z},r,n+'楼上棟瓦'));
      for(const s of[-1,1])cho.push(box(m.x+s*(gw+.5),m.z,2.4,2*r+1.5,apex-r,2*r+2.5,n+'楼上棟瓦鬼板'));}
     // 風鐸（腰屋根と上屋根の四隅）
     for(const[LL,SS,ey,sh]of[[108,108,WG.lowEave,SH],[L,S,e,SH]]){const rs=heianCornerSoriSpec(LL,SS);for(const sx of[-1,1])for(const sz of[-1,1]){const dx=LL/2-3,dz=SS/2-3,yTop=ey-sh+heianSoriLiftCorner(dx,dz,rs);cho.push(col(m.x+sx*dx,m.z+sz*dz,yTop-3.5,3.5,.35,n+'風鐸吊'),col(m.x+sx*dx,m.z+sz*dz,yTop-8,4.5,1.5,n+'風鐸'));}}}
@@ -15739,7 +15829,7 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
  return[['大垣・宮城門',wall],['朝堂院',cho],['大極殿',dai],['朝堂院屋根詳細',chodoinDetailState?.details||[]],['豊楽院',buraku],['豊楽院屋根詳細',burakuDetailState?.details||[]],
   ['内裏',dairi],['官衙',kancho],['敷地',site]];
 },'manifold');if(!ok||!burakuDetailState||!chodoinDetailState)return ok;const roofMaterial=window.__heianRoofMaterialInfo?.(),chodoinInfo={mode:'distant-common-detail',facadeDoors:bodies.filter(b=>/^(小安殿|延休堂|含嘉堂|顕章堂|昌福堂|含章堂|承光堂|延禄堂|明礼堂|修式堂|暉章堂|永寧堂|康楽堂|西朝集堂|東朝集堂|会昌門楼上|応天門楼上|白虎楼楼上|蒼龍楼楼上).*正面朱扉/.test(b.name)).length,tileRoofs:roofMaterial?.tiles||0,hiwadaRoofs:roofMaterial?.hiwada||0,tileTexture:!!roofMaterial?.tileAsset,hiwadaTexture:!!roofMaterial?.hiwadaAsset,daigokudenLowerRoofs:bodies.filter(b=>b.name==='大極殿下層屋根').length,daigokudenDoors:bodies.filter(b=>b.name.startsWith('大極殿詳細版南面板扉')).length,daigokudenTransoms:bodies.filter(b=>b.name.startsWith('大極殿詳細版南面欄間格子')).length,ornateTowerRidges:bodies.filter(b=>/^(白虎楼|蒼龍楼).*(緑釉|棟瓦)(大棟|降棟|隅棟)/.test(b.name)).length};
-chodoinInfo.valid=chodoinInfo.facadeDoors>=29&&chodoinInfo.tileRoofs>0&&chodoinInfo.hiwadaRoofs>0&&chodoinInfo.tileTexture&&chodoinInfo.hiwadaTexture&&chodoinInfo.daigokudenLowerRoofs===0&&chodoinInfo.daigokudenDoors===9&&chodoinInfo.daigokudenTransoms===27&&chodoinInfo.ornateTowerRidges===244/* 108→244: 楼の屋根を隅反りさせ、隅棟を4区間に（2026-09-25） */;window.__daidairiChodoinDetailInfo=()=>chodoinInfo;const burakuRequired=['豊楽殿大屋根','豊楽殿南面板扉','儀鸞門屋根','齊景楼東西棟入母屋屋根','栖霞楼東西棟入母屋屋根'],burakuInfo={adopted:true,mode:'distant-common-detail',doors:bodies.filter(b=>b.name.startsWith('豊楽殿南面板扉')).length,
+chodoinInfo.valid=chodoinInfo.facadeDoors>=29&&chodoinInfo.tileRoofs>0&&chodoinInfo.hiwadaRoofs>0&&chodoinInfo.tileTexture&&chodoinInfo.hiwadaTexture&&chodoinInfo.daigokudenLowerRoofs===0&&chodoinInfo.daigokudenDoors===0&&chodoinInfo.daigokudenTransoms===27&&chodoinInfo.ornateTowerRidges===244/* 108→244: 楼の屋根を隅反りさせ、隅棟を4区間に（2026-09-25） */;window.__daidairiChodoinDetailInfo=()=>chodoinInfo;const burakuRequired=['豊楽殿大屋根','豊楽殿南面板扉','儀鸞門屋根','齊景楼東西棟入母屋屋根','栖霞楼東西棟入母屋屋根'],burakuInfo={adopted:true,mode:'distant-common-detail',doors:bodies.filter(b=>b.name.startsWith('豊楽殿南面板扉')).length,
  // 豊楽殿の稜線の棟（2026-08-24井内さん指摘）。大極殿と同じ緑釉で、寄棟なので隅棟4本×2区間＋大棟1
  burakudenHipRidges:bodies.filter(b=>/^豊楽殿大屋根緑釉隅棟/.test(b.name)).length,
  burakudenMainRidge:bodies.filter(b=>/^豊楽殿大屋根緑釉大棟/.test(b.name)).length,
@@ -15767,7 +15857,7 @@ function makeChodoinDetail(){
  const ok=makeHeian('朝堂院詳細版',k=>{const site=[],cho=[],dai=[];site.push(k.box(0,0,2400,4900,-4,4,'地面'));buildChodoin(shiftKit(k,0,-3800),cho,dai,{detail:true});return[['朝堂院詳細版',cho],['大極殿詳細版',dai],['敷地',site]];},'manifold');if(!ok)return false;
  const mainRoofs=bodies.filter(b=>b.name.startsWith('大極殿詳細版大屋根')),gableRoofs=bodies.filter(b=>b.name.includes('詳細切妻瓦屋根瓦面')),textureAssetId=applyDaigokudenDetailAppearance();applyChodoinDetailAppearance(textureAssetId);const tileRoofSurfaces=chodoinDetailRoofSurfaceBodies();
  const requiredHalls=['小安殿','延休堂','含嘉堂','顕章堂','昌福堂','含章堂','承光堂','延禄堂','明礼堂','修式堂','暉章堂','永寧堂','康楽堂','西朝集堂','東朝集堂'],requiredGates=['昭慶門','会昌門','応天門'],requiredTowers=['白虎楼','蒼龍楼','翔鸞楼','栖鳳楼'];
- const hasDetail=n=>bodies.some(b=>b.name.startsWith(n)&&b.name.includes('詳細')),hasAny=n=>bodies.some(b=>b.name.startsWith(n)),bodyColor=n=>bodies.find(b=>b.name.startsWith(n))?.mesh.material.color.getHexString(),monumental=['会昌門','応天門'],gateColumnCounts=monumental.map(n=>bodies.filter(b=>b.name.startsWith(n+'柱')).length),gatePassages=monumental.every(n=>{const sleeves=bodies.filter(b=>b.name.startsWith(n+'袖壁')&&!b.name.includes('上小壁'));return sleeves.length===2&&sleeves.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh);return q.max.x<-.1||q.min.x>.1;});}),ornateTowerRoofs=tileRoofSurfaces.filter(b=>/^(白虎楼|蒼龍楼).*(中央上櫓屋根|稜線小櫓屋根)/.test(b.name)).length,wingTowerRoofs=tileRoofSurfaces.filter(b=>/^(翔鸞楼|栖鳳楼).*(東西棟入母屋屋根|一階入母屋屋根)/.test(b.name)).length,wallPalette=bodyColor('延休堂詳細外周白壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor('延休堂詳細上小壁')==='a64032'&&bodyColor('延休堂詳細外周柱')==='a64032'&&bodyColor('会昌門袖壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor('会昌門柱')==='a64032';
+ const hasDetail=n=>bodies.some(b=>b.name.startsWith(n)&&b.name.includes('詳細')),hasAny=n=>bodies.some(b=>b.name.startsWith(n)),bodyColor=n=>bodies.find(b=>b.name.startsWith(n))?.mesh.material.color.getHexString(),monumental=['会昌門','応天門'],gateColumnCounts=monumental.map(n=>bodies.filter(b=>b.name.startsWith(n+'柱')).length),gatePassages=monumental.every(n=>{const sleeves=bodies.filter(b=>b.name.startsWith(n+'袖壁')&&!b.name.includes('上小壁'));return sleeves.length===2&&sleeves.every(b=>{const q=new THREE.Box3().setFromObject(b.mesh);return q.max.x<-.1||q.min.x>.1;});}),ornateTowerRoofs=tileRoofSurfaces.filter(b=>/^(白虎楼|蒼龍楼).*(中央上櫓屋根|稜線小櫓屋根)/.test(b.name)).length,wingTowerRoofs=tileRoofSurfaces.filter(b=>/^(翔鸞楼|栖鳳楼).*(東西棟入母屋屋根|一階入母屋屋根)/.test(b.name)).length,wallPalette=bodyColor('延休堂詳細外周白壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor('延休堂詳細上小壁')===SHINDEN_PART_PALETTE.plaster.slice(1)/* 2026-10-07 扉より上も白壁 */&&bodyColor('延休堂詳細外周柱')==='a64032'&&bodyColor('会昌門袖壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor('会昌門柱')==='a64032';
  const detailBodies=bodies.filter(b=>!b.name.startsWith('大極殿詳細版')),count=re=>detailBodies.filter(b=>re.test(b.name)).length,hipMain=count(/一階大寄棟屋根緑釉大棟/),ridgeCounts={gableMain:count(/詳細切妻瓦屋根棟瓦大棟/),hipMain,irimoyaMain:count(/緑釉大棟/)-hipMain,descending:count(/緑釉降棟/),hipCorners:count(/緑釉隅棟/)},structureCounts={groundRafters:count(/地垂木/),flyingRafters:count(/飛檐垂木/),eavePurlins:count(/軒桁/),brackets:count(/組物(大斗|肘木|巻斗)/),gableWalls:count(/妻面白壁/)};
  const mainBB=new THREE.Box3();for(const b of mainRoofs)mainBB.expandByObject(b.mesh);const mainCenter=mainBB.getCenter(new THREE.Vector3()),info={bodies:bodies.length,ops:ops.length,groups:groups.length,mainRoofPanels:mainRoofs.length,gableRoofs:gableRoofs.length,tileRoofSurfaces:tileRoofSurfaces.length,ridgeCounts,structureCounts,halls:requiredHalls.filter(hasDetail).length,gates:requiredGates.filter(hasAny).length,towers:requiredTowers.filter(hasAny).length,gateColumnCounts,gatePassages,ornateTowerRoofs,wingTowerRoofs,wallPalette,mainCenterZ:Math.round(mainCenter.z*10)/10,tileTexture:tileRoofSurfaces.every(b=>!!imageAssetData(bodyMaterials[b.colorIdx]?.textureAssetId)),mainTileTexture:mainRoofs.every(b=>!!imageAssetData(bodyMaterials[b.colorIdx]?.textureAssetId)),skipped:ops.filter(o=>o._skipped).length};
  const ridges=info.ridgeCounts,under=info.structureCounts;info.valid=info.bodies>3000&&info.bodies<16000/* 5000→11000: 組物を軒沿いへ、垂木を軒全長へ密に（2026-08-25）。→16000: 楼閣4棟に三手先・垂木（2026-09-25・実測14273） */&&info.mainRoofPanels===56&&info.gableRoofs===38&&info.tileRoofSurfaces===60/* 58→62: 翔鸞楼・栖鳳楼の腰屋根4（2026-09-25）。→60: 1.89 で後ろの身屋は一重＝腰屋根は手前の2だけ */&&ridges.gableMain===38&&ridges.hipMain===2&&ridges.irimoyaMain===16&&ridges.descending===64&&ridges.hipCorners>=240/* 80→104: 応天門・会昌門の隅反りで隅棟の区間を増やした（2026-09-25）。→288: 楼閣の屋根も隅反り。1.89: 後ろの身屋の腰屋根2つ分の隅棟が減るので下限比較（実測は撮り直しで） */&&under.groundRafters>=318&&under.flyingRafters>=318&&under.eavePurlins===216/* 232→216: 楼閣は簡略の軒桁をやめ三手先の丸桁へ（2026-09-25） */&&under.brackets>=1200/* 密度は下限比較（2026-08-25） */&&under.gableWalls===30&&info.halls===requiredHalls.length&&info.gates===requiredGates.length&&info.towers===requiredTowers.length&&info.gateColumnCounts[0]===18&&info.gateColumnCounts[1]===24&&info.gatePassages&&info.ornateTowerRoofs===10&&info.wingTowerRoofs===4&&info.wallPalette&&Math.abs(info.mainCenterZ+2240)<1&&info.tileTexture&&info.mainTileTexture&&info.skipped===0;window.__chodoinDetailInfo=()=>info;
@@ -15775,6 +15865,10 @@ function makeChodoinDetail(){
 }
 // 第二次大極殿の独立詳細版。現行buildChodoinは変えず、外形だけ同寸法で比較できるようにする。
 const HEIAN_TILE_TEXTURE_ID='tile96-v2',HEIAN_HIWADA_TEXTURE_ID='hiwada96-v1',HEIAN_WALL_CAP_TINT='#dcf0fa';
+// 緑釉瓦（2026-10-07 井内さん「大極殿・楼閣・回廊・応天門などは瓦が緑だと NPC が言うのに緑じゃない」）。
+// 瓦の絵は灰緑（線形で約 .11,.127,.125）なので、色は掛け算で緑へ寄せる（線形 .2,1,.55 ≒ #7cffc2）。1 を超える掛け算はできないので G は最大のまま。
+// 対象は朝堂院・大極殿・豊楽院（NPC の台詞が緑と言う範囲）。寺院・塀の瓦笠は従来の灰青のまま
+const HEIAN_GLAZED_TILE_TINT='#7cffc2',HEIAN_GLAZED_TILE_GROUP=/^(大極殿|朝堂院|豊楽院)/;
 // 瓦・檜皮の質感（2026-09-27井内さん「瓦とか檜皮葺きをリアルにできるのかな？」→案1＝絵の描き直し＋凹凸の絵）。
 // 🚫 旧は96pxの縦縞（瓦・#454b49地に12px間隔）と波線（檜皮・8px段）だけで、近くで見ると平らな板に線を引いただけだった。
 // ⇒ 高さの場（丸瓦＝半円の筒・平瓦＝浅い樋・段の継ぎ目の溝・玉縁）から、色（窪みを暗く・瓦ごとに色むら）と normalMap を作る。
@@ -15889,7 +15983,12 @@ function buildDaigokudenDetail(k,{includeSite=true}={}){
  for(const sx of[-180,0,180]){for(let i=0;i<5;i++)base.push(box(sx,123+i*7,44,7,9,14-i*2.8,P+'南階 / 段'+(i+1)));for(const ex of[-24,24])base.push(box(sx+ex,140,4,42,9,14,P+'南階耳石'));}
  const posts=[];for(const x of xs)for(const z of[-80,80])posts.push([x,z]);for(const z of zs.slice(1,-1))for(const x of[-240,240])posts.push([x,z]);for(const[x,z]of posts)frame.push(col(x,z,25,67,2.4,P+'外周柱'));
  const moyaXs=xs.slice(1,-1),moyaZs=zs.slice(1,-1),mx=moyaXs[moyaXs.length-1],mz=moyaZs[moyaZs.length-1],moyaPosts=[];for(const x of moyaXs)for(const z of[-mz,mz])moyaPosts.push([x,z]);for(const x of[-mx,mx])moyaPosts.push([x,0]);for(const[x,z]of moyaPosts)frame.push(col(x,z,25,67,2.2,P+'母屋柱'));
- for(let i=1;i<=9;i++){const x0=xs[i],x1=xs[i+1],cx=(x0+x1)/2,w=x1-x0-4;frame.push(box(cx,78.8,w,2.4,27,47,P+'南面板扉'));frame.push(box(cx,78.6,w,3,77,7,P+'南面上小壁'));for(const q of[-.28,0,.28])frame.push(box(cx+q*w,80.2,1.2,1.8,76,8,P+'南面欄間格子'));}for(const i of[0,10])frame.push(box((xs[i]+xs[i+1])/2,77.5,xs[i+1]-xs[i]-3,5,25,59,P+'南面端白壁'));
+ for(let i=1;i<=9;i++){const x0=xs[i],x1=xs[i+1],cx=(x0+x1)/2,w=x1-x0-4;/* 2026-10-07 井内さん「大極殿正面を開放にする」: 南面の板扉9枚を外す（屋内の「大極殿に入る」と同じく前が開いて高御座が見える）。上小壁と欄間格子は残す */frame.push(box(cx,78.6,w,3,77,7,P+'南面上小壁'));for(const q of[-.28,0,.28])frame.push(box(cx+q*w,80.2,1.2,1.8,76,8,P+'南面欄間格子'));}for(const i of[0,10])frame.push(box((xs[i]+xs[i+1])/2,77.5,xs[i+1]-xs[i]-3,5,25,59,P+'南面端白壁'));
+ // 高御座（簡易・母屋の中央。屋内の高御座と同じ構成＝三段の継壇・八本柱の屋形・屋根・頂の飾り。八角は箱で近似）。正面（南 +z）は帳を上げて開ける
+ {const hz=-6,F=25,hb=(w,y,h,n)=>frame.push(box(0,hz,w,w,y,h,P+n));hb(62,F,4,'高御座継壇一');hb(61.5,F+4,.6,'高御座金具');hb(48,F+4.6,4,'高御座継壇二');hb(36,F+8.6,4,'高御座継壇三');hb(36.6,F+12.6,.6,'高御座金具');
+  for(const[px,pz]of[[-14,-14],[0,-14],[14,-14],[-14,0],[14,0],[-14,14],[0,14],[14,14]])frame.push(col(px,hz+pz,F+13.2,26,.8,P+'高御座柱'));
+  hb(42,F+39,.8,'高御座軒');hb(32,F+39.8,3,'高御座屋根');hb(20,F+42.8,3,'高御座屋根');hb(8,F+45.8,3,'高御座屋根');frame.push(box(0,hz,3,3,F+48.8,3,P+'高御座金具鳳凰'));
+  frame.push(box(-14,hz,.5,28,F+13.2,22,P+'高御座帳'),box(14,hz,.5,28,F+13.2,22,P+'高御座帳'),box(0,hz-14,28,.5,F+13.2,22,P+'高御座帳'));}
  // 壁の下端は29だったが基壇上端石の天端は25（外周柱も25から立つ）。4mm＝実寸40cmの隙間が空いて床下が見えていた（2026-08-24）
  frame.push(box(0,-77.5,470,5,25,59,P+'北面外周白壁'));for(const s of[-1,1])for(let i=0;i<4;i++){const z0=zs[i],z1=zs[i+1],cz=(z0+z1)/2,d=z1-z0-3;if(i===0||i===3)frame.push(box(s*237.5,cz,5,d,25,59,P+'側面外周白壁'));else{frame.push(box(s*237.5,cz,5,d,25,20,P+'側面連子下白壁'));for(let j=1;j<=7;j++)frame.push(box(s*239,z0+(z1-z0)*j/8,2.4,1.2,45,37,P+'側面連子バー'));}}
  frame.push(box(0,-80,486,5,84,7,P+'北梁'),box(0,80,486,5,84,7,P+'南梁'),box(-240,0,5,160,84,7,P+'西梁'),box(240,0,5,160,84,7,P+'東梁'));
@@ -16040,20 +16139,23 @@ function applyHeianTextureBodies(targets,{textureAssetId,data,makeTexture,tileMM
   mat.color.set(tint);mat.emissive.set('#000000');mat.opacity=1;mat.transparent=false;mat.side=THREE.DoubleSide;mat.depthTest=true;mat.depthWrite=true;mat.metalness=metalness;mat.roughness=roughness;ensurePlanarUV(b.mesh.geometry,'roof');mat.map=shared;heianRoofAttachNormal(mat,id,[shared.repeat.x,shared.repeat.y]);mat.userData.heianTexture=id;mat.needsUpdate=true;}
  refreshBodyEmissive();return textureAssetId;
 }
-function applyDetailedTileTexture(roofBodies,textureAssetId=null){return applyHeianTextureBodies(roofBodies,{textureAssetId,data:daigokudenTileTextureData,makeTexture:makeHeianTileTexture,tileMM:24,id:HEIAN_TILE_TEXTURE_ID});}
+function applyDetailedTileTexture(roofBodies,textureAssetId=null,tint='#ffffff'){return applyHeianTextureBodies(roofBodies,{textureAssetId,data:daigokudenTileTextureData,makeTexture:makeHeianTileTexture,tileMM:24,id:HEIAN_TILE_TEXTURE_ID,tint});}
 function applyHeianRoofMaterialSystem(label){
  const innerIds=new Set(groups.find(g=>g.name==='内裏')?.idxs||[]),hiyoku=b=>isHeianRoofSurfaceName(b.name)&&!/瓦笠/.test(b.name)&&(/檜皮葺.*屋根|板葺笠/.test(b.name)||label==='内裏'||/^朱雀院/.test(label)||(label==='大内裏'&&innerIds.has(b.colorIdx))),hiwada=bodies.filter(hiyoku),hiSet=new Set(hiwada),tilesAll=bodies.filter(b=>isHeianRoofSurfaceName(b.name)&&!hiSet.has(b)),caps=tilesAll.filter(b=>/瓦笠/.test(b.name)),capSet=new Set(caps),tiles=tilesAll.filter(b=>!capSet.has(b));
  // 塀の瓦笠は同じ瓦の絵に青みを掛ける（2026-10-01井内さん「塀の上の青は青系の瓦みたくするのでいい」）。板葺笠は檜皮の絵（木の板の段）
- const tileAssetId=applyHeianTextureBodies(caps,{textureAssetId:applyDetailedTileTexture(tiles),data:daigokudenTileTextureData,makeTexture:makeHeianTileTexture,tileMM:24,id:HEIAN_TILE_TEXTURE_ID,tint:HEIAN_WALL_CAP_TINT}),hiwadaAssetId=applyHeianTextureBodies(hiwada,{data:hiwadaTextureData,makeTexture:makeHeianHiwadaTexture,tileMM:18,id:HEIAN_HIWADA_TEXTURE_ID,metalness:.02,roughness:.94});window.__heianRoofMaterialInfo=()=>({label,tiles:tiles.length,hiwada:hiwada.length,tileAsset:!!tileAssetId,hiwadaAsset:!hiwada.length||!!hiwadaAssetId});return{tileAssetId,hiwadaAssetId,tiles,hiwada};
+ // 緑釉瓦: 朝堂院・大極殿・豊楽院の屋根だけ緑の掛け算を付ける（group 名か asset 名で判定）。残りは従来の瓦
+ const glazedGroupIds=new Set(groups.filter(g=>HEIAN_GLAZED_TILE_GROUP.test(g.name)).flatMap(g=>g.idxs||[])),glazed=tiles.filter(b=>HEIAN_GLAZED_TILE_GROUP.test(label)||glazedGroupIds.has(b.colorIdx)),glazedSet=new Set(glazed),plainTiles=tiles.filter(b=>!glazedSet.has(b));
+ const plainAssetId=applyDetailedTileTexture(plainTiles),glazedAssetId=applyDetailedTileTexture(glazed,plainAssetId,HEIAN_GLAZED_TILE_TINT);
+ const tileAssetId=applyHeianTextureBodies(caps,{textureAssetId:glazedAssetId||plainAssetId,data:daigokudenTileTextureData,makeTexture:makeHeianTileTexture,tileMM:24,id:HEIAN_TILE_TEXTURE_ID,tint:HEIAN_WALL_CAP_TINT}),hiwadaAssetId=applyHeianTextureBodies(hiwada,{data:hiwadaTextureData,makeTexture:makeHeianHiwadaTexture,tileMM:18,id:HEIAN_HIWADA_TEXTURE_ID,metalness:.02,roughness:.94});window.__heianRoofMaterialInfo=()=>({label,tiles:tiles.length,hiwada:hiwada.length,tileAsset:!!tileAssetId,hiwadaAsset:!hiwada.length||!!hiwadaAssetId});return{tileAssetId,hiwadaAssetId,tiles,hiwada};
 }
 function applyDaigokudenDetailAppearance(P='大極殿詳細版'){
- for(const b of bodies){const n=b.name;if(!n.startsWith(P))continue;const c=/緑釉|鴟尾/.test(n)?'#3f674f':/大屋根/.test(n)?'#454b49':/板扉/.test(n)?'#9e3d28'/* 木の色#71382cから丹塗りへ（2026-08-26井内さん「扉は赤」） */:/小舞/.test(n)?'#4a231a'/* 組物の背面。同じ朱（#9e3d28）だと三手先が背景に溶けるので軒裏の陰の色へ落とす（2026-09-23） */:/白壁|上小壁/.test(n)?SHINDEN_PART_PALETTE.plaster:/外周柱|母屋柱|梁|長押|横架材|通肘木|軒桁|組物|垂木|隅木|連子|欄間/.test(n)?'#9e3d28':/基壇目地/.test(n)?'#827b6b':null;if(c)setHeianBodyColor(b,c);}
- return applyDetailedTileTexture(bodies.filter(b=>b.name.startsWith(P+'大屋根')));
+ for(const b of bodies){const n=b.name;if(!n.startsWith(P))continue;const c=/高御座金/.test(n)?'#c9a24a':/高御座帳/.test(n)?'#5f3b73':/高御座継壇二/.test(n)?'#a64032':/高御座/.test(n)?'#1c1410':/緑釉|鴟尾/.test(n)?'#3f674f':/大屋根/.test(n)?'#454b49':/板扉/.test(n)?'#9e3d28'/* 木の色#71382cから丹塗りへ（2026-08-26井内さん「扉は赤」） */:/軒下朱小舞/.test(n)?SHINDEN_PART_PALETTE.plaster/* 扉より上の壁は白（2026-10-07）。組物・柱・梁は朱のまま */:/小舞/.test(n)?'#4a231a'/* 組物の背面。同じ朱（#9e3d28）だと三手先が背景に溶けるので軒裏の陰の色へ落とす（2026-09-23） */:/白壁|上小壁/.test(n)?SHINDEN_PART_PALETTE.plaster:/外周柱|母屋柱|梁|長押|横架材|通肘木|軒桁|組物|垂木|隅木|連子|欄間/.test(n)?'#9e3d28':/基壇目地/.test(n)?'#827b6b':null;if(c)setHeianBodyColor(b,c);}
+ return applyDetailedTileTexture(bodies.filter(b=>b.name.startsWith(P+'大屋根')),null,HEIAN_GLAZED_TILE_TINT);
 }
 function chodoinDetailRoofSurfaceBodies(){return bodies.filter(b=>{const n=b.name;if(n.startsWith('大極殿詳細版')||/棟瓦|緑釉|地垂木|飛檐垂木|軒桁|組物/.test(n))return false;return /瓦面/.test(n)||/^(会昌門|応天門)(下屋根|屋根)/.test(n)||/^(白虎楼|蒼龍楼).*(一階大寄棟屋根|中央上櫓屋根|稜線小櫓屋根)/.test(n)||/^(翔鸞楼|栖鳳楼).*(東西棟入母屋屋根|一階入母屋屋根|腰屋根)/.test(n)/* 翔鸞楼・栖鳳楼は本体の板の屋根に瓦を貼る（2026-09-25。旧は詳細kitの瓦面）。1.89 で東西棟・後ろの身屋は一重の入母屋 */;});}
 function applyChodoinDetailAppearance(textureAssetId){
- for(const b of bodies){const n=b.name;if(n.startsWith('大極殿詳細版'))continue;const c=/緑釉/.test(n)?'#3f674f':/棟瓦/.test(n)?'#38413f':/地垂木|飛檐垂木|軒桁|組物/.test(n)?'#9e3d28':/妻面白壁/.test(n)?SHINDEN_PART_PALETTE.plaster:null;if(c)setHeianBodyColor(b,c);}
- return applyDetailedTileTexture(chodoinDetailRoofSurfaceBodies(),textureAssetId);
+ for(const b of bodies){const n=b.name;if(n.startsWith('大極殿詳細版'))continue;const c=/緑釉/.test(n)?'#3f674f':/棟瓦/.test(n)?'#3f674f'/* 緑の瓦屋根の棟は緑（2026-10-07） */:/地垂木|飛檐垂木|軒桁|組物/.test(n)?'#9e3d28':/妻面白壁/.test(n)?SHINDEN_PART_PALETTE.plaster:null;if(c)setHeianBodyColor(b,c);}
+ return applyDetailedTileTexture(chodoinDetailRoofSurfaceBodies(),textureAssetId,HEIAN_GLAZED_TILE_TINT);
 }
 function makeDaigokudenDetail(){
  const ok=makeHeian('大極殿詳細版',buildDaigokudenDetail,'manifold');if(!ok)return false;const P='大極殿詳細版',count=s=>bodies.filter(b=>b.name.startsWith(P+s)).length,roofBodies=bodies.filter(b=>b.name.startsWith(P+'大屋根'));
@@ -16063,7 +16165,7 @@ function makeDaigokudenDetail(){
  // 位置（24前後）に届き、かつ軒先 z±115 には届かない（2026-09-23。旧「20未満」は二手先時代の値）
  const outerBrBodies=bodies.filter(b=>b.name.startsWith(P+'組物手先肘木三')),outerBrBB=new THREE.Box3();for(const b of outerBrBodies)outerBrBB.expandByObject(b.mesh);
  const purlinBB=new THREE.Box3();for(const b of bodies)if(b.name.startsWith(P+'軒桁'))purlinBB.expandByObject(b.mesh);const size=bb.getSize(new THREE.Vector3()),doorZ=doorBB.getCenter(new THREE.Vector3()).z,mat=roofBody&&bodyMaterials[roofBody.colorIdx],info={roofPanels:roofBodies.length,columns:count('外周柱'),moyaColumns:count('母屋柱'),doors:count('南面板扉'),doorZ:Math.round(doorZ*10)/10,doorColor:doorBodies[0]?bodyColors[doorBodies[0].colorIdx]:null,bracketReach:Math.round((outerBrBB.max.z-80)*10)/10,transoms:count('南面欄間格子'),smallWalls:count('南面上小壁'),rearWalls:count('北面外周白壁'),soffitWalls:count('軒下朱小舞'),soffitColor:(()=>{const b=bodies.find(b=>b.name.startsWith(P+'軒下朱小舞'));return b?bodyColors[b.colorIdx]:null;})(),soffitClearance:(()=>{/* 小舞4面それぞれの外面の真上から大屋根へ垂線を落とし、瓦面の高さ−小舞天端の最小値。正なら瓦面を突き抜けていない（2026-09-23「壁が屋根を突き抜けてる」） */const roofs=bodies.filter(b=>b.name.startsWith(P+'大屋根')).map(b=>{b.mesh.updateWorldMatrix(true,false);return b.mesh;});let minC=Infinity;for(const b of bodies){if(!b.name.startsWith(P+'軒下朱小舞'))continue;const bb=new THREE.Box3().setFromObject(b.mesh),c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3()),thinX=sz.x<sz.z,px=thinX?(c.x>0?bb.max.x:bb.min.x):0,pz=thinX?0:(c.z>0?bb.max.z:bb.min.z),hits=new THREE.Raycaster(new THREE.Vector3(px,400,pz),new THREE.Vector3(0,-1,0)).intersectObjects(roofs,false);if(!hits.length)return null;minC=Math.min(minC,hits[0].point.y-bb.max.y);}return minC===Infinity?null:+minC.toFixed(1);})(),outerSideWalls:count('側面外周白壁'),innerSideWalls:count('側面上小壁'),endWalls:count('南面端白壁'),wallBands:count('内法長押')+count('外周頭部横架材'),throughBeams:count('通肘木'),eavePurlins:count('軒桁'),latticeBars:count('側面連子バー'),rails:count('朱欄干'),brackets:count('組物'),bracketClusters:count('組物大斗'),tailRafters:count('組物尾垂木'),makito:count('組物巻斗'),purlinZ:Math.round(purlinBB.max.z*10)/10,purlinTopY:Math.round(purlinBB.max.y*10)/10,hipRafters:count('隅木'),groundRafters:count('地垂木'),flyingRafters:count('飛檐垂木'),tileRows:count('灰黒丸瓦列'),eaveSegments:count('緑釉軒瓦'),hipRidgeSegments:count('緑釉隅棟'),shibi:count('鴟尾'),stairs:count('南階 / 段'),plaques:count('扁額'),tileTexture:!!(mat?.textureAssetId&&imageAssetData(mat.textureAssetId)),roofSize:[size.x,size.y,size.z].map(v=>Math.round(v*10)/10),ridge:heianDaigokudenRidgeSeatInfo(P),skipped:ops.filter(o=>o._skipped).length};
- info.valid=!!info.ridge?.seated&&info.roofPanels===56&&info.columns===30&&info.moyaColumns===22&&info.doors===9&&info.doorZ>75&&info.doorZ<82&&info.doorColor==='#9e3d28'/* 扉は木の色でなく丹塗り（2026-08-26井内さん「大極殿、豊楽殿の扉は赤」） */&&info.bracketReach>15&&info.bracketReach<19/* 三手先の先端＝柱通り+14.4〜17。総出1.5m前後で軒先（+35）には届かない（2026-09-23・初版24〜30は張り出し過ぎ） */&&info.purlinZ>94&&info.purlinZ<99&&info.purlinTopY>121&&info.purlinTopY<124/* 丸桁の天端。屋根裏（roofEave118でz=94.4はy≈124）に地垂木を挟んで接する */&&info.bracketClusters===34/* 外周柱30＋四隅は両方向で+4 */&&info.tailRafters===34&&info.makito===34*9/* 三手先1組に巻斗9（中備の巻斗は「間巻斗」で別名） */&&info.hipRafters===4&&info.transoms===27&&info.smallWalls===9&&info.endWalls===2&&info.rearWalls===1&&info.soffitWalls===4/* 梁上の空帯を塞ぐ朱の小舞4面（2026-08-24。白壁から朱へ変更） */&&info.soffitClearance!=null&&info.soffitClearance>0/* 小舞が瓦面を突き抜けない（2026-09-23） */&&info.outerSideWalls===4&&info.innerSideWalls===0&&info.wallBands===8&&info.throughBeams===4&&info.eavePurlins===4&&info.latticeBars===28&&info.rails===0&&info.brackets>=34*18+30*6/* 三手先34組×18部材＋中備30組×6部材（2026-09-23。330→800超） */&&info.groundRafters>=300/* 104→300超: 二軒を4単位（40cm）間隔で軒全長へ（2026-09-23） */&&info.flyingRafters>=info.groundRafters&&info.tileRows===0&&info.eaveSegments===0/* 44→0: 軒先の緑釉帯を撤去（2026-08-24） */&&info.hipRidgeSegments===56&&info.shibi===2&&info.stairs===15&&info.plaques===2&&info.tileTexture&&Math.abs(size.x-560)<2&&Math.abs(size.z-230)<2&&info.skipped===0;window.__daigokudenDetailInfo=()=>info;
+ info.valid=!!info.ridge?.seated&&info.roofPanels===56&&info.columns===30&&info.moyaColumns===22&&info.doors===0/* 2026-10-07 正面を開放（板扉なし） */&&info.bracketReach>15&&info.bracketReach<19/* 三手先の先端＝柱通り+14.4〜17。総出1.5m前後で軒先（+35）には届かない（2026-09-23・初版24〜30は張り出し過ぎ） */&&info.purlinZ>94&&info.purlinZ<99&&info.purlinTopY>121&&info.purlinTopY<124/* 丸桁の天端。屋根裏（roofEave118でz=94.4はy≈124）に地垂木を挟んで接する */&&info.bracketClusters===34/* 外周柱30＋四隅は両方向で+4 */&&info.tailRafters===34&&info.makito===34*9/* 三手先1組に巻斗9（中備の巻斗は「間巻斗」で別名） */&&info.hipRafters===4&&info.transoms===27&&info.smallWalls===9&&info.endWalls===2&&info.rearWalls===1&&info.soffitWalls===4/* 梁上の空帯を塞ぐ朱の小舞4面（2026-08-24。白壁から朱へ変更） */&&info.soffitClearance!=null&&info.soffitClearance>0/* 小舞が瓦面を突き抜けない（2026-09-23） */&&info.outerSideWalls===4&&info.innerSideWalls===0&&info.wallBands===8&&info.throughBeams===4&&info.eavePurlins===4&&info.latticeBars===28&&info.rails===0&&info.brackets>=34*18+30*6/* 三手先34組×18部材＋中備30組×6部材（2026-09-23。330→800超） */&&info.groundRafters>=300/* 104→300超: 二軒を4単位（40cm）間隔で軒全長へ（2026-09-23） */&&info.flyingRafters>=info.groundRafters&&info.tileRows===0&&info.eaveSegments===0/* 44→0: 軒先の緑釉帯を撤去（2026-08-24） */&&info.hipRidgeSegments===56&&info.shibi===2&&info.stairs===15&&info.plaques===2&&info.tileTexture&&Math.abs(size.x-560)<2&&Math.abs(size.z-230)<2&&info.skipped===0;window.__daigokudenDetailInfo=()=>info;
  if(!info.valid){console.error('CADKIT_FAIL daigokuden-detail '+JSON.stringify(info));setStatus('大極殿詳細版の自己検査に失敗');return false;}console.log('CADKIT_OK daigokuden-detail '+JSON.stringify(info));return true;
 }
 // 大極殿の棟が屋根へ座っているかを、生成後の実geometryで測る（2026-08-24井内さん「棟が浮いてる」）。
@@ -16110,15 +16212,15 @@ function heianHeritageDetailKit(k,state){
  out.gable=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,sOverhang=8,lOverhang=10)=>{const n=bodies.length,r=k.gable(parts,cx,cz,w,d,y0,eave,rise,label,noBase,sOverhang,lOverhang);if(nonTile(label))return r;const found=capture(n),roofEave=y0+Math.round((eave-y0)*1.2),roofRise=Math.round(rise*1.8);detail(parts,cx,cz,w,d,roofEave,label+'屋根','gable',.9,{rise:roofRise/1.5,sOverhang,lOverhang,rank:'small',samples:2,gableWall:true},found);return r;};
  out.gableRoof=(parts,cx,cz,w,d,eave,rise,label,sOverhang=8,lOverhang=0)=>{const n=bodies.length,r=k.gableRoof(parts,cx,cz,w,d,eave,rise,label,sOverhang,lOverhang);if(nonTile(label))return r;const found=capture(n);detail(parts,cx,cz,w,d,eave,label,'gable',.9,{rise,sOverhang,lOverhang,rank:'small',samples:2},found);return r;};
  out.openGallery=(parts,cx,cz,len,axis,lift=0,label='回廊',width=26)=>{const n=bodies.length,r=k.openGallery(parts,cx,cz,len,axis,lift,label,width),found=capture(n),w=axis==='x'?len:width,d=axis==='x'?width:len;detail(parts,cx,cz,w,d,33+lift,label+'屋根','gable',.9,{rise:13,sOverhang:8,rank:'small',samples:2},found);return r;};
- out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const n=bodies.length,r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),found=capture(n),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);detail(parts,cx,cz,w,d,roofY,label+'屋根','gable',.9,{rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',samples:3,gableWall:true,verge:!opts.hiwada,...(opts.eaves?{eaves:false}/* 平三斗・垂木は本体（2026-09-25） */:{})},found.filter(b=>!/垂木|組物/.test(b.name)));if(w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
+ out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const n=bodies.length,r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),found=capture(n),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);detail(parts,cx,cz,w,d,roofY,label+'屋根','gable',.9,{rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',samples:3,gableWall:true,verge:!opts.hiwada,...(opts.eaves?{eaves:false}/* 平三斗・垂木は本体（2026-09-25） */:{})},found.filter(b=>!/垂木|組物/.test(b.name)));if(!opts.sideDoors&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
  out.templeGate=(parts,cx,cz,w,d,y0,eave,rise,label,inward=1)=>{const n=bodies.length,r=k.templeGate(parts,cx,cz,w,d,y0,eave,rise,label,inward),found=capture(n),beamY=Math.max(y0+21,eave+10),roofEave=beamY+12;detail(parts,cx,cz,w,d,roofEave,label+'屋根','gable',.9,{rise:Math.round(rise*1.2),sOverhang:6,lOverhang:7,rank:'small',samples:2},found);return r;};
  out.gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{const n=bodies.length,r=k.gate2(cx,cz,w,label,parts,monumental,columnCount),found=capture(n);state.lowerRoofs++;// 軒桁・組物を壁の通りへ寄せるため、各屋根が載る身舎の平面をwallで渡す（gate2の一階は幅w・奥行64、
  // 楼上は重層でw×64・非重層でw-40×52。formalFacadeへ渡している値と同じ・2026-08-26）
  // 重層門は gate2 本体が三手先・丸桁を組む（2026-09-23）。ここでは棟と垂木だけ重ね、組物・軒桁は出さない。高さは HEIAN_GATE2
  // 2026-09-24: 垂木も gate2 本体（板の屋根の裏へ密に）。detail は上屋根の棟だけ（eaves:false）。下屋根は棟が無い（ridges:false）ので
  //   detail を呼ぶと中身ゼロで alignment が落ちる → 呼ばず bandRidges だけ。styles.yosemune が1減る（toji/saiji/buraku の期待値を更新）
- if(monumental){const G=HEIAN_GATE2;k.bandRidges(state.details,cx,cz,w+58,120,G.lowerEave,G.lowerTop,label+'下屋根',{cornerSori:true});detail(parts,cx,cz,w+90,144,G.upperEave,label+'屋根','irimoya',.85,{rank:'major',samples:3,wall:[w,64],eaves:false,cornerSori:true/* 本体の隅反りに隅棟を沿わせる（2026-09-25） */},[found[1]]);}else{detail(parts,cx,cz,w+50,108,77,label+'裳階','yosemune',.204,{ridges:false,rank:'major',samples:2,wall:[w,64]},[found[0]]);k.bandRidges(state.details,cx,cz,w+50,108,77,88,label+'裳階');detail(parts,cx,cz,w+16,88,106,label+'屋根','irimoya',.818,{rank:'major',samples:3,wall:[w-40,52]},[found[1]]);}k.formalFacade(parts,cx,cz,monumental?w:w-40,monumental?64:52,88+(monumental?HEIAN_GATE2.lift:0),105+(monumental?HEIAN_GATE2.lift:0),label+'楼上','S',Math.max(3,Math.round(w/55)));return r;};
- out.tower=(parts,cx,cz,label,yOffset=0,palatial=false,ornate=false)=>{const n=bodies.length,r=k.tower(parts,cx,cz,label,yOffset,palatial,ornate),found=capture(n);const detailN=(dx,dz,w,d,eave,lb,style,slope,options={},source=[])=>{if(!k.nat)return detail(parts,cx+dx,cz+dz,w,d,eave,lb,style,slope,options,source);const m=bodies.length;state.styles[style]++;k.nat('detailedTileRoof',parts,cx,cz,dx,dz,w,d,eave,lb,style,slope,{...options,surface:false,baseRidgeScale:options.baseRidgeScale??0});const added=bodies.slice(m);state.alignments.push({label:lb,source:source.filter(Boolean),details:added});return added;};const bandN=(p2,w,d,...rr)=>k.nat?k.nat('bandRidges',p2,cx,cz,0,0,w,d,...rr):k.bandRidges(p2,cx,cz,w,d,...rr);if(!palatial)detailN(0,0,122,94,HEIAN_TOWER.temple.eave+yOffset,label+'東西棟入母屋屋根','irimoya',.88,{rank:'tower',samples:2,eaves:false,sori:false,cornerSori:true/* 鐘楼・経蔵も三手先＋板の屋根（2026-09-25） */},found.filter(b=>b.name.includes('東西棟入母屋屋根')));else if(!ornate){/* 2026-09-25 楼を三手先＋板の屋根へ（HEIAN_TOWER.plain）。腰屋根は帯なので bandRidges、組物・垂木は本体（eaves:false） */const P=HEIAN_TOWER.plain;bandN(state.details,132,112,P.lowEave+yOffset,P.lowTop+yOffset,label+'一階屋根',{sori:false,cornerSori:true});detailN(0,0,124,92,P.upEave+yOffset,label+'東西棟入母屋屋根','irimoya',.9,{rank:'tower',samples:2,eaves:false,sori:false,cornerSori:true},found.filter(b=>b.name.includes('東西棟入母屋屋根')));k.formalFacade(parts,cx,cz,72,58,P.upFloor+yOffset+1,P.upTop+yOffset-2,label+'楼上','S',3,3);}else{const O=HEIAN_TOWER.ornate,o={rank:'tower',green:true,eaves:false,sori:false,cornerSori:true};detailN(0,0,132,112,O.eave+yOffset,label+'一階大寄棟屋根','yosemune',.45,{...o,samples:2},found.filter(b=>b.name.includes('一階大寄棟屋根')));detailN(0,0,68,68*2/3,O.cEave+yOffset,label+'中央上櫓屋根','irimoya',.8,{...o,samples:2,ridgeR:HEIAN_TOWER_RIDGE_R.center},found.filter(b=>b.name.includes('中央上櫓屋根')));for(const sx of[-1,1])for(const sz of[-1,1])detailN(sx*37,sz*30,42,28,O.turretEave+yOffset,label+'稜線小櫓屋根','irimoya',.7,{...o,samples:1,ridgeR:HEIAN_TOWER_RIDGE_R.turret},found.filter(b=>b.name.includes('稜線小櫓屋根')));}return r;};
+ if(monumental){const G=HEIAN_GATE2;k.bandRidges(state.details,cx,cz,w+58,120,G.lowerEave,G.lowerTop,label+'下屋根',{cornerSori:true});detail(parts,cx,cz,heianGate2Small(label,monumental)?w+68:w+90,heianGate2Small(label,monumental)?126:144,G.upperEave,label+'屋根','irimoya',.85,{rank:'major',samples:3,wall:[w,64],eaves:false,cornerSori:true/* 本体の隅反りに隅棟を沿わせる（2026-09-25） */},[found[1]]);}else{detail(parts,cx,cz,w+50,108,77,label+'裳階','yosemune',.204,{ridges:false,rank:'major',samples:2,wall:[w,64]},[found[0]]);k.bandRidges(state.details,cx,cz,w+50,108,77,88,label+'裳階');detail(parts,cx,cz,w+16,88,106,label+'屋根','irimoya',.818,{rank:'major',samples:3,wall:[w-40,52]},[found[1]]);}k.formalFacade(parts,cx,cz,monumental?w:w-40,monumental?64:52,88+(monumental?HEIAN_GATE2.lift:0),105+(monumental?HEIAN_GATE2.lift:0),label+'楼上','S',Math.max(3,Math.round(w/55)));return r;};
+ out.tower=(parts,cx,cz,label,yOffset=0,palatial=false,ornate=false)=>{const n=bodies.length,r=k.tower(parts,cx,cz,label,yOffset,palatial,ornate),found=capture(n);const detailN=(dx,dz,w,d,eave,lb,style,slope,options={},source=[])=>{if(!k.nat)return detail(parts,cx+dx,cz+dz,w,d,eave,lb,style,slope,options,source);const m=bodies.length;state.styles[style]++;k.nat('detailedTileRoof',parts,cx,cz,dx,dz,w,d,eave,lb,style,slope,{...options,surface:false,baseRidgeScale:options.baseRidgeScale??0});const added=bodies.slice(m);state.alignments.push({label:lb,source:source.filter(Boolean),details:added});return added;};const bandN=(p2,w,d,...rr)=>k.nat?k.nat('bandRidges',p2,cx,cz,0,0,w,d,...rr):k.bandRidges(p2,cx,cz,w,d,...rr);if(!palatial)detailN(0,0,122,94,HEIAN_TOWER.temple.eave+yOffset,label+'東西棟入母屋屋根','irimoya',.88,{rank:'tower',samples:2,eaves:false,sori:false,cornerSori:true/* 鐘楼・経蔵も三手先＋板の屋根（2026-09-25） */},found.filter(b=>b.name.includes('東西棟入母屋屋根')));else if(!ornate){/* 2026-09-25 楼を三手先＋板の屋根へ（HEIAN_TOWER.plain）。腰屋根は帯なので bandRidges、組物・垂木は本体（eaves:false） */const P=HEIAN_TOWER.plain;bandN(state.details,132,112,P.lowEave+yOffset,P.lowTop+yOffset,label+'一階屋根',{sori:false,cornerSori:true});detailN(0,0,124,92,P.upEave+yOffset,label+'東西棟入母屋屋根','irimoya',P.slope,{rank:'tower',samples:2,eaves:false,sori:false,cornerSori:true},found.filter(b=>b.name.includes('東西棟入母屋屋根')));k.formalFacade(parts,cx,cz,72,58,P.upFloor+yOffset+1,P.upTop+yOffset-2,label+'楼上','S',3,3);}else{const O=HEIAN_TOWER.ornate,o={rank:'tower',green:true,eaves:false,sori:false,cornerSori:true};detailN(0,0,O.roofL,O.roofS,O.eave+yOffset,label+'一階大寄棟屋根','yosemune',.45,{...o,samples:2},found.filter(b=>b.name.includes('一階大寄棟屋根')));detailN(0,0,O.cRoofL,O.cRoofS,O.cEave+yOffset,label+'中央上櫓屋根','irimoya',.8,{...o,samples:2,ridgeR:HEIAN_TOWER_RIDGE_R.center},found.filter(b=>b.name.includes('中央上櫓屋根')));for(const sx of[-1,1])for(const sz of[-1,1])detailN(sx*37,sz*30,O.tRoofL,O.tRoofS,O.turretEave+yOffset,label+'稜線小櫓屋根','irimoya',.7,{...o,samples:1,ridgeR:HEIAN_TOWER_RIDGE_R.turret},found.filter(b=>b.name.includes('稜線小櫓屋根')));}return r;};
  out.cornerCap=(parts,cx,cz,lift=0,label='回廊角屋根')=>{const n=bodies.length,r=k.cornerCap(parts,cx,cz,lift,label);capture(n);state.hogyo++;return r;};
  out.pagoda=(parts,cx,cz,w,label)=>{const n=bodies.length,r=k.pagoda(parts,cx,cz,w,label),found=capture(n);state.pagodaLayers+=found.length;addHeianPagodaRoofDetails(k,parts,cx,cz,w,label,state);addHeianPagodaBodyDetails(k,parts,cx,cz,w,label,state);return r;};
  return out;
@@ -16141,11 +16243,11 @@ function heianDistantHeritageKit(k,details=null){const out={...k,heritageDetail:
   return b;};
  out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);
   // けらばの降棟と降鬼だけ重ねる（1.76）。大棟は本体の殻の帯があるので出さない（mainRidge:false）。檜皮葺（内裏・朱雀院）・板葺は除く
-  if(!opts.hiwada&&!/板葺|檜皮|草葺|^朱雀院/.test(label))k.detailedTileRoof(sink,cx,cz,w,d,roofY,label+'屋根','gable',.9,{surface:false,rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',mainRidge:false,eaves:false,dense:false});if(w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
- out.gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{const r=k.gate2(cx,cz,w,label,parts,monumental,columnCount),lw=monumental?w+58:w+50,ld=monumental?120:108,ly1=monumental?85:88,uw=monumental?w+90:w+16,ud=monumental?144:88,slope=monumental?.85:.818,lowerLabel=label+(monumental?'下屋根':'裳階'),G=HEIAN_GATE2,ly0=monumental?G.lowerEave:77,ly1b=monumental?G.lowerTop:ly1,ue=monumental?G.upperEave:106,lift=monumental?G.lift:0;k.bandRidges(parts,cx,cz,lw,ld,ly0,ly1b,lowerLabel,{cornerSori:monumental});k.detailedTileRoof(parts,cx,cz,uw,ud,ue,label+'屋根','irimoya',slope,{surface:false,dense:false,rank:'major',samples:2,wall:[monumental?w:w-40,monumental?64:52]/* 遠景kitでも軒桁・組物を楼上の壁の通りへ寄せる（2026-08-27） */,eaves:!monumental/* 重層門は gate2 本体の三手先・丸桁・垂木を使う（2026-09-23/24） */,cornerSori:monumental/* 隅反りに隅棟を沿わせる（2026-09-25） */});k.formalFacade(parts,cx,cz,monumental?w:w-40,monumental?64:52,88+lift,105+lift,label+'楼上','S',Math.max(3,Math.round(w/55)));return r;};
+  if(!opts.hiwada&&!/板葺|檜皮|草葺|^朱雀院/.test(label))k.detailedTileRoof(sink,cx,cz,w,d,roofY,label+'屋根','gable',.9,{surface:false,rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',mainRidge:false,eaves:false,dense:false});if(!opts.sideDoors&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
+ out.gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{const r=k.gate2(cx,cz,w,label,parts,monumental,columnCount),lw=monumental?w+58:w+50,ld=monumental?120:108,ly1=monumental?85:88,uw=monumental?(heianGate2Small(label,monumental)?w+68:w+90):w+16,ud=monumental?(heianGate2Small(label,monumental)?126:144):88,slope=monumental?.85:.818,lowerLabel=label+(monumental?'下屋根':'裳階'),G=HEIAN_GATE2,ly0=monumental?G.lowerEave:77,ly1b=monumental?G.lowerTop:ly1,ue=monumental?G.upperEave:106,lift=monumental?G.lift:0;k.bandRidges(parts,cx,cz,lw,ld,ly0,ly1b,lowerLabel,{cornerSori:monumental});k.detailedTileRoof(parts,cx,cz,uw,ud,ue,label+'屋根','irimoya',slope,{surface:false,dense:false,rank:'major',samples:2,wall:[monumental?w:w-40,monumental?64:52]/* 遠景kitでも軒桁・組物を楼上の壁の通りへ寄せる（2026-08-27） */,eaves:!monumental/* 重層門は gate2 本体の三手先・丸桁・垂木を使う（2026-09-23/24） */,cornerSori:monumental/* 隅反りに隅棟を沿わせる（2026-09-25） */});k.formalFacade(parts,cx,cz,monumental?w:w-40,monumental?64:52,88+lift,105+lift,label+'楼上','S',Math.max(3,Math.round(w/55)));return r;};
  out.tower=(parts,cx,cz,label,yOffset=0,palatial=false,ornate=false)=>{if(palatial&&ornate){const O=HEIAN_TOWER.ornate;buildChodoinDetailTower(k,parts,cx,cz,label,yOffset,true,true);k.formalFacade(parts,cx,cz,O.cSize,O.cSize,O.cLowY+yOffset+1,O.cTopY+yOffset-2,label+'楼上','S',3);return;}
   const r=k.tower(parts,cx,cz,label,yOffset,palatial,ornate);if(!palatial){const TP=HEIAN_TOWER.temple;k.detailedTileRoof(parts,cx,cz,122,94,TP.eave+yOffset,label+'東西棟入母屋屋根','irimoya',.88,{surface:false,dense:false,rank:'tower',samples:2,sori:false,eaves:false,cornerSori:true});if(/経蔵/.test(label))k.formalFacade(parts,cx,cz,72,62,2+yOffset,TP.wall+yOffset-4,label,'S',3,3);return r;}
-  const P=HEIAN_TOWER.plain;/* 2026-09-25 楼を三手先＋板の屋根へ。高さは HEIAN_TOWER.plain、組物・垂木は本体 */k.bandRidges(parts,cx,cz,132,112,P.lowEave+yOffset,P.lowTop+yOffset,label+'一階屋根',{sori:false,cornerSori:true});k.detailedTileRoof(parts,cx,cz,124,92,P.upEave+yOffset,label+'東西棟入母屋屋根','irimoya',.9,{surface:false,dense:false,rank:'tower',samples:2,sori:false,eaves:false,cornerSori:true});k.formalFacade(parts,cx,cz,72,58,P.upFloor+yOffset+1,P.upTop+yOffset-2,label+'楼上','S',3,3);return r;};return out;
+  const P=HEIAN_TOWER.plain;/* 2026-09-25 楼を三手先＋板の屋根へ。高さは HEIAN_TOWER.plain、組物・垂木は本体 */k.bandRidges(parts,cx,cz,132,112,P.lowEave+yOffset,P.lowTop+yOffset,label+'一階屋根',{sori:false,cornerSori:true});k.detailedTileRoof(parts,cx,cz,124,92,P.upEave+yOffset,label+'東西棟入母屋屋根','irimoya',P.slope,{surface:false,dense:false,rank:'tower',samples:2,sori:false,eaves:false,cornerSori:true});k.formalFacade(parts,cx,cz,72,58,P.upFloor+yOffset+1,P.upTop+yOffset-2,label+'楼上','S',3,3);return r;};return out;
 }
 function heianTerrainTempleDetailKit(k,details=null){const out=heianDistantHeritageKit(k,details);out.terrainTempleDetail=true;
  out.pagoda=(parts,cx,cz,w,label)=>{const r=k.pagoda(parts,cx,cz,w,label),state={pagodaParts:0};addHeianPagodaRidgeDetails(k,parts,cx,cz,w,label);addHeianPagodaBodyDetails(k,parts,cx,cz,w,label,state);return r;};
@@ -16667,6 +16769,7 @@ function heianSpeechTags(x,z){
   for(const id of['toji','saiji']){const s=HEIAN_LANDMARK_SITES[id];if(s&&Math.abs(x-s.x)<s.w/2&&Math.abs(z-s.z)<s.d/2)tags.add(id);}if(z>31000)tags.add('minamibe');if(x>20500)tags.add('kamo');
   for(const q of HEIAN_KUGYO)if(Math.hypot(x-q.x,z-q.z)<700)tags.add('estate_'+q.id); /* 公卿の邸の前（2026-09-26） */
   if(heianTsujiShrines.some(s=>Math.hypot(x-s.x,z-s.z)<450))tags.add('tsuji'); /* 辻の神の祠の近く（2026-09-30） */
+  for(const q of heianQuirkSpots)if(Math.hypot(x-q.x,z-q.z)<(q.tr||300))tags.add('quirk_'+q.id); /* 街かどの出来事の近く（2026-10-07） */
   if(x>5640&&x<6400&&Math.abs(z+1422)<600)tags.add('yomeimon');if(x>5640&&x<6400&&Math.abs(z-4297)<600)tags.add('ikuhomon');}
  // 1.75: 歩行の地点一覧に無い4つ（朱雀門・後宮・穀倉院・羅城門の南）。🚫 at:'suzakumon' 20行・'kokyu' 8行・'kokuso' 3行・'south' 5行が、どこでもタグにならず一度も出ていなかった
  if(Math.hypot(x,z-6860)<700)tags.add('suzakumon');
@@ -20411,6 +20514,11 @@ function heianRobotLampUpdate(rt){
   if(show){const x=rt.position.x,z=rt.position.z,gy=Math.max(heianWalkGroundY(x,z)||rt.position.y,rt.position.y-2);P.position.set(x,gy+.6,z);P.scale.setScalar(k.r);P.material.opacity=k.a*night;}}
  rt.lampInfo={night:Math.round(night*100)/100,intensity:Math.round(L.intensity*10)/10,pool:Math.round(heianLampK.pool.a*100)/100};}
 window.__heianRobotLampInfo=()=>heianTinRobotRuntime?.lampInfo||null;
+// 歩行ロボの外形（世界座標）。歩行カメラのズームが「体全体が画角に入る距離」を決めるのに使う（2026-10-07）。足元からの高さ・幅・奥行き
+function heianRobotBounds(){const rt=heianTinRobotRuntime;if(!rt?.robotBodies?.length)return null;const box=new THREE.Box3();
+ for(const b of rt.robotBodies)if(b.mesh?.visible!==false){b.mesh.updateWorldMatrix(true,false);box.expandByObject(b.mesh);}
+ if(box.isEmpty())return null;const s=box.getSize(new THREE.Vector3());return{minY:box.min.y,maxY:box.max.y,height:s.y,width:s.x,depth:s.z};}
+window.__heianRobotBounds=()=>{const r=heianRobotBounds(),p=heianWalk?.active?heianWalk.position:null;return r&&{...r,feetY:p?p.y:null,aboveFeet:p?r.maxY-p.y:null};};
 // ---- ロボの動作（2026-09-29井内さん「ジャンプ、踊る、祈る、お辞儀するとかをできるようにしたい。参拝は祈るで行ける」）。
 // 歩きの姿勢の上に関節角を足す（ホバーの構えと同じ重ね方）。焼き込みの poses を増やさない＝焼き直し不要。
 // keys: [秒, 関節角, 浮き（世界単位・10=1m）]。間は滑らかにつなぐ。spin: 踊りの一回転（秒の区間）
@@ -22156,6 +22264,11 @@ function heianFaunaGround(k,root,F){
  for(const[nm,coat,belly]of[['東三条殿',0x2a2622,0xeeeae0],['堀河院',0x6e6457,null],['亭子院',0xe8e4da,null]]){const e=window.__heianImperialEstates?.().find(q=>q.name===nm);if(!e)continue;
   for(let r=0;r<420;r+=30){let ok=false;for(let a=0;a<8&&!ok;a++){const x=e.x+Math.cos(a*.785)*r,z=e.z+e.d*.2+Math.sin(a*.785)*r;if(!heianWalkBlocked(x,z,4)){sitCat(x,z,catMat(coat),belly?catMat(belly):null,nm+'の唐猫（紐つき）',true);ok=true;}}if(ok)break;}}
  houses.filter((b,i)=>hsh(b.minX,b.minZ,19)<.01).slice(0,2).forEach((b,i)=>{const c=buildHeianCat(k,catMat(i?0x6e6457:0xb5723a),{walk:true,name:'町の猫'+(i+1)}),x=(b.minX+b.maxX)/2,z=b.maxZ+5;root.add(c.group);walkCats.push({...c,x0:x,z0:z,half:Math.max(8,(b.maxX-b.minX)*.4),ph:i*.5});});
+ // 街かどの小さな出来事（heianQuirkSpots）: いつも居る犬3匹・猫の親子。往復は短く、脚は heianOxAnimate で振る（町の猫と同じ walkCats）
+ info.quirkAnimals=0;
+ for(const q of heianQuirkSpots){
+  if(q.kind==='dogs3'){[0xb5723a,0xd9d0bf,0x3a2e25].forEach((c,i)=>{const dg=buildHeianDog(k,catMat(c),'街かどの犬'+(i+1));root.add(dg.group);walkCats.push({...dg,x0:q.x+(i-1)*9,z0:q.z+(i-1)*4,half:5+i*2,ph:i*.31+hsh(q.x,q.z,i)});info.quirkAnimals++;});}
+  else if(q.kind==='cats'){[1,.6,.55].forEach((sc,i)=>{const c=buildHeianCat(k,catMat(i?0xb5723a:0x6e6457),{walk:true,name:i?'猫の子':'猫の親'});c.group.scale.setScalar(sc);root.add(c.group);walkCats.push({...c,x0:q.x+i*6,z0:q.z+i*2.5,half:9,ph:i*.07});info.quirkAnimals++;});}}
  info.cats=cats.length+walkCats.length;info.catNames=[...cats.map(c=>c.name),...walkCats.map(c=>c.group.name)];
  const place=(m,i,x,y,z,ry,rx=0,s=1)=>{d.position.set(x,y,z);d.rotation.set(rx,ry,0,'YXZ');d.scale.setScalar(s);d.updateMatrix();m.setMatrixAt(i,d.matrix);};
  for(const kind of Object.keys(hens))hens[kind].forEach((p,i)=>place(henMesh[kind],i,p.x,p.y,p.z,p.ry));sparrows.forEach((p,i)=>place(sparrowMesh,i,p.x,p.y,p.z,p.ry));
@@ -22757,7 +22870,7 @@ function createHeianCrowdRuntime(point=HEIAN_GAME_LOCATIONS[0]){
     const terrainY=p.gyT,surfaceY=Number.isFinite(runtime.surfaceY)?runtime.surfaceY:p.gyAt,y=surfaceY+.2;runtime.maxSurfaceLift=Math.max(runtime.maxSurfaceLift,surfaceY-terrainY);const dph=dancing?danceT*Math.PI*2/.9+p.phase:0,swing=fue?0:dancing?Math.sin(dph*2)*(ds===1?.45:.95)*danceW:still?0:Math.sin(runtime.time*p.cadence*(runner?1+.7*rainK:1)+p.phase)*(runner?.55+.3*rainK:.55),bob=fue?Math.abs(Math.sin(dph))*.35*danceW:dancing?Math.abs(Math.sin(dph))*(ds===1?.6:ds===2?1.1:1.8)*danceW:still?0:Math.abs(Math.sin(runtime.time*p.cadence*(runner?1+.7*rainK:1)+p.phase))*(runner?.18+.5*rainK:.18),heading0=p.standing||p.workStill||runtime.formation!=='flow'?p.heading:Math.atan2(p.axisX*p.direction,p.axisZ*p.direction),
      heading=bowing&&p.bowTo?heading0+Math.atan2(Math.sin(Math.atan2(p.bowTo.x-p.x,p.bowTo.z-p.z)-heading0),Math.cos(Math.atan2(p.bowTo.x-p.x,p.bowTo.z-p.z)-heading0))*Math.min(1,bowW*1.6):(fue||waving)&&(p.danceTo||p.waveTo)?Math.atan2((waving?p.waveTo:p.danceTo).x-p.x,(waving?p.waveTo:p.danceTo).z-p.z):ds===2?heading0+danceT*3.2*danceW:ds===5?heading0+Math.min(1,Math.max(0,((danceT%3.6)-1.35)/1.35))*Math.PI*2:dancing?heading0+Math.sin(dph)*.6*danceW:heading0;pos.set(p.x,y+bob,p.z); /* 笛と手を振る人はロボの方を向く・回る人はその場で回る */qb.setFromAxisAngle(THREE.Object3D.DEFAULT_UP,heading);
      if(bowW>0)qb.multiply(heianBowQ.setFromAxisAngle(heianBowAxis,THREE.MathUtils.degToRad(HEIAN_BOW_BACK.deg)*bowW));/* 足元を支点に前へ傾ける */
-     if(ds===1)qb.multiply(heianBowQ.setFromAxisAngle(heianRollAxis,Math.sin(dph)*.22*danceW));/* 1.86 揺れる踊り＝足元を支点に左右へ傾ける */{const ph=p.height*(p.lookH||1);base.compose(pos,qb,scale.set(ph,ph,ph));}setPart(parts.shadow,i,base,[0,.25-bob,0],[4.6,1,4.6]);setPart(parts.robe,i,base,[0,8,0],p.courtOfficial?[p.courtDress==='束帯'?1.18:1.08,1.03,1.1]:[p.female?1.12:1,p.female?1.05:1,p.female?1.08:1]);setPart(parts.head,i,base,[0,13.2,0],[1.8,1.8,1.8]);setPart(parts.eyes,i,base,[0,13,1.62],[1,1,1]);setPart(parts.hat,i,base,[0,16,0],p.female||p.monk?[0,0,0]:[1,1,1],.12);setPart(parts.hair,i,base,[0,12.2,-1.3],p.female?[2.4,3.2,1.5]:[0,0,0]);setPart(parts.bangs,i,base,[0,13.15,.15],p.female?[2.05,1.75,2.05]:[0,0,0]);setPart(parts.femaleHeadwear,i,base,[0,16.1,0],p.female?[1,.72,1]:[0,0,0]);setPart(parts.courtBelt,i,base,[0,9.2,0],p.courtOfficial?[5,.55,2]:[0,0,0]);setPart(parts.shaku,i,base,[1.4,10,-1.4],p.courtOfficial?[.6,3.3,.25]:[0,0,0],-.18);setPart(parts.cargoPack,i,base,[0,11,-3.1],p.cargoRole==='pack'?[4.8,5.2,3.2]:[0,0,0]);setPart(parts.cargoLoad,i,base,[0,7.4,3.2],p.cargoRole==='hand'||p.cargoRole==='handoff'?[5.4,3.4,4.2]:[0,0,0]);{const pw=worship||fue,aw=p.courtOfficial?[1.05,3.7,1.05]:pw?[.48,3.2,.48]:[.48,4,.48]; // 1.86 笛を吹く人は両手を口の前へ（参拝の腕と同じ形）・手を振る人は右腕を頭の上へ上げて振る
+     if(ds===1)qb.multiply(heianBowQ.setFromAxisAngle(heianRollAxis,Math.sin(dph)*.22*danceW));/* 1.86 揺れる踊り＝足元を支点に左右へ傾ける */{const ph=p.height*(p.lookH||1);base.compose(pos,qb,scale.set(ph,ph,ph));}setPart(parts.shadow,i,base,[0,.25-bob,0],[4.6,1,4.6]);setPart(parts.robe,i,base,[0,8,0],p.courtOfficial?[p.courtDress==='束帯'?1.18:1.08,1.03,1.1]:[p.female?1.12:1,p.female?1.05:1,p.female?1.08:1]);setPart(parts.head,i,base,[0,13.2,0],[1.8,1.8,1.8]);setPart(parts.eyes,i,base,[0,13,1.62],[1,1,1]);setPart(parts.hat,i,base,[0,16,0],p.female||p.monk?[0,0,0]:[1,1,1],.12);setPart(parts.hair,i,base,[0,12.2,-1.3],p.female?[2.4,3.2,1.5]:[0,0,0]);setPart(parts.bangs,i,base,[0,13.7,.15],p.female?[2.05,1.75,2.05]:[0,0,0]);setPart(parts.femaleHeadwear,i,base,[0,16.1,0],p.female?[1,.72,1]:[0,0,0]);setPart(parts.courtBelt,i,base,[0,9.2,0],p.courtOfficial?[5,.55,2]:[0,0,0]);setPart(parts.shaku,i,base,[1.4,10,-1.4],p.courtOfficial?[.6,3.3,.25]:[0,0,0],-.18);setPart(parts.cargoPack,i,base,[0,11,-3.1],p.cargoRole==='pack'?[4.8,5.2,3.2]:[0,0,0]);setPart(parts.cargoLoad,i,base,[0,7.4,3.2],p.cargoRole==='hand'||p.cargoRole==='handoff'?[5.4,3.4,4.2]:[0,0,0]);{const pw=worship||fue,aw=p.courtOfficial?[1.05,3.7,1.05]:pw?[.48,3.2,.48]:[.48,4,.48]; // 1.86 笛を吹く人は両手を口の前へ（参拝の腕と同じ形）・手を振る人は右腕を頭の上へ上げて振る
      // 1.99 ロボ踊り（ds=5・踊る人の約1割）: 腕を交互に前上へ上げ、足を踏み、3.6秒の真ん中で一回転する（HEIAN_ROBOT_ACTIONS.dance と同じ拍）
      const rb=ds===5,rs=rb?Math.sin(dph):0,rbU=-2.6*danceW,rbD=-.5*danceW,rbR=rs>0?rbU:rbD,rbL=rs>0?rbD:rbU;
      setPart(parts.armL,i,base,rb?[-3,10-2*Math.cos(rbL),-2*Math.sin(rbL)]:fue?[-1.2,11.2,1.4]:pw?[-1.7,9.2,-1.3]:[-3,8,0],aw,rb?rbL:fue?-1.2:pw?-.5:-swing*.7);
@@ -22822,8 +22935,8 @@ function disposeHeianCrowd(){heianCrowdRuntime?.dispose();}
 //  時刻: 役ごとの刻（HEIAN_DAILY_LIFE_HOURS）の外は隠す。人ごとに刻を±30分ずらし、一斉に現れない。動かすのはカメラから250m以内だけ
 //  考証: 洗い物は川・井戸端で盥を使う（推定）。子の遊び（鬼ごっこ・竹馬）は既存の台詞と同じく推定。厩の牛馬の世話は舎人・牛飼・下人の仕事（通説）。
 //        辻の位置は条坊の小路の交点から決定的に選ぶ（実在の家や井戸の位置ではない）
-const HEIAN_DAILY_LIFE_HOURS={wash:[[7,15]],cook:[[5,8.5],[16,19]],well:[[5,9],[15.5,18]],sweep:[[6,10]],groom:[[6,11],[15,18]],talk:[[8,18]],play:[[8.5,17]]};
-const HEIAN_DAILY_LIFE_WHO={wash:'洗い女',cook:'炊女',well:'炊女',sweep:'下人',groom:'厩の者',play:'童'};
+const HEIAN_DAILY_LIFE_HOURS={fish:[[6,10],[15,18]],wash:[[7,15]],cook:[[5,8.5],[16,19]],well:[[5,9],[15.5,18]],sweep:[[6,10]],groom:[[6,11],[15,18]],talk:[[8,18]],play:[[8.5,17]]};
+const HEIAN_DAILY_LIFE_WHO={fish:'釣り人',wash:'洗い女',cook:'炊女',well:'炊女',sweep:'下人',groom:'厩の者',play:'童'};
 const heianLifeHash=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v);};
 // 辻と堀川の岸の置き場。小路と大路の交点の角（道の端寄り）から、左京は半分・右京は2割ほどを選ぶ
 function heianDailyLifeStreetSpots(){
@@ -22848,7 +22961,10 @@ function heianDailyLifeStreetSpots(){
 // 2.02 顔（目2つ＋口）。原点は「頭の中心から(0,-.2,1.62)」＝従来の目の原点。頭は半径1.8の球。
 // 🚫 2.01までは目が半径.2・球の面から.05しか出ず、遠目でも近くでものっぺらぼうに見えた（2026-10-07井内さん）。
 //    目は半径.26・面から約.09出す。口は細い箱。女の頭頂髪（頭の中心より上）にかからないよう目は中心より下（-.4）
-function heianEyePairGeometry(){const a=new THREE.SphereGeometry(.26,8,6).scale(1,1.15,.4),m=new THREE.BoxGeometry(.7,.12,.14);const g=mergeGeometries([a.clone().translate(-.62,-.2,0),a.clone().translate(.62,-.2,0),m.translate(0,-.75,-.13)],false);a.dispose();return g;}
+// 2026-10-07 井内さん「人に目が付いたけど下すぎる」: 目を +.45 上げて顔の中心の高さへ（旧 -.4 → 今 +.05）。球面は上ほど前へ出るので目 z +.05・口 z を奥 -.13 → +.07。
+function heianEyePairGeometry(){const a=new THREE.SphereGeometry(.26,8,6).scale(1,1.15,.4),m=new THREE.BoxGeometry(.7,.12,.14);
+ // 女と童の頭頂髪（半球）はその分 +.55 上げて目にかからないようにした（bangs の setPart/set）
+ const g=mergeGeometries([a.clone().translate(-.62,.25,.05),a.clone().translate(.62,.25,.05),m.translate(0,-.35,.07)],false);a.dispose();return g;}
 // 暮らしの営みの層の本体。人は役ごとの姿勢（しゃがむ・立つ・歩く・走る）と道具（盥・竈と鍋・釣瓶の縄・桶・箒）を持つ
 function createHeianDailyLifeRuntime(){
  if(heianDailyLifeRuntime)return heianDailyLifeRuntime;
@@ -22865,6 +22981,11 @@ function createHeianDailyLifeRuntime(){
    else if(s.role==='play'){const R=12+s.n*1.5,kid=j=>({color:kidColors[Math.floor(h(s.x+j*7,s.z,21)*kidColors.length)],ph:h(s.x+j*7,s.z,22)*6.283});
     for(let j=0;j<s.n;j++)add('play',s.x,s.z,0,{R,a0:j/s.n*6.283,spd:.9+h(s.x+j,s.z,31)*.3,female:h(s.x+j,s.z,32)<.4,...kid(j)});add('play',s.x,s.z,0,{R:0,oni:true,...kid(9)});}
    else{const f=s.face??h(s.x,s.z,33)*6.283,c=Math.cos(f),sn=Math.sin(f);for(let j=0;j<s.n;j++){const off=(j-(s.n-1)/2)*10;add('wash',s.x+c*off,s.z-sn*off,f,{canal:!!s.canal});}}}
+  // 街かどの小さな出来事（heianQuirkSpots）: 辻を走り回る子供・堀川の釣り人
+  for(const q of heianQuirkSpots){
+   if(q.kind==='kids'){const kid=j=>({color:kidColors[Math.floor(h(q.x+j*7,q.z,21)*kidColors.length)],ph:h(q.x+j*7,q.z,22)*6.283});
+    for(let j=0;j<5;j++)add('play',q.x,q.z,0,{R:13+(j%2)*2,a0:j/5*6.283,spd:1+h(q.x+j,q.z,31)*.4,female:j%3===0,...kid(j)});add('play',q.x,q.z,0,{R:0,oni:true,...kid(9)});}
+   else if(q.kind==='fisher')add('fish',q.x,q.z,q.face,{canal:true,who:'釣り人',female:false});}
   // 邸の下働き（__heianEstateService の厨・台盤所・井戸・馬屋）。前は南（+z）とみて南側の空きに置く
   const free=(x,z,r=5)=>!heianWalkBlocked(x,z,r)&&!heianCityCanalContains(x,z,4);
   const pathFree=(ax,az,bx,bz)=>[0,.25,.5,.75,1].every(t=>free(ax+(bx-ax)*t,az+(bz-az)*t,4));
@@ -22905,7 +23026,7 @@ function createHeianDailyLifeRuntime(){
   const lerp3=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
   // 1人分の姿勢。体の座標は前が +z、足もとが原点（群衆と同じ寸法: 顔 y13.2・衣 y4〜12）
   const pose=(p,i,t)=>{const P=parts;if(!p.on){for(const m of PL)hide(m,i);return;}
-   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,sq=p.role==='wash'||p.role==='cook';
+   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,sq=p.role==='wash'||p.role==='cook'||p.role==='fish';
    if(p.ax!==undefined){const D=Math.hypot(p.bx-p.ax,p.bz-p.az)||1,per=2*D/p.spd,u=((t+p.ph*9)%per)/per,f=u<.5?u*2:2-u*2,s=u<.5?1:-1;
     x=p.ax+(p.bx-p.ax)*f;z=p.az+(p.bz-p.az)*f;y=p.ya+(p.yb-p.ya)*f;hd=Math.atan2((p.bx-p.ax)*s,(p.bz-p.az)*s);walk=1;}
    if(p.role==='play'){if(p.oni)hd=T*.5;else{const a=p.a0+t*p.spd*.55;x=p.cx+Math.sin(a)*p.R;z=p.cz+Math.cos(a)*p.R;hd=a+Math.PI/2;walk=1.6;}}
@@ -22918,12 +23039,13 @@ function createHeianDailyLifeRuntime(){
    else{set(P.robe,i,[0,8+bob,0],fem?[1.12,1.05,1.08]:[1,1,1]);hy=13.2+bob;hz=walk>1?.5:0;shY=10.2+bob;shZ=0;
     for(const[m,f,sx,a]of[[P.legL,P.footL,-1.1,sw],[P.legR,P.footR,1.1,-sw]]){const fy=.3+Math.max(0,a)*.9,fz=Math.sin(a)*3.4;rod(m,i,[sx,6+bob,0],[sx,fy+.3,fz],.62);set(f,i,[sx,fy,fz+.5],[1.5,.6,2],a*.4);}}
    set(P.head,i,[0,hy,hz],[1.8,1.8,1.8]);set(P.eyes,i,[0,hy-.2,hz+1.62],[1,1,1]);/* 目は頭頂髪（y≧顔の中心）より下に置く。上だと女と童の目が髪に埋まった */
-   if(p.child){hide(P.hat,i);hide(P.hair,i);set(P.bangs,i,[0,hy-.05,hz+.1],[1.95,1.7,1.95]);}
-   else if(fem){hide(P.hat,i);set(P.hair,i,[0,hy-1,hz-1.3],[2.4,3.2,1.5]);set(P.bangs,i,[0,hy-.05,hz+.15],[2.05,1.75,2.05]);}
+   if(p.child){hide(P.hat,i);hide(P.hair,i);set(P.bangs,i,[0,hy+.5,hz+.1],[1.95,1.7,1.95]);}
+   else if(fem){hide(P.hat,i);set(P.hair,i,[0,hy-1,hz-1.3],[2.4,3.2,1.5]);set(P.bangs,i,[0,hy+.5,hz+.15],[2.05,1.75,2.05]);}
    else{set(P.hat,i,[0,hy+2.8,hz],[1,1,1],.12);hide(P.hair,i);hide(P.bangs,i);}
    for(const m of PROPS)hide(m,i);
    const sL=[-2.6,shY,shZ],sR=[2.6,shY,shZ];let hL=[-2.9,shY-3.9,-sw*1.6],hR=[2.9,shY-3.9,sw*1.6];
    if(p.role==='wash'){const s=Math.sin(T*3);set(P.tub,i,[0,.9,4.4],[1,1,1]);hL=[-1,2.4,4+s*.7];hR=[1,2.4,4-s*.7];}
+   else if(p.role==='fish'){const s=Math.sin(T*.7)*.4,tip=[1.4+s,15,14];rod(P.stick,i,[1.4,5.4,3.4],tip,.16);hR=[1.4,5.4,3.4];hL=[-.4,4.6,2.6];} // 釣り人: しゃがんで竿を水の方へ（糸は省く）
    else if(p.role==='cook'){set(P.kamado,i,[0,2.2,6.4],[6.5,4.4,5.5]);set(P.pot,i,[0,4.9,6.4],[2.4,1.5,2.4]);hR=[1+Math.cos(T*2)*.8,5.6,5+Math.sin(T*2)*.8];hL=[-1.8,4.4,2.6];}
    else if(p.role==='well'){const c=Math.sin(T*1.6);hL=[-.6,9+c*2,3.4];hR=[.6,9-c*2,3.4];rod(P.stick,i,[0,9+Math.abs(c)*2,3.5],[0,5,6.5],.18);set(P.bucket,i,[3.8,1.3,1.8],[1,1,1]);}
    else if(p.role==='groom'){hR=[2.9,shY-4.3,.3];set(P.bucket,i,[2.9,2.6,.3],[1,1,1]);}
@@ -22994,6 +23116,8 @@ const heianWalk=createHeianWalkController({
  captureCameraState:cameraState,applyCameraState,setStatus,thirdPerson:true,followDistance:68,followTargetHeight:33,overheadDistance:130, // ロボ2倍に合わせてカメラも引く（2026-08-17）
  // 視線を約10°上へ（ロボを画面の下寄りへ）。見回しで首・胴はひねらない＝カメラを回り込ませて正面から撮れる（2026-09-26井内さん「自撮りとかができない」）
  frameLift:.17,faceLook:false,
+ // ズームの近さの下限（体全体が画角に入る距離）に使うロボの背丈と幅。最初に測れた値を使い回す（しぐさで手を上げた姿勢を測らない）
+ actorSize:(()=>{let cached=null;return()=>{if(cached)return cached;const b=heianRobotBounds();if(b&&b.height>10)cached={height:b.height,width:Math.max(b.width,b.depth)};return cached;};})(),
  pickWalkGround:heianWalkClickPick,showWalkTarget:showHeianWalkTarget,hideWalkTarget:hideHeianWalkTarget,
  resolvePoint:heianQuestResolvePoint,isBlocked:heianQuestWalkBlocked, // 門籍の箱を先に見る（1.56）
  getTerrain:()=>heianTerrainSampler?{groundY:heianWalkGroundY,bounds:{minX:-heianTerrainSampler.halfX,maxX:heianTerrainSampler.halfX,minZ:-heianTerrainSampler.halfZ,maxZ:heianTerrainSampler.halfZ}}:null,
@@ -23069,6 +23193,92 @@ function heianInteriorKit(g){const mats=new Map(),mat=(hex,o)=>{const k=hex+'|'+
  return{mat,add,box:(x,z,w,d,y0,h,hex,name,o,parent)=>add(new THREE.BoxGeometry(w,h,d),hex,x,y0+h/2,z,name,o,parent),
   cyl:(x,z,r,y0,h,hex,name,parent,seg=10)=>add(new THREE.CylinderGeometry(r,r,h,seg),hex,x,y0+h/2,z,name,null,parent)};}
 // 殿舎1棟の屋内（大極殿）。返す形は heianInteriorBuild と同じ
+// 高御座（大極殿の屋内・2026-10-07 井内さん「だいぶ凝った作りにしたい。本物を参考に」）。
+//  参考: 延喜式（内匠寮・内蔵寮）＝蓋は八角・各角に小鳳と玉幡・八面に鏡3面ずつ・頂に大鏡と大鳳（鳳9・鏡25）／障子12枚（正面と背面を除く6面に2枚ずつ）／帳。
+//        院政期の絵図からの復原＝下壇（壇）・中壇（御帳土居。八本柱が立つ）・上壇（狭義の高御座）の三段。現存（京都御所・大正）＝黒漆の浜床＋朱漆の勾欄＋八角の屋形、柱間に紫綾の帳（裏は緋）。
+//  推定: 階は正面（南）に5級／下壇は方形で黒漆・金の框／蓋の反り・蕨手の形／御座は畳＋茵の平座（大極殿は平座を基本とする説）。寸法は 1=10cm。
+//  向き: +z が南（正面）。八角は面が正面を向く（辺の中央＝k·π/4）、角と柱は k·π/4+π/8。
+function heianBuildTakamikura(C){
+ const{g,add,box,F,hz,block}=C,PI=Math.PI,LAC=0x1c1410,GOLD=0xc9a24a,VERM=0xb0382a,PURPLE=0x5a3a78,SCARLET=0xb8322a,MIRROR=0xdfe4e6,Z=v=>hz+v;
+ const oct=(r0,r1,h,y,hex,name,o)=>{const m=add(new THREE.CylinderGeometry(r0,r1,h,8),hex,0,y+h/2,hz,name,o);m.rotation.y=PI/8;return m;};
+ // ---- 下壇（壇・浜床）: 黒漆の方形。金の框、四面に格狭間（鳳凰・麒麟を描いた板の代わり）、正面に階5級、壇上に朱の勾欄
+ const B=28,H=9;
+ box(0,hz,2*B,2*B,F,H,LAC,'高御座・下壇');box(0,hz,2*B+1.6,2*B+1.6,F,1,GOLD,'高御座・金具下框');box(0,hz,2*B+1.6,2*B+1.6,F+H-1,1,GOLD,'高御座・金具上框');
+ const panel=(x,z,alongX,len)=>{box(x,z,alongX?len+1.2:.4,alongX?.4:len+1.2,F+2,6,GOLD,'高御座・格狭間縁');box(x,z,alongX?len:.6,alongX?.6:len,F+2.3,5.4,0x27443f,'高御座・格狭間');};
+ for(const s of[-1,1]){panel(s*19,Z(B+.1),true,12);for(const t of[-16,0,16])panel(s*(B+.1),Z(t),false,12);}
+ for(const t of[-16,0,16])panel(t,Z(-B-.1),true,12);
+ for(let j=0;j<4;j++){const sh=7.2-1.8*j,zc=B+1.3+2.6*j;box(0,Z(zc),20,2.6,F,sh,LAC,'高御座・階');box(0,Z(zc+1.2),20.4,.4,F+sh-.3,.3,GOLD,'高御座・階金具');}
+ const rail=(x1,z1,x2,z2)=>{const L=Math.hypot(x2-x1,z2-z1),n=Math.max(1,Math.ceil(L/12.5)),ang=Math.atan2(x2-x1,z2-z1);
+  for(const yy of[7,3.2]){const m=box((x1+x2)/2,Z((z1+z2)/2),1,L,F+H+yy,yy>5?1.2:.8,VERM,'高御座・勾欄');m.rotation.y=ang;}
+  for(let i=0;i<=n;i++){const x=x1+(x2-x1)*i/n,z=z1+(z2-z1)*i/n;box(x,Z(z),1.4,1.4,F+H,8,VERM,'高御座・勾欄束');add(new THREE.SphereGeometry(.9,8,6),GOLD,x,F+H+8.6,Z(z),'高御座・擬宝珠');}};
+ const R=B-3;rail(-R,-R,R,-R);rail(-R,-R,-R,R);rail(R,-R,R,R);rail(-R,R,-11,R);rail(11,R,R,R);
+ // ---- 中壇（御帳土居・八角）と上壇（高御座・八角）。中壇の上に八本柱、上壇の上に御座
+ const Y1=F+H,Y2=Y1+6,Y3=Y2+4;
+ oct(26,26,6,Y1,LAC,'高御座・中壇');oct(26.6,26.6,.8,Y1,GOLD,'高御座・金具');oct(26.6,26.6,.8,Y1+5.2,GOLD,'高御座・金具');
+ oct(19,19,4,Y2,LAC,'高御座・上壇');oct(19.6,19.6,.6,Y2+3.4,GOLD,'高御座・金具');
+ // 御座: 畳（高麗縁）＋茵の平座。大極殿の高御座は平座が基本（椅子は後世）
+ box(0,hz,16.8,16.8,Y3,.9,0xd8d2bc,'高御座・畳縁');box(0,hz,15.4,15.4,Y3,1.3,0x9aa56a,'高御座・畳');
+ box(0,hz,10,10,Y3+1.3,.4,SCARLET,'高御座・茵縁');box(0,hz,8.8,8.8,Y3+1.7,.4,0x6b3b7d,'高御座・茵');
+ // 剣璽の案（左右の小さな黒漆の台）
+ for(const s of[-1,1]){box(s*12,Z(3),5,5,Y3,3,LAC,'高御座・案');box(s*12,Z(3),5.6,5.6,Y3+2.8,.3,GOLD,'高御座・案金具');}
+ box(-12,Z(3),.9,8,Y3+3.1,.9,0x2b2320,'高御座・剣');box(-12,Z(-.4),1.6,1.2,Y3+3,1.2,GOLD,'高御座・剣の鍔');box(12,Z(3),2.4,2.4,Y3+3.1,2,GOLD,'高御座・璽');box(12,Z(3),2.9,2.9,Y3+3.1,.5,PURPLE,'高御座・璽の緒');
+ // 八本の柱（角＝k·π/4+π/8）。柱の根と頭に金具、柱の間に貫
+ const Rp=22.5,Rpa=Rp*Math.cos(PI/8),PH=30,Yp=Y2;
+ for(let k=0;k<8;k++){const a=k*PI/4+PI/8,x=Math.sin(a)*Rp,z=Z(Math.cos(a)*Rp);
+  add(new THREE.CylinderGeometry(1.1,1.1,PH,12),LAC,x,Yp+PH/2,z,'高御座・柱');
+  add(new THREE.CylinderGeometry(1.5,1.5,.9,12),GOLD,x,Yp+.5,z,'高御座・柱金具');add(new THREE.CylinderGeometry(1.5,1.5,1.4,12),GOLD,x,Yp+PH-.9,z,'高御座・柱金具');}
+ for(let k=0;k<8;k++){const a=k*PI/4,m=box(Math.sin(a)*Rpa,Z(Math.cos(a)*Rpa),2*Rp*Math.sin(PI/8),1.6,Yp+PH-5,2.4,LAC,'高御座・貫');m.rotation.y=a;
+  const n=box(Math.sin(a)*Rpa,Z(Math.cos(a)*Rpa),2*Rp*Math.sin(PI/8),1.8,Yp+PH-5.3,.4,GOLD,'高御座・貫金具');n.rotation.y=a;}
+ // ---- 蓋（八角）: 軒桁＋反った屋根＋金の降り棟（蕨手）。天井は朱＋放射の金＋中央に大円鏡
+ const Ye=Yp+PH,Rc=32,Ra=Rc*Math.cos(PI/8),prof=[[32,0],[27.5,1.4],[22,3.6],[16,6.9],[10.5,11.2],[5.5,16],[2.2,19.6],[.8,22]],Yr=Ye+4;
+ oct(Rc,Rc,4,Ye,LAC,'高御座・軒桁');oct(Rc+.6,Rc+.6,.7,Ye,GOLD,'高御座・軒金具');oct(Rc+.6,Rc+.6,.7,Ye+3.3,GOLD,'高御座・軒金具');
+ const roof=add(new THREE.LatheGeometry(prof.map(p=>new THREE.Vector2(p[0],p[1])),8),LAC,0,Yr,hz,'高御座・蓋',{side:THREE.DoubleSide,flatShading:true});roof.rotation.y=PI/8;
+ oct(30,30,.3,Ye-.3,VERM,'高御座・天井');
+ for(let k=0;k<8;k++){const a=k*PI/4+PI/8,m=box(Math.sin(a)*16.5,Z(Math.cos(a)*16.5),1.2,19,Ye-.6,.3,GOLD,'高御座・天井金具');m.rotation.y=a;}
+ add(new THREE.CylinderGeometry(6.5,6.5,.4,24),GOLD,0,Ye-.7,hz,'高御座・大円鏡縁');add(new THREE.CylinderGeometry(5.3,5.3,.5,24),MIRROR,0,Ye-.9,hz,'高御座・大円鏡');
+ // 降り棟の金（蕨手）: 頂から角へ反りに沿わせ、軒先で外へ跳ねて巻く
+ const hook=[[34.4,-.5],[36.3,.6],[36.7,2.4],[35.6,3.8]];
+ for(let k=0;k<8;k++){const a=k*PI/4+PI/8,s=Math.sin(a),c=Math.cos(a),pts=[...prof].reverse().concat(hook).map(p=>new THREE.Vector3(s*p[0],Yr+p[1],Z(c*p[0])));
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),40,.6,6),GOLD,0,0,0,'高御座・降り棟');
+  add(new THREE.TorusGeometry(1.2,.35,6,14,4.6),GOLD,s*35.4,Yr+4.6,Z(c*35.4),'高御座・蕨手の巻').rotation.y=a+PI/2;}
+ // ---- 鳳（大1＋小8＝9）。胴・頭・冠・嘴・開いた翼・三本の尾羽を金で
+ const phoenix=(x,y,z,s,ry)=>{const P=new THREE.Group();P.position.set(x,y,z);P.rotation.y=ry;P.scale.setScalar(s);g.add(P);const n='高御座・鳳凰',pm=(geo,px,py,pz)=>add(geo,GOLD,px,py,pz,n,null,P);
+  pm(new THREE.SphereGeometry(1,10,8),0,1.6,0).scale.set(.9,1.1,1.9);pm(new THREE.SphereGeometry(.62,8,6),0,3.5,1.9);
+  pm(new THREE.ConeGeometry(.22,1.1,6),0,3.4,2.9).rotation.x=PI/2;pm(new THREE.ConeGeometry(.2,1.5,5),0,4.5,1.6).rotation.x=-.5;
+  for(const t of[-1,0,1]){const m=pm(new THREE.ConeGeometry(.35,4.4,5),t*.9,1.9,-3.4);m.rotation.x=-1.26;m.rotation.z=t*.3;}
+  for(const sx of[-1,1]){const m=pm(new THREE.BoxGeometry(2.8,.15,1.8),sx*1.7,2.5,-.2);m.rotation.z=sx*.5;}
+  return P;};
+ const apex=Yr+22;add(new THREE.SphereGeometry(1.6,10,8),GOLD,0,apex+1,hz,'高御座・宝珠');phoenix(0,apex+2.4,hz,2.4,0);
+ for(let k=0;k<8;k++){const a=k*PI/4+PI/8;phoenix(Math.sin(a)*35.6,Yr+4.4,Z(Math.cos(a)*35.6),1,a);}
+ // ---- 鏡（八面に3面ずつ＝24）と白玉を日月に見立てて交互に、軒桁の外面へ。角ごとに玉幡を垂らす
+ const disc=(r,h,hex,x,y,z,a,n)=>{const geo=new THREE.CylinderGeometry(r,r,h,20);geo.rotateX(PI/2);add(geo,hex,x,y,z,n).rotation.y=a;};
+ for(let k=0;k<8;k++){const a=k*PI/4,s=Math.sin(a),c=Math.cos(a);
+  for(const t of[-7.4,0,7.4]){const rr=Ra+.6,x=s*rr+c*t,z=Z(c*rr-s*t);disc(1.9,.3,GOLD,x,Ye+2,z,a,'高御座・鏡縁');disc(1.55,.5,MIRROR,s*(rr+.1)+c*t,Ye+2,Z(c*(rr+.1)-s*t),a,'高御座・鏡');}
+  for(const t of[-3.7,3.7])add(new THREE.SphereGeometry(.75,8,6),0xf4f1e8,s*(Ra+.9)+c*t,Ye+2,Z(c*(Ra+.9)-s*t),'高御座・白玉');}
+ for(let k=0;k<8;k++){const a=k*PI/4+PI/8,s=Math.sin(a),c=Math.cos(a),x=s*31.4,z=Z(c*31.4);
+  add(new THREE.SphereGeometry(.8,8,6),GOLD,x,Ye-.4,z,'高御座・玉幡');add(new THREE.CylinderGeometry(.12,.12,2.4,5),GOLD,x,Ye-1.6,z,'高御座・玉幡');
+  const b=box(x,z,1.9,.3,Ye-11.6,9.6,SCARLET,'高御座・玉幡');b.rotation.y=a;const b2=box(x,z,.8,.4,Ye-11.6,9.6,GOLD,'高御座・玉幡');b2.rotation.y=a;
+  for(const [i,hx] of[0xf4f1e8,0x6fa58a,0xf4f1e8].entries())add(new THREE.SphereGeometry(.45,6,5),hx,x+Math.cos(a)*(i-1)*.8,Ye-12.1,z-Math.sin(a)*(i-1)*.8,'高御座・玉幡');}
+ // ---- 柱間: 障子（正面・背面を除く6面に2枚ずつ＝12）、背面は帳（表は紫、裏は緋）、正面は帳を巻き上げて左右に絞る
+ const Rs=Rpa-.9,Y0=Y3-1.5,SH=22,SW=2*Rp*Math.sin(PI/8)-1;
+ const at=(a,r,t)=>[Math.sin(a)*r+Math.cos(a)*t,Z(Math.cos(a)*r-Math.sin(a)*t)];
+ const rot=(m,a)=>{m.rotation.y=a;return m;};
+ for(const k of[1,2,3,5,6,7]){const a=k*PI/4;
+  for(const t of[-SW/4,SW/4]){const w=SW/2-.3,[x,z]=at(a,Rs,t);
+   rot(box(x,z,w+.8,.5,Y0,SH+.8,0x3a2a20,'高御座・障子枠'),a);
+   {const[px,pz]=at(a,Rs+.1,t);rot(box(px,pz,w,.4,Y0+.4,SH,0xeee6cf,'高御座・障子'),a);
+    const[bx,bz]=at(a,Rs+.3,t);rot(box(bx,bz,w,.3,Y0+SH*.5,.5,0x3a2a20,'高御座・障子桟'),a);rot(box(bx,bz,.5,.3,Y0+.4,SH,0x3a2a20,'高御座・障子桟'),a);}}}
+ {const a=PI;
+  const[x,z]=at(a,Rs,0);rot(box(x,z,SW,.5,Y0,SH+1,SCARLET,'高御座・帳裏'),a);
+  const[px,pz]=at(a,Rs+.6,0);rot(box(px,pz,SW,.5,Y0,SH+1,PURPLE,'高御座・帳'),a);
+  for(let i=-2;i<=2;i++){const[qx,qz]=at(a,Rs+1,i*SW/5);rot(box(qx,qz,1.1,.5,Y0,SH+1,0x45305e,'高御座・帳の襞'),a);}
+  const[gx,gz]=at(a,Rs+1,0);rot(box(gx,gz,SW,.6,Y0+SH-1,1.6,GOLD,'高御座・帳の飾り'),a);}
+ {const roll=add(new THREE.CylinderGeometry(1.2,1.2,SW-1,12),PURPLE,0,Y0+SH-1.5,Z(Rs+.8),'高御座・巻き上げた帳');roll.rotation.z=PI/2;
+  for(const s of[-1,1]){const x=s*(SW/2-1);add(new THREE.CylinderGeometry(.18,.18,10,5),SCARLET,x,Y0+SH-7,Z(Rs+1.2),'高御座・帳の緒');add(new THREE.SphereGeometry(.7,8,6),GOLD,x,Y0+SH-12.2,Z(Rs+1.2),'高御座・帳の房');
+   box(s*(Rp*Math.sin(PI/8)+1.4),Z(Rs-.2),2.6,1.5,Y0,SH-2,PURPLE,'高御座・絞った帳');box(s*(Rp*Math.sin(PI/8)+1.4),Z(Rs-1.1),2.0,.5,Y0,SH-2,SCARLET,'高御座・絞った帳の裏');}
+  for(const s of[-1,1])add(new THREE.CylinderGeometry(1.35,1.35,.8,12),GOLD,s*(SW/2-3.5),Y0+SH-1.5,Z(Rs+.8),'高御座・帳の金具').rotation.z=PI/2;}
+ block(-30,30,hz-30,hz+39,'高御座');
+}
 function heianInteriorBuildHall(D){
  const g=new THREE.Group();g.name='屋内・'+D.name;const{add,box,cyl}=heianInteriorKit(g),floors=[],blocks=[],picks=[],people=[];
  const block=(x0,x1,z0,z1,name)=>blocks.push({minX:Math.min(x0,x1),maxX:Math.max(x0,x1),minZ:Math.min(z0,z1),maxZ:Math.max(z0,z1),name});
@@ -23115,15 +23325,8 @@ function heianInteriorBuildHall(D){
   // 母屋柱の上の虹梁（桁行に沿う＝見下ろしの手前を横切らない向き）と棟木
   for(const s of[-1,1])box(0,zs[s<0?1:3],xs[10]-xs[1]+6,4,F+146,8,RED,'大極殿・母屋の桁');
   box(0,0,2*rx+8,5,top-5,6,0x5a3a26,'大極殿・棟木');}
- // 高御座（母屋の中央・南面）: 三段の八角の継壇＋八本柱の屋形＋八角の屋根＋頂の鳳凰。南の面だけ帳を上げる
- {const hz=-6,oct=(r0,r1,h,y,hex,name)=>{const m=add(new THREE.CylinderGeometry(r0,r1,h,8),hex,0,y+h/2,hz,name);m.rotation.y=Math.PI/8;return m;},GOLD=0xc9a24a,LAC=0x1c1410;
-  oct(30,31,4,F,LAC,'高御座・継壇一');oct(30.6,30.6,.6,F+4,GOLD,'高御座・金具');oct(24,25,4,F+4.6,RED,'高御座・継壇二');oct(18,19,4,F+8.6,LAC,'高御座・継壇三');oct(18.6,18.6,.6,F+12.6,GOLD,'高御座・金具');
-  // 🚫 柱を k·π/4 に置いたら k=0 が正面（+z）の真ん中に立ち、帳の開きの中に柱があった（2026-09-28井内さん
-  //    「高御座の柱が正面にあっておかしい」）。八角の段は π/8 回してあるので、柱は角（k·π/4+π/8）、帳は辺の中央（k·π/4）
-  for(let k=0;k<8;k++){const a=k*Math.PI/4+Math.PI/8;cyl(Math.sin(a)*14,hz+Math.cos(a)*14,.8,F+13,26,LAC,'高御座・柱');}
-  oct(21,21,.8,F+39,GOLD,'高御座・軒');oct(.8,21,8,F+39.8,LAC,'高御座・屋根');add(new THREE.SphereGeometry(1.8,10,8),GOLD,0,F+49.6,hz,'高御座・鳳凰').scale.set(1,1.3,1.6);
-  for(let k=1;k<8;k++){const a=k*Math.PI/4,rc=14*Math.cos(Math.PI/8),w=2*14*Math.sin(Math.PI/8),m=add(new THREE.BoxGeometry(w,22,.5),0x5f3b73,Math.sin(a)*rc,F+26,hz+Math.cos(a)*rc,'高御座・帳',{transparent:true,opacity:.72});m.rotation.y=a;}
-  block(-32,32,hz-32,hz+32,'高御座');}
+ // 高御座（母屋の中央・南面）: 下壇・中壇・上壇の三段＋八本柱＋八角の蓋（鳳9・鏡25・玉幡8）＋障子12＋帳。詳細は heianBuildTakamikura
+ {const F_=F;heianBuildTakamikura({g,add,box,F:F_,hz:-6,block});}
  // 人: 立つ官人（袍・石帯・冠と垂纓・笏）と衛士（烏帽子・鉾）。延喜の服制で五位は浅緋・六位は深緑（延喜式）
  const skin=0xf1e3d0,dark=0x15110e;
  D.people.forEach(([pid,x,z,rot=0,pose='official',who='官人'],idx)=>{const cols=D.robes[pose]||[0x6a5a3a],robe=cols[idx%cols.length],G=new THREE.Group(),y=x*x/(X(560)/2)**2<1&&z*z/(Z(240)/2)**2<1?F:G0;
@@ -23328,6 +23531,12 @@ function heianActionBarSync(){
 addEventListener('keydown',e=>{if(!heianGameMode||!heianWalk.active||e.metaKey||e.ctrlKey||e.altKey||e.repeat||heianDialog.open||heianPhotoMode)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'))return;
  if(t?.tagName==='BUTTON'&&e.code==='Space'){if(t.matches(':focus-visible'))return;t.blur();}
  const name=e.code==='Space'?'jump':e.code==='KeyQ'?'dance':e.code==='KeyB'?'bow':e.code==='KeyG'?'wave':e.code==='KeyF'&&!heianInteriorBtnAct?'pray':null;if(!name)return;e.preventDefault();if(name==='pray'&&heianPrayHere())return;heianRobotAct(name);},true);
+// 画面の案内（「E：〜に話しかける」「F：〜に入る」など）を消せる（2026-10-07井内さん「このダイアログ消せるようにしたい」）。H キーか案内の上で右クリックで消す・もう一度で戻す。
+//  消しても E・F のキーは効く（ボタンを隠すだけ）。記録 localStorage heian-hints-off
+function heianHintsToggle(off){const hud=document.getElementById('heianGameHud');if(!hud)return;const v=off===undefined?!hud.classList.contains('heian-hints-off'):!!off;hud.classList.toggle('heian-hints-off',v);try{localStorage.setItem('heian-hints-off',v?'1':'0');}catch(e){}return v;}
+try{if(localStorage.getItem('heian-hints-off')==='1')addEventListener('load',()=>heianHintsToggle(true));}catch(e){}
+addEventListener('keydown',e=>{if(!heianGameMode||!heianWalk.active||e.metaKey||e.ctrlKey||e.altKey||e.repeat||heianDialog.open)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'))return;if(e.code==='KeyH'){e.preventDefault();heianHintsToggle();}},true);
+addEventListener('contextmenu',e=>{if(e.target.closest?.('.heian-dialog-hint,.heian-interior-btn')){e.preventDefault();heianHintsToggle(true);}},true);
 // 1.98 「祈る」でそのまま参拝（2026-10-06井内さん「祈るのボタンで参拝できていいと思う」）。堂・社殿・辻の神の近く（HEIAN_WORSHIP_REACH）で押すと、祈りのしぐさに続けて加護が出る。
 // 🚫 旧は画面の「F：〜で祈る」が出ている間だけ参拝になり、近くに屋内の入口があると「祈る」が入口（入る）を押してしまった。入口は F／その札で入り、ボタンの「祈る」は参拝だけにする
 function heianPrayHere(){const p=heianWalk.position;if(!heianWalk.active||heianInterior||heianPhotoMode||heianDialog.open||heianWorship.busy)return false;const w=heianWorshipAt(p);if(!w)return false;
@@ -23559,11 +23768,11 @@ const HEIAN_GAME_LOCATIONS=[
  {id:'machijiri',name:'町尻殿',x:10605,z:6317,spawn:{x:10605,z:6960},look:{x:10605,z:6317,height:22},viewScale:1.15,description:'町尻小路に面した1町の邸。小路の名をそのまま邸の名とする、当時よくある呼び方。主は特定できていない。'},
  {id:'yamabuki',name:'山吹殿',x:16059,z:9299,spawn:{x:16059,z:9947},look:{x:16059,z:9299,height:22},viewScale:1.15,description:'1町の邸。花の名を邸に冠する呼び方で、庭に山吹を植えたことに由来すると伝わる。主は特定できていない。'},
  // 2026-10-06 諸司厨町と別所・施薬院。位置は KYOU.PDF（『平安京提要』1994 山田邦和の京図）と各辞典による推定。建物は建てず名前だけ
- {id:'mokumachi',name:'木工町',x:6630,z:8900,spawn:{x:6630,z:8500},look:{x:6630,z:8900,height:22},viewScale:1.15,description:'木工寮の厨町。番で上った工や下働きが寝起きし、宮や京の普請へ通う。夜明けから鋸と鑿の音がする。位置は京図による推定。'},
- {id:'shurishikimachi',name:'修理職町',x:12760,z:390,spawn:{x:12760,z:1000},look:{x:12760,z:390,height:22},viewScale:1.15,description:'修理職の厨町。材木置き場と大工の住まいがあり、内裏の修理に通う。位置は京図による推定。'},
+ {id:'mokumachi',name:'木工町',x:6606,z:9299,spawn:{x:6606,z:8650},look:{x:6606,z:9299,height:22},viewScale:1.15,description:'木工寮の厨町。番で上った工や下働きが寝起きし、宮や京の普請へ通う。庶民の住まいの隣に、板を乾かす材木置場と作業小屋がある。夜明けから鋸と鑿の音がする。位置は京図による推定。'},
+ {id:'shurishikimachi',name:'修理職町',x:12060,z:672,spawn:{x:12060,z:5},look:{x:12060,z:672,height:22},viewScale:1.15,description:'修理職の厨町。材木置き場と作業小屋の隣に大工の住まいがあり、内裏の修理に通う。位置は京図による推定。'},
  {id:'takumimachi',name:'内匠町',x:-18870,z:2600,spawn:{x:-18070,z:2400},look:{x:-18870,z:2600,height:22},viewScale:1.15,description:'内匠寮の厨町。調度や建具をつくる匠が寝起きし、大内裏の内匠寮へ通う。位置は京図による推定。'},
  {id:'zushomachi',name:'図書町',x:-7840,z:-5980,spawn:{x:-7840,z:-5380},look:{x:-7840,z:-5980,height:22},viewScale:1.15,description:'図書寮の厨町。紙を漉く者や書を写す者が寝起きする。紙屋川に近い。位置は京図による推定。'},
- {id:'kamiyain',name:'紙屋院',x:-9400,z:-700,spawn:{x:-9400,z:-100},look:{x:-9400,z:-700,height:22},viewScale:1.15,description:'図書寮の別所の紙漉き所。紙屋川の水で官の紙を漉き、内蔵寮へ納める。所在は確かでなく、ここは川の西岸に置いた推定の位置。'},
+ {id:'kamiyain',name:'紙屋院',x:-8972,z:-663,spawn:{x:-8972,z:10},look:{x:-8972,z:-663,height:22},viewScale:1.15,description:'図書寮の別所の紙漉き所。紙屋川の水で官の紙を漉き、内蔵寮へ納める。町の川側に建物、西の空きに紙の干し場と蔵がある。所在は確かでなく、ここは川の西岸に置いた推定の位置。'},
  {id:'seyakuin',name:'施薬院',x:12060,z:43160,spawn:{x:12060,z:43760},look:{x:12060,z:43160,height:22},viewScale:1.15,description:'病の貧しい人に薬を施し、手当てをする所。藤原冬嗣が開いたと伝わる。左京九条三坊、西洞院大路の東の辺り（推定）。'},
  // 🚫 六條院（rokujoin）と六条河原院（kawaranoin）を別の地点として並べていたが、同じ邸（中心の差 130）だった
  //    （2026-10-02井内さん「同じ建物を２箇所と認識してるのかな？一個にまとめていいと思う」）。⇒ 地点は kawaranoin の1つ、邸の名も「六条河原院」へ
@@ -24615,8 +24824,18 @@ window.__heianDroneGroundProbe=()=>{
  renderer.domElement.addEventListener('wheel',e=>{if(!runtime.cruising)return;e.preventDefault();
   runtime.cruiseZoom=THREE.MathUtils.clamp(runtime.cruiseZoom*Math.exp(e.deltaY*.0012),.002,1.8);},{passive:false});
  let cruiseDrag=null;
- renderer.domElement.addEventListener('pointerdown',e=>{if(runtime.cruising)cruiseDrag={x:e.clientX,y:e.clientY};});
+ // Command（Ctrl・Shift でも）＋ドラッグで旋回の中心を地面の上で動かす（2026-10-07井内さん「俯瞰でCommandを押しながらドラッグしたら位置を移動できたのにできない」）。
+ // 🚫 旋回中は apply() が毎フレーム camera を書くので、OrbitControls の移動は効かない。旋回の中心 cruiseTarget を直接動かす
+ renderer.domElement.addEventListener('pointerdown',e=>{if(runtime.cruising)cruiseDrag={x:e.clientX,y:e.clientY,pan:e.metaKey||e.ctrlKey||e.shiftKey};});
  addEventListener('pointermove',e=>{if(!cruiseDrag||!runtime.cruising)return;
+  if(cruiseDrag.pan){
+   const dx=e.clientX-cruiseDrag.x,dy=e.clientY-cruiseDrag.y,tg=runtime.cruiseTarget,fx=tg.x-camera.position.x,fz=tg.z-camera.position.z,fl=Math.hypot(fx,fz)||1,f0x=fx/fl,f0z=fz/fl,
+    dist=camera.position.distanceTo(tg),perPx=2*dist*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))/Math.max(1,renderer.domElement.clientHeight),
+    sinE=Math.max(.2,Math.sin(runtime.cruiseElev??.6)); // 地面の奥行きは仰角が低いほど画面で縮むので、縦ドラッグはその逆数だけ伸ばす
+   tg.x=THREE.MathUtils.clamp(tg.x-(-f0z)*dx*perPx+f0x*dy*perPx/sinE,HEIAN_MAP_WIDE.x0,HEIAN_MAP_WIDE.x1);
+   tg.z=THREE.MathUtils.clamp(tg.z-f0x*dx*perPx+f0z*dy*perPx/sinE,HEIAN_MAP_WIDE.z0,HEIAN_MAP_WIDE.z1);
+   {const y=terrainYAt(tg.x,tg.z);if(Number.isFinite(y))tg.y=y+55;}
+   cruiseDrag={x:e.clientX,y:e.clientY,pan:true};return;}
   runtime.cruiseAngle-=(e.clientX-cruiseDrag.x)*.0035;
   // 下へドラッグで高く（真上へ）、上へドラッグで低く（地表すれすれへ）。旧の高さ倍率と同じ向き
   if(runtime.cruiseElev==null){const f=route.at(-1);runtime.cruiseElev=Math.atan2(f.altitude,f.radius);}
@@ -24762,8 +24981,8 @@ const HEIAN_HOVER_POINTS=[ // 大内裏内の門・殿（HEIAN_GAME_LOCATIONSと
  {name:'羅城門',x:0,z:HEIAN_RAJOMON_Z,r:300},{name:'朱雀門',x:0,z:6860,r:280},{name:'応天門',x:6.6,z:5553,r:240},
  {name:'大極殿',x:6.6,z:1383,r:380},{name:'豊楽殿',x:-1976,z:2244,r:380},{name:'内裏',x:1725,z:-1247,r:1100},
  {name:'船岡山',x:0,z:-21000,r:900},
- {name:'木工町（木工寮の厨町・推定）',x:6630,z:8900,r:200},{name:'修理職町（推定）',x:12760,z:390,r:200},{name:'内匠町（推定）',x:-18870,z:2600,r:200},
- {name:'図書町（推定）',x:-7840,z:-5980,r:200},{name:'紙屋院（紙漉き所・推定）',x:-9400,z:-700,r:200},{name:'施薬院（推定）',x:12060,z:43160,r:200}];
+ {name:'内匠町（推定）',x:-18870,z:2600,r:200},
+ {name:'図書町（推定）',x:-7840,z:-5980,r:200}]; /* 紙屋院・施薬院は建物（官式の敷地）を建てたので名前は建物から付く（2026-10-07） */
 // 固有名テーブル: 主要施設の結合前body名（'大極殿大屋根'・'宮内省塀'など）から基準名を取り、
 // world XZのbboxへ集約する（2026-08-19井内さん指示「朝堂院の建物・宮内省などの区画・内裏の門も名前を」）。
 // 結合後は名前が消えるので、landmark配置直後（merge前）に collectHeianHoverNames で収集する
@@ -25832,7 +26051,8 @@ function startHeianGame(entryMode='overview'){
    return{leaves:noon.sceneClosedLeaves.total,noonVisible:noon.sceneClosedLeaves.visible,nightVisible:night.sceneClosedLeaves.visible,
     // 35＝坊門1（InstancedMesh）＋主要建築13（大内裏・東西寺・神泉苑・羅城門・官学7・朱雀院の表示結合）＋貴族邸5variant
     //    ＋東西市の門4×扉2×2市=16（2026-09-12）
-    ok:noon.sceneClosedLeaves.total===35&&noon.sceneClosedLeaves.visible===0&&night.sceneClosedLeaves.visible===night.sceneClosedLeaves.total};}
+    // →37: 紙屋院・施薬院の門（2026-10-07）
+    ok:noon.sceneClosedLeaves.total===37&&noon.sceneClosedLeaves.visible===0&&night.sceneClosedLeaves.visible===night.sceneClosedLeaves.total};}
   finally{syncHeianGateDoors(before);}};
  let gateDoorsProbeResult=null; // 時刻を振る重い検査なので1回だけ（__heianGameInfo は各所から何度も呼ばれる）
  window.__heianGameInfo=()=>({active:heianGameMode,gateDoors:(gateDoorsProbeResult??=gateDoorsProbe()),gateDoorsOK:gateDoorsProbeResult.ok,entryMode:heianGameEntryMode,entryStarted,selected:heianGameSelectedId,locations:HEIAN_GAME_LOCATIONS.length,options:select.options.length,overviewOption:select.querySelector('option[value="overview"]')?.textContent||'',markers:map.querySelectorAll('.heian-map-marker').length,mapTitle:map.querySelector('.heian-map-title')?.textContent||'',mapRoads:map.querySelectorAll('.heian-map-road').length,mapCanals:map.querySelectorAll('.heian-map-canal').length,mapPalace:map.querySelector('.heian-map-palace')?.textContent||'',mapPlayer:!!map.querySelector('.heian-map-player'),mapPlayerVisible:!map.querySelector('.heian-map-player')?.hidden,hud:!!document.getElementById('heianGameHud'),entryGate:!!document.getElementById('heianEntryGate'),headerActionsHidden:actions.hidden,menuButton:!!menuButton,menuButtonHidden:menuButton.hidden,menuOpen:actions.classList.contains('open'),menuExpanded:menuButton.getAttribute('aria-expanded'),headerButtons:[...actions.querySelectorAll('button')].map(b=>b.textContent),headerPrimary:[...actions.querySelectorAll('button.primary')].map(b=>b.textContent),title:heading.textContent,seriesTitle:series.textContent,titleMark:!!title.querySelector('.kit-mark'),subtitle:subtitle.textContent,hoverSuppression:window.__heianHoverState?.()||null,kamoFordBlocked:(()=>{const p=window.__terrainInfo?.().kamoFord;return p?!!heianWalkBlocked(p[0],p[1],5):null;})(),terrain:!!heianTerrainGroup,walkMode:heianWalk.mode,viewMode:heianWalk.viewMode,pointerLocked:document.pointerLockElement!==null,cursor:getComputedStyle(renderer.domElement).cursor,crosshair:!!document.querySelector('.heian-game-crosshair'),walking:heianWalk.active,running:heianWalk.running,autoWalking:heianWalk.autoWalking,actorReady:!!heianTinRobotRuntime,actorSource:heianTinRobotRuntime?.source||null,occtLoaded:!!OCCT,occtRequested:!!OCCT_LOAD,actorVisible:!!heianTinRobotRuntime?.visible,actorBodies:heianTinRobotRuntime?.robotBodies.length||0,gaitSteps:heianTinRobotRuntime?.gaitSteps.length||0,skipSteps:heianTinRobotRuntime?.skipSteps.length||0,gaitKind:heianTinRobotRuntime?.gaitKind||null,twist:heianTinRobotRuntime?.twist||null,robotOutlineWidth:heianTinRobotRuntime?.outlineWidth||1,robotOutlines:heianTinRobotRuntime?.outlines?.length||0,photoMode:heianPhotoMode,photoBar:!!heianPhotoBar,photoBarHidden:heianPhotoBar?.hidden??true,walkSurfaces:heianWalkSurfaceMeshes.length,walkObstacles:heianWalkObstacleRecords.length,walkConnectors:heianWalkConnectorRecords.length,mobReady:!!heianMobRuntime,mob:heianMobRuntime?.inspect()||null,crowdReady:!!heianCrowdRuntime,crowd:heianCrowdRuntime?.inspect()||null,ambient:heianWalkAmbientAnchor?{active:true,anchor:{...heianWalkAmbientAnchor},player:heianWalk.position.toArray(),forwardDistance:(heianWalkAmbientAnchor.spawnX-heianWalk.position.x)*Math.sin(heianWalkAmbientAnchor.heading)+(heianWalkAmbientAnchor.spawnZ-heianWalk.position.z)*Math.cos(heianWalkAmbientAnchor.heading)}:null});
@@ -26539,11 +26759,12 @@ function heianGrassTuftGeometry(){
 // 2026-09-26井内さん「神社系、お堂なんかも木が生えてるとリアル」「朱雀院、神泉苑、何々院は木や草がもっと多い方がいい」:
 //   神社（大将軍堂・五條天神・市比賣社）は社殿を囲む鎮守の森＝常緑の広葉樹（楠・椎の想定）を密に。町堂（六角堂・因幡堂）は堂のまわりに数本。
 //   朱雀院は白砂の南庭（朝覲・相撲の場）と池の水面を外し、池畔と敷地の空きへ木を増やす。〜院（奨学院・勧学院・弘文院）も倍に
-const HEIAN_PRECINCT_TREES={toji:150,saiji:150,daigakuryo:40,kokuso:16,kobunin:28,shogakuin:28,kangakuin:28,eastKorokan:26,westKorokan:26,ukyoShiki:10,sakyoShiki:10,
+const HEIAN_PRECINCT_TREES={toji:150,saiji:150,daigakuryo:40,kokuso:16,kamiyain:14,seyakuin:14,kobunin:28,shogakuin:28,kangakuin:28,eastKorokan:26,westKorokan:26,ukyoShiki:10,sakyoShiki:10,
  suzakuin:300,daishogun:26,gojoTenjin:48,ichihime:10};
 const HEIAN_PRECINCT_SHRINES=new Set(['daishogun','gojoTenjin','ichihime','町堂']);
 // 敷地ごとの追加条件。exclude は敷地中心からの矩形 [cx,cz,w,d]、pond は池の制御点（敷地中心から）。minStep は候補の格子の最小間隔
 const heianPrecinctOptions=id=>id==='suzakuin'?{exclude:[[80,heianSuzakuinCoreZ(-626.5),1190,1300],[1040,720,220,2800]/* 馬場（競馬の走路） */],pond:HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),minStep:64,cluster:true}
+ :id==='kamiyain'?{exclude:[[-290,0,620,1140]]/* 塀の外の干し場と蔵（紙屋院・2026-10-07）。ここへ木をまかない */}
  :HEIAN_PRECINCT_SHRINES.has(id)?{minStep:52,inset:40,axis:.08,margin:30}
  :id==='曹司'?{minStep:60,inset:50,axis:.1,margin:40,edge:140/* 塀際の帯だけ */}:{};
 function heianPointInPoly(x,z,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.y>z)!==(b.y>z)&&x<(b.x-a.x)*(z-a.y)/(b.y-a.y)+a.x)inside=!inside;}return inside;}
@@ -26905,8 +27126,47 @@ window.__heianHyakki=(force,opt={})=>{if(force&&typeof force==='object'){opt=for
   gate:heianQuestHas('hyakki'),hidMob:M.hidMob.size,hidCrowd:heianCrowdRuntime?.hiddenByHyakki??null};
  if(opt.year){out.days=[];for(let d=1;d<=360;d++){const c=heianHyakkiCond(d,1.5);if(c.imiDay)out.days.push([d,c.label,c.eto,c.rollOK?1:0]);}out.nights=out.days.filter(x=>x[3]).length;}
  return out;};
+// ---- 街かどの小さな出来事（2026-10-07 井内さん「街を歩き回る楽しさを入れたい。町や道ごとに他と違う何か・事件・珍しい出来事を。POI にはしない」）。
+//  表 HEIAN_QUIRKS の1行＝1つの景色。kind: bigtree 街角の大木／bigrock 角の大岩／dogs3 いつも居る犬3匹／cats 猫の親子／kids 走り回る子供／fisher 堀川の釣り人。
+//  at={x:南北の道名,z:東西の道名,s:[±1,±1]}＝辻の角、canal={side:±1,z}＝堀川の岸。地図のピンにもホバー名にも出さない（歩いていて見つける景色）。
+//  偏り（場所で景色が変わる）: 左京の北=大木、南=人の営み（犬・猫・子供）、右京=大木と大岩で空きを感じさせる、川沿い=釣り。すべて推定の景色（史料の裏付けなし）
+//  tag: 近く（tr）にいると台詞のタグ quirk_<id> が付く（heian-lines.js に at:'quirk_<id>' で書く）＝「あの大木の辻を西」のように会話とつなぐ
+const HEIAN_QUIRKS=Object.freeze([
+ {id:'keyaki',kind:'bigtree',at:{x:'東洞院大路',z:'三条大路',s:[1,1]},v:4,sc:2.7,r:46,tr:380},
+ {id:'kusu',kind:'bigtree',at:{x:'西大宮大路',z:'五条大路',s:[-1,1]},v:5,sc:2.5,r:46,tr:380},
+ {id:'muku',kind:'bigtree',at:{x:'道祖大路',z:'六条大路',s:[1,-1]},v:3,sc:2.4,r:46,tr:380},
+ {id:'ganseki',kind:'bigrock',at:{x:'西洞院大路',z:'七条大路',s:[-1,-1]},sc:[17,9,13],r:26,tr:300},
+ {id:'ishi2',kind:'bigrock',at:{x:'東京極大路',z:'二条大路',s:[-1,1]},sc:[13,8,11],r:22,tr:300},
+ {id:'inu3',kind:'dogs3',at:{x:'東洞院大路',z:'七条大路',s:[-1,-1]},r:24,tr:260},
+ {id:'neko',kind:'cats',at:{x:'西洞院大路',z:'五条大路',s:[1,1]},r:16,tr:260},
+ {id:'kodomo1',kind:'kids',at:{x:'道祖大路',z:'八条大路',s:[1,-1]},r:30,tr:260},
+ {id:'kodomo2',kind:'kids',at:{x:'東洞院大路',z:'九条大路',s:[-1,1]},r:30,tr:260},
+ {id:'tsuri1',kind:'fisher',canal:{side:1,z:16500},r:14,tr:300},
+ {id:'tsuri2',kind:'fisher',canal:{side:1,z:24500},r:14,tr:300}]);
+const heianQuirkSpots=[]; // 置けた分だけ {…表の行,x,z,face}。動物（Fauna）・人（DailyLife）・台詞タグがここを読む
+function heianQuirkPos(q,blockR=q.r||16){
+ if(q.canal){const bx=q.canal.side*HEIAN_CITY_CANAL_X;
+  for(const dz of[0,140,-140,280,-280,420,-420])for(const bank of[-1,1])for(const off of[42,48,56,66]){const x=bx+bank*off,z=q.canal.z+dz;
+   if(heianWalkBlocked(x,z,3)||heianCityCanalContains(x,z,2)||heianInsideLandmark(x,z,20))continue;return{x,z,face:Math.atan2(-bank,0)};}return null;}
+ const T=heianAvenueTable;if(!T||!q.at)return null;const ax=T.x.find(a=>a.name===q.at.x),az=T.z.find(a=>a.name===q.at.z);if(!ax||!az)return null;
+ // 辻の角。路面の端寄り(-16)から外へ、障害物に当たらない最初の所
+ for(const o of[-16,6,22,44,70]){const x=ax.c+q.at.s[0]*(ax.w/2+o),z=az.c+q.at.s[1]*(az.w/2+o);
+  if(!heianWalkBlocked(x,z,blockR)&&!heianInsideLandmark(x,z,40)&&!heianCityCanalContains(x,z,blockR))return{x,z,face:Math.atan2(ax.c-x,az.c-z)};}
+ return null;}
+function heianBuildQuirks(layer){
+ heianQuirkSpots.length=0;const t0=performance.now(),trees=[],rocks=[],out={};
+ for(const q of HEIAN_QUIRKS){const p=heianQuirkPos(q);if(!p)continue;const s={...q,...p};heianQuirkSpots.push(s);out[q.kind]=(out[q.kind]||0)+1;
+  const gy=window.__heianGroundY?.(p.x,p.z)??terrainYAt(p.x,p.z);
+  if(q.kind==='bigtree'){trees.push({x:p.x,z:p.z,y:gy,rot:(p.x*.013+p.z*.007)%6.28,s:q.sc,v:q.v});addHeianWalkObstacle(p.x-7,p.x+7,p.z-7,p.z+7,'街角の大木');}
+  else if(q.kind==='bigrock'){rocks.push({x:p.x,z:p.z,y:gy,sc:q.sc,ry:(p.x*.021+p.z*.011)%6.28});const r=q.sc[0]*.8;addHeianWalkObstacle(p.x-r,p.x+r,p.z-r,p.z+r,'街角の大岩');}}
+ // 大木は固定の倍率（通常の上限と掛け合わさらない）。名前に「広葉樹」を含めて遠景の間引き(heianChunkVegetation)に乗せる
+ if(trees.length)for(const m of heianBroadleafMeshes(trees,'植栽・街角の大木（広葉樹・推定）'))layer.add(m);
+ if(rocks.length){const g=new THREE.IcosahedronGeometry(1,1),m=new THREE.InstancedMesh(g,new THREE.MeshLambertMaterial({color:0x8d8779}),rocks.length),d=new THREE.Object3D();
+  rocks.forEach((r,i)=>{d.position.set(r.x,r.y+r.sc[1]*.35,r.z);d.rotation.set(.15,r.ry,.1);d.scale.set(r.sc[0],r.sc[1],r.sc[2]);d.updateMatrix();m.setMatrixAt(i,d.matrix);});
+  m.instanceMatrix.needsUpdate=true;m.castShadow=m.receiveShadow=true;m.computeBoundingSphere();m.name='点景・街角の大岩（推定）';layer.add(m);}
+ out.ms=Math.round(performance.now()-t0);window.__heianQuirkInfo=()=>({...out,spots:heianQuirkSpots.map(s=>({id:s.id,kind:s.kind,x:Math.round(s.x),z:Math.round(s.z)}))});return out;}
 function addHeianPrecinctTrees(){
- const layer=heianVegetationLayerRef;if(!layer)return 0;heianBuildLumpFoliage(layer);try{heianBuildModoribashi(layer);}catch(e){console.warn('一条戻橋を作れません',e);}try{heianBuildOmiyaBridges(layer);}catch(e){console.warn('大宮川の橋を作れません',e);}try{console.log('HEIAN_PROFILE roadVerge '+JSON.stringify(heianBuildRoadVerge(layer)));}catch(e){console.warn('道端の草と石を置けません',e);}try{console.log('HEIAN_PROFILE shrines '+JSON.stringify(heianBuildShrines(layer)));}catch(e){console.warn('辻の神・邸の社を置けません',e);}try{heianBuildSuzakuGateBridges(layer);}catch(e){console.warn('朱雀大路の門前の橋を作れません',e);}try{heianBuildGateOxen(layer);}catch(e){console.warn('門外の牛を置けません',e);}heianFlowerSpots.length=0;heianFlowerMeshes.length=0; // 都を作り直したときに重ねない
+ const layer=heianVegetationLayerRef;if(!layer)return 0;heianBuildLumpFoliage(layer);try{heianBuildModoribashi(layer);}catch(e){console.warn('一条戻橋を作れません',e);}try{heianBuildOmiyaBridges(layer);}catch(e){console.warn('大宮川の橋を作れません',e);}try{console.log('HEIAN_PROFILE roadVerge '+JSON.stringify(heianBuildRoadVerge(layer)));}catch(e){console.warn('道端の草と石を置けません',e);}try{console.log('HEIAN_PROFILE shrines '+JSON.stringify(heianBuildShrines(layer)));}catch(e){console.warn('辻の神・邸の社を置けません',e);}try{heianBuildSuzakuGateBridges(layer);}catch(e){console.warn('朱雀大路の門前の橋を作れません',e);}try{heianBuildGateOxen(layer);}catch(e){console.warn('門外の牛を置けません',e);}try{console.log('HEIAN_PROFILE quirks '+JSON.stringify(heianBuildQuirks(layer)));}catch(e){console.warn('街かどの出来事を置けません',e);}heianFlowerSpots.length=0;heianFlowerMeshes.length=0; // 都を作り直したときに重ねない
  const h=(x,z,n)=>{const v=Math.sin(x*.0127+z*.0391+n*12.9898)*43758.5453;return v-Math.floor(v);},pts=[];
  // 町堂は町の1/4（__heianImperialEstates の qx..）を境内として扱う
  const halls=(window.__heianImperialEstates?.()||[]).filter(e=>/六角堂|因幡堂/.test(e.name||''));
@@ -27335,11 +27595,17 @@ function makeHeianPleasureBoat(name='苑池の楽舟'){
 function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,hash,isNorthSakyo13,isNorthEliteCore,isNorthTransition){
  const layer=new THREE.Group();layer.name='平安京住宅（1/8町モジュール合成）';
  heianSubregions=[];
- const moduleHoverLabel=type=>({庶民長屋:'庶民長屋の小区画',従者長屋:'従者長屋の小区画',下級役人宅:'下級役人宅の小区画',中級役人宅:'中級役人宅の小区画',屋敷庭:'屋敷の庭',空地:'空き地',雑木林:'雑木林',草地:'草地',建築中:'建築中の小区画',畑:'畑',寝殿造敷地:'貴族邸の小区画',資材置場:'建設資材置場',火災跡:'小規模な火災跡（901〜930年の景観上の推定）',民間市:'民間の小市（景観上の推定）'}[type]||type);
+ // 厨町の木工町・修理職町（2026-10-07井内さん「庶民街とそれに隣接した木材置場、作業場など。それぞれ一町全部じゃなくてもいい」）。
+ //  1町=2列×4行の8モジュール（i=行*2+列）。西列は庶民の住まい、東列（修理職町は西列）に木材置場と作業場を並べて隣り合わせにする（位置・配置は推定）
+ const HEIAN_TRADE_TOWNS=[
+  {id:'mokumachi',x:6606,z:9299,hover:'木工町（庶民の住まいと木材置場・作業場・推定）',modules:['庶民長屋','作業場','庶民長屋','材木置場','従者長屋','材木置場','庶民長屋','作業場']},
+  {id:'shurishikimachi',x:12060,z:672,hover:'修理職町（庶民の住まいと木材置場・作業場・推定）',modules:['材木置場','庶民長屋','作業場','庶民長屋','材木置場','従者長屋','作業場','庶民長屋']}
+ ];
+ const moduleHoverLabel=type=>({庶民長屋:'庶民長屋の小区画',従者長屋:'従者長屋の小区画',下級役人宅:'下級役人宅の小区画',中級役人宅:'中級役人宅の小区画',屋敷庭:'屋敷の庭',空地:'空き地',雑木林:'雑木林',草地:'草地',建築中:'建築中の小区画',畑:'畑',寝殿造敷地:'貴族邸の小区画',資材置場:'建設資材置場',火災跡:'小規模な火災跡（901〜930年の景観上の推定）',民間市:'民間の小市（景観上の推定）',材木置場:'材木置場（推定）',作業場:'木工の作業場（推定）'}[type]||type);
  const proxyRoot=new THREE.Group(),detailRoot=new THREE.Group();proxyRoot.name='住宅遠景proxy';detailRoot.name='住宅近景chunk';layer.add(proxyRoot,detailRoot);
  const nobleSet=new Set(noblePlots),wetlandCells=cityCells.filter(c=>c.landUse==='湿地').length,placements=[],plotSurfaces=[],moduleTreePoints=[],ecoModules=[],ecoCellSet=new Set(),ecoTypes=['藪','林','草原','湿地','池'],patternNames=['庶民長屋','従者長屋','下級役人宅','中級役人宅','屋敷庭','空地','雑木林','草地','建築中','畑','寝殿造敷地','資材置場','火災跡','民間市'],infillShrines=allSites.filter(s=>s.name==='大将軍堂'||s.name==='五條天神'),blockingSites=allSites.filter(s=>!infillShrines.includes(s));
  const ecoCounts=Object.fromEntries(ecoTypes.map(n=>[n,0])),ecoQuarterCells={'1/4':0,'2/4':0,'3/4':0,'4/4':0/* 🚫 '4/4'が無いとaddEcoCellの既定quarters=4で undefined++ → NaN になり、
- JSONでnullとして出る。しかも検査の some(n=>n<1) はNaNを捕まえないので、この四半分だけ検査が空回りしていた（2026-09-07） */},microUseCounts={資材置場:0,火災跡:0,民間市:0},microProps=[],microWalkObstacles=[];let microWells=0,microCarts=0,microLaundry=0,eastWetlandEcoCells=0,urbanEcoModules=0,microTwoModuleTowns=0,microMarketStalls=0;
+ JSONでnullとして出る。しかも検査の some(n=>n<1) はNaNを捕まえないので、この四半分だけ検査が空回りしていた（2026-09-07） */},microUseCounts={資材置場:0,火災跡:0,民間市:0,材木置場:0,作業場:0},microProps=[],microWalkObstacles=[];let microWells=0,microCarts=0,microLaundry=0,eastWetlandEcoCells=0,urbanEcoModules=0,microTwoModuleTowns=0,microMarketStalls=0;
  const addEcoCell=(c,wet=false,quarters=4)=>{
   if(ecoCellSet.has(c)||nobleSet.has(c)||allSites.some(s=>overlapsZone(c,s)))return;ecoCellSet.add(c);
   const mw=c.w/2,md=c.d/4,preset=wet?['湿地','藪','池','湿地','草原','林','池','藪']:['藪','草原','林','藪','草原','湿地','林','池'],offset=Math.floor(hash(c.x,c.z,611)*8),reverse=hash(c.x,c.z,612)>.5,moduleCount=wet?THREE.MathUtils.clamp(quarters,1,3)*2:8;
@@ -27408,12 +27674,31 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
  const addMicroProp=(shape,x,z,w,h,d,color,rot=0,lift=0)=>microProps.push({shape,x,z,w,h,d,color,rot,y:groundTop(x,z,w,d)+h/2+1+lift});
  const buildMicroUse=(c,m,type,n)=>{microUseCounts[type]++;microWalkObstacles.push({x:m.x,z:m.z,w:m.w*.68,d:m.d*.62,type});
   // 小用途の脇には必ず藪を残し、空き地全体を人工物で埋めない。
-  ecoModules.push({x:m.x+m.w*.38,z:m.z+m.d*.34,w:m.w*.18,d:m.d*.22,type:'藪',seed:hash(c.x,c.z,n+889),source:'小用途脇の藪'});ecoCounts['藪']++;urbanEcoModules++;
+  if(type!=='材木置場'&&type!=='作業場'){ecoModules.push({x:m.x+m.w*.38,z:m.z+m.d*.34,w:m.w*.18,d:m.d*.22,type:'藪',seed:hash(c.x,c.z,n+889),source:'小用途脇の藪'});ecoCounts['藪']++;urbanEcoModules++;} // 木工町の材木置場・作業場には藪を足さない
   if(type==='資材置場'){for(let i=0;i<4;i++)addMicroProp('box',m.x-m.w*.16+i*18,m.z-m.d*.16,14,8,82,0x76563a,(i%2-.5)*.08);for(let i=0;i<7;i++)addMicroProp('sphere',m.x+m.w*.14+(i%3)*15,m.z-m.d*.12+Math.floor(i/3)*14,14,10,12,0x918a7b);addMicroProp('cone',m.x-m.w*.03,m.z+m.d*.16,44,18,38,0x9d835f);}
+  else if(type==='材木置場'){
+   // 2026-10-07 井内さん「木工町／修理職町は庶民街とそれに隣接した木材置場、作業場」。乾かす板の桟積み5列と、丸太の山2つ（推定）
+   for(let i=0;i<5;i++){const bx=m.x-m.w*.36+i*m.w*.18,bz=m.z-m.d*.2;
+    for(const dx of[-34,34])addMicroProp('box',bx+dx,bz,8,4,32,0x5e4833); /* 土台の角材（板が地面から浮いて見えないように） */
+    for(let L=0;L<4;L++)addMicroProp('box',bx+(L%2?2:-2),bz,96,6,30,L%2?0xa98c5e:0xb89b6e,0,4+L*6.4);}
+   for(const px of[-.18,.2]){for(let j=-1;j<=1;j++)addMicroProp('box',m.x+m.w*px,m.z+m.d*.12+j*14,150,13,13,0x70512f);for(const j of[-.5,.5])addMicroProp('box',m.x+m.w*px,m.z+m.d*.12+j*14,150,13,13,0x7a5a36,0,13);addMicroProp('box',m.x+m.w*px,m.z+m.d*.12,150,12,13,0x6a4c2c,0,26);}
+   for(const[a,b]of[[.34,.02],[.34,.18]])addMicroProp('box',m.x+m.w*a,m.z+m.d*b,44,5,14,0x8a6a44,0.2);}
+  else if(type==='作業場'){
+   // 吹き放ちの作業小屋（柱4本＋板屋根）、木挽き台と作業台、削り屑、組みかけの骨組、仕上がった角材の山（推定）
+   const sx=m.x-m.w*.12,sz=m.z-m.d*.1;
+   for(const dx of[-62,62])for(const dz of[-32,32])addMicroProp('box',sx+dx,sz+dz,4,34,4,0x473727);
+   addMicroProp('box',sx,sz,156,5,86,0x594939,0,34);
+   addMicroProp('box',sx-34,sz+8,70,12,22,0x6e4f32);
+   for(const dx of[18,62])addMicroProp('box',sx+dx,sz-6,16,14,18,0x6e4f32);addMicroProp('box',sx+40,sz-6,92,8,10,0x70512f,0,14);
+   for(let i=0;i<6;i++)addMicroProp('sphere',sx+22+(i%3)*14,sz+14+Math.floor(i/3)*12,14,5,11,0xcdb27d);
+   const fx=m.x+m.w*.26,fz=m.z+m.d*.05;
+   for(const dx of[-26,26])for(const dz of[-14,14])addMicroProp('box',fx+dx,fz+dz,4,44,4,0x8a6a44);
+   for(const dz of[-14,14])addMicroProp('box',fx,fz+dz,60,5,5,0x7a5a36,0,42);addMicroProp('box',fx,fz,5,5,34,0x7a5a36,0,42);
+   for(let L=0;L<3;L++)addMicroProp('box',m.x-m.w*.3,m.z+m.d*.28,84,6,24,0xb89b6e,0,L*6.4);}
   else if(type==='火災跡'){for(let i=0;i<5;i++)addMicroProp('box',m.x+(i-2)*24,m.z-m.d*.08,7,24-(i%2)*7,7,0x342b25);for(let i=0;i<6;i++)addMicroProp('box',m.x+(i-2.5)*25,m.z+m.d*.08+(i%2)*18,42,5,8,0x3b3029,(i%3-1)*.42);for(let i=0;i<9;i++)addMicroProp('sphere',m.x-m.w*.14+(i%3)*18,m.z+m.d*.2+Math.floor(i/3)*14,13,8,11,0x62584d);addMicroProp('cone',m.x+m.w*.16,m.z+m.d*.15,36,10,32,0x514840);}
   else{const stalls=2+(hash(c.x,c.z,n+907)>.52?1:0);microMarketStalls+=stalls;for(let i=0;i<stalls;i++){const x=m.x+(i-(stalls-1)/2)*105,z=m.z-m.d*.06,yOff=0;addMicroProp('box',x,z,HEIAN_MARKET_STALL_SPEC.canopySize[0],HEIAN_MARKET_STALL_SPEC.canopySize[1],HEIAN_MARKET_STALL_SPEC.canopySize[2],0x594939,0,30);addMicroProp('box',x,z+7,HEIAN_MARKET_STALL_SPEC.counterSize[0],HEIAN_MARKET_STALL_SPEC.counterSize[1],HEIAN_MARKET_STALL_SPEC.counterSize[2],0x6e4f32);for(const dx of[-35,35])for(const dz of[-20,20])addMicroProp('box',x+dx,z+dz,3,30,3,0x473727);for(const dx of[-15,15])addMicroProp('sphere',x+dx,z+7,14,9,14,0x9a7142,0,10);}}};
- const buildModule=(c,m,type,n)=>{patternCounts[type]++;moduleCells++;const before=rowHouses;plotSurfaces.push({x:m.x,z:m.z,w:m.w-12,d:m.d-12,y:groundTop(m.x,m.z,m.w-12,m.d-12)+.8,type});
-  if(type==='資材置場'||type==='火災跡'||type==='民間市')buildMicroUse(c,m,type,n);
+ const buildModule=(c,m,type,n)=>{patternCounts[type]=(patternCounts[type]||0)+1;moduleCells++;const before=rowHouses;plotSurfaces.push({x:m.x,z:m.z,w:m.w-12,d:m.d-12,y:groundTop(m.x,m.z,m.w-12,m.d-12)+.8,type});
+  if(type==='資材置場'||type==='火災跡'||type==='民間市'||type==='材木置場'||type==='作業場')buildMicroUse(c,m,type,n);
   else if(type==='屋敷庭'){estateGardenModules++;moduleFence(c,m,n+85,type);const count=5+Math.floor(hash(c.x,c.z,n+6)*5);for(let i=0;i<count;i++)moduleTreePoints.push({x:m.x+(hash(c.x,c.z,n+12+i*2)-.5)*m.w*.62,z:m.z+(hash(c.x,c.z,n+13+i*2)-.5)*m.d*.56,s:(.46+hash(c.x,c.z,n+50+i)*.38)*1.3,evergreen:hash(c.x,c.z,n+70+i)>.45,module:true,garden:true});}
   else if(type==='空地'){vacantLots++;fence(c,m.x,m.z+m.d*.18,m.w*.36,3,n+90,type);{const count=3+Math.floor(hash(c.x,c.z,n+6)*4);for(let i=0;i<count;i++)moduleTreePoints.push({x:m.x+(hash(c.x,c.z,n+12+i*2)-.5)*m.w*.68,z:m.z+(hash(c.x,c.z,n+13+i*2)-.5)*m.d*.62,s:(.42+hash(c.x,c.z,n+50+i)*.32)*1.3,evergreen:hash(c.x,c.z,n+70+i)>.62,module:true,vacant:true});}}
   else if(type==='草地'){grassModules++;const candidates=[[-.38,-.34],[.38,-.34],[-.38,.34],[.38,.34],[0,-.42],[0,.42]];let planted=0;for(let i=0;i<candidates.length&&planted<3;i++){const x=m.x+candidates[i][0]*m.w,z=m.z+candidates[i][1]*m.d;if(infillShrines.some(s=>Math.abs(x-s.x)<s.w/2+24&&Math.abs(z-s.z)<s.d/2+24))continue;moduleTreePoints.push({x,z,s:.34+hash(c.x,c.z,n+80+i)*.22,evergreen:false,module:true,grass:true});planted++;}}
@@ -27514,8 +27799,9 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   if(c.landUse==='水田'||blocked||c.boVacant||nobleSet.has(c)){if(!c.hoverUse)c.hoverUse=nobleSet.has(c)?'貴族の邸宅街区':blocked?'空き地・草地（施設のまわり）':'水田';continue;}
   // 混在町（c.mixedEstate=貴族邸レイヤーが四分町邸を置いた町）は北帯の専用プリセット・専用カウンタから
   // 除外する（六角堂周囲は北のエリート帯の内側にも混在町が立つため・2026-08-19）
+  const tradeTown=HEIAN_TRADE_TOWNS.find(t=>Math.abs(c.x-t.x)<5&&Math.abs(c.z-t.z)<5)||null; // 木工町・修理職町。北帯の専用プリセットの集計には入れない
   const mixedEstate=c.mixedEstate,nearShrine=infillShrines.some(s=>Math.hypot(c.x-s.x,c.z-s.z)<2200);
-  const southKamo=!mixedEstate&&!nearShrine&&c.x>14000&&c.x<20800&&c.z>24000,northSakyo=!mixedEstate&&!nearShrine&&isNorthSakyo13(c),northCore=!mixedEstate&&!nearShrine&&isNorthEliteCore(c),northTransition=!mixedEstate&&!nearShrine&&isNorthTransition(c),riverEdge=!southKamo&&c.x>18040&&c.z>30000,nearEastMarket=Math.hypot(c.x-HEIAN_LANDMARK_SITES.eastMarket.x,c.z-HEIAN_LANDMARK_SITES.eastMarket.z)<6500;
+  const southKamo=!mixedEstate&&!nearShrine&&c.x>14000&&c.x<20800&&c.z>24000,northSakyo=!mixedEstate&&!nearShrine&&!tradeTown&&isNorthSakyo13(c),northCore=!mixedEstate&&!nearShrine&&!tradeTown&&isNorthEliteCore(c),northTransition=!mixedEstate&&!nearShrine&&!tradeTown&&isNorthTransition(c),riverEdge=!southKamo&&c.x>18040&&c.z>30000,nearEastMarket=Math.hypot(c.x-HEIAN_LANDMARK_SITES.eastMarket.x,c.z-HEIAN_LANDMARK_SITES.eastMarket.z)<6500;
   const ukyo=c.x<0,suzakuUkyo=ukyo&&c.x>-5817.6,katsuraD=ukyo?distanceToKatsuraRiver(c.x,c.z):Infinity,floodplain=katsuraD<HEIAN_UKYO_FLOODPLAIN;
   if(ukyo){ukyoBandCells[ukyoBandOf(c.z)]++;if(katsuraD<ukyoKatsuraMin)ukyoKatsuraMin=katsuraD;if(floodplain)ukyoFloodplainCells++;if(c.x>-5817.6)ukyoBo1Cells++;}else if(southKamo)southKamoCells++;
   const settleChance=southKamo?.98:suzakuUkyo?1:(northCore?1:northTransition?.94:riverEdge?.42:c.landUse==='畑・草地'?.72:.94)*ukyoSettleFactor(c);
@@ -27525,7 +27811,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   const estateFill=hash(c.x,c.z,327)>settleChance&&!ukyo&&!riverEdge&&!mixedEstate;
   // 空き町はhoverUseを明示する。未設定だと推定図の用途（庶民密集・貴族邸など）へフォールバックし、
   // 実体が空き地なのに住宅街区と表示される（2026-08-20井内さん指摘のホバー不一致）
-  if(hash(c.x,c.z,327)>settleChance&&!estateFill&&!mixedEstate&&!nearShrine){if(ukyo&&(floodplain||(c.x<-8605.2&&c.z>ukyoBandZ[1])))addEcoCell(c,floodplain);if(!c.hoverUse)c.hoverUse='空き町（草地と木立）';continue;}moduleTowns++;
+  if(hash(c.x,c.z,327)>settleChance&&!estateFill&&!mixedEstate&&!nearShrine&&!tradeTown){if(ukyo&&(floodplain||(c.x<-8605.2&&c.z>ukyoBandZ[1])))addEcoCell(c,floodplain);if(!c.hoverUse)c.hoverUse='空き町（草地と木立）';continue;}moduleTowns++;
   if(ukyo){ukyoTowns++;ukyoBandTowns[ukyoBandOf(c.z)]++;if(floodplain)ukyoFloodplainTowns++;if(c.x>-5817.6)ukyoBo1Towns++;}else{sakyoTowns++;if(southKamo)southKamoTowns++;}
   const denseChance=nearEastMarket?.72:c.landUse==='庶民密集'?.5:c.landUse==='畑・草地'?.34:.28;
   // 右京の三条以南は畑混じりのプリセットへ。北（三条より北）は左京と同じ扱いを残す。
@@ -27542,6 +27828,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   const preset=nearShrine?shrineMixedPreset:mixedEstate?mixedPreset:estateFill?(northSakyo?estateFillPresetNorth:estateFillPreset):northCore?northElitePreset:northTransition?transitionPreset:southKamo?southKamoPreset:riverEdge?riverEdgePreset:suzakuUkyo?suzakuUkyoPreset:ukyoField?ukyoPresets[ukyoBandOf(c.z)-1]:fullDense?densePresets[Math.floor(hash(c.x,c.z,324)*densePresets.length)]:nobleMix?noblePreset:commonPresets[Math.floor(hash(c.x,c.z,328)*commonPresets.length)];
   const offset=Math.floor(hash(c.x,c.z,329)*8),reverse=hash(c.x,c.z,330)>.5,mw=c.w/2,md=c.d/4,beforeRows=rowHouses,beforeUrbanEco=urbanEcoModules,beforeVacant=vacantLots,beforeGarden=estateGardenModules,beforeWoodland=patternCounts['雑木林'],beforeCommoner=patternCounts['庶民長屋'],beforeServant=patternCounts['従者長屋'];if(riverEdge)southEastTowns++;if(fullDense){fullDenseTowns++;if(nearEastMarket)marketDenseTowns++;}
   const tally={},modules=Array.from({length:8},(_,i)=>{const src=(offset+(reverse?7-i:i)+80)%8,col=i%2,row=Math.floor(i/2),m={x:c.x-c.w/2+(col+.5)*mw,z:c.z-c.d/2+(row+.5)*md,w:mw,d:md,col,row},shrine=infillShrines.find(s=>Math.abs(m.x-s.x)<(m.w+s.w)/2&&Math.abs(m.z-s.z)<(m.d+s.d)/2);return{m,type:shrine?'草地':mixedEstate&&col===mixedEstate.col&&(row===mixedEstate.rowPair||row===mixedEstate.rowPair+1)?'寝殿造敷地':preset[src]};});
+  if(tradeTown)modules.forEach((q,i)=>{q.type=tradeTown.modules[i];});
   // 空地・雑木林の1枠、または同じ列の隣接2枠を小規模用途へ置換する。1枠=1/8町。
   const candidates=modules.map((q,i)=>['空地','雑木林'].includes(q.type)?i:-1).filter(i=>i>=0);if(candidates.length&&hash(c.x,c.z,341)<.42){const kinds=['資材置場','火災跡','民間市'],kind=kinds[Math.floor(hash(c.x,c.z,342)*kinds.length)],pairs=candidates.filter(i=>i%2===0&&candidates.includes(i+1)),two=pairs.length&&hash(c.x,c.z,343)<.38,start=two?pairs[Math.floor(hash(c.x,c.z,344)*pairs.length)]:candidates[Math.floor(hash(c.x,c.z,345)*candidates.length)];modules[start].type=kind;if(two){modules[start+1].type=kind;microTwoModuleTowns++;}}
   // 🚫 町堂（六角堂・因幡堂）の境内へ住宅モジュールを重ねていたため、境内にホバーすると「屋敷の庭」等が出た
@@ -27562,7 +27849,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   // landUse（推定図の用途）とプリセットの実描画がずれ、家が並ぶ町が「畑・草地」と出ていた（2026-08-19井内さん指摘）
   {const houses=(tally['庶民長屋']||0)+(tally['従者長屋']||0),officials=(tally['下級役人宅']||0)+(tally['中級役人宅']||0),fields=tally['畑']||0;
    const ecoAdded=urbanEcoModules-beforeUrbanEco; // 藪・草原を実際に足した町は空き系の文言も合わせる（2026-08-20）
-   c.hoverUse=tally['資材置場']?'建設資材を置く小区画':tally['火災跡']?'小規模な火災跡（901〜930年の景観上の推定）':tally['民間市']?'藪に混じる民間の小市（景観上の推定）':mixedEstate?'貴族邸と長屋の混在街区':estateFill?'屋敷と庭の街区':fields>=3&&fields>=houses+officials?'畑まじりの街区':officials>houses?'官人の住宅街区':houses?'庶民の街区':ecoAdded?'藪と草地の空き街区':'空き地・雑木の街区';}
+   c.hoverUse=tradeTown?tradeTown.hover:tally['資材置場']?'建設資材を置く小区画':tally['火災跡']?'小規模な火災跡（901〜930年の景観上の推定）':tally['民間市']?'藪に混じる民間の小市（景観上の推定）':mixedEstate?'貴族邸と長屋の混在街区':estateFill?'屋敷と庭の街区':fields>=3&&fields>=houses+officials?'畑まじりの街区':officials>houses?'官人の住宅街区':houses?'庶民の街区':ecoAdded?'藪と草地の空き街区':'空き地・雑木の街区';}
   if(mixedEstate)mixedTowns++;if(nearShrine)shrineMixedTowns++;
   if(northCore){northEliteCoreTowns++;northEliteCoreCommonerModules+=patternCounts['庶民長屋']-beforeCommoner;northEliteCoreServantModules+=patternCounts['従者長屋']-beforeServant;northEliteCoreVacantModules+=vacantLots-beforeVacant;northEliteCoreGardenModules+=estateGardenModules-beforeGarden;}
   if(northTransition){northTransitionTowns++;northTransitionCommonerModules+=patternCounts['庶民長屋']-beforeCommoner;if(fullDense)northTransitionDenseTowns++;}
@@ -27609,7 +27896,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
  //  2026-08-19井内さん「近づくと建物がなくなってしまう」）
  const structures=placements.filter(p=>p.kind!=='fence'),proxy=makeInstances(structures,'body','住宅遠景proxy',.97);if(proxy)proxyRoot.add(proxy);
  const proxyRoof=makeInstances(structures,'roof','住宅遠景proxy屋根',.97);if(proxyRoof)proxyRoot.add(proxyRoof);detailRoot.visible=false;
- const plotColors={'屋敷庭':0x71855f,'空地':0x789460,'雑木林':0x5f7e52,'草地':0x7f9565,'資材置場':0x8f8069,'火災跡':0x554b43,'民間市':0x9b765d,'中級役人宅':0x9e9b6d,'下級役人宅':0xa8a078,'従者長屋':0x9d8d6d,'庶民長屋':0xa99674,'建築中':0xb09b73,'寝殿造敷地':0x8d9a6b};
+ const plotColors={'屋敷庭':0x71855f,'空地':0x789460,'雑木林':0x5f7e52,'草地':0x7f9565,'資材置場':0x8f8069,'火災跡':0x554b43,'民間市':0x9b765d,'材木置場':0x9a8461,'作業場':0x8b7556,'中級役人宅':0x9e9b6d,'下級役人宅':0xa8a078,'従者長屋':0x9d8d6d,'庶民長屋':0xa99674,'建築中':0xb09b73,'寝殿造敷地':0x8d9a6b};
  const plotGeom=new THREE.PlaneGeometry(1,1);plotGeom.rotateX(-Math.PI/2);const plotMesh=new THREE.InstancedMesh(plotGeom,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}),plotSurfaces.length);plotMesh.name='住宅敷地（1/8町単位）';plotMesh.visible=false;plotMesh.frustumCulled=false;plotMesh.renderOrder=2;
  plotSurfaces.forEach((q,i)=>{dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(0,0,0);dummy.scale.set(q.w,1,q.d);dummy.updateMatrix();plotMesh.setMatrixAt(i,dummy.matrix);plotMesh.setColorAt(i,new THREE.Color(plotColors[q.type]||0x9c9275));});plotMesh.instanceMatrix.needsUpdate=true;if(plotMesh.instanceColor)plotMesh.instanceColor.needsUpdate=true;layer.add(plotMesh);
  // 資材・焼け跡・民間市の点景はbox/sphere/coneの3 InstancedMeshへ集約する。
@@ -29055,7 +29342,7 @@ function addHeianCityBlocks(group){
   const yAt=(x,z)=>Math.max(terrainYAt(x,z)+.9,plotY(x,z)+.45,(heianWalkPadTop(x,z)??-Infinity)+.45);
   const C=heianCarpetBuilder(hash),blob=(x,z,rx,rz,rot,seed,kind)=>{C.blob(x,z,rx,rz,rot,seed,yAt);byKind[kind]++;};
   // 1) 敷地（1/8町）の角・縁。空き地・草地・雑木林・庭は中にも広く敷く。寝殿造の敷地は邸の庭があるので触らない
-  const cornerOnly=new Set(['資材置場','火災跡','民間市']),wide=new Set(['空地','草地','雑木林','屋敷庭']);
+  const cornerOnly=new Set(['資材置場','火災跡','民間市','材木置場','作業場']),wide=new Set(['空地','草地','雑木林','屋敷庭']);
   plots.forEach((q,i)=>{if(q.type==='寝殿造敷地')return;const m=Math.min(q.w,q.d),s=i*37+3;
    const nc=wide.has(q.type)?4:cornerOnly.has(q.type)?2:2+Math.floor(hash(q.x,q.z,s)*3);
    const corners=[[-1,-1],[1,-1],[1,1],[-1,1]].sort((a,b)=>hash(q.x+a[0],q.z+a[1],s)-hash(q.x+b[0],q.z+b[1],s)).slice(0,nc);
@@ -29311,6 +29598,8 @@ const HEIAN_LANDMARK_SITES={
  // z11955→11895.95→11850.15: 三条めり込み修正の後、二条からの積算へ統一（職の行+小路120・三条北縁との間は45.8空く）。
  // 南縁=三条大路の北縁に接する（東寺の九条大路と同じ載せ方）
  shogakuin:{name:'奨学院',x:1030.2,z:11850.15,w:1212,d:1164.3,gateSide:'S'},kangakuin:{name:'勧学院',x:2363.4,z:11850.15,w:1212,d:1164.3,gateSide:'S'},
+ // 2026-10-07 井内さん「紙屋院は内膳司の建物とか／施薬院は中和院をその位置にコピペ」。位置は歩行の地点（kamiyain・seyakuin）と同じ。敷地と建物は大内裏の内膳司（585×740）・中和院（591×990）を x×.94（大内裏の倍率）で写した推定。
+ kamiyain:{name:'紙屋院',x:-9272,z:-663,w:1213,d:1215,wallW:550,ox:300,gateSide:'S',certainty:'所在は確かでない。町の東（紙屋川側）に大内裏の内膳司の建物を写し、西の空きを干し場と蔵にした推定'},seyakuin:{name:'施薬院',x:12060,z:43160,w:555,d:990,gateSide:'S',certainty:'左京九条三坊の辺りは推定。大内裏の中和院の敷地・建物を写した推定'},
  // 七条・朱雀両側の位置は史料準拠。1町×南北2町、七条大路側南門、南北軸の左右対称平面は図と官衙形式からの推定。
  eastKorokan:{name:'東鴻臚館',x:1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
  westKorokan:{name:'西鴻臚館',x:-1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
@@ -29358,7 +29647,7 @@ const HEIAN_LANDMARK_SITES={
  suzakuin:{name:'朱雀院',x:-1696.8,z:15320.2,w:2545.2,d:5199.4,certainty:'位置と8町規模は史料準拠、殿舎平面・池形・門位置は推定'},
  tobatsu:{name:'鳥羽津',x:1280,z:72300,w:800,d:560}
 };
-const HEIAN_OFFICIAL_COMPOUND_IDS=Object.freeze(['daigakuryo','kokuso','ukyoShiki','sakyoShiki','kobunin','shogakuin','kangakuin']);
+const HEIAN_OFFICIAL_COMPOUND_IDS=Object.freeze(['daigakuryo','kokuso','ukyoShiki','sakyoShiki','kobunin','shogakuin','kangakuin','kamiyain','seyakuin']);
 // 🚫 HEIAN_LANDMARK_SITES（東寺・神泉苑・市など）だけを見ていたため、朱雀院・冷泉院・六條院などの
 //    離宮・大邸宅と町堂（六角堂・因幡堂）の境内が「施設の外」と判定され、牛車や街路MOBがその中に湧いて
 //    塀を抜けて出てきていた（2026-08-30井内さん「夜なのに朱雀院から壁を通り抜けて出てきた」。
@@ -29384,20 +29673,21 @@ function heianCartLaneX(x,z,lane){return heianInsideLandmark(x+lane,z,28)?x:x+la
 function makeHeianOfficialCompound(id){
  const s=HEIAN_LANDMARK_SITES[id];if(!s)throw new Error('不明な官学施設 '+id);const state=HEIAN_HERITAGE_DETAIL_ADOPTED?newHeianHeritageDetailState():null;
  const ok=makeHeian('官学地区・'+s.name,k=>{if(state)k=heianHeritageDetailKit(k,state);
-  const walls=[],gates=[],main=[],lodgings=[],stores=[],trees=[],W=s.w-50,D=s.d-50;
+  // s.wallW／s.ox: 敷地（町）の一部だけを塀で囲み、残りを空き地にする（紙屋院は川側の東へ寄せる・2026-10-07）。無指定は従来どおり敷地全体
+  const walls=[],gates=[],main=[],lodgings=[],stores=[],trees=[],W=(s.wallW||s.w)-50,D=s.d-50,ox=s.ox||0;
   const formal=!['kobunin','shogakuin','kangakuin'].includes(id),wallName=s.name+(formal?'築地塀':'板塀');
   // 塀は高く＋築地塀は瓦笠つき、正門は一階1.6倍（2026-08-17井内さん指示）
   const gateSide=s.gateSide||'S',opening=formal?130:100,wallH=formal?24:18;
   // 共通生成へ（2026-09-11）。寸法と笠（瓦=三角断面／板=板葺）は HEIAN_WALL_SPEC が正本。
   // 🚫 それまで板塀は笠なしで、築地塀の笠は平らな板だった
-  const wall=(cx,cz,w,d)=>{const axis=w>=d?'x':'z';k.wallSegment(walls,axis,cx,cz,axis==='x'?w:d,wallName,formal?'築地':'板塀');};
+  const wall=(cx,cz,w,d)=>{const axis=w>=d?'x':'z';k.wallSegment(walls,axis,cx+ox,cz,axis==='x'?w:d,wallName,formal?'築地':'板塀');};
   if(gateSide==='N'||gateSide==='S'){
    const z=(gateSide==='N'?-1:1)*(D-8)/2,half=(W-opening)/2;
    wall(-(opening+half)/2,z,half,8);wall((opening+half)/2,z,half,8);
-   for(const x of[-44,44])for(const dz of[-18,18])gates.push(k.col(x,z+dz,-1,37,4,s.name+'正門柱'));
-   gates.push(k.box(0,z,116,44,34,6,s.name+'正門梁'),k.roof(0,z,154,84,39,s.name+(formal?'瓦葺正門屋根':'板葺屋根')));
+   for(const x of[-44,44])for(const dz of[-18,18])gates.push(k.col(x+ox,z+dz,-1,37,4,s.name+'正門柱'));
+   gates.push(k.box(ox,z,116,44,34,6,s.name+'正門梁'),k.roof(ox,z,154,84,39,s.name+(formal?'瓦葺正門屋根':'板葺屋根')));
    // 夜間閉鎖の扉（2026-09-11）。柱間88の中央を2枚で塞ぐ。昼は syncHeianGateDoors が隠す
-   for(const sx of[-1,1])gates.push(k.box(sx*22,z,42,4,-1,33,s.name+'正門夜間閉鎖扉'));
+   for(const sx of[-1,1])gates.push(k.box(ox+sx*22,z,42,4,-1,33,s.name+'正門夜間閉鎖扉'));
   }else{
    const x=(gateSide==='W'?-1:1)*(W-8)/2,half=(D-opening)/2;
    wall(x,-(opening+half)/2,8,half);wall(x,(opening+half)/2,8,half);
@@ -29447,6 +29737,27 @@ function makeHeianOfficialCompound(id){
    formalHall(main,0,-300,460,140,27,18,'講堂');formalHall(stores,0,-60,360,110,22,14,'書庫');
    hall(lodgings,-360,230,110,390,22,14,'西学舎',true);hall(lodgings,360,230,110,390,22,14,'東学舎',true);store(0,360,'経書倉');
    plant(-180,100,'書院梅',.9);plant(180,100,'書院梅',.9);plant(-150,310,'学舎松',.9);plant(150,310,'学舎松',.9);
+  }else if(id==='kamiyain'){
+   // 紙屋院（図書寮の別所・紙漉き所）＝大内裏の内膳司（並列2棟 385×150）の敷地と建物を写す（2026-10-07 井内さん指示）。
+   // 内膳司は z=-185 と +148 に正庁を並べる型。写した上で、紙屋らしく棟の間の庭に干し板の列と漉き槽を置く（推定）
+   // 2026-10-07 井内さん「敷地を川沿い側にして、敷地は町の南北に合わせる。左側が開いたら、紙を平らに置いて乾かす場所や蔵が2、3個」
+   //  敷地＝町ぜんぶ（1213×1215）。塀で囲むのは川側（東）の幅550×町の南北。西側の空きは塀の外の干し場と蔵（推定）。X＝塀の中心
+   const X=ox;
+   formalHall(main,X,-300,385,150,26,17,'紙漉所');formalHall(main,X,60,385,150,26,17,'紙干所');
+   for(const z of[-150,-100])for(let i=0;i<10;i++)if(i!==4&&i!==5)stores.push(k.box(X-180+i*40,z,24,2,-1,30,s.name+'板')); /* 中央(x±20)は門からの通り道 */
+   for(const dx of[-170,-110,-50])stores.push(k.box(X+dx,-200,52,34,-1,8,s.name+'基壇')); /* 漉き槽（名は hover の部材語彙に合わせる） */
+   plant(X-225,420,'外周柳',1);plant(X+225,420,'外周柳',1);plant(X-225,200,'外周柳',1);plant(X+225,200,'外周柳',1);plant(X-225,-500,'外周松',.9);plant(X+225,-500,'外周松',.9);
+   // 塀の外（西側）: 干し場＝筵の上に漉いた紙を平らに並べる（8×4）。蔵は3棟、門のある南側の寄り
+   for(let j=0;j<4;j++)for(let i=0;i<8;i++){const x=-540+i*62,z=-470+j*60;stores.push(k.box(x,z,52,42,-1,2,s.name+'基壇'),k.box(x,z,44,34,1,1,s.name+'板'));}
+   store(-510,330,'紙蔵');store(-380,330,'楮蔵');store(-250,330,'料紙蔵');
+   plant(-570,-540,'外周松',.9);plant(-30,-540,'外周松',.9);plant(-570,540,'外周柳',1);plant(-30,540,'外周柳',1);
+  }else if(id==='seyakuin'){
+   // 施薬院＝大内裏の中和院（591×990）の敷地と建物を写す。神嘉殿→正庁、北殿→薬殿、西舎・東舎→病舎、渡殿でつなぐ。
+   // 南の庭に薬草園の畝を足す（推定）
+   formalHall(main,0,-100,250,110,26,20,'正庁');formalHall(main,0,-345,250,100,24,16,'薬殿');k.watari(main,'z',0,-295,-155);
+   for(const sx of[-1,1]){const x=sx*170;formalHall(lodgings,x,230,90,200,24,16,sx<0?'西病舎':'東病舎');k.watari(main,'x',-100,Math.min(sx*125,x),Math.max(sx*125,x));k.watari(main,'z',x,-100,130);}
+   for(const x of[-120,-60,60,120])for(const z of[300,350])stores.push(k.box(x,z,60,20,-1,3,s.name+'基壇')) /* 薬草園の畝 */;
+   plant(-100,-10,'前庭梅',.9);plant(100,-10,'前庭梅',.9);plant(-215,420,'外周松',.9);plant(215,420,'外周松',.9);
   }else{
    formalHall(main,0,-300,430,140,27,18,'講堂');hall(lodgings,-350,100,110,430,22,14,'西寄宿舎',true);hall(lodgings,350,100,110,430,22,14,'東寄宿舎',true);
    hall(lodgings,0,230,320,100,21,13,id==='kangakuin'?'政所':'学頭所',true);store(-200,390,'倉');
@@ -31664,7 +31975,7 @@ async function makeHeianTerrain(){
   // 羅城門の内の空閑地2町も坊城で囲む
   if(city.bomonGates!==13||city.bomonRoads!==7||city.bomonSides!==2||city.bomonOpening!==72||city.suzakuWallSegments<25
    ||city.suzakuWallThick!==15||city.suzakuWallHeight!==24||city.suzakuWallInnerFace!==424.2||city.suzakuWallMeshes!==3||city.rajomonVacant?.length!==2)throw new Error('坊門・坊城が不正です '+JSON.stringify({gates:city.bomonGates,roads:city.bomonRoads,sides:city.bomonSides,opening:city.bomonOpening,walls:city.suzakuWallSegments,thick:city.suzakuWallThick,height:city.suzakuWallHeight,inner:city.suzakuWallInnerFace,meshes:city.suzakuWallMeshes,vacant:city.rajomonVacant}));
-  if(city.blocks!==1064/* 1069→1064: 菅原院1町・紅梅殿白梅殿2町・亭子院2町を史料位置へ予約（2026-08-20） */||city.roads!==90||!city.canalRoadSplit||city.canalRoadRecords!==5||Math.abs(city.canalOpeningWidth-76.6)>.001||Math.abs(city.canalSideRoadWidth-22.3)>.001||city.roadFadeRegion!=='右京南西低湿地'||city.roadFadeVertices<1||city.roadFadeMin>.04||!city.roadVertexAlpha||city.blockFadeRegion!=='右京南西低湿地'||city.blockFadeCells<1||city.blockFadeMin>.02||!city.blockInstanceAlpha||city.northRows!==10||city.northRoads!==23||city.eastMarketX!==7284.6||city.eastMarketZ!==32994||city.westMarketX!==-7284.6||city.westMarketZ!==32994||!city.palaceClear||city.palaceIntrusions!==0||city.templeReservedBlocks!==16||!city.templeRoadClear||city.templeRoadIntrusions!==0||city.shinsenenReservedBlocks!==6||city.shinsenenBoundaryRoads<4 /* 4→1以上: 条坊の実寸化で行ピッチが変わり南北縁が道路に乗らない。東縁=大宮大路の内縁のみ一致（2026-08-18） */||city.officialReservedBlocks!==13||city.officialRoadIntrusions!==0||city.korokanReservedBlocks!==4||city.korokanRoadIntrusions!==0||city.paddyCells!==0||city.paddyWaterPlots!==0||city.paddyLevees!==0||city.paddyRoadIntrusions!==0||city.paddySiteIntrusions!==0||city.reservedSiteIntrusions!==0||!city.sideRoadsContinuous||city.northBoundaryRoadSpans!==1||city.northBoundaryRoadWidth!==242.4 /* 一条大路は通常の大路24m（2026-08-18） */||city.northBoundaryRoadZ!==-7150||city.palaceSideRoadX!==5817.6 /* 大内裏を挟むのは大宮大路（2026-08-18） */||city.palaceBoundaryRoads!==4||city.palaceRoadOverlapArea!==0||city.paddyMeshes!==4||city.outerPaddyCells<200||city.outerPaddyMeshes!==0||!city.farmland||city.farmland.squares<600||city.farmland.insideCity!==0||city.farmland.waterIntrusions!==0||city.farmland.hamletIntrusions!==0/* 1.83 都の外の田（heianFarmland） */||city.outerPaddyRoadIntrusions!==0||city.outerPaddyWaterIntrusions!==0||city.outerPaddyInsideCity!==0)throw new Error('街区配置が不正です '+JSON.stringify(city));
+  if(city.blocks!==1062/* 1064→1062: 紙屋院・施薬院を官式敷地として予約（2026-10-07）。 1069→1064: 菅原院1町・紅梅殿白梅殿2町・亭子院2町を史料位置へ予約（2026-08-20） */||city.roads!==90||!city.canalRoadSplit||city.canalRoadRecords!==5||Math.abs(city.canalOpeningWidth-76.6)>.001||Math.abs(city.canalSideRoadWidth-22.3)>.001||city.roadFadeRegion!=='右京南西低湿地'||city.roadFadeVertices<1||city.roadFadeMin>.04||!city.roadVertexAlpha||city.blockFadeRegion!=='右京南西低湿地'||city.blockFadeCells<1||city.blockFadeMin>.02||!city.blockInstanceAlpha||city.northRows!==10||city.northRoads!==23||city.eastMarketX!==7284.6||city.eastMarketZ!==32994||city.westMarketX!==-7284.6||city.westMarketZ!==32994||!city.palaceClear||city.palaceIntrusions!==0||city.templeReservedBlocks!==16||!city.templeRoadClear||city.templeRoadIntrusions!==0||city.shinsenenReservedBlocks!==6||city.shinsenenBoundaryRoads<4 /* 4→1以上: 条坊の実寸化で行ピッチが変わり南北縁が道路に乗らない。東縁=大宮大路の内縁のみ一致（2026-08-18） */||city.officialReservedBlocks!==15/* 13→15: 紙屋院・施薬院（2026-10-07） */||city.officialRoadIntrusions!==0||city.korokanReservedBlocks!==4||city.korokanRoadIntrusions!==0||city.paddyCells!==0||city.paddyWaterPlots!==0||city.paddyLevees!==0||city.paddyRoadIntrusions!==0||city.paddySiteIntrusions!==0||city.reservedSiteIntrusions!==0||!city.sideRoadsContinuous||city.northBoundaryRoadSpans!==1||city.northBoundaryRoadWidth!==242.4 /* 一条大路は通常の大路24m（2026-08-18） */||city.northBoundaryRoadZ!==-7150||city.palaceSideRoadX!==5817.6 /* 大内裏を挟むのは大宮大路（2026-08-18） */||city.palaceBoundaryRoads!==4||city.palaceRoadOverlapArea!==0||city.paddyMeshes!==4||city.outerPaddyCells<200||city.outerPaddyMeshes!==0||!city.farmland||city.farmland.squares<600||city.farmland.insideCity!==0||city.farmland.waterIntrusions!==0||city.farmland.hamletIntrusions!==0/* 1.83 都の外の田（heianFarmland） */||city.outerPaddyRoadIntrusions!==0||city.outerPaddyWaterIntrusions!==0||city.outerPaddyInsideCity!==0)throw new Error('街区配置が不正です '+JSON.stringify(city));
   if(nobles.residences!==176/* 175→176: 紅梅殿・白梅殿を小路を挟む1町邸×2へ分割（2026-08-20） */||nobles.mixedEstateTowns!==32/* 33→32: 紅梅殿・白梅殿の予約街区が従来の混在町1件を置換 */||nobles.plots!==34||nobles.parcelGrid?.cols!==4||nobles.parcelGrid?.rows!==8||nobles.parcelGrid?.units!==32||nobles.parcelSpecErrors!==0||nobles.parcelAlignmentErrors!==0||nobles.architectureScaleErrors!==0||nobles.northSakyo13FullChoPlots<3||nobles.southOfNijoFullChoPlots<2/* 15/20/49/44/48→17/23/45/43/48: 1町の名邸5件（菅原院・小二条院をv1、町尻殿・紅梅殿・白梅殿をv2）を
    敷地に見合うテンプレへ上げた（2026-09-11井内さん「家司の建物、牛車関連、井戸なんかがないよ」） */
    /* 17/23/45/43→19/23/44/42: 紅梅殿v2→v1、亭子院の2棟をv3+v4→v1+v2（2026-09-12） */
@@ -31700,13 +32011,13 @@ async function makeHeianTerrain(){
     throw new Error('車宿の牛車が不正です '+JSON.stringify({...an,kurumaEstates,residences:nobles.residences}));}
   const badGrades=Object.entries(grades).filter(([,g])=>g.vertices<1||g.intrusions!==0||(g.grade==='slope'?(g.northRiseMm<=0||g.reliefMm<=0):g.flatnessMm>.01));
   const entranceGrade=grades.daidairiSouthEntrance||{};
-  if(t.gradedSites!==24||badGrades.length|| /* 17→19: 京内神社2社、→20: 淀津（2026-08-17）、→21: 鳥羽津（2026-08-18）、→22: 朱雀門前の平坦帯（2026-08-19）、→24: 市比賣社（2026-09-11） */entranceGrade.grade!=='flat'||entranceGrade.flatnessMm>.01||entranceGrade.reliefMm>.01)throw new Error('敷地造成が不正です gradedSites='+t.gradedSites+' entranceFlatness='+entranceGrade.flatnessMm+' bad='+badGrades.map(([id,g])=>id+':v'+g.vertices+'/relief'+g.flatnessMm+'/intrusions'+g.intrusions).join(','));
+  if(t.gradedSites!==26||badGrades.length|| /* 24→26: 紙屋院・施薬院（2026-10-07）、17→19: 京内神社2社、→20: 淀津（2026-08-17）、→21: 鳥羽津（2026-08-18）、→22: 朱雀門前の平坦帯（2026-08-19）、→24: 市比賣社（2026-09-11） */entranceGrade.grade!=='flat'||entranceGrade.flatnessMm>.01||entranceGrade.reliefMm>.01)throw new Error('敷地造成が不正です gradedSites='+t.gradedSites+' entranceFlatness='+entranceGrade.flatnessMm+' bad='+badGrades.map(([id,g])=>id+':v'+g.vertices+'/relief'+g.flatnessMm+'/intrusions'+g.intrusions).join(','));
   if(approach.routes!==13||approach.yellowIncluded!==false||approach.width!==140||approach.color!==HEIAN_ROAD_COLOR/* 道の不透明化と同色（2026-08-19） */||approach.segments!==235/* 160→235: 東海道・北東街道・南東街道を地形DEMの谷筋へ引き直した（2026-08-25） */||approach.outOfBounds!==0||approach.drawCalls!==1||approach.kamoCrossings!==5||approach.kamoBankRoutes!==1||approach.cityEdgeStarts!==11||approach.gateStarts!==12||approach.northeastCornerEast!==true||approach.imadegawaEastWest!==true||approach.shirakawaFromKonoe!==true||approach.tokaidoFromSanjo!==true||approach.riverFollowingRoutes!==7||approach.riverAnchors!==7||approach.riverAligned!==7||approach.valleyAnchors!==10||approach.valleyAligned!==10||approach.passAnchors!==4||approach.passAligned!==4||approach.mountainFoots!==1||approach.mountainFootsAligned!==1||approach.avenueExtensions!==2||!approach.avenueStraight||approach.avenueWidths?.['nijo-east']!==140||approach.avenueWidths?.['sanjo-east']!==300||approach.ridgeWarnings!==0||approach.lakeShoreConnections!==5||approach.lakeShoreAligned!==5||approach.waterIntrusions!==0||!approach.southStraightToFirstRiver||approach.bankAdjustedPoints<1||approach.maxBankPasses!==6||approach.riverOverlapSamples!==0||approach.southwestBranch?.southOfRajomonM!==20||!approach.southwestBranch?.onSouthRoad||approach.traceVersion!==10)throw new Error('周辺街道が不正です '+JSON.stringify(approach));
   // ?skipDaidairi=1（検証モード）は大内裏を作らないので、大内裏に依存する3条件だけ外す。
   // 🚫 地形66.4分のうち大内裏が66.2分。これを外せば14秒で地形が作れ、荷車の接地影・町堂の門・
   //    住宅・群衆といった「地形の中にしか無いもの」を焼かずに確認できる（2026-08-30）
   const skipD=HEIAN_SKIP_DAIDAIRI;
-  if((skipD?landmarks.models!==19:landmarks.models!==20)|| /* 17→18: 神泉苑の乾臨閣・塀・門（2026-08-19）、→20: 市比賣社（2026-09-11） */landmarks.sites!==18||landmarks.siteCanalIntrusions?.length!==0/* 敷地が堀川・西堀川の開渠に載っていないか（2026-09-11） */||landmarks.officialCompounds!==7||landmarks.kokusoCarts!==3||landmarks.kokusoCartDeckSizes?.length!==3||landmarks.kokusoCartDeckSizes.some(size=>size[0]!==22||size[1]!==46)||landmarks.kokusoCartWheels!==6||landmarks.kokusoCartWheelSizes?.length!==6||landmarks.kokusoCartWheelSizes.some(size=>size[0]!==1.8||size[1]!==17.2||size[2]!==17.2)||landmarks.meshes<2000||landmarks.gradedSites!==24|| /* 京内神社2社＋淀津（2026-08-17）＋鳥羽津（2026-08-18）＋朱雀門前平坦帯（2026-08-19）＋市比賣社（2026-09-11） */landmarks.terrainIntrusions!==0||landmarks.shinsenenPondMeshes!==1||landmarks.shinsenenShoreMeshes!==1||landmarks.shinsenenShoreMode!=='outer-offset-jitter'||landmarks.shinsenenShoreColor!=='#d9eff0'||landmarks.shinsenenShoreOpacity!==HEIAN_POND_SHORE_OPACITY||landmarks.shinsenenPondShape!=='irregular-closed-curve'||landmarks.shinsenenPondVertices<48||landmarks.shinsenenX!==4363.2||landmarks.ryubidanFlags!==12/* 8→12: 朱6・白6（2026-10-01） */||landmarks.ryubidanFlagPoles!==12||window.__heianWindFlagInfo?.()?.red!==6||window.__heianWindFlagInfo?.()?.white!==6||landmarks.eastMarket?.z!==32994||landmarks.marketStalls?.stalls!==95/* 96→95: 北東角の1つを市比賣社へ（2026-09-12） */||landmarks.marketStalls?.removedForShrine!==1||landmarks.marketStalls?.drawCalls!==8/* 4→6: 周囲の商いゴザと野菜の2meshを追加した分（2026-08-24）。6→8: 店の標の柱と札（2026-10-02） */||landmarks.marketStalls?.roofStyle!=='板葺き切妻'||landmarks.marketStalls?.roofColor!==SHINDEN_PART_PALETTE.roof/* #594939→庶民の家と同じ屋根（2026-10-02） */||!(landmarks.marketStalls?.signs>=90)||landmarks.marketStalls?.canopySize?.[0]!==80||landmarks.marketStalls?.canopySize?.[2]!==50||landmarks.marketStalls?.coverage?.[0]<2000||landmarks.marketStalls?.coverage?.[1]<1700||landmarks.eastKorokan?.x!==1030.2 /* 町割りへ合わせた（2026-08-18） */ /* 朱雀大路の縁へ戻した（2026-08-18） */||landmarks.eastKorokan?.z!==32994||landmarks.eastKorokan?.w!==1212||landmarks.eastKorokan?.d!==2503.5||landmarks.westKorokan?.x!==-1030.2||landmarks.westKorokan?.z!==32994||landmarks.westKorokan?.w!==1212||landmarks.westKorokan?.d!==2503.5||landmarks.korokanSymmetry?.eastBodies!==landmarks.korokanSymmetry?.westBodies||!landmarks.korokanSymmetry?.sameOrientation||!landmarks.korokanSymmetry?.samePlan||!landmarks.korokanSymmetry?.siteContainment||!landmarks.korokanSymmetry?.internalSymmetry||(!skipD&&(landmarks.placements?.daidairi?.grade!=='slope'||landmarks.placements?.daidairi?.hiddenGround!==1||landmarks.placements?.daidairi?.southGateMinClearanceMm<-.05||landmarks.placements?.daidairi?.southGateTerrainSpreadMm>.6))/* .01→.6: 官学地区を二条大路へ寄せた分、学寮の造成テラスが朱雀門前台地に隣接し、翼部の標本点が段差の補間帯へ掛かる（実測spread=.467=実寸5cm・2026-08-19） */||landmarks.placements?.rajomon?.z!==HEIAN_RAJOMON_Z||landmarks.placements?.toji?.x!==4363.2||landmarks.placements?.toji?.z!==42504.7 /* 南端を九条大路の北縁へ載せた（2026-08-18） */||landmarks.placements?.saiji?.x!==-4363.2||landmarks.placements?.saiji?.z!==42504.7)throw new Error('主要施設配置が不正です models='+landmarks.models+' sites='+landmarks.sites+' meshes='+landmarks.meshes+' gradedSites='+landmarks.gradedSites+' terrainIntrusions='+landmarks.terrainIntrusions+' shinsenenPondMeshes='+landmarks.shinsenenPondMeshes+' shinsenenX='+landmarks.shinsenenX+' eastKorokan='+landmarks.eastKorokan?.x+','+landmarks.eastKorokan?.z+' westKorokan='+landmarks.westKorokan?.x+','+landmarks.westKorokan?.z+' daidairiGrade='+landmarks.placements?.daidairi?.grade+' hiddenGround='+landmarks.placements?.daidairi?.hiddenGround+' toji='+landmarks.placements?.toji?.x+','+landmarks.placements?.toji?.z+' saiji='+landmarks.placements?.saiji?.x+','+landmarks.placements?.saiji?.z);
+  if((skipD?landmarks.models!==21:landmarks.models!==22)|| /* →21/22: 紙屋院・施薬院（2026-10-07）。17→18: 神泉苑の乾臨閣・塀・門（2026-08-19）、→20: 市比賣社（2026-09-11） */landmarks.sites!==18||landmarks.siteCanalIntrusions?.length!==0/* 敷地が堀川・西堀川の開渠に載っていないか（2026-09-11） */||landmarks.officialCompounds!==9/* 7→9: 紙屋院・施薬院 */||landmarks.kokusoCarts!==3||landmarks.kokusoCartDeckSizes?.length!==3||landmarks.kokusoCartDeckSizes.some(size=>size[0]!==22||size[1]!==46)||landmarks.kokusoCartWheels!==6||landmarks.kokusoCartWheelSizes?.length!==6||landmarks.kokusoCartWheelSizes.some(size=>size[0]!==1.8||size[1]!==17.2||size[2]!==17.2)||landmarks.meshes<2000||landmarks.gradedSites!==26/* 24→26: 紙屋院・施薬院（2026-10-07） */|| /* 京内神社2社＋淀津（2026-08-17）＋鳥羽津（2026-08-18）＋朱雀門前平坦帯（2026-08-19）＋市比賣社（2026-09-11） */landmarks.terrainIntrusions!==0||landmarks.shinsenenPondMeshes!==1||landmarks.shinsenenShoreMeshes!==1||landmarks.shinsenenShoreMode!=='outer-offset-jitter'||landmarks.shinsenenShoreColor!=='#d9eff0'||landmarks.shinsenenShoreOpacity!==HEIAN_POND_SHORE_OPACITY||landmarks.shinsenenPondShape!=='irregular-closed-curve'||landmarks.shinsenenPondVertices<48||landmarks.shinsenenX!==4363.2||landmarks.ryubidanFlags!==12/* 8→12: 朱6・白6（2026-10-01） */||landmarks.ryubidanFlagPoles!==12||window.__heianWindFlagInfo?.()?.red!==6||window.__heianWindFlagInfo?.()?.white!==6||landmarks.eastMarket?.z!==32994||landmarks.marketStalls?.stalls!==95/* 96→95: 北東角の1つを市比賣社へ（2026-09-12） */||landmarks.marketStalls?.removedForShrine!==1||landmarks.marketStalls?.drawCalls!==8/* 4→6: 周囲の商いゴザと野菜の2meshを追加した分（2026-08-24）。6→8: 店の標の柱と札（2026-10-02） */||landmarks.marketStalls?.roofStyle!=='板葺き切妻'||landmarks.marketStalls?.roofColor!==SHINDEN_PART_PALETTE.roof/* #594939→庶民の家と同じ屋根（2026-10-02） */||!(landmarks.marketStalls?.signs>=90)||landmarks.marketStalls?.canopySize?.[0]!==80||landmarks.marketStalls?.canopySize?.[2]!==50||landmarks.marketStalls?.coverage?.[0]<2000||landmarks.marketStalls?.coverage?.[1]<1700||landmarks.eastKorokan?.x!==1030.2 /* 町割りへ合わせた（2026-08-18） */ /* 朱雀大路の縁へ戻した（2026-08-18） */||landmarks.eastKorokan?.z!==32994||landmarks.eastKorokan?.w!==1212||landmarks.eastKorokan?.d!==2503.5||landmarks.westKorokan?.x!==-1030.2||landmarks.westKorokan?.z!==32994||landmarks.westKorokan?.w!==1212||landmarks.westKorokan?.d!==2503.5||landmarks.korokanSymmetry?.eastBodies!==landmarks.korokanSymmetry?.westBodies||!landmarks.korokanSymmetry?.sameOrientation||!landmarks.korokanSymmetry?.samePlan||!landmarks.korokanSymmetry?.siteContainment||!landmarks.korokanSymmetry?.internalSymmetry||(!skipD&&(landmarks.placements?.daidairi?.grade!=='slope'||landmarks.placements?.daidairi?.hiddenGround!==1||landmarks.placements?.daidairi?.southGateMinClearanceMm<-.05||landmarks.placements?.daidairi?.southGateTerrainSpreadMm>.6))/* .01→.6: 官学地区を二条大路へ寄せた分、学寮の造成テラスが朱雀門前台地に隣接し、翼部の標本点が段差の補間帯へ掛かる（実測spread=.467=実寸5cm・2026-08-19） */||landmarks.placements?.rajomon?.z!==HEIAN_RAJOMON_Z||landmarks.placements?.toji?.x!==4363.2||landmarks.placements?.toji?.z!==42504.7 /* 南端を九条大路の北縁へ載せた（2026-08-18） */||landmarks.placements?.saiji?.x!==-4363.2||landmarks.placements?.saiji?.z!==42504.7)throw new Error('主要施設配置が不正です models='+landmarks.models+' sites='+landmarks.sites+' meshes='+landmarks.meshes+' gradedSites='+landmarks.gradedSites+' terrainIntrusions='+landmarks.terrainIntrusions+' shinsenenPondMeshes='+landmarks.shinsenenPondMeshes+' shinsenenX='+landmarks.shinsenenX+' eastKorokan='+landmarks.eastKorokan?.x+','+landmarks.eastKorokan?.z+' westKorokan='+landmarks.westKorokan?.x+','+landmarks.westKorokan?.z+' daidairiGrade='+landmarks.placements?.daidairi?.grade+' hiddenGround='+landmarks.placements?.daidairi?.hiddenGround+' toji='+landmarks.placements?.toji?.x+','+landmarks.placements?.toji?.z+' saiji='+landmarks.placements?.saiji?.x+','+landmarks.placements?.saiji?.z);
   if(!(t.kamoGravelVertices>0)||!(t.kamoWaterVertices>0)||!(t.kamoSourceWays>0)||t.kamoChannels!==t.kamoSourceWays*3||!(t.kamoWaterWidthRatio>0&&t.kamoWaterWidthRatio<.4)||t.kamoWidthProfile?.upstream!==0||t.kamoWidthProfile?.mountainFoot!==.25||t.kamoWidthProfile?.sanjo!==1||t.kamoWidthProfile?.tobatsu!==2.4/* 三条以南の連続拡幅（2026-08-20） */||t.kamoWidthProfile?.waterAtKujo!==1||Math.abs(t.kamoWidthProfile?.waterSouthOfKujo-1.15)>.001||Math.abs(t.kamoWidthProfile?.waterTobatsu-1.15)>.001||t.kamoWidthProfile?.waterFlowStartZ!==46500||t.kamoWidthProfile?.waterFlowFullZ!==55000||t.kamoWidthProfile?.waterFlowGain!==.15||!(t.kamoMainChannelScale>1&&t.kamoMainChannelScale<1.4)||t.takanoWidthScale!==.55||!t.kamoFord||t.kamoWalkable!==true)throw new Error('鴨川の河原・細流・徒歩横断設定が不正です '+JSON.stringify({gravel:t.kamoGravelVertices,water:t.kamoWaterVertices,ways:t.kamoSourceWays,channels:t.kamoChannels,ratio:t.kamoWaterWidthRatio,ford:t.kamoFord,walkable:t.kamoWalkable}));
   if(!(t.katsuraGravelVertices>0)||!(t.katsuraWaterVertices>0)||!(t.katsuraSourceWays>0)||t.katsuraChannels!==t.katsuraSourceWays||t.katsuraWaterWidthRatio!==.6||!(t.katsuraWidthProfile?.mountain<t.katsuraWidthProfile?.foothill&&t.katsuraWidthProfile?.foothill<t.katsuraWidthProfile?.cityWest&&t.katsuraWidthProfile?.cityWest<t.katsuraWidthProfile?.plain)||t.katsuraWalkable!==true)throw new Error('桂川の白石河原・単流路・裾野拡幅が不正です '+JSON.stringify({gravel:t.katsuraGravelVertices,water:t.katsuraWaterVertices,ways:t.katsuraSourceWays,channels:t.katsuraChannels,ratio:t.katsuraWaterWidthRatio,profile:t.katsuraWidthProfile}));
   if(!(t.ukyoMinorRivers>0)||t.ukyoMinorWidthScale!==.55||!t.westHorikawaPreserved)throw new Error('右京周辺の細流縮小または西堀川除外が不正です '+JSON.stringify({rivers:t.ukyoMinorRivers,scale:t.ukyoMinorWidthScale,westHorikawa:t.westHorikawaPreserved}));
@@ -38554,13 +38865,13 @@ if(location.hash==='#heiantest'){
    towerOrnatePlacementOK=['白虎楼','蒼龍楼'].every(turretPlacementOK),
    towerOrnateOK=towerOrnateCountsOK&&towerOrnateSquareOK&&towerOrnateWall30OK&&towerOrnateHeightOK&&towerOrnatePlacementOK,
    towerOrnateExclusive=['齊景楼','栖霞楼'].every(n=>namedCount(n,'中央中間屋根')===0&&namedCount(n,'中央上櫓屋根')===0&&namedCount(n,'稜線小櫓屋根')===0),
-   towerLowerStoryOK=['白虎楼','蒼龍楼','齊景楼','栖霞楼'].every(n=>{const lo=bb(n+'下層内壁'),hi=bb(n+'下層内壁上小壁'),h=lo&&hi?hi.max.y-lo.min.y:0;return namedCount(n,'下層壁面柱')===12&&h>44&&h<49;});
+   towerLowerStoryOK=['白虎楼','蒼龍楼','齊景楼','栖霞楼'].every(n=>{const lo=bb(n+'下層内壁'),hi=bb(n+'下層内壁上小壁'),h=lo&&hi?hi.max.y-lo.min.y:0;return namedCount(n,'下層壁面柱')===12&&h>38&&h<49/* 朝堂院楼（白虎楼・蒼龍楼）は 2026-10-07 に壁 48→42 */;});
   const innerGallery=bb('内裏回廊屋根'),kokyuRoofNames=['承香殿屋根','常寧殿屋根','貞観殿屋根','弘徽殿屋根','登華殿屋根','麗景殿屋根','宣耀殿屋根','飛香舎（藤壺）屋根','凝花舎（梅壺）屋根','襲芳舎（雷鳴壺）屋根','昭陽舎（梨壺）屋根','昭陽北舎屋根','淑景舎（桐壺）屋根','淑景北舎屋根'],kokyuRoofs=kokyuRoofNames.map(bb),kokyuRoofOK=!!innerGallery&&kokyuRoofs.every(b=>b&&b.min.y>innerGallery.min.y&&b.max.y>innerGallery.max.y);
   const bodyColor=n=>bodies.find(b=>b.name.startsWith(n))?.mesh.material.color.getHexString(),bodyTextureOK=(n,id,tileMM)=>{const b=bodies.find(x=>x.name.startsWith(n)),m=b&&bodyMaterials[b.colorIdx];return !!(m?.textureAssetId&&imageAssetData(m.textureAssetId)&&m.textureTileMM===tileMM&&b.mesh.material.map&&b.mesh.material.userData.heianTexture===id);};
   const innerWallPaletteOK=['紫宸殿','清涼殿','仁寿殿','承香殿','飛香舎（藤壺）'].every(n=>bodyColor(n+'内壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor(n+'内壁上小壁')==='463b33');
   const roofPaletteOK=bodyTextureOK('大極殿大屋根',HEIAN_TILE_TEXTURE_ID,24)
    &&bodyTextureOK('紫宸殿屋根',HEIAN_HIWADA_TEXTURE_ID,18)
-   &&bodyColor('大極殿内壁上小壁')==='a64032'&&bodyColor('大極殿内壁')===SHINDEN_PART_PALETTE.plaster.slice(1); // 瓦・檜皮は共有texture、白壁上3割は朱の小壁
+   &&bodyColor('大極殿内壁上小壁')===SHINDEN_PART_PALETTE.plaster.slice(1)&&bodyColor('大極殿内壁')===SHINDEN_PART_PALETTE.plaster.slice(1); // 瓦・檜皮は共有texture。大極殿は扉より上も白壁（2026-10-07・旧は朱の上小壁）
   const shibiTargets=['大極殿','会昌門','応天門','豊楽殿','儀鸞門','朱雀門'],goldShibiTargets=['大極殿','豊楽殿'],tileShibiTargets=['会昌門','応天門','儀鸞門','朱雀門'];
   const shibiCount=n=>bodies.filter(b=>b.name.startsWith(n+'鴟尾')).length,
    shibiHeight=n=>{const b=bb(n+'鴟尾');return b?b.getSize(new THREE.Vector3()).y:0;};
