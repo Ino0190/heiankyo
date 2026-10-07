@@ -8069,3 +8069,30 @@ L.say.push(
 L.KISHITSU=Object.assign(L.KISHITSU||{},{"omi_ishimaro": "信心", "tadatsune": "噂好き", "yasumaro": "働き者", "sanae": "働き者", "inumaru": "遊び好き", "kaede": "慎重", "toramaru": "噂好き", "kosaisho": "遊び好き", "naishi": "慎重", "nyobo_yomi": "噂好き", "sakon": "皮肉屋", "shosho": "働き者", "gakunin": "遊び好き", "kemari_youth": "噂好き", "kurodo": "噂好き", "tsurayuki": "遊び好き", "eimon_jo": "働き者", "geki": "皮肉屋", "harukaze": "慎重", "harunari": "信心", "ichitsukasa": "皮肉屋", "kangaku_hakase": "働き者", "koreyuki": "信心", "kusushi": "慎重", "masanari": "皮肉屋", "okura_shi": "噂好き", "shakyosei": "信心", "urabe": "働き者", "eshi": "働き者", "hida_hirotari": "噂好き", "hiwada": "慎重", "kaji": "皮肉屋", "kamiya": "信心", "nishikibe": "遊び好き", "yasuomi": "信心", "zenne": "信心", "kawara_baba": "信心", "onimaru": "噂好き", "chunagon": "噂好き", "edame": "働き者", "kohagi": "慎重", "toshimichi": "皮肉屋", "kitanokata": "慎重", "hyoe_menoto": "噂好き", "kogiku": "遊び好き", "kotakamaru": "噂好き", "kotaro": "働き者", "suzumemaru": "慎重", "nakanokimi": "遊び好き", "kotota": "噂好き", "takemitsu": "働き者", "kuromaro": "噂好き", "ako": "信心", "hamanari": "噂好き", "toji": "噂好き", "akane": "慎重", "mochime": "噂好き", "sakeuri": "噂好き", "tsugejo": "噂好き", "ayume": "働き者", "kikume": "皮肉屋", "kinu_akindo": "信心", "kome_akindo": "遊び好き", "masume": "働き者", "nishi_toji": "慎重", "ishimaro": "信心", "oimatsu": "慎重", "banjo": "働き者", "hatsuo": "噂好き", "hirotari": "皮肉屋", "kawaraji": "遊び好き", "kizukai": "働き者", "kunimitsu": "噂好き", "niage": "慎重", "kangakuin": "噂好き", "fumimaro": "皮肉屋", "myobo": "働き者", "sansei": "慎重", "shigezane": "噂好き", "heita": "噂好き", "chidori": "信心", "masumi": "信心", "ninnaji": "慎重", "okina_katari": "噂好き", "rusui": "信心", "sangaku": "噂好き", "sugoroku": "噂好き", "bocho": "働き者", "iwamaru": "皮肉屋", "tahito": "遊び好き", "uomaro": "働き者", "yadonushi": "慎重", "dainagon_keishi": "慎重", "korekiyo": "噂好き", "yasuyuki": "働き者", "enjo": "信心", "renkan": "噂好き", "rokakudo_so": "働き者", "takuhatsu_so": "慎重", "kenshin": "皮肉屋", "miko": "信心", "seyakuin": "信心", "toji_ouna": "働き者", "zoushime": "噂好き", "ayame": "慎重", "someshi": "皮肉屋", "uneme": "遊び好き", "takemaru": "働き者", "kamo_negi": "信心", "mutsu": "噂好き", "sumobito": "遊び好き", "tsukushi": "働き者"});
 L.KISHITSU_TOPIC={"噂好き": {"恋": 4, "事件": 4, "政": 3, "怪異": 3, "見聞": 2, "遊び": 2}, "働き者": {"仕事": 4, "値": 3, "季節": 2, "暮らし": 2, "食": 1.5}, "慎重": {"暮らし": 3, "季節": 3, "仕事": 2, "政": 0.3, "事件": 0.3, "恋": 0.5}, "皮肉屋": {"政": 4, "値": 3, "見聞": 3, "事件": 2}, "信心": {"神仏": 5, "怪異": 3, "季節": 2, "暮らし": 1.5}, "遊び好き": {"遊び": 5, "食": 4, "季節": 2, "見聞": 2, "恋": 2}};
 L.KISHITSU_MIX={"衛士": {"働き者": 3, "慎重": 3, "皮肉屋": 1.5, "噂好き": 1, "遊び好き": 1, "信心": 0.5}, "官人": {"働き者": 2, "慎重": 2, "皮肉屋": 2, "噂好き": 2, "遊び好き": 1, "信心": 1}, "庶民": {"働き者": 2, "慎重": 1.5, "皮肉屋": 1, "噂好き": 2, "遊び好き": 2, "信心": 1.5}, "女": {"働き者": 2, "慎重": 1.5, "皮肉屋": 1, "噂好き": 2.5, "遊び好き": 1.5, "信心": 2}, "僧": {"信心": 5, "慎重": 2, "皮肉屋": 1, "働き者": 1, "噂好き": 0.5, "遊び好き": 0.5}, "人夫": {"働き者": 3, "遊び好き": 2, "皮肉屋": 1.5, "噂好き": 1.5, "慎重": 1, "信心": 1}, "売り子": {"働き者": 3, "噂好き": 2.5, "皮肉屋": 1.5, "慎重": 1, "遊び好き": 1, "信心": 1}, "既定": {"噂好き": 1, "働き者": 1, "慎重": 1, "皮肉屋": 1, "信心": 1, "遊び好き": 1}};})();
+
+// ---- 街かどの小さな出来事の台詞（2026-10-07 井内さん「あの大木の辻を西、のように会話とつなぐ」）。
+// 本体の HEIAN_QUIRKS（CadKit/index.html）の近く（tr m 以内）で、タグ quirk_<id> が付く。景色の話であり、史料の裏付けは無い（推定・架空）
+(function(){const L=window.HEIAN_LINES;if(!L)return;
+const Q=(at,who,t,o)=>Object.assign({at,who,t,n:'街かどの景色（推定・架空）'},o||{});
+L.say.push(
+ Q('quirk_keyaki','庶民','あの大きな欅の辻を西へ曲がれば、市へ近い。迷ったら欅を探しなされ'),
+ Q('quirk_keyaki','童','この木、登ると見つかって怒られるんだ。でも、てっぺんから朱雀大路が見えるんだぜ'),
+ Q('quirk_keyaki','女','夏はこの欅の下が涼しくて、みな立ち話をしていく'),
+ Q('quirk_kusu','庶民','右京の楠じゃ。この辺りは空き地が多いが、この木だけは誰も切らん'),
+ Q('quirk_kusu','旅人','大きな楠だな。都の西は人が少ないが、これほどの木は左京にも少ない'),
+ Q('quirk_muku','庶民','椋の大木の辻じゃ。実の熟れる頃は、鳥と子供で取り合いになる'),
+ Q('quirk_ganseki','庶民','この辻の角の岩は、昔からここにある。荷車は皆、岩をよけて曲がる'),
+ Q('quirk_ganseki','童','岩の上に登ると、荷車がよく見えるよ'),
+ Q('quirk_ishi2','庶民','東京極の岩か。京の東の端を知らせる目印よ、と祖父は言うておった'),
+ Q('quirk_inu3','庶民','ここの犬は三匹。いつもここに居って、誰が通るか見ておる'),
+ Q('quirk_inu3','女','三匹とも人なつこい。何も持たぬ者にも尾を振るのよ'),
+ Q('quirk_neko','女','猫の親子が、毎日この辻を通る。子猫がころころついて歩くのがかわいいの'),
+ Q('quirk_neko','童','ねこ！ ちっちゃいのが二匹いるんだ！'),
+ Q('quirk_kodomo1','庶民','この辻は子供の遊び場じゃ。荷車が来ると、蜘蛛の子を散らすように逃げる'),
+ Q('quirk_kodomo2','庶民','九条の子らは元気がいい。鬼ごっこの声が、日が暮れるまで止まん'),
+ Q('quirk_kodomo2','女','暗くなる前に帰りなさいと、毎日言うのに'),
+ Q('quirk_tsuri1','釣り人','堀川で釣れるのは小さな鮒ばかり。でも朝のうちは、手ぶらで帰ることはない'),
+ Q('quirk_tsuri1','釣り人','しっ。魚が逃げる。…竿を見ておれば、心が凪ぐ'),
+ Q('quirk_tsuri2','釣り人','ここは水が澄んでおる。北の方は荷舟が多うて、魚が寄らん'),
+ Q('quirk_tsuri2','庶民','あの釣り人、毎朝おる。釣れた日は近所に分けてくれるんじゃ')
+);})();
