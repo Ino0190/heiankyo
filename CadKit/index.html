@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="f2326e7b4ee7ac7c1cc68703cd9ccb24eff89b361748ffaad2dee49b6dee3cb3">
+<meta name="heian-release" content="54275e673bb838407497d31f31f52dd8297243ca1dafb83e9dd9315070d2c651">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -12613,7 +12613,7 @@ const HEIAN_TOWER=Object.freeze((()=>{const q=.6,st=4.8*q,rr=.9*q,shell=4,stack=
  //   主塔も高さ7割（下櫓 26→18・上櫓 18→13）・幅7割（46×2/3→×.7）。二層目の屋根（中央上櫓・稜線小櫓）は1.3倍（中央 68→88、小櫓 42×28→55×36）
  const oWall=40,oIW=64,oID=52,oEave=eaveAt(oWall+stack,heianRoofPurlinRise(oL,oS,.45,'yosemune',oX+3*st,oZ+3*st));
  const cq=.35,cst=4.8*cq,crr=.9*cq,cShell=3,cSize=46*2/3*.7,cLowY=oEave+17+oRise,cLowH=18,cTopY=cLowY+cLowH,cTopH=13,cWallTop=cTopY+cTopH,
-  cRoofL=78/* 2026-10-07 井内さん「上の屋根が微妙に大きい」: 88→78 */,cRoofS=cRoofL*2/3,tRoofL=55,tRoofS=36,
+  cRoofL=62/* 2026-10-07 井内さん「上の屋根が微妙に大きい」: 88→78。さらに「東西方向を8割くらいに縮めたい。前から見るとデカく見える」: 78→62（南北の奥行 cRoofS は78の2/3＝52のまま） */,cRoofS=78*2/3,tRoofL=55,tRoofS=36,
   cEave=eaveAt(cWallTop+heianMitesakiStackHeight(cq),heianRoofPurlinRise(cRoofL,cRoofS,.8,'irimoya',cSize/2+3*cst,cSize/2+3*cst),cShell,crr);
  const ornate={cRoofL,cRoofS,tRoofL,tRoofS,wall:oWall,iw:oIW,id:oID,eave:oEave,roofL:oL,roofS:oS,px:oX,pz:oZ,rise:oRise,cq,cst,cShell,cSize,cLowY,cLowH,cTopY,cTopH,cWallTop,cEave,turretY:oEave+6+oRise,turretH:23,turretEave:oEave+29+oRise};
  // 2026-10-07 井内さん「豊楽殿の脇の楼閣も全体的に高さを7割に」: 下層の柱 48→34（壁 59→45）・腰屋根の帯 14→10・楼上の壁 24→17・上屋根の勾配 .9→.7。平面は変えない
@@ -22935,8 +22935,16 @@ function disposeHeianCrowd(){heianCrowdRuntime?.dispose();}
 //  時刻: 役ごとの刻（HEIAN_DAILY_LIFE_HOURS）の外は隠す。人ごとに刻を±30分ずらし、一斉に現れない。動かすのはカメラから250m以内だけ
 //  考証: 洗い物は川・井戸端で盥を使う（推定）。子の遊び（鬼ごっこ・竹馬）は既存の台詞と同じく推定。厩の牛馬の世話は舎人・牛飼・下人の仕事（通説）。
 //        辻の位置は条坊の小路の交点から決定的に選ぶ（実在の家や井戸の位置ではない）
-const HEIAN_DAILY_LIFE_HOURS={fish:[[6,10],[15,18]],wash:[[7,15]],cook:[[5,8.5],[16,19]],well:[[5,9],[15.5,18]],sweep:[[6,10]],groom:[[6,11],[15,18]],talk:[[8,18]],play:[[8.5,17]]};
-const HEIAN_DAILY_LIFE_WHO={fish:'釣り人',wash:'洗い女',cook:'炊女',well:'炊女',sweep:'下人',groom:'厩の者',play:'童'};
+// 2026-10-07 井内さん「最近追加した地点では、そこで働いている人がいるはず。作業している感じで配置したい」: 働く役 saw 木挽き／hammer 大工／carry 荷運び／raft 筏師／paper 紙漉き／dry 紙干し／herb 薬草摘み
+const HEIAN_DAILY_LIFE_HOURS={fish:[[6,10],[15,18]],wash:[[7,15]],cook:[[5,8.5],[16,19]],well:[[5,9],[15.5,18]],sweep:[[6,10]],groom:[[6,11],[15,18]],talk:[[8,18]],play:[[8.5,17]],
+ saw:[[7,12],[13,17]],hammer:[[7,12],[13,17]],carry:[[7,12],[13,17]],raft:[[7,12],[13,17]],paper:[[6,12],[13,16]],dry:[[7,16]],herb:[[6,10],[15,18]]};
+const HEIAN_DAILY_LIFE_WHO={fish:'釣り人',wash:'洗い女',cook:'炊女',well:'炊女',sweep:'下人',groom:'厩の者',play:'童',saw:'人夫',hammer:'人夫',carry:'人夫',raft:'人夫',paper:'人夫',dry:'人夫',herb:'下人'};
+// 紙屋院・施薬院で働く人（敷地の中心からのローカル座標 [役, x, z, 向き]）。向きは atan2(dx,dz)（0＝南・π＝北・π/2＝東）。推定
+const HEIAN_COMPOUND_WORKERS={
+ kamiyain:[['paper',160,-100,Math.PI],['paper',220,-100,Math.PI],['paper',280,-100,Math.PI],['dry',-509,-440,Math.PI/2],['dry',-261,-320,-Math.PI/2],['dry',-447,-200,Math.PI/2]],
+ seyakuin:[['herb',-515,-330,Math.PI/2],['herb',-415,-150,-Math.PI/2],['herb',-365,40,Math.PI/2],['herb',-465,-420,0]]};
+// 荷運びの往復（[役, 始点x, 始点z, 終点x, 終点z]）。紙屋院＝蔵から干し場の東の通路へ、施薬院＝蔵の前から調薬所の前へ
+const HEIAN_COMPOUND_PORTERS={kamiyain:[['carry',-380,250,-380,-70],['carry',-40,-500,-40,480]],seyakuin:[['carry',470,-230,470,-20]]};
 const heianLifeHash=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v);};
 // 辻と堀川の岸の置き場。小路と大路の交点の角（道の端寄り）から、左京は半分・右京は2割ほどを選ぶ
 function heianDailyLifeStreetSpots(){
@@ -22971,7 +22979,7 @@ function createHeianDailyLifeRuntime(){
  try{
   const k=createHeianMobKit(),root=k.root;root.name='平安京・暮らしの営み';
   const mat=c=>{const m=new THREE.MeshLambertMaterial({color:c});k.materials.add(m);return m;},geo=g=>(k.geometries.add(g),g);
-  const robeMat=mat(0xffffff),M={tub:mat(0x8a6a44),clay:mat(0x9b7f62),pot:mat(0x2b2724),broom:mat(0xa88f5c),rope:mat(0x6b5a3e)};
+  const robeMat=mat(0xffffff),M={tub:mat(0x8a6a44),clay:mat(0x9b7f62),pot:mat(0x2b2724),broom:mat(0xa88f5c),rope:mat(0x6b5a3e),timber:mat(0x9a7a4e),paper:mat(0xf1ebdc)};
   const people=[],h=heianLifeHash,commonColors=[0x8c7a5c,0x6f6a5e,0x5d6a70,0x7a5a45,0xa39478,0x5f6650,0x7b6a58],kidColors=[0xc9b48a,0x9a6b4a,0x7f8f6a,0xb08860,0x8a9aa0,0xa5795f];
   const add=(role,x,z,face,o={})=>{people.push({role,x,z,face,cx:x,cz:z,wx:x,wz:z,child:role==='play',female:role==='wash'||role==='cook'||role==='well',
    color:commonColors[Math.floor(h(x,z,21)*commonColors.length)],ph:h(x,z,22)*6.283,shift:h(x,z,23)-.5,ht:.9+h(x,z,24)*.13,y:heianWalkGroundY(x,z),on:false,...o});};
@@ -23006,6 +23014,14 @@ function createHeianDailyLifeRuntime(){
    if(s.ax!==undefined){if(!walker(s.role,s.ax,s.az,s.bx,s.bz,{...o,spd:s.role==='sweep'?2.4:5}))continue;const p=people[people.length-1];p.ya=Math.max(p.ya,s.y);p.yb=Math.max(p.yb,s.y);p.y=p.ya;}
    else{if(!free(s.x,s.z,4))continue;add(s.role,s.x,s.z,s.face,{...o,who:s.role==='wash'?'炊女':undefined});const p=people[people.length-1];p.y=Math.max(p.y,s.y);}
    nobleSpots++;}
+  // 働く人（2026-10-07 井内さん「最近追加した地点では、そこで働いている人がいるはず」）: 街区の組み立てが積んだ置き場（木工町・修理職町の作業場・材木置場・河岸）と、紙屋院・施薬院の持ち場
+  for(const q of heianTradeSpots){if(q.bx!==undefined)walker(q.role,q.x,q.z,q.bx,q.bz,{who:'人夫',servant:true,spd:q.spd||3.2,ph:h(q.x,q.z,54)*6.283});
+   else add(q.role,q.x,q.z,q.face??0,{who:'人夫',...(q.y!==undefined?{y:q.y}:{}),...(q.o||{})});}
+  let compoundWorkers=0;
+  for(const[id,list]of Object.entries(HEIAN_COMPOUND_WORKERS)){const S=HEIAN_LANDMARK_SITES[id];if(!S)continue;
+   for(const[role,lx,lz,face]of list){const x=S.x+lx,z=S.z+lz;add(role,x,z,face,{who:role==='herb'?'下人':'人夫',female:role==='herb'||(role==='paper'&&h(x,z,51)<.5)||(role==='dry'&&h(x,z,52)<.6)});compoundWorkers++;}}
+  for(const[id,list]of Object.entries(HEIAN_COMPOUND_PORTERS)){const S=HEIAN_LANDMARK_SITES[id];if(!S)continue;
+   for(const[role,ax,az,bx,bz]of list)if(walker(role,S.x+ax,S.z+az,S.x+bx,S.z+bz,{spd:3.2,who:'人夫',servant:true,ph:h(S.x+ax,S.z+az,53)*6.283}))compoundWorkers++;}
   const N=Math.max(1,people.length);
   const make=(name,g,m,edges=true)=>{const x=new THREE.InstancedMesh(g,m,N);x.name=name;x.count=people.length;x.instanceMatrix.setUsage(THREE.DynamicDrawUsage);x.frustumCulled=false;root.add(x);if(edges)heianAddInstancedEdges(x,.6);return x;};
   const G=k.geometry;if(!heianShadowBlobGeom)heianShadowBlobGeom=new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2);
@@ -23014,11 +23030,12 @@ function createHeianDailyLifeRuntime(){
    legL:make('営み・左脚',G.cylinder,k.mats.dark),legR:make('営み・右脚',G.cylinder,k.mats.dark),footL:make('営み・左足',G.box,k.mats.dark),footR:make('営み・右足',G.box,k.mats.dark),
    tub:make('営み・盥',geo(new THREE.CylinderGeometry(3.2,2.7,1.8,14)),M.tub),kamado:make('営み・竈',G.box,M.clay),pot:make('営み・鍋',G.sphere,M.pot),
    stick:make('営み・箒の柄と釣瓶の縄',G.cylinder,M.rope),broom:make('営み・箒',G.box,M.broom),bucket:make('営み・桶',geo(new THREE.CylinderGeometry(1.5,1.3,2.6,10)),M.tub),
+   tool:make('営み・木材',G.box,M.timber),sheet:make('営み・紙',G.box,M.paper),
    shadow:make('営み・足元影',heianShadowBlobGeom,heianShadowMaterial(.22),false)};
   parts.shadow.renderOrder=2;
   people.forEach((p,i)=>{const c=new THREE.Color(p.color);for(const m of[parts.robe,parts.armL,parts.armR])m.setColorAt(i,c);});
   for(const m of[parts.robe,parts.armL,parts.armR])if(m.instanceColor)m.instanceColor.needsUpdate=true;
-  const PL=Object.values(parts),PROPS=[parts.tub,parts.kamado,parts.pot,parts.stick,parts.broom,parts.bucket];
+  const PL=Object.values(parts),PROPS=[parts.tub,parts.kamado,parts.pot,parts.stick,parts.broom,parts.bucket,parts.tool,parts.sheet];
   const pos=new THREE.Vector3(),scl=new THREE.Vector3(),q0=new THREE.Quaternion(),q1=new THREE.Quaternion(),eu=new THREE.Euler(),B=new THREE.Matrix4(),L=new THREE.Matrix4(),W=new THREE.Matrix4(),Z=new THREE.Matrix4().makeScale(0,0,0),UP=new THREE.Vector3(0,1,0),dv=new THREE.Vector3();
   const set=(m,i,p,s,rx=0,rz=0)=>{pos.set(p[0],p[1],p[2]);scl.set(s[0],s[1],s[2]);q1.setFromEuler(eu.set(rx,0,rz));L.compose(pos,q1,scl);m.setMatrixAt(i,W.multiplyMatrices(B,L));};
   const hide=(m,i)=>m.setMatrixAt(i,Z);
@@ -23026,7 +23043,7 @@ function createHeianDailyLifeRuntime(){
   const lerp3=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
   // 1人分の姿勢。体の座標は前が +z、足もとが原点（群衆と同じ寸法: 顔 y13.2・衣 y4〜12）
   const pose=(p,i,t)=>{const P=parts;if(!p.on){for(const m of PL)hide(m,i);return;}
-   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,sq=p.role==='wash'||p.role==='cook'||p.role==='fish';
+   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,sq=p.role==='wash'||p.role==='cook'||p.role==='fish'||p.role==='hammer'||p.role==='dry'||p.role==='herb';
    if(p.ax!==undefined){const D=Math.hypot(p.bx-p.ax,p.bz-p.az)||1,per=2*D/p.spd,u=((t+p.ph*9)%per)/per,f=u<.5?u*2:2-u*2,s=u<.5?1:-1;
     x=p.ax+(p.bx-p.ax)*f;z=p.az+(p.bz-p.az)*f;y=p.ya+(p.yb-p.ya)*f;hd=Math.atan2((p.bx-p.ax)*s,(p.bz-p.az)*s);walk=1;}
    if(p.role==='play'){if(p.oni)hd=T*.5;else{const a=p.a0+t*p.spd*.55;x=p.cx+Math.sin(a)*p.R;z=p.cz+Math.cos(a)*p.R;hd=a+Math.PI/2;walk=1.6;}}
@@ -23050,6 +23067,19 @@ function createHeianDailyLifeRuntime(){
    else if(p.role==='well'){const c=Math.sin(T*1.6);hL=[-.6,9+c*2,3.4];hR=[.6,9-c*2,3.4];rod(P.stick,i,[0,9+Math.abs(c)*2,3.5],[0,5,6.5],.18);set(P.bucket,i,[3.8,1.3,1.8],[1,1,1]);}
    else if(p.role==='groom'){hR=[2.9,shY-4.3,.3];set(P.bucket,i,[2.9,2.6,.3],[1,1,1]);}
    else if(p.role==='sweep'){const s=Math.sin(T*2.4),top=[1.4,10.2,1.4],bot=[s*3.2,.8,7];rod(P.stick,i,top,bot,.22);set(P.broom,i,[s*3.2,.5,7.2],[3.2,.9,1.4],0,0);hR=lerp3(top,bot,.12);hL=lerp3(top,bot,.42);}
+   else if(p.role==='saw'){const s=Math.sin(T*3.2); // 木挽き: 丸太を台に載せて大鋸を前後に挽く
+    set(P.tool,i,[0,6.4,6.6],[11,2.6,2.6]);set(P.broom,i,[0,2.5,6.6],[9,5,2]);rod(P.stick,i,[0,12.4+s*.7,5.2],[0,5.8+s*.7,5.2],.5);hL=[-.7,shY+.6+s*.7,4.6];hR=[.7,shY+.9+s*.7,4.6];}
+   else if(p.role==='hammer'){const u=Math.abs(Math.sin(T*3.4)); // 大工: しゃがんで板に釘を打つ
+    set(P.tool,i,[0,.9,6.4],[5,1,10]);hR=[2.2,3+u*5,5.2];rod(P.stick,i,hR,[2.2,7.4+u*5,5.2],.3);set(P.broom,i,[2.2,7.6+u*5,5.2],[1.8,1.8,3.6]);hL=[-1.2,2.2,5.4];}
+   else if(p.role==='carry'){set(P.tool,i,[1.6,shY+1.8,.3],[2.4,2.4,13]);hL=[1.2,shY+1.2,2.6];hR=[2.4,shY+1.2,-2.4];} // 荷運び: 角材を肩に
+   else if(p.role==='raft'){const push=Math.sin(T*1.1); // 筏師: 長い竿で川底を突く
+    rod(P.stick,i,[2.2,13.6,2.4+push*.8],[3.2,-5,9+push*1.6],.28);hR=[2.2,9.4,2.8+push*.8];hL=[1.2,11.8,2.6+push*.8];}
+   else if(p.role==='paper'){const y=5.4+Math.sin(T*2)*.9; // 紙漉き: 簀桁を槽の水の中で揺する
+    set(P.tub,i,[0,2.8,7.4],[2.4,1.6,2.4]);set(P.sheet,i,[0,y,6.8],[7,.5,5],Math.sin(T*2)*.12);hL=[-3.2,y,6.8];hR=[3.2,y,6.8];}
+   else if(p.role==='dry'){const w=Math.sin(T*1.6); // 紙干し: しゃがんで漉いた紙を筵に広げる
+    set(P.sheet,i,[0,.9,6.4],[6,.4,4.6]);hR=[2.6+w*1.4,1.6,6];hL=[-2.6-w*1.4,1.6,6];}
+   else if(p.role==='herb'){const w=Math.sin(T*1.8); // 薬草摘み: しゃがんで草を摘み、籠へ
+    set(P.bucket,i,[3.6,1.3,3.2],[1.4,1.2,1.4]);hR=[1.6+w*.8,1.2+Math.max(0,w)*2.6,5.2];hL=[-1.2,1.4,5.4];}
    else if(p.role==='talk'){const g=Math.max(0,Math.sin(T*.9))**2;hR=[2.4,shY-3.8+g*3.2,g*2.6];}
    else if(p.role==='play'&&p.oni){hL=[-.8,hy,hz+2.1];hR=[.8,hy,hz+2.1];}
    rod(P.armL,i,sL,hL,.48);rod(P.armR,i,sR,hR,.48);};
@@ -23769,11 +23799,11 @@ const HEIAN_GAME_LOCATIONS=[
  {id:'yamabuki',name:'山吹殿',x:16059,z:9299,spawn:{x:16059,z:9947},look:{x:16059,z:9299,height:22},viewScale:1.15,description:'1町の邸。花の名を邸に冠する呼び方で、庭に山吹を植えたことに由来すると伝わる。主は特定できていない。'},
  // 2026-10-06 諸司厨町と別所・施薬院。位置は KYOU.PDF（『平安京提要』1994 山田邦和の京図）と各辞典による推定。建物は建てず名前だけ
  {id:'mokumachi',name:'木工町',x:6606,z:9299,spawn:{x:6606,z:8650},look:{x:6606,z:9299,height:22},viewScale:1.15,description:'木工寮の厨町。番で上った工や下働きが寝起きし、宮や京の普請へ通う。庶民の住まいの隣に、板を乾かす材木置場と作業小屋がある。夜明けから鋸と鑿の音がする。位置は京図による推定。'},
- {id:'shurishikimachi',name:'修理職町',x:12060,z:672,spawn:{x:12060,z:5},look:{x:12060,z:672,height:22},viewScale:1.15,description:'修理職の厨町。材木置き場と作業小屋の隣に大工の住まいがあり、内裏の修理に通う。位置は京図による推定。'},
+ {id:'shurishikimachi',name:'修理職町',x:7939,z:672,spawn:{x:7939,z:5},look:{x:8300,z:672,height:22},viewScale:1.15,description:'修理職の厨町。材木置き場と作業小屋の隣に大工の住まいがあり、内裏の修理に通う。堀川の岸には河岸があり、筏で運んだ材木が積まれる。位置は京図による推定。'},
  {id:'takumimachi',name:'内匠町',x:-18870,z:2600,spawn:{x:-18070,z:2400},look:{x:-18870,z:2600,height:22},viewScale:1.15,description:'内匠寮の厨町。調度や建具をつくる匠が寝起きし、大内裏の内匠寮へ通う。位置は京図による推定。'},
  {id:'zushomachi',name:'図書町',x:-7840,z:-5980,spawn:{x:-7840,z:-5380},look:{x:-7840,z:-5980,height:22},viewScale:1.15,description:'図書寮の厨町。紙を漉く者や書を写す者が寝起きする。紙屋川に近い。位置は京図による推定。'},
- {id:'kamiyain',name:'紙屋院',x:-8972,z:-663,spawn:{x:-8972,z:10},look:{x:-8972,z:-663,height:22},viewScale:1.15,description:'図書寮の別所の紙漉き所。紙屋川の水で官の紙を漉き、内蔵寮へ納める。町の川側に建物、西の空きに紙の干し場と蔵がある。所在は確かでなく、ここは川の西岸に置いた推定の位置。'},
- {id:'seyakuin',name:'施薬院',x:12060,z:43160,spawn:{x:12060,z:43760},look:{x:12060,z:43160,height:22},viewScale:1.15,description:'病の貧しい人に薬を施し、手当てをする所。藤原冬嗣が開いたと伝わる。左京九条三坊、西洞院大路の東の辺り（推定）。'},
+ {id:'kamiyain',name:'紙屋院',x:-8942,z:-663,spawn:{x:-8942,z:10},look:{x:-8942,z:-663,height:22},viewScale:1.15,description:'図書寮の別所の紙漉き所。紙屋川の水で官の紙を漉き、内蔵寮へ納める。町の川側に建物、西の空きに紙の干し場と蔵がある。所在は確かでなく、ここは川の西岸に置いた推定の位置。'},
+ {id:'seyakuin',name:'施薬院',x:12060,z:43156,spawn:{x:12060,z:43830},look:{x:12060,z:43156,height:22},viewScale:1.15,description:'病の貧しい人に薬を施し、手当てをする所。藤原冬嗣が開いたと伝わる。左京九条三坊、西洞院大路の東の辺り（推定）。'},
  // 🚫 六條院（rokujoin）と六条河原院（kawaranoin）を別の地点として並べていたが、同じ邸（中心の差 130）だった
  //    （2026-10-02井内さん「同じ建物を２箇所と認識してるのかな？一個にまとめていいと思う」）。⇒ 地点は kawaranoin の1つ、邸の名も「六条河原院」へ
  {id:'suzakuin',name:'朱雀院',x:-1696.8,z:15320.2,spawn:{x:-1696.8,z:18114},look:{x:-1696.8,z:14380,height:35},viewScale:1.45,description:'宇多上皇の後院。白砂の南庭では相撲が催され、東の馬場では競馬や騎射が行われた。'},
@@ -26764,7 +26794,7 @@ const HEIAN_PRECINCT_TREES={toji:150,saiji:150,daigakuryo:40,kokuso:16,kamiyain:
 const HEIAN_PRECINCT_SHRINES=new Set(['daishogun','gojoTenjin','ichihime','町堂']);
 // 敷地ごとの追加条件。exclude は敷地中心からの矩形 [cx,cz,w,d]、pond は池の制御点（敷地中心から）。minStep は候補の格子の最小間隔
 const heianPrecinctOptions=id=>id==='suzakuin'?{exclude:[[80,heianSuzakuinCoreZ(-626.5),1190,1300],[1040,720,220,2800]/* 馬場（競馬の走路） */],pond:HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),minStep:64,cluster:true}
- :id==='kamiyain'?{exclude:[[-290,0,620,1140]]/* 塀の外の干し場と蔵（紙屋院・2026-10-07）。ここへ木をまかない */}
+ :id==='kamiyain'||id==='seyakuin'?{exclude:[[0,0,1300,1300]]/* 一町ぜんぶ塀の中で、干し場・薬草園・蔵がある。木は組み立て側で決めて植える（紙屋院・施薬院・2026-10-07） */}
  :HEIAN_PRECINCT_SHRINES.has(id)?{minStep:52,inset:40,axis:.08,margin:30}
  :id==='曹司'?{minStep:60,inset:50,axis:.1,margin:40,edge:140/* 塀際の帯だけ */}:{};
 function heianPointInPoly(x,z,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.y>z)!==(b.y>z)&&x<(b.x-a.x)*(z-a.y)/(b.y-a.y)+a.x)inside=!inside;}return inside;}
@@ -27143,6 +27173,7 @@ const HEIAN_QUIRKS=Object.freeze([
  {id:'kodomo2',kind:'kids',at:{x:'東洞院大路',z:'九条大路',s:[-1,1]},r:30,tr:260},
  {id:'tsuri1',kind:'fisher',canal:{side:1,z:16500},r:14,tr:300},
  {id:'tsuri2',kind:'fisher',canal:{side:1,z:24500},r:14,tr:300}]);
+const heianTradeSpots=[]; // 働く人の置き場 {role,x,z,face,...}。木工町・修理職町の作業場／材木置場／河岸（街区の組み立てが積む）。暮らしの営み（DailyLife）が読む（2026-10-07）
 const heianQuirkSpots=[]; // 置けた分だけ {…表の行,x,z,face}。動物（Fauna）・人（DailyLife）・台詞タグがここを読む
 function heianQuirkPos(q,blockR=q.r||16){
  if(q.canal){const bx=q.canal.side*HEIAN_CITY_CANAL_X;
@@ -27594,12 +27625,13 @@ function makeHeianPleasureBoat(name='苑池の楽舟'){
 }
 function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,hash,isNorthSakyo13,isNorthEliteCore,isNorthTransition){
  const layer=new THREE.Group();layer.name='平安京住宅（1/8町モジュール合成）';
- heianSubregions=[];
+ heianSubregions=[];heianTradeSpots.length=0;
  // 厨町の木工町・修理職町（2026-10-07井内さん「庶民街とそれに隣接した木材置場、作業場など。それぞれ一町全部じゃなくてもいい」）。
  //  1町=2列×4行の8モジュール（i=行*2+列）。西列は庶民の住まい、東列（修理職町は西列）に木材置場と作業場を並べて隣り合わせにする（位置・配置は推定）
  const HEIAN_TRADE_TOWNS=[
   {id:'mokumachi',x:6606,z:9299,hover:'木工町（庶民の住まいと木材置場・作業場・推定）',modules:['庶民長屋','作業場','庶民長屋','材木置場','従者長屋','材木置場','庶民長屋','作業場']},
-  {id:'shurishikimachi',x:12060,z:672,hover:'修理職町（庶民の住まいと木材置場・作業場・推定）',modules:['材木置場','庶民長屋','作業場','庶民長屋','材木置場','従者長屋','作業場','庶民長屋']}
+  // 修理職町は堀川（x=8605）の西の岸に接する町へ。東列（堀川側）に材木置場と作業場を並べ、堀川の岸に河岸（桟橋・筏・積んだ木材）を置く（2026-10-07井内さん）
+  {id:'shurishikimachi',x:7939,z:672,kashi:true,hover:'修理職町（庶民の住まいと木材置場・作業場・堀川の河岸・推定）',modules:['庶民長屋','材木置場','庶民長屋','作業場','従者長屋','材木置場','庶民長屋','作業場']}
  ];
  const moduleHoverLabel=type=>({庶民長屋:'庶民長屋の小区画',従者長屋:'従者長屋の小区画',下級役人宅:'下級役人宅の小区画',中級役人宅:'中級役人宅の小区画',屋敷庭:'屋敷の庭',空地:'空き地',雑木林:'雑木林',草地:'草地',建築中:'建築中の小区画',畑:'畑',寝殿造敷地:'貴族邸の小区画',資材置場:'建設資材置場',火災跡:'小規模な火災跡（901〜930年の景観上の推定）',民間市:'民間の小市（景観上の推定）',材木置場:'材木置場（推定）',作業場:'木工の作業場（推定）'}[type]||type);
  const proxyRoot=new THREE.Group(),detailRoot=new THREE.Group();proxyRoot.name='住宅遠景proxy';detailRoot.name='住宅近景chunk';layer.add(proxyRoot,detailRoot);
@@ -27672,31 +27704,57 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
  ];
  const addUrbanEco=(c,m,type,n)=>{const chance={屋敷庭:.58,空地:.72,草地:.55,雑木林:.86}[type]||0;if(!chance||hash(m.x,m.z,n+501)>chance)return;const count=type==='雑木林'?2:1;for(let i=0;i<count;i++){const ecoType=type==='草地'?'草原':type==='雑木林'&&hash(m.x,m.z,n+510+i)>.48?'林':'藪';ecoModules.push({x:m.x+(hash(m.x,m.z,n+520+i)-.5)*m.w*.34,z:m.z+(hash(m.x,m.z,n+530+i)-.5)*m.d*.32,w:m.w*(type==='雑木林'?.34:.26),d:m.d*(type==='雑木林'?.3:.23),type:ecoType,seed:hash(m.x,m.z,n+540+i),source:'市街地・'+type});ecoCounts[ecoType]++;urbanEcoModules++;}};
  const addMicroProp=(shape,x,z,w,h,d,color,rot=0,lift=0)=>microProps.push({shape,x,z,w,h,d,color,rot,y:groundTop(x,z,w,d)+h/2+1+lift});
+ // 下面の高さを直接指定する版（積み山の土台と板を同じ地面の高さから積む。🚫 小さい脚と大きい板で groundTop の足もとが食い違い、板山が浮いて見えた・2026-10-07）
+ const addMicroPropY=(shape,x,z,w,h,d,color,rot,yBottom)=>microProps.push({shape,x,z,w,h,d,color,rot,y:yBottom+h/2});
  const buildMicroUse=(c,m,type,n)=>{microUseCounts[type]++;microWalkObstacles.push({x:m.x,z:m.z,w:m.w*.68,d:m.d*.62,type});
   // 小用途の脇には必ず藪を残し、空き地全体を人工物で埋めない。
   if(type!=='材木置場'&&type!=='作業場'){ecoModules.push({x:m.x+m.w*.38,z:m.z+m.d*.34,w:m.w*.18,d:m.d*.22,type:'藪',seed:hash(c.x,c.z,n+889),source:'小用途脇の藪'});ecoCounts['藪']++;urbanEcoModules++;} // 木工町の材木置場・作業場には藪を足さない
   if(type==='資材置場'){for(let i=0;i<4;i++)addMicroProp('box',m.x-m.w*.16+i*18,m.z-m.d*.16,14,8,82,0x76563a,(i%2-.5)*.08);for(let i=0;i<7;i++)addMicroProp('sphere',m.x+m.w*.14+(i%3)*15,m.z-m.d*.12+Math.floor(i/3)*14,14,10,12,0x918a7b);addMicroProp('cone',m.x-m.w*.03,m.z+m.d*.16,44,18,38,0x9d835f);}
   else if(type==='材木置場'){
    // 2026-10-07 井内さん「木工町／修理職町は庶民街とそれに隣接した木材置場、作業場」。乾かす板の桟積み5列と、丸太の山2つ（推定）
-   for(let i=0;i<5;i++){const bx=m.x-m.w*.36+i*m.w*.18,bz=m.z-m.d*.2;
-    for(const dx of[-34,34])addMicroProp('box',bx+dx,bz,8,4,32,0x5e4833); /* 土台の角材（板が地面から浮いて見えないように） */
-    for(let L=0;L<4;L++)addMicroProp('box',bx+(L%2?2:-2),bz,96,6,30,L%2?0xa98c5e:0xb89b6e,0,4+L*6.4);}
-   for(const px of[-.18,.2]){for(let j=-1;j<=1;j++)addMicroProp('box',m.x+m.w*px,m.z+m.d*.12+j*14,150,13,13,0x70512f);for(const j of[-.5,.5])addMicroProp('box',m.x+m.w*px,m.z+m.d*.12+j*14,150,13,13,0x7a5a36,0,13);addMicroProp('box',m.x+m.w*px,m.z+m.d*.12,150,12,13,0x6a4c2c,0,26);}
-   for(const[a,b]of[[.34,.02],[.34,.18]])addMicroProp('box',m.x+m.w*a,m.z+m.d*b,44,5,14,0x8a6a44,0.2);}
+   // 板の山は足もとの地面（ひと山の範囲の高さ）から、土台の角材（3めり込ませる）→板4段の順に積む
+   for(let i=0;i<5;i++){const bx=m.x-m.w*.36+i*m.w*.18,bz=m.z-m.d*.2,g=groundTop(bx,bz,96,30);
+    for(const dx of[-34,34])addMicroPropY('box',bx+dx,bz,8,8,32,0x5e4833,0,g-3);
+    for(let L=0;L<4;L++)addMicroPropY('box',bx+(L%2?2:-2),bz,96,6,30,L%2?0xa98c5e:0xb89b6e,0,g+5+L*6.2);}
+   for(const px of[-.18,.2]){const lx=m.x+m.w*px,lz=m.z+m.d*.12,g=groundTop(lx,lz,150,40)-1;
+    for(let j=-1;j<=1;j++)addMicroPropY('box',lx,lz+j*14,150,13,13,0x70512f,0,g);
+    for(const j of[-.5,.5])addMicroPropY('box',lx,lz+j*14,150,13,13,0x7a5a36,0,g+13);
+    addMicroPropY('box',lx,lz,150,12,13,0x6a4c2c,0,g+26);}
+   for(const[a,b]of[[.34,.02],[.34,.18]]){const x=m.x+m.w*a,z=m.z+m.d*b;addMicroPropY('box',x,z,44,5,14,0x8a6a44,0.2,groundTop(x,z,44,14)-.5);}
+   // 働く人: 丸太の山の脇で荷を担ぐ人（修理職・木工寮の人夫）
+   heianTradeSpots.push({role:'carry',x:m.x+m.w*.02,z:m.z-m.d*.02,face:Math.PI/2});}
   else if(type==='作業場'){
-   // 吹き放ちの作業小屋（柱4本＋板屋根）、木挽き台と作業台、削り屑、組みかけの骨組、仕上がった角材の山（推定）
-   const sx=m.x-m.w*.12,sz=m.z-m.d*.1;
-   for(const dx of[-62,62])for(const dz of[-32,32])addMicroProp('box',sx+dx,sz+dz,4,34,4,0x473727);
-   addMicroProp('box',sx,sz,156,5,86,0x594939,0,34);
-   addMicroProp('box',sx-34,sz+8,70,12,22,0x6e4f32);
-   for(const dx of[18,62])addMicroProp('box',sx+dx,sz-6,16,14,18,0x6e4f32);addMicroProp('box',sx+40,sz-6,92,8,10,0x70512f,0,14);
-   for(let i=0;i<6;i++)addMicroProp('sphere',sx+22+(i%3)*14,sz+14+Math.floor(i/3)*12,14,5,11,0xcdb27d);
-   const fx=m.x+m.w*.26,fz=m.z+m.d*.05;
-   for(const dx of[-26,26])for(const dz of[-14,14])addMicroProp('box',fx+dx,fz+dz,4,44,4,0x8a6a44);
-   for(const dz of[-14,14])addMicroProp('box',fx,fz+dz,60,5,5,0x7a5a36,0,42);addMicroProp('box',fx,fz,5,5,34,0x7a5a36,0,42);
-   for(let L=0;L<3;L++)addMicroProp('box',m.x-m.w*.3,m.z+m.d*.28,84,6,24,0xb89b6e,0,L*6.4);}
+   // 作業場は厩（馬寮の厩 umaya）と同じ形式（2026-10-07 井内さん「修理職の作業場は厩と同じ形式でいいかも」）: 前（南）が開いた細長い小屋。
+   //  柱を1間(40)ごとに前後2列、奥と両妻に板壁、板葺の切妻（箱を段に積んで棟へ寄せる）。中に木挽き台と作業台。屋外に組みかけの骨組と角材の山（推定）
+   const L=200,sd=64,eave=34,sx=m.x-m.w*.12,sz=m.z-m.d*.08,g=groundTop(sx,sz,L,sd),wood=0x7a5c3e;
+   for(let i=0;i<=5;i++)for(const q of[-1,1])addMicroPropY('box',sx-L/2+i*(L/5),sz+q*(sd/2-3),4,eave,4,0x6a4c2c,0,g);
+   addMicroPropY('box',sx,sz-(sd/2-2),L,eave-3,3,wood,0,g);
+   for(const q of[-1,1])addMicroPropY('box',sx+q*(L/2-2),sz,3,eave-5,sd-6,wood,0,g);
+   for(let k=0;k<5;k++)addMicroPropY('box',sx,sz,L+14,4,(sd+26)*(1-k*.2),0x594939,0,g+eave+k*4);
+   addMicroPropY('box',sx,sz,L+16,3,6,0x473727,0,g+eave+20); /* 棟押さえ */
+   for(let i=0;i<7;i++)addMicroPropY('sphere',sx-30+(i%4)*12,sz+14+Math.floor(i/4)*10,14,4,11,0xcdb27d,0,g); /* 削り屑 */
+   const fx=m.x+m.w*.26,fz=m.z+m.d*.05,fg=groundTop(fx,fz,60,34);
+   for(const dx of[-26,26])for(const dz of[-14,14])addMicroPropY('box',fx+dx,fz+dz,4,44,4,0x8a6a44,0,fg);
+   for(const dz of[-14,14])addMicroPropY('box',fx,fz+dz,60,5,5,0x7a5a36,0,fg+42);addMicroPropY('box',fx,fz,5,5,34,0x7a5a36,0,fg+42);
+   {const lx=m.x-m.w*.3,lz=m.z+m.d*.28,lg=groundTop(lx,lz,84,24);for(let l=0;l<3;l++)addMicroPropY('box',lx,lz,84,6,24,0xb89b6e,0,lg+l*6.2);}
+   // 働く人: 小屋の中で木挽き（丸太の台の後ろ）と大工（作業台）、骨組みの脇でもう1人の大工
+   heianTradeSpots.push({role:'saw',x:sx-55,z:sz-1,face:Math.PI},{role:'hammer',x:sx+62,z:sz-1,face:Math.PI},{role:'hammer',x:fx,z:fz+24,face:Math.PI});}
   else if(type==='火災跡'){for(let i=0;i<5;i++)addMicroProp('box',m.x+(i-2)*24,m.z-m.d*.08,7,24-(i%2)*7,7,0x342b25);for(let i=0;i<6;i++)addMicroProp('box',m.x+(i-2.5)*25,m.z+m.d*.08+(i%2)*18,42,5,8,0x3b3029,(i%3-1)*.42);for(let i=0;i<9;i++)addMicroProp('sphere',m.x-m.w*.14+(i%3)*18,m.z+m.d*.2+Math.floor(i/3)*14,13,8,11,0x62584d);addMicroProp('cone',m.x+m.w*.16,m.z+m.d*.15,36,10,32,0x514840);}
   else{const stalls=2+(hash(c.x,c.z,n+907)>.52?1:0);microMarketStalls+=stalls;for(let i=0;i<stalls;i++){const x=m.x+(i-(stalls-1)/2)*105,z=m.z-m.d*.06,yOff=0;addMicroProp('box',x,z,HEIAN_MARKET_STALL_SPEC.canopySize[0],HEIAN_MARKET_STALL_SPEC.canopySize[1],HEIAN_MARKET_STALL_SPEC.canopySize[2],0x594939,0,30);addMicroProp('box',x,z+7,HEIAN_MARKET_STALL_SPEC.counterSize[0],HEIAN_MARKET_STALL_SPEC.counterSize[1],HEIAN_MARKET_STALL_SPEC.counterSize[2],0x6e4f32);for(const dx of[-35,35])for(const dz of[-20,20])addMicroProp('box',x+dx,z+dz,3,30,3,0x473727);for(const dx of[-15,15])addMicroProp('sphere',x+dx,z+7,14,9,14,0x9a7142,0,10);}}};
+ // 修理職町の河岸（堀川の西の岸）: 桟橋・筏2・岸に積んだ木材（2026-10-07 井内さん「修理職の近くの堀川の川端に河岸があって、木材が積んであったり、筏が浮いてるかも。そこで何らかの作業」。推定）
+ //  堀川の水は 8605.2 を中心に幅60.6、岸の道は水の西に22.3。水面は路面より8低い。🚫 筏・桟橋は街区の外（堀川の路面）に置くので街区の予約や歩行障害には入れない（桟橋の床だけ歩ける高さ）
+ const buildKashi=c=>{const cx=HEIAN_CITY_CANAL_X,z0=c.z,roadY=groundTop(cx-52,z0,10,80),wl=cx-30.3;
+  addMicroPropY('box',wl+10.5,z0,30,3,28,0x7a5a36,0,roadY-6); /* 桟橋の床 */
+  for(const x of[wl-1,wl+19])for(const dz of[-11,11])addMicroPropY('box',x,z0+dz,3,11,3,0x473727,0,roadY-14);
+  for(let i=0;i<3;i++)addMicroPropY('box',wl+4+i*7,z0-9,5,4,11,0xb89b6e,0,roadY-3); /* 床に積んだ板 */
+  const raft=(zc,len,n,x0)=>{for(let i=0;i<n;i++)addMicroPropY('box',x0+(i-(n-1)/2)*6.4,zc,6.2,7,len,0x8a6a44,0,roadY-12);
+   for(const dz of[-.4,0,.4])addMicroPropY('box',x0,zc+dz*len,n*6.4+2,2,4,0x5e4833,0,roadY-5);};
+  raft(z0+30,150,6,wl+38);raft(z0-170,110,5,wl+36);
+  for(const zc of[z0-130,z0+150]){const x0=cx-52;
+   for(let r=0;r<3;r++)for(let i=0;i<3-r;i++)addMicroPropY('box',x0+(i-(2-r)/2)*6.6,zc,6.6,6.6,90,0x7a5a36,0,roadY-1+r*6.6);}
+  // 働く人: 筏の上の筏師2人（竿で突く）、桟橋で荷を担ぐ人、岸の道を往復する人夫
+  heianTradeSpots.push({role:'raft',x:wl+38,z:z0+60,face:Math.PI/2,y:roadY-5},{role:'raft',x:wl+36,z:z0-150,face:Math.PI/2,y:roadY-5},{role:'carry',x:wl+10,z:z0+2,face:Math.PI/2,y:roadY-3},
+   {role:'carry',x:cx-52,z:z0-70,bx:cx-52,bz:z0+80,spd:3});};
  const buildModule=(c,m,type,n)=>{patternCounts[type]=(patternCounts[type]||0)+1;moduleCells++;const before=rowHouses;plotSurfaces.push({x:m.x,z:m.z,w:m.w-12,d:m.d-12,y:groundTop(m.x,m.z,m.w-12,m.d-12)+.8,type});
   if(type==='資材置場'||type==='火災跡'||type==='民間市'||type==='材木置場'||type==='作業場')buildMicroUse(c,m,type,n);
   else if(type==='屋敷庭'){estateGardenModules++;moduleFence(c,m,n+85,type);const count=5+Math.floor(hash(c.x,c.z,n+6)*5);for(let i=0;i<count;i++)moduleTreePoints.push({x:m.x+(hash(c.x,c.z,n+12+i*2)-.5)*m.w*.62,z:m.z+(hash(c.x,c.z,n+13+i*2)-.5)*m.d*.56,s:(.46+hash(c.x,c.z,n+50+i)*.38)*1.3,evergreen:hash(c.x,c.z,n+70+i)>.45,module:true,garden:true});}
@@ -27844,6 +27902,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
     plotSurfaces.push({x:m.x,z:m.z,w:m.w-12,d:m.d-12,y:groundTop(m.x,m.z,m.w-12,m.d-12)+.8,type});
     if(type==='屋敷庭')estateGardenModules++;
     if(type==='寝殿造敷地')hallTempleReservedSkipped++;return;}tally[type]=(tally[type]||0)+1;heianSubregions.push({n:moduleHoverLabel(type),x:m.x,z:m.z,w:m.w-8,d:m.d-8,overRoad:false});buildModule(c,m,type,i*1000);});
+  if(tradeTown?.kashi)buildKashi(c);
   if(southKamo)southKamoOpenModules+=(tally['空地']||0)+(tally['雑木林']||0)+(tally['資材置場']||0)+(tally['火災跡']||0)+(tally['民間市']||0);
   // マウスオーバーの街区名は実際に建てた8モジュールの内訳で決める。
   // landUse（推定図の用途）とプリセットの実描画がずれ、家が並ぶ町が「畑・草地」と出ていた（2026-08-19井内さん指摘）
@@ -29599,7 +29658,7 @@ const HEIAN_LANDMARK_SITES={
  // 南縁=三条大路の北縁に接する（東寺の九条大路と同じ載せ方）
  shogakuin:{name:'奨学院',x:1030.2,z:11850.15,w:1212,d:1164.3,gateSide:'S'},kangakuin:{name:'勧学院',x:2363.4,z:11850.15,w:1212,d:1164.3,gateSide:'S'},
  // 2026-10-07 井内さん「紙屋院は内膳司の建物とか／施薬院は中和院をその位置にコピペ」。位置は歩行の地点（kamiyain・seyakuin）と同じ。敷地と建物は大内裏の内膳司（585×740）・中和院（591×990）を x×.94（大内裏の倍率）で写した推定。
- kamiyain:{name:'紙屋院',x:-9272,z:-663,w:1213,d:1215,wallW:550,ox:300,gateSide:'S',certainty:'所在は確かでない。町の東（紙屋川側）に大内裏の内膳司の建物を写し、西の空きを干し場と蔵にした推定'},seyakuin:{name:'施薬院',x:12060,z:43160,w:555,d:990,gateSide:'S',certainty:'左京九条三坊の辺りは推定。大内裏の中和院の敷地・建物を写した推定'},
+ kamiyain:{name:'紙屋院',x:-9272,z:-663,w:1213,d:1215,gateX:330,gateSide:'S',riverGates:[[-430,60,'gate'],[-170,26,'water'],[250,60,'gate'],[470,60,'gate']],certainty:'所在は確かでない。一町を塀で囲み、川側（東）に大内裏の内膳司の建物を写し、西を干し場と蔵にした推定'},seyakuin:{name:'施薬院',x:12060,z:43156,w:1213,d:1195,gateSide:'S',certainty:'左京九条三坊の辺りは推定。一町を塀で囲み、中央に大内裏の中和院の建物を写し、西に薬草園、東に蔵を置いた推定'},
  // 七条・朱雀両側の位置は史料準拠。1町×南北2町、七条大路側南門、南北軸の左右対称平面は図と官衙形式からの推定。
  eastKorokan:{name:'東鴻臚館',x:1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
  westKorokan:{name:'西鴻臚館',x:-1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
@@ -29673,21 +29732,21 @@ function heianCartLaneX(x,z,lane){return heianInsideLandmark(x+lane,z,28)?x:x+la
 function makeHeianOfficialCompound(id){
  const s=HEIAN_LANDMARK_SITES[id];if(!s)throw new Error('不明な官学施設 '+id);const state=HEIAN_HERITAGE_DETAIL_ADOPTED?newHeianHeritageDetailState():null;
  const ok=makeHeian('官学地区・'+s.name,k=>{if(state)k=heianHeritageDetailKit(k,state);
-  // s.wallW／s.ox: 敷地（町）の一部だけを塀で囲み、残りを空き地にする（紙屋院は川側の東へ寄せる・2026-10-07）。無指定は従来どおり敷地全体
-  const walls=[],gates=[],main=[],lodgings=[],stores=[],trees=[],W=(s.wallW||s.w)-50,D=s.d-50,ox=s.ox||0;
+  // s.gateX: 南北面の正門を敷地の中央からずらす位置（紙屋院・施薬院は敷地＝一町ぜんぶを塀で囲む・2026-10-07）。s.riverGates: 東の塀に作業用の出入口（[z,幅]）と水路の取り入れ口
+  const walls=[],gates=[],main=[],lodgings=[],stores=[],trees=[],W=s.w-50,D=s.d-50,gx=s.gateX||0;
   const formal=!['kobunin','shogakuin','kangakuin'].includes(id),wallName=s.name+(formal?'築地塀':'板塀');
   // 塀は高く＋築地塀は瓦笠つき、正門は一階1.6倍（2026-08-17井内さん指示）
   const gateSide=s.gateSide||'S',opening=formal?130:100,wallH=formal?24:18;
   // 共通生成へ（2026-09-11）。寸法と笠（瓦=三角断面／板=板葺）は HEIAN_WALL_SPEC が正本。
   // 🚫 それまで板塀は笠なしで、築地塀の笠は平らな板だった
-  const wall=(cx,cz,w,d)=>{const axis=w>=d?'x':'z';k.wallSegment(walls,axis,cx+ox,cz,axis==='x'?w:d,wallName,formal?'築地':'板塀');};
+  const wall=(cx,cz,w,d)=>{const axis=w>=d?'x':'z';k.wallSegment(walls,axis,cx,cz,axis==='x'?w:d,wallName,formal?'築地':'板塀');};
   if(gateSide==='N'||gateSide==='S'){
-   const z=(gateSide==='N'?-1:1)*(D-8)/2,half=(W-opening)/2;
-   wall(-(opening+half)/2,z,half,8);wall((opening+half)/2,z,half,8);
-   for(const x of[-44,44])for(const dz of[-18,18])gates.push(k.col(x+ox,z+dz,-1,37,4,s.name+'正門柱'));
-   gates.push(k.box(ox,z,116,44,34,6,s.name+'正門梁'),k.roof(ox,z,154,84,39,s.name+(formal?'瓦葺正門屋根':'板葺屋根')));
+   const z=(gateSide==='N'?-1:1)*(D-8)/2,gl=gx-opening/2,gr=gx+opening/2;
+   wall((-W/2+gl)/2,z,gl+W/2,8);wall((gr+W/2)/2,z,W/2-gr,8);
+   for(const x of[-44,44])for(const dz of[-18,18])gates.push(k.col(gx+x,z+dz,-1,37,4,s.name+'正門柱'));
+   gates.push(k.box(gx,z,116,44,34,6,s.name+'正門梁'),k.roof(gx,z,154,84,39,s.name+(formal?'瓦葺正門屋根':'板葺屋根')));
    // 夜間閉鎖の扉（2026-09-11）。柱間88の中央を2枚で塞ぐ。昼は syncHeianGateDoors が隠す
-   for(const sx of[-1,1])gates.push(k.box(ox+sx*22,z,42,4,-1,33,s.name+'正門夜間閉鎖扉'));
+   for(const sx of[-1,1])gates.push(k.box(gx+sx*22,z,42,4,-1,33,s.name+'正門夜間閉鎖扉'));
   }else{
    const x=(gateSide==='W'?-1:1)*(W-8)/2,half=(D-opening)/2;
    wall(x,-(opening+half)/2,8,half);wall(x,(opening+half)/2,8,half);
@@ -29696,7 +29755,15 @@ function makeHeianOfficialCompound(id){
    for(const sz of[-1,1])gates.push(k.box(x,sz*22,4,42,-1,33,s.name+'正門夜間閉鎖扉')); // 夜間閉鎖の扉（2026-09-11）
   }
   if(gateSide!=='N')wall(0,-(D-8)/2,W,8);if(gateSide!=='S')wall(0,(D-8)/2,W,8);
-  if(gateSide!=='W')wall(-(W-8)/2,0,8,D-8);if(gateSide!=='E')wall((W-8)/2,0,8,D-8);
+  if(gateSide!=='W')wall(-(W-8)/2,0,8,D-8);
+  if(s.riverGates){
+   // 川側（東）の塀: 作業用の出入口（柱2本と冠木だけの木戸）と、水路を引き込む取り入れ口。開口の間を塀でつなぐ（紙屋院・2026-10-07井内さん「川側に作業のための出入口は複数」）
+   const ex=(W-8)/2,cuts=[...s.riverGates].sort((a,b)=>a[0]-b[0]);let z0=-(D-8)/2;
+   for(const[cz,cw,kind]of cuts){const a=cz-cw/2;if(a>z0)wall(ex,(z0+a)/2,8,a-z0);z0=cz+cw/2;
+    if(kind!=='water')for(const dz of[-cw/2+3,cw/2-3])gates.push(k.col(ex,cz+dz,-1,30,3,s.name+'通用口柱'));
+    gates.push(k.box(ex,cz,12,cw+6,kind==='water'?24:28,4,s.name+'通用口梁'));}
+   if(z0<(D-8)/2)wall(ex,(z0+(D-8)/2)/2,8,(D-8)/2-z0);
+  }else if(gateSide!=='E')wall((W-8)/2,0,8,D-8);
   const hall=(parts,x,z,w,d,eave,rise,label,board=false,y0=-1)=>k.gable(parts,x,z,w,d,y0,eave,rise,s.name+label+(board?'板葺':'瓦葺'));
   const formalHall=(parts,x,z,w,d,eave,rise,label)=>k.colonnadeHall(parts,x,z,w,d,-1,eave,rise,s.name+label+'瓦葺');
   // 高床式倉庫: 倉庫部分（壁体）の高さを倍に（2026-08-17井内さん指示）
@@ -29741,23 +29808,30 @@ function makeHeianOfficialCompound(id){
    // 紙屋院（図書寮の別所・紙漉き所）＝大内裏の内膳司（並列2棟 385×150）の敷地と建物を写す（2026-10-07 井内さん指示）。
    // 内膳司は z=-185 と +148 に正庁を並べる型。写した上で、紙屋らしく棟の間の庭に干し板の列と漉き槽を置く（推定）
    // 2026-10-07 井内さん「敷地を川沿い側にして、敷地は町の南北に合わせる。左側が開いたら、紙を平らに置いて乾かす場所や蔵が2、3個」
-   //  敷地＝町ぜんぶ（1213×1215）。塀で囲むのは川側（東）の幅550×町の南北。西側の空きは塀の外の干し場と蔵（推定）。X＝塀の中心
-   const X=ox;
+   // 2026-10-07 井内さん「紙屋院・施薬院の敷地を一町にして、塀をその一町に添わせたい。紙屋院は川側に作業のための出入り口は複数。川を細く水路で引き込む」
+   //  敷地＝塀＝町ぜんぶ（1213×1215）。建物は川側（東）、西は塀の内の干し場と蔵。東の塀に作業用の木戸3つと水路の取り入れ口（推定）。X＝建物群の中心
+   const X=330;
    formalHall(main,X,-300,385,150,26,17,'紙漉所');formalHall(main,X,60,385,150,26,17,'紙干所');
-   for(const z of[-150,-100])for(let i=0;i<10;i++)if(i!==4&&i!==5)stores.push(k.box(X-180+i*40,z,24,2,-1,30,s.name+'板')); /* 中央(x±20)は門からの通り道 */
-   for(const dx of[-170,-110,-50])stores.push(k.box(X+dx,-200,52,34,-1,8,s.name+'基壇')); /* 漉き槽（名は hover の部材語彙に合わせる） */
+   for(const z of[-70,-40])for(let i=0;i<10;i++)if(i!==4&&i!==5)stores.push(k.box(X-180+i*40,z,24,2,-1,30,s.name+'板')); /* 中央(x±20)は門からの通り道 */
+   // 水路: 川（東）から東の塀の取り入れ口を通り、漉き槽の列まで。縁は石組み、水は「水面」の名（歩いて渡れる浅い水路・水色）
+   {const x0=X-210,x1=(W-8)/2,len=x1-x0,cx=(x0+x1)/2;
+    stores.push(k.box(cx,-170,len,16,-1,2,'水面・'+s.name+'水路'),k.box(cx,-182,len,4,-1,6,s.name+'基壇'),k.box(cx,-158,len,4,-1,6,s.name+'基壇'),k.box(x0-24,-170,56,44,-1,2,'水面・'+s.name+'溜め水'));
+    for(const dx of[-170,-110,-50]){stores.push(k.box(X+dx,-128,52,34,-1,8,s.name+'基壇'),k.box(X+dx,-128,44,26,6,2,'水面・'+s.name+'漉き槽水'));}} /* 漉き槽3基（水を張る） */
    plant(X-225,420,'外周柳',1);plant(X+225,420,'外周柳',1);plant(X-225,200,'外周柳',1);plant(X+225,200,'外周柳',1);plant(X-225,-500,'外周松',.9);plant(X+225,-500,'外周松',.9);
-   // 塀の外（西側）: 干し場＝筵の上に漉いた紙を平らに並べる（8×4）。蔵は3棟、門のある南側の寄り
-   for(let j=0;j<4;j++)for(let i=0;i<8;i++){const x=-540+i*62,z=-470+j*60;stores.push(k.box(x,z,52,42,-1,2,s.name+'基壇'),k.box(x,z,44,34,1,1,s.name+'板'));}
+   // 西の空き: 干し場＝筵の上に漉いた紙を平らに並べる（8×6）。蔵は3棟（南寄り）
+   for(let j=0;j<6;j++)for(let i=0;i<8;i++){const x=-540+i*62,z=-470+j*60;stores.push(k.box(x,z,52,42,-1,2,s.name+'基壇'),k.box(x,z,44,34,1,1,s.name+'板'));}
    store(-510,330,'紙蔵');store(-380,330,'楮蔵');store(-250,330,'料紙蔵');
-   plant(-570,-540,'外周松',.9);plant(-30,-540,'外周松',.9);plant(-570,540,'外周柳',1);plant(-30,540,'外周柳',1);
+   plant(-545,-540,'外周松',.9);plant(-30,-540,'外周松',.9);plant(-545,540,'外周柳',1);plant(-30,540,'外周柳',1);
   }else if(id==='seyakuin'){
    // 施薬院＝大内裏の中和院（591×990）の敷地と建物を写す。神嘉殿→正庁、北殿→薬殿、西舎・東舎→病舎、渡殿でつなぐ。
-   // 南の庭に薬草園の畝を足す（推定）
+   // 2026-10-07 井内さん「敷地を一町にして塀をその一町に添わせたい。広がった敷地に薬草園や蔵を置いてほしい」
+   //  敷地＝塀＝町ぜんぶ（1213×1195）。中央に中和院の殿舎、西に薬草園（畝50）、東に蔵3棟と調薬所・煎薬所（推定）
    formalHall(main,0,-100,250,110,26,20,'正庁');formalHall(main,0,-345,250,100,24,16,'薬殿');k.watari(main,'z',0,-295,-155);
    for(const sx of[-1,1]){const x=sx*170;formalHall(lodgings,x,230,90,200,24,16,sx<0?'西病舎':'東病舎');k.watari(main,'x',-100,Math.min(sx*125,x),Math.max(sx*125,x));k.watari(main,'z',x,-100,130);}
-   for(const x of[-120,-60,60,120])for(const z of[300,350])stores.push(k.box(x,z,60,20,-1,3,s.name+'基壇')) /* 薬草園の畝 */;
-   plant(-100,-10,'前庭梅',.9);plant(100,-10,'前庭梅',.9);plant(-215,420,'外周松',.9);plant(215,420,'外周松',.9);
+   for(let i=0;i<5;i++)for(let j=0;j<10;j++)stores.push(k.box(-540+i*50,-440+j*58,36,36,-1,4,s.name+'薬草畝生垣')); /* 薬草園の畝（緑の名＝生垣の色） */
+   store(345,-300,'薬蔵');store(430,-300,'施薬蔵');store(515,-300,'貯蔵蔵');
+   hall(stores,430,-60,200,80,22,14,'調薬所',true);hall(stores,430,110,160,70,20,12,'煎薬所',true);
+   plant(-100,-10,'前庭梅',.9);plant(100,-10,'前庭梅',.9);plant(-250,480,'外周松',.9);plant(250,480,'外周松',.9);plant(-560,480,'外周松',.9);plant(560,480,'外周松',.9);plant(-100,420,'前庭梅',.9);plant(100,420,'前庭梅',.9);
   }else{
    formalHall(main,0,-300,430,140,27,18,'講堂');hall(lodgings,-350,100,110,430,22,14,'西寄宿舎',true);hall(lodgings,350,100,110,430,22,14,'東寄宿舎',true);
    hall(lodgings,0,230,320,100,21,13,id==='kangakuin'?'政所':'学頭所',true);store(-200,390,'倉');
