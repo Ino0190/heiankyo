@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="59a2d52b62ac5ba290be1133b83181888c6bb7ff9aff36b7f0c148dc699a7fae">
+<meta name="heian-release" content="62a5b0daf5d07e2d97439918cad566363f1ec15eaf23f572e4d656073c0e6c1f">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -15039,6 +15039,12 @@ function buildDairiInner(k,den,kokyu,kaku){
  // 南階は基壇の南へ
  den.push(box(1650,-1680,90,24,-1,4,'紫宸殿南階'));
  den.push(box(1650,-1692,90,16,-1,8,'紫宸殿南階'));
+ // 南庭の白砂（2026-10-09 井内さん「内裏の紫宸殿の前は白砂が敷かれてたみたいだね」）。
+//  範囲＝承明門の内側（内郭南回廊の北縁 z-1313）から紫宸殿の南階（z-1668）まで、校書殿（東壁 x1335）と宜陽殿（西壁 x1965）の間。
+//  紫宸殿の基壇の両脇（x1360〜1450・1850〜1940）にも回して、庭が殿の前だけで切れないようにした。色は名前の「白砂」で砂色（朱雀院の南庭・南庭白砂と同じ規則）。
+//  上端は地面(0)より0.5だけ上げる＝重なりのちらつきを避ける。桜・橘（addHeianFloweringTrees）はこの砂の上に立つ
+ den.push(box(1650,-1494,580,352,-1,1.5,'紫宸殿南庭白砂'));
+ for(const sx of[-1,1])den.push(box(1650+sx*245,-1786,86,238,-1,1.5,'紫宸殿南庭白砂'));
  // 左近の桜・右近の橘は addHeianFloweringTrees が季節の色で1本ずつ描く（2026-09-26）。
  // 🚫 ここの k.tree と両方あって、紫宸殿の前に桜・橘が2本ずつ立っていた（井内さん「紫宸殿前の桜、橘は1こずつだよ」）
  // 入母屋の殿。白壁は従来寸法のまま、柱・梁と軒だけを紫宸殿水準へ上げる。
@@ -20404,7 +20410,7 @@ function resolveHeianWalkPoint(x,z,radius=5){if(!heianWalkBlocked(x,z,radius))re
 // 🚫 回廊の梁（柱頭の上・軒の高さ）も障害物にしていた。豊楽院は地形が回廊の基準面より高く、梁の下端が「地面+23」の判定に入って
 //    回廊の全長（z2455〜5370）が帯状の壁として登録され、壁のない回廊なのに柱間を横断できなかった
 //    （2026-10-03井内さん「豊楽院の回廊だけど、壁がなくていいんだけど通り抜けられない。壁のない回廊は横断できるはず」）。梁は頭の上なので除き、柱だけで塞ぐ
-function collectHeianWalkObstacles(group){group.updateMatrixWorld(true);group.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||/(?:地面|敷地|屋根|床|水面|苑池|基壇|石段|階|竜尾壇|竜尾道|旗|道路|街路|参道|道|田|畦|松|木|樹|植栽|敷石|石敷|板敷|甃|車寄せ|夜間閉鎖扉|瓦笠|板葺笠|塀笠|塀屋根|注連縄|笠木|鳥居貫|鳥居$|鳥居\s\d+$|回廊梁)/.test(o.name))return;
+function collectHeianWalkObstacles(group){group.updateMatrixWorld(true);group.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||/(?:地面|敷地|屋根|床|水面|苑池|基壇|石段|階|竜尾壇|竜尾道|旗|道路|街路|参道|道|田|畦|松|木|樹|植栽|敷石|石敷|板敷|甃|白砂|車寄せ|夜間閉鎖扉|瓦笠|板葺笠|塀笠|塀屋根|注連縄|笠木|鳥居貫|鳥居$|鳥居\s\d+$|回廊梁)/.test(o.name))return;
   // 🚫 `敷石`が除外に無かったため、**上東門・上西門は門自身の敷石（厚さ0.2m・開口124単位を覆う）が
   //    壁と同格の障害物として登録され、見た目は抜けているのに通れなかった**（2026-09-07実測。
   //    比較: 陽明門は脚2本だけなので間の50単位=5mが空いている）。井内さん「上東門、上西門も牛車が
@@ -20416,27 +20422,37 @@ function hideHeianWalkTarget(){if(!heianWalkTargetMarker)return;scene.remove(hei
 //  （クリックした場所が見た目とズレることがある＝柱で「ここ」と分かる）。足元の円はそのまま、円から縦に伸びる薄い光の柱（下が濃く上へ消える）と、広がって消える波紋。
 //  2026-10-08 井内さん「光の柱はスクロールしないで、特に上の方がチラチラ揺らめくとかにしたい」: 柱は動かさず、上ほど小さな区画ごとに明るさがちらつく（シェーダ）。
 //  到着・目的地の取消しで消える（hideHeianWalkTarget）。毎フレームの動きは heianWalkTargetTick
-const HEIAN_PILLAR_VERT='varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}';
-const HEIAN_PILLAR_FRAG=`uniform float uTime;uniform float uOp;uniform float uAmp;uniform vec3 uColor;varying vec2 vUv;
+// 2026-10-08 井内さん「半分くらいの高さでいい」「ベタ塗りみたいで微妙。波動砲の発射シーンの最初の感じを半透明で揺らめく感じで」:
+//  高さ半分(8.5m)・半透明の3層（外のにじみ・本体・芯）。輪郭ほど透けて（視線と面の向きで縁を薄く）中心に光が溜まる。上ほど横に揺れ、太さが息をする。
+//  明るさは上ほど小さな区画ごとにちらつく。柱の模様は動かさない（スクロールしない）
+const HEIAN_PILLAR_VERT=`uniform float uTime;uniform float uSway;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
+void main(){vUv=uv;vec3 p=position;float hv=uv.y;
+ float br=1.0+0.10*hv*sin(hv*13.0+uTime*2.1);p.x*=br;p.z*=br;                                    // 太さが息をする
+ p.x+=sin(uTime*1.9+hv*5.0)*uSway*hv*hv;p.z+=cos(uTime*1.5+hv*4.3)*uSway*hv*hv;                  // 上ほど横に揺れる
+ vec4 mv=modelViewMatrix*vec4(p,1.0);vN=normalize(normalMatrix*normal);vV=-mv.xyz;gl_Position=projectionMatrix*mv;}`;
+const HEIAN_PILLAR_FRAG=`uniform float uTime;uniform float uOp;uniform float uAmp;uniform vec3 uColor;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
 float h(float x){return fract(sin(x*127.1)*43758.5453);}
 void main(){float v=vUv.y;
- float g=pow(1.0-v,0.85);                                   // 下が濃く、上へ消える
- float rows=26.0,cols=8.0;vec2 cell=vec2(floor(vUv.x*cols),floor(v*rows));float id=h(cell.x*7.31+cell.y*13.17);
- float tw=0.5+0.5*sin(uTime*(5.0+id*9.0)+id*6.2832);          // 区画ごとの明滅（周期・位相がばらばら）
+ float g=pow(1.0-v,0.9);                                       // 下が濃く、上へ消える
+ float f=abs(dot(normalize(vN),normalize(vV)));float edge=0.12+0.88*pow(smoothstep(0.0,0.9,f),1.5); // 縁ほど透ける＝ベタ塗りにならない
+ float rows=22.0,cols=8.0;vec2 cell=vec2(floor(vUv.x*cols),floor(v*rows));float id=h(cell.x*7.31+cell.y*13.17);
+ float tw=0.5+0.5*sin(uTime*(5.0+id*9.0)+id*6.2832);
  float tw2=0.5+0.5*sin(uTime*(11.0+id*7.0)+h(id)*6.2832);
- float amp=uAmp*smoothstep(0.05,0.85,v);                      // 上ほど強くちらつく。根元は安定
+ float amp=uAmp*smoothstep(0.05,0.85,v);                       // 上ほど強くちらつく。根元は安定
  float flick=1.0-amp*(0.65*tw+0.35*tw2);
- gl_FragColor=vec4(uColor,uOp*g*flick);}`;
+ float lowGlow=1.0+0.6*smoothstep(0.25,0.0,v);                 // 根元に光が溜まる
+ gl_FragColor=vec4(uColor,clamp(uOp*g*flick*edge*lowGlow,0.0,1.0));}`;
 function showHeianWalkTarget(point){
  hideHeianWalkTarget();const grp=new THREE.Group();grp.name='自動歩行目的地';grp.position.set(point.x,point.y+.2,point.z);
  const ring=new THREE.Mesh(new THREE.RingGeometry(4,6,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xf0c24b,side:THREE.DoubleSide,depthWrite:false}));ring.name='目的地の円';ring.renderOrder=8;grp.add(ring);
  const wave=new THREE.Mesh(new THREE.RingGeometry(5.4,6,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffe9a8,side:THREE.DoubleSide,transparent:true,opacity:0,depthWrite:false}));wave.name='目的地の波紋';wave.renderOrder=8;grp.add(wave);
- const H=170,mats=[];
- const mk=(r0,r1,op,amp,color,add,name)=>{const mat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uOp:{value:op},uAmp:{value:amp},uColor:{value:new THREE.Color(color)}},vertexShader:HEIAN_PILLAR_VERT,fragmentShader:HEIAN_PILLAR_FRAG,
+ const H=85,mats=[];
+ const mk=(r0,r1,op,amp,sway,color,add,name)=>{const mat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uSway:{value:sway},uOp:{value:op},uAmp:{value:amp},uColor:{value:new THREE.Color(color)}},vertexShader:HEIAN_PILLAR_VERT,fragmentShader:HEIAN_PILLAR_FRAG,
    transparent:true,blending:add?THREE.AdditiveBlending:THREE.NormalBlending,side:THREE.DoubleSide,depthWrite:false,fog:false});mats.push(mat);
-  const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,H,36,1,true),mat);m.position.y=H/2;m.name=name;m.renderOrder=9;m.frustumCulled=false;grp.add(m);return m;};
- mk(6.5,4.5,.8,.95,0xffd25a,false,'目的地の光の柱');   // 金。通常合成（加算だと明るい空で白く飛ぶ）
- mk(1.5,.9,.6,1,0xfff3c8,true,'目的地の光の芯');      // 芯だけ加算で光らせる。こちらも上ほどちらつく
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,H,40,24,true),mat);m.position.y=H/2;m.name=name;m.renderOrder=9;m.frustumCulled=false;grp.add(m);return m;};
+ mk(7.5,5.5,.32,.8,1.6,0xffe6a8,false,'目的地の光のにじみ');   // 外のにじみ（広くて薄い）
+ mk(4.6,3.0,.55,.95,2.0,0xffd25a,false,'目的地の光の柱');       // 本体の金。通常合成（加算だと明るい空で白く飛ぶ）
+ mk(1.2,.6,.7,1,.7,0xfff6d8,true,'目的地の光の芯');             // 芯だけ加算
  grp.userData={t0:performance.now()/1000,wave,mats};heianWalkTargetMarker=grp;scene.add(grp);
 }
 // 毎フレーム: 柱の明滅の時刻を進める・波紋が広がって消える（柱そのものは動かさない）
@@ -26338,8 +26354,8 @@ function startHeianGame(entryMode='overview'){
    return{leaves:noon.sceneClosedLeaves.total,noonVisible:noon.sceneClosedLeaves.visible,nightVisible:night.sceneClosedLeaves.visible,
     // 35＝坊門1（InstancedMesh）＋主要建築13（大内裏・東西寺・神泉苑・羅城門・官学7・朱雀院の表示結合）＋貴族邸5variant
     //    ＋東西市の門4×扉2×2市=16（2026-09-12）
-    // →37: 紙屋院・施薬院の門（2026-10-07）
-    ok:noon.sceneClosedLeaves.total===37&&noon.sceneClosedLeaves.visible===0&&night.sceneClosedLeaves.visible===night.sceneClosedLeaves.total};}
+    // →37: 紙屋院・施薬院の門（2026-10-07）、→39: 悲田院2の門（2026-10-08）
+    ok:noon.sceneClosedLeaves.total===39&&noon.sceneClosedLeaves.visible===0&&night.sceneClosedLeaves.visible===night.sceneClosedLeaves.total};}
   finally{syncHeianGateDoors(before);}};
  let gateDoorsProbeResult=null; // 時刻を振る重い検査なので1回だけ（__heianGameInfo は各所から何度も呼ばれる）
  window.__heianGameInfo=()=>({active:heianGameMode,gateDoors:(gateDoorsProbeResult??=gateDoorsProbe()),gateDoorsOK:gateDoorsProbeResult.ok,entryMode:heianGameEntryMode,entryStarted,selected:heianGameSelectedId,locations:HEIAN_GAME_LOCATIONS.length,options:select.options.length,overviewOption:select.querySelector('option[value="overview"]')?.textContent||'',markers:map.querySelectorAll('.heian-map-marker').length,mapTitle:map.querySelector('.heian-map-title')?.textContent||'',mapRoads:map.querySelectorAll('.heian-map-road').length,mapCanals:map.querySelectorAll('.heian-map-canal').length,mapPalace:map.querySelector('.heian-map-palace')?.textContent||'',mapPlayer:!!map.querySelector('.heian-map-player'),mapPlayerVisible:!map.querySelector('.heian-map-player')?.hidden,hud:!!document.getElementById('heianGameHud'),entryGate:!!document.getElementById('heianEntryGate'),headerActionsHidden:actions.hidden,menuButton:!!menuButton,menuButtonHidden:menuButton.hidden,menuOpen:actions.classList.contains('open'),menuExpanded:menuButton.getAttribute('aria-expanded'),headerButtons:[...actions.querySelectorAll('button')].map(b=>b.textContent),headerPrimary:[...actions.querySelectorAll('button.primary')].map(b=>b.textContent),title:heading.textContent,seriesTitle:series.textContent,titleMark:!!title.querySelector('.kit-mark'),subtitle:subtitle.textContent,hoverSuppression:window.__heianHoverState?.()||null,kamoFordBlocked:(()=>{const p=window.__terrainInfo?.().kamoFord;return p?!!heianWalkBlocked(p[0],p[1],5):null;})(),terrain:!!heianTerrainGroup,walkMode:heianWalk.mode,viewMode:heianWalk.viewMode,pointerLocked:document.pointerLockElement!==null,cursor:getComputedStyle(renderer.domElement).cursor,crosshair:!!document.querySelector('.heian-game-crosshair'),walking:heianWalk.active,running:heianWalk.running,autoWalking:heianWalk.autoWalking,actorReady:!!heianTinRobotRuntime,actorSource:heianTinRobotRuntime?.source||null,occtLoaded:!!OCCT,occtRequested:!!OCCT_LOAD,actorVisible:!!heianTinRobotRuntime?.visible,actorBodies:heianTinRobotRuntime?.robotBodies.length||0,gaitSteps:heianTinRobotRuntime?.gaitSteps.length||0,skipSteps:heianTinRobotRuntime?.skipSteps.length||0,gaitKind:heianTinRobotRuntime?.gaitKind||null,twist:heianTinRobotRuntime?.twist||null,robotOutlineWidth:heianTinRobotRuntime?.outlineWidth||1,robotOutlines:heianTinRobotRuntime?.outlines?.length||0,photoMode:heianPhotoMode,photoBar:!!heianPhotoBar,photoBarHidden:heianPhotoBar?.hidden??true,walkSurfaces:heianWalkSurfaceMeshes.length,walkObstacles:heianWalkObstacleRecords.length,walkConnectors:heianWalkConnectorRecords.length,mobReady:!!heianMobRuntime,mob:heianMobRuntime?.inspect()||null,crowdReady:!!heianCrowdRuntime,crowd:heianCrowdRuntime?.inspect()||null,ambient:heianWalkAmbientAnchor?{active:true,anchor:{...heianWalkAmbientAnchor},player:heianWalk.position.toArray(),forwardDistance:(heianWalkAmbientAnchor.spawnX-heianWalk.position.x)*Math.sin(heianWalkAmbientAnchor.heading)+(heianWalkAmbientAnchor.spawnZ-heianWalk.position.z)*Math.cos(heianWalkAmbientAnchor.heading)}:null});
@@ -26547,6 +26563,10 @@ const HEIAN_OUTER_PADDY_REGION=[[-42000,21000],[-30000,22500],[-26000,30000],[-2
 //  九条の南から鴨川・桂川の合流まで（鳥羽）と、鴨川の東から深草・伏見の山裾、南は巨椋池の北岸まで。西は桂川の東岸で HEIAN_OUTER_PADDY_REGION と少し重ねる。
 //  川・池・京域・津・集落は田の配置の側で外す（南の縁は池の中まで取り、水面は巨椋池と同じ水位の判定で外す）。東の山裾は起伏の判定で棚田と林になる。外形は推定（条里の遺構は鳥羽・深草とも知られる）
 const HEIAN_SOUTH_PADDY_REGION=[[-21000,46200],[23500,46200],[30000,47000],[28500,58000],[30500,70000],[27500,82000],[25000,92000],[37000,98500],[26000,103000],[12000,105000],[2000,104000],[-1500,101500],[-3000,98500],[-4000,96000],[-3500,90000],[-5800,82000],[-8500,76000],[-12000,71000],[-16500,65000],[-17800,60000],[-17500,55000],[-19000,50000]];
+// 桂川の西岸（対岸）から西山の山裾まで（2026-10-09 井内さん「右京側、桂川の対岸から、西の山の麓までを田畑にしたい」）。
+//  東の縁＝桂川（西岸。川の中心から500以内は田にしない）、西の縁＝西山の麓（DEMで谷底より15m前後登る所を南北4kmおきに拾った）。
+//  山裾の斜面は heianFarmland の斜面の規則（緩い斜面＝棚田・急＝林や藪）がそのまま働くので、縁の外形は大づかみでよい。外形・耕地の広がりは推定
+const HEIAN_WEST_PADDY_REGION=[[-50000,26000],[-52000,34000],[-50500,42000],[-49500,50000],[-47000,58000],[-45500,66000],[-44000,70000],[-42500,74000],[-42500,79000],[-50000,84000],[-55000,90000],[-55000,95000],[-3900,95000],[-3950,90000],[-4700,86000],[-5850,82000],[-8100,78000],[-9550,74000],[-12350,70000],[-16700,66000],[-18150,62000],[-18600,58000],[-18300,54000],[-19800,50000],[-24000,46000],[-26200,42000],[-27550,38000],[-29600,34000],[-30000,30000],[-30700,26000]];
 function heianInOuterPaddyRegion(x,z){let inside=false;for(let i=0,j=HEIAN_OUTER_PADDY_REGION.length-1;i<HEIAN_OUTER_PADDY_REGION.length;j=i++){const[xi,zi]=HEIAN_OUTER_PADDY_REGION[i],[xj,zj]=HEIAN_OUTER_PADDY_REGION[j];if(zi>z!==zj>z&&x<(xj-xi)*(z-zi)/(zj-zi)+xi)inside=true;}return inside;}
 // 領域内の境界からの距離を0..1へ正規化（0=境界、1=内部4200mm以上）。縁の全周フェードに使う。
 function heianOuterPaddyEdgeK(x,z){
@@ -27065,12 +27085,12 @@ function heianGrassTuftGeometry(){
 // 2026-09-26井内さん「神社系、お堂なんかも木が生えてるとリアル」「朱雀院、神泉苑、何々院は木や草がもっと多い方がいい」:
 //   神社（大将軍堂・五條天神・市比賣社）は社殿を囲む鎮守の森＝常緑の広葉樹（楠・椎の想定）を密に。町堂（六角堂・因幡堂）は堂のまわりに数本。
 //   朱雀院は白砂の南庭（朝覲・相撲の場）と池の水面を外し、池畔と敷地の空きへ木を増やす。〜院（奨学院・勧学院・弘文院）も倍に
-const HEIAN_PRECINCT_TREES={toji:150,saiji:150,daigakuryo:40,kokuso:16,kamiyain:14,seyakuin:14,kobunin:28,shogakuin:28,kangakuin:28,eastKorokan:26,westKorokan:26,ukyoShiki:10,sakyoShiki:10,
+const HEIAN_PRECINCT_TREES={toji:150,saiji:150,daigakuryo:40,kokuso:16,kamiyain:14,seyakuin:14,hideninUkyo:14,hideninSakyo:14,kobunin:28,shogakuin:28,kangakuin:28,eastKorokan:26,westKorokan:26,ukyoShiki:10,sakyoShiki:10,
  suzakuin:300,daishogun:26,gojoTenjin:48,ichihime:10};
 const HEIAN_PRECINCT_SHRINES=new Set(['daishogun','gojoTenjin','ichihime','町堂']);
 // 敷地ごとの追加条件。exclude は敷地中心からの矩形 [cx,cz,w,d]、pond は池の制御点（敷地中心から）。minStep は候補の格子の最小間隔
 const heianPrecinctOptions=id=>id==='suzakuin'?{exclude:[[80,heianSuzakuinCoreZ(-626.5),1190,1300],[1040,720,220,2800]/* 馬場（競馬の走路） */],pond:HEIAN_SUZAKUIN_POND_CONTROLS.map(([x,z])=>[x,heianSuzakuinCoreZ(z)]),minStep:64,cluster:true}
- :id==='kamiyain'||id==='seyakuin'?{exclude:[[0,0,1300,1300]]/* 一町ぜんぶ塀の中で、干し場・薬草園・蔵がある。木は組み立て側で決めて植える（紙屋院・施薬院・2026-10-07） */}
+ :id==='kamiyain'||id==='seyakuin'||id==='hideninUkyo'||id==='hideninSakyo'?{exclude:[[0,0,1300,1300]]/* 一町ぜんぶ塀の中で、干し場・薬草園・蔵がある。木は組み立て側で決めて植える（紙屋院・施薬院・2026-10-07） */}
  :HEIAN_PRECINCT_SHRINES.has(id)?{minStep:52,inset:40,axis:.08,margin:30}
  :id==='曹司'?{minStep:60,inset:50,axis:.1,margin:40,edge:140/* 塀際の帯だけ */}:{};
 function heianPointInPoly(x,z,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.y>z)!==(b.y>z)&&x<(b.x-a.x)*(z-a.y)/(b.y-a.y)+a.x)inside=!inside;}return inside;}
@@ -28198,6 +28218,10 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   {id:'southwest-pond-4',name:'右京南西の大池',x:-22900,z:41900,w:3100,d:1800,size:'大',connectGroup:'southwest-main',connectedTo:'southwest-pond-2'}
  ];
  for(const p of southwestPonds){ecoModules.push({...p,type:'池',seed:hash(p.x,p.z,1200),source:'右京南西低湿地・道路横断池',dedicated:true});ecoCounts['池']++;heianSubregions.push({n:p.name+'（景観上の推定）',x:p.x,z:p.z,w:p.w,d:p.d,overRoad:true});}
+ // 悲田院（右京）の九条大路の向かいの沼（2026-10-08 井内さん「九条の向かいにちょっとした沼があった。西へ向かう道と九条の間に置きたい」）。
+ //  九条大路の南縁 z=45430 と南西街道（(-8000,46000)→(-14000,47500) の線分・x=-12060 で z≈47015）の間の約1585に、道から250以上・九条から320以上離して置く。形と広さは推定
+ const hideninPonds=[{id:'hidenin-pond',name:'悲田院前の沼',x:-12059.85,z:46125,w:1100,d:750,size:'小'}];
+ for(const p of hideninPonds){ecoModules.push({...p,type:'池',seed:hash(p.x,p.z,1210),source:'悲田院前の沼',dedicated:true});ecoCounts['池']++;heianSubregions.push({n:p.name+'（景観上の推定）',x:p.x,z:p.z,w:p.w,d:p.d,overRoad:false});}
  const chunkSize=8000,chunkMap=new Map();for(const p of placements){const key=Math.floor((p.x+24000)/chunkSize)+':'+Math.floor((p.z+8000)/chunkSize);if(!chunkMap.has(key))chunkMap.set(key,{key,items:[]});chunkMap.get(key).items.push(p);}
  const chunks=[...chunkMap.values()],unitBox=new THREE.BoxGeometry(1,1,1),unitRoof=makeHeianHouseRoofUnit(),rowBody=makeHeianRowHouseBodyUnit(),dummy=new THREE.Object3D();
  // 官人宅の壁は漆喰の白でなく土壁・板壁寄りの色（2026-08-19井内さん「官人の屋敷の壁も白くないのがそれっぽい」。
@@ -28723,7 +28747,7 @@ function addHeianCityBlocks(group){
  // ---- 都の外の田の配置（1.83 heianFarmland）。条里の町ごとに種類を決め、1町1画素の DataTexture にする（地形のシェーダが読む）。
  //  種類 1長地 2半折 3崩れ（川沿い） 4棚田 5藪 6林 7葦原（1.84 紙屋川・巨椋池の岸）。G＝町ごとの乱数、B＝縁で地の色へ溶かす量。
  //  集落の家が乗る町・京域・川（桂川の中心から50m）は田にしない。範囲は旧の水田の外形＋その外 250m の帯（山裾の棚田・林）
- {const J=HEIAN_JORI,R=HEIAN_OUTER_PADDY_REGION,R2=HEIAN_SOUTH_PADDY_REGION,edgeD=(P,x,z)=>{let d=Infinity;for(let i=0,j=P.length-1;i<P.length;j=i++)d=Math.min(d,heianPointSegmentDistance(x,z,P[j][0],P[j][1],P[i][0],P[i][1]));return d;},polyD=(x,z)=>Math.min(edgeD(R,x,z),edgeD(R2,x,z));
+ {const J=HEIAN_JORI,R=HEIAN_OUTER_PADDY_REGION,R2=HEIAN_SOUTH_PADDY_REGION,R3=HEIAN_WEST_PADDY_REGION,edgeD=(P,x,z)=>{let d=Infinity;for(let i=0,j=P.length-1;i<P.length;j=i++)d=Math.min(d,heianPointSegmentDistance(x,z,P[j][0],P[j][1],P[i][0],P[i][1]));return d;},polyD=(x,z)=>Math.min(edgeD(R,x,z),edgeD(R2,x,z),edgeD(R3,x,z));
   // 1.84 南の田: 鴨川（九条の南で幅が最大2.4倍に広がる＝kamoWidthProfile）・巨椋池・津の敷地を外す
   const kamoRivers=(window.HEIAN_WATER?.current?.rivers||[]).filter(r=>(r.name||'').replace(/\s+/g,'')==='鴨川'&&r.points.some(p=>p[1]>40000&&p[1]<105000));
   const ujiRivers=(window.HEIAN_WATER?.current?.rivers||[]).filter(r=>/^宇治川/.test((r.name||'').replace(/\s+/g,''))&&r.points.some(p=>p[1]>95000&&p[1]<112000));
@@ -28741,13 +28765,13 @@ function addHeianCityBlocks(group){
   const ogH=(x,z)=>{if(!ogL||z<88000||edgeD(ogura,x,z)>4500&&!heianPointInPolygon([x,z],ogura))return Infinity;const c=J.cho/2;
    if(ogWaterCell(x,z))return -2;for(const[ax,az]of[[-c,-c],[c,-c],[-c,c],[c,c]])if(ogWaterCell(x+ax,z+az))return -1;return terrainYAt(x,z)-ogL.level;};
   const tsuRects=['tobatsu','yodotsu'].map(k=>HEIAN_LANDMARK_SITES[k]).filter(Boolean);
-  let u0=Infinity,u1=-Infinity,v0=Infinity,v1=-Infinity;for(const[x,z]of R.concat(R2)){for(const[ax,az]of[[-J.band,-J.band],[J.band,-J.band],[-J.band,J.band],[J.band,J.band]]){const[u,v]=heianJoriUV(x+ax,z+az);u0=Math.min(u0,u);u1=Math.max(u1,u);v0=Math.min(v0,v);v1=Math.max(v1,v);}}
+  let u0=Infinity,u1=-Infinity,v0=Infinity,v1=-Infinity;for(const[x,z]of R.concat(R2,R3)){for(const[ax,az]of[[-J.band,-J.band],[J.band,-J.band],[-J.band,J.band],[J.band,J.band]]){const[u,v]=heianJoriUV(x+ax,z+az);u0=Math.min(u0,u);u1=Math.max(u1,u);v0=Math.min(v0,v);v1=Math.max(v1,v);}}
   const iMin=Math.floor(u0),jMin=Math.floor(v0),nx=Math.ceil(u1)-iMin,nz=Math.ceil(v1)-jMin,data=new Uint8Array(nx*nz*4),kinds=new Uint8Array(nx*nz);
   const hh=(i,j,k)=>{const v=Math.sin(i*127.1+j*311.7+k*74.7)*43758.5453;return v-Math.floor(v);};
   const kamiyaPts=(window.HEIAN_WATER?.current?.rivers||[]).find(q=>q.wayId===HEIAN_KAMIYA_MEANDER.wayId)?.points||[];
   const dKamiya=(x,z)=>{if(x<-27000||x>-14000||z<24000||z>60000)return Infinity;let d=Infinity;for(let i=1;i<kamiyaPts.length;i++)d=Math.min(d,heianPointSegmentDistance(x,z,...kamiyaPts[i-1],...kamiyaPts[i]));return d;};
   const byKind={none:0,jori:0,half:0,broken:0,terrace:0,scrub:0,wood:0,marsh:0,yard:0},names=['none','jori','half','broken','terrace','scrub','wood','marsh','yard'];
-  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const gi=i+iMin,gj=j+jMin,[x,z]=heianJoriXZ(gi+.5,gj+.5),inR1=heianPointInPolygon([x,z],R),inR2=heianPointInPolygon([x,z],R2),inR=inR1||inR2;let k=0,fade=1,wet=false; // 🚫 heianInOuterPaddyRegion は交差で true にするだけ（偶奇を数えない）＝外形の西側まで内に入る。ここは正しい内外判定を使う
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const gi=i+iMin,gj=j+jMin,[x,z]=heianJoriXZ(gi+.5,gj+.5),inR1=heianPointInPolygon([x,z],R),inR2=heianPointInPolygon([x,z],R2),inR3=heianPointInPolygon([x,z],R3),inR=inR1||inR2||inR3;let k=0,fade=1,wet=false; // 🚫 heianInOuterPaddyRegion は交差で true にするだけ（偶奇を数えない）＝外形の西側まで内に入る。ここは正しい内外判定を使う
    const pd=inR?0:polyD(x,z);
    if(inR||pd<J.band){
     const corners=[[gi,gj],[gi+1,gj],[gi,gj+1],[gi+1,gj+1]].map(([u,v])=>heianJoriXZ(u,v));
@@ -28765,8 +28789,8 @@ function addHeianCityBlocks(group){
      else if(!inR)k=r<.35?5:r<.55?6:r<.8?1:2;               // 外の帯の平地＝藪・林まじりの田
      else if(dk<2500||dm<1800)k=r<.55?3:r<.8?1:2;           // 川に近い低地＝崩れた区画が多い
      else k=r<.08?5:r<.62?1:2;                              // 条里の田（長地6割・半折4割・藪少し）
-     const e1=inR1?heianOuterPaddyEdgeK(x,z):0,e2=inR2?Math.min(1,edgeD(R2,x,z)/4200):0;
-     fade=inR?THREE.MathUtils.clamp(Math.max(e1,e2)*1.4+.25,0,1):THREE.MathUtils.clamp(1-pd/J.band,0,1);
+     const e1=inR1?heianOuterPaddyEdgeK(x,z):0,e2=inR2?Math.min(1,edgeD(R2,x,z)/4200):0,e3=inR3?Math.min(1,edgeD(R3,x,z)/4200):0;
+     fade=inR?THREE.MathUtils.clamp(Math.max(e1,e2,e3)*1.4+.25,0,1):THREE.MathUtils.clamp(1-pd/J.band,0,1);
      if(wet)fade=Math.max(fade,.85);
      if(Number.isFinite(oh))fade=Math.max(fade,.8);}} // 南の外形の縁は池の中に引いた＝汀の田は縁に近いだけで褪せていた（撮影 ogs4 の土色の長方形） // 紙屋川と桂川の間は外形の縁に近く薄く溶けて土色に見えた（撮影 kmy3）
    kinds[j*nx+i]=k;const o=(j*nx+i)*4;data[o]=k;data[o+1]=Math.floor(hh(gi,gj,2)*255);data[o+2]=Math.round(fade*255);data[o+3]=255;}
@@ -28819,22 +28843,22 @@ function addHeianCityBlocks(group){
   const palaceX0=hillEdge!==null?hillEdge+600:riverX-3000-42000/2-5000;
   const cx=palaceX0+5000,westX=cx-21000,eastX=cx+21000;
   const palace={x0:palaceX0,x1:palaceX0+10000,z0:zNorth,z1:zNorth+16000},segs=[];
-  const addLine=(ax,az,bx,bz,strong=false)=>{const len=Math.hypot(bx-ax,bz-az),n=Math.max(1,Math.ceil(len/600));
+  const addLine=(ax,az,bx,bz,strong=false,wide=0)=>{const len=Math.hypot(bx-ax,bz-az),n=Math.max(1,Math.ceil(len/600));
    for(let i=0;i<n;i++){const t0=i/n,t1=(i+1)/n,x0=ax+(bx-ax)*t0,z0=az+(bz-az)*t0,x1=ax+(bx-ax)*t1,z1=az+(bz-az)*t1,mx=(x0+x1)/2,mz=(z0+z1)/2;
     if(!strong&&mx>palace.x0+40&&mx<palace.x1-40&&mz>palace.z0+40&&mz<palace.z1-40)continue;
     const h0=terrainYAt(x0,z0),h1=terrainYAt(x1,z1);
     if(!Number.isFinite(h0)||!Number.isFinite(h1)||Math.abs(h1-h0)>70)continue;
     if(riverDistance(mx,mz)<1200)continue;
-    segs.push({x:mx,z:mz,y:Math.max(h0,h1)+1.2,len:Math.hypot(x1-x0,z1-z0)+8,horizontal:az===bz,strong});}};
+    segs.push({x:mx,z:mz,y:Math.max(h0,h1)+1.2,len:Math.hypot(x1-x0,z1-z0)+8,horizontal:az===bz,strong,wide});}};
   // 南北9本（西四坊..東四坊）。中央c=4は朱雀大路=宮南辺から太く目立たせる（2026-08-17井内さん指示）
-  for(let c=0;c<9;c++){const x=westX+c*(eastX-westX)/8;if(c===4)addLine(x,palace.z1,x,zSouth,true);else addLine(x,zNorth,x,zSouth);}
+  for(let c=0;c<9;c++){const x=westX+c*(eastX-westX)/8;if(c===4)addLine(x,palace.z1,x,zSouth,true,240/* 朱雀大路の跡は太めに: 140→240（2026-10-09 井内さん「長岡京、朱雀大路のあとは少し太めにしてみる？」）。他の大路は90・宮の枠は140のまま */);else addLine(x,zNorth,x,zSouth);}
   for(let r2=0;r2<11;r2++){const z=zNorth+r2*(zSouth-zNorth)/10;addLine(westX,z,eastX,z);}
   addLine(palace.x0,palace.z0,palace.x0,palace.z1,true);addLine(palace.x1,palace.z0,palace.x1,palace.z1,true);
   addLine(palace.x0,palace.z1,palace.x1,palace.z1,true);addLine(palace.x0,palace.z0,palace.x1,palace.z0,true);
   if(!segs.length)return{lines:0,segments:0,anchored:true};
   const nagaokaMesh=new THREE.InstancedMesh(leveeGeom,new THREE.MeshBasicMaterial({color:0xc9b78d,transparent:true,opacity:.3,depthWrite:false}),segs.length);
   nagaokaMesh.name='長岡京条坊跡（推定・うっすら）';nagaokaMesh.frustumCulled=false;nagaokaMesh.renderOrder=2;
-  segs.forEach((s,i)=>{paddyDummy.position.set(s.x,s.y,s.z);paddyDummy.scale.set(s.horizontal?s.len:(s.strong?140:90),2,s.horizontal?(s.strong?140:90):s.len);paddyDummy.updateMatrix();nagaokaMesh.setMatrixAt(i,paddyDummy.matrix);});
+  segs.forEach((s,i)=>{paddyDummy.position.set(s.x,s.y,s.z);{const ww=s.wide||(s.strong?140:90);paddyDummy.scale.set(s.horizontal?s.len:ww,2,s.horizontal?ww:s.len);}paddyDummy.updateMatrix();nagaokaMesh.setMatrixAt(i,paddyDummy.matrix);});
   nagaokaMesh.instanceMatrix.needsUpdate=true;paddyDummy.scale.set(1,1,1);paddyLayer.add(nagaokaMesh);
   return{lines:24,segments:segs.length,anchored:true,riverX:Math.round(riverX),east:Math.round(eastX),west:Math.round(westX),zNorth,zSouth,palaceClear:true,suzakuStrong:true};
  })();
@@ -29625,6 +29649,46 @@ function addHeianCityBlocks(group){
  for(const m of heianBroadleafMeshes(broadList,'植栽・落葉樹屋敷林'))deciduous.add(m);
  const trunks=new THREE.Group();trunks.name='植栽・幹'; // 幹は各樹種のメッシュが持つ（空の入れ物だけ残す）
  for(const m of[reeds,willowTrunks,willowCrowns,willowLeaves]){m.instanceMatrix.needsUpdate=true;m.frustumCulled=false;}reeds.name='植栽・湿地低木葦';willowTrunks.name='朱雀大路街路樹・幹';willowCrowns.name='朱雀大路街路樹・柳想定樹冠（推定）';willowLeaves.name='朱雀大路街路樹・柳の葉（推定）';vegetationLayer.add(trunks,evergreens,deciduous,reeds,willowTrunks,willowCrowns,willowLeaves);
+ // 田園の茂み・林（2026-10-09 井内さん「田畑・民家のある辺り・その他あちこちに茂みや林が点在」「鳥羽作道とか他の道の脇に時々茂みがあるとリアル」）。
+ //  ① 集落: 家の外側に屋敷林（4〜6本の小さな林）と家のそばの茂み ② 田: 畦（町の縁）に茂み、ところどころ小さな林 ③ 街道: 道の脇に時々茂み
+ //  茂み＝丸く茂る広葉樹（variant 5）を小さく（s .36〜.62）、林＝広葉樹と松の混植（s .75〜1.3）。川・池・京域・施設・街道の路面・家の上は避ける。数・位置は推定の景観
+ {const t0=performance.now(),CAP=2600,brush=[],grove=[],pine=[],cnt={hamlet:0,field:0,road:0,groveN:0,rejected:0};
+  const hz=(a,b,n)=>hash(a,b,7000+n);
+  const houseDist=(x,z)=>{let d=Infinity;for(const q of hamletHouses)d=Math.min(d,Math.hypot(x-q.x,z-q.z)-Math.max(q.w,q.d)/2);return d;};
+  const okAt=(x,z,roadM=50,houseM=70)=>{if(!Number.isFinite(terrainYAt(x,z))||insideCityRect(x,z)||insideSite(x,z))return false;
+   if(distanceToApproach([x,z])<roadM||hamletNearWater(x,z,40)||houseDist(x,z)<houseM)return false;return true;};
+  const total=()=>brush.length+grove.length+pine.length;
+  const addBush=(x,z,n,sMin=.36,sMax=.62)=>{for(let i=0;i<n&&total()<CAP;i++){const bx=x+(hz(x,z,i*3+1)-.5)*60,bz=z+(hz(x,z,i*3+2)-.5)*60;
+    brush.push({x:bx,z:bz,y:terrainYAt(bx,bz)+2,rot:hz(bx,bz,3)*Math.PI*2,s:sMin+hz(bx,bz,4)*(sMax-sMin),v:5});}};
+  const addGrove=(x,z,n)=>{cnt.groveN++;for(let i=0;i<n&&total()<CAP;i++){const a=hz(x,z,i*5+1)*Math.PI*2,r=Math.sqrt(hz(x,z,i*5+2))*95,gx=x+Math.cos(a)*r,gz=z+Math.sin(a)*r;
+    if(!Number.isFinite(terrainYAt(gx,gz)))continue;const s=.75+hz(gx,gz,5)*.55,p={x:gx,z:gz,y:terrainYAt(gx,gz)+2,rot:hz(gx,gz,6)*Math.PI*2,s};
+    if(hz(gx,gz,7)<.3)pine.push(p);else{p.v=Math.floor(hz(gx,gz,8)*5);grove.push(p);}}
+   addBush(x,z,2,.4,.55);};
+  // ① 集落（家のまわり）
+  hamletSites.forEach((site,si)=>{const mine=hamletHouses.filter(q=>Math.hypot(q.x-site.x,q.z-site.z)<650);if(!mine.length)return;
+   const nGrove=site.port?1:2+(hz(site.x,site.z,9)<.5?1:0);
+   for(let g=0;g<nGrove;g++)for(let tries=0;tries<8;tries++){const a=hz(site.x,site.z,20+g*9+tries)*Math.PI*2,r=380+hz(site.x,site.z,40+g*9+tries)*320,x=site.x+Math.cos(a)*r,z=site.z+Math.sin(a)*r;
+    if(!okAt(x,z,120,180))continue;addGrove(x,z,4+Math.floor(hz(x,z,10)*3));cnt.hamlet++;break;}
+   for(const q of mine)if(hz(q.x,q.z,11)<.42){const a=hz(q.x,q.z,12)*Math.PI*2,r=Math.max(q.w,q.d)/2+60+hz(q.x,q.z,13)*90,x=q.x+Math.cos(a)*r,z=q.z+Math.sin(a)*r;
+    if(okAt(x,z,70,45)){addBush(x,z,1+Math.floor(hz(x,z,14)*2));cnt.hamlet++;}}});
+  // ② 田（畦の縁の茂みと、ところどころ小さな林）
+  const F=heianFarmland;
+  if(F)for(let j=0;j<F.nz;j++)for(let i=0;i<F.nx;i++){const k=F.kinds[j*F.nx+i];if(k<1||k>3)continue;const gi=i+F.iMin,gj=j+F.jMin,r=hz(gi,gj,30);
+   if(r>=(k===3?.16:.075))continue;
+   const side=Math.floor(hz(gi,gj,31)*4),u=side<2?hz(gi,gj,32):(side===2?.04:.96),v=side<2?(side===0?.04:.96):hz(gi,gj,33),[x,z]=heianFarmXZ(gi+u,gj+v);
+   if(!okAt(x,z,60,70)){cnt.rejected++;continue;}
+   if(r<.022)addGrove(x,z,3+Math.floor(hz(gi,gj,34)*3));else addBush(x,z,1+Math.floor(hz(gi,gj,35)*2));cnt.field++;}
+  // ③ 街道の脇（鳥羽作道ほか。道の縁から70〜230離す。900おきに候補を置いて3〜4割に茂みを置く）
+  for(const r of heianApproachRoadRecords){const L=Math.hypot(r.bx-r.ax,r.bz-r.az);if(L<50)continue;const dx=(r.bx-r.ax)/L,dz=(r.bz-r.az)/L,nx=-dz,nz=dx,n=Math.max(1,Math.round(L/900));
+   for(let q=0;q<n;q++){const t=(q+hz(r.ax,r.az,50+q))/n*L,roll=hz(r.ax+q,r.az,51);if(roll>.36)continue;
+    const side=hz(r.az,r.ax+q,52)<.5?-1:1,off=r.width/2+70+hz(r.ax,r.az+q,53)*160,x=r.ax+dx*t+nx*off*side,z=r.az+dz*t+nz*off*side;
+    if(!okAt(x,z,40,60)){cnt.rejected++;continue;}
+    if(roll<.04)addGrove(x,z,3+Math.floor(hz(x,z,54)*3));else addBush(x,z,1+Math.floor(hz(x,z,55)*2));cnt.road++;}}
+  const grp=new THREE.Group();grp.name='植栽・田園の茂みと林（推定）';
+  for(const m of heianBroadleafMeshes([...brush,...grove],'郊外の茂み・林'))grp.add(m);
+  for(const m of heianPineMeshes(pine,'郊外の林・松'))grp.add(m);
+  vegetationLayer.add(grp);
+  window.__heianCountryBrush=()=>({...cnt,brush:brush.length,grove:grove.length,pine:pine.length,total:total(),cap:CAP,meshes:grp.children.length,roads:heianApproachRoadRecords.length,houses:hamletHouses.length,sites:hamletSites.length,ms:Math.round(performance.now()-t0)});}
  // 下草・草むら（2026-09-25 草木の増量）。空き地・草地・疎住の町を厚く、庶民の町・その他は少し。
  // 株は数株ずつ寄せて「草むら」にする。家（歩行の障害物）・川・主要施設の敷地は避ける。水田・湿地（葦がある）・貴族邸・生態の町は置かない
  {const grassPoints=[],patchesOf=c=>c.landUse==='疎住・空地'?16:c.landUse==='畑・草地'?12:c.landUse==='庶民密集'?4:c.landUse==='水田'||c.landUse==='湿地'||c.landUse==='貴族邸'?0:7;
@@ -29935,6 +29999,8 @@ const HEIAN_LANDMARK_SITES={
  shogakuin:{name:'奨学院',x:1030.2,z:11850.15,w:1212,d:1164.3,gateSide:'S'},kangakuin:{name:'勧学院',x:2363.4,z:11850.15,w:1212,d:1164.3,gateSide:'S'},
  // 2026-10-07 井内さん「紙屋院は内膳司の建物とか／施薬院は中和院をその位置にコピペ」。位置は歩行の地点（kamiyain・seyakuin）と同じ。敷地と建物は大内裏の内膳司（585×740）・中和院（591×990）を x×.94（大内裏の倍率）で写した推定。
  kamiyain:{name:'紙屋院',x:-9272,z:-663,w:1213,d:1215,gateX:330,gateSide:'S',riverGates:[[-430,60,'gate'],[-170,26,'water'],[250,60,'gate'],[470,60,'gate']],certainty:'所在は確かでない。一町を塀で囲み、川側（東）に大内裏の内膳司の建物を写し、西を干し場と蔵にした推定'},seyakuin:{name:'施薬院',x:12060,z:43156,w:1213,d:1195,gateSide:'S',certainty:'左京九条三坊の辺りは推定。一町を塀で囲み、中央に大内裏の中和院の建物を写し、西に薬草園、東に蔵を置いた推定'},
+ // 2026-10-08 井内さん「右京のカーソルのあるあたりの空き地に悲田院を。西寺の倉垣院と同じものをその街区に」「左京側もほぼ対象の位置に」。右京＝九条大路の北の最南の列（湿地の未利用街区）、左京＝その鏡映し（庶民街区1町を置き換え）。建物は西寺の倉垣院（本院の堂1・倉3）を写した推定。
+ hideninUkyo:{name:'悲田院（右京）',x:-12059.85,z:44470.85,w:1212.9,d:1192,gateSide:'S',certainty:'右京九条の辺りは推定。一町を塀で囲み、西寺の倉垣院（堂1・倉3）をそのまま写した推定'},hideninSakyo:{name:'悲田院（左京）',x:12059.85,z:44470.85,w:1212.9,d:1192,gateSide:'S',certainty:'左京九条の辺りは推定（右京の悲田院のほぼ鏡映し）。一町を塀で囲み、西寺の倉垣院（堂1・倉3）をそのまま写した推定'},
  // 七条・朱雀両側の位置は史料準拠。1町×南北2町、七条大路側南門、南北軸の左右対称平面は図と官衙形式からの推定。
  eastKorokan:{name:'東鴻臚館',x:1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
  westKorokan:{name:'西鴻臚館',x:-1030.2,z:32994,w:1212,d:2503.5,gateSide:'S',certainty:'七条・朱雀両側は確定、1町×南北2町と南向き左右対称平面は推定'},
@@ -29982,7 +30048,7 @@ const HEIAN_LANDMARK_SITES={
  suzakuin:{name:'朱雀院',x:-1696.8,z:15320.2,w:2545.2,d:5199.4,certainty:'位置と8町規模は史料準拠、殿舎平面・池形・門位置は推定'},
  tobatsu:{name:'鳥羽津',x:1280,z:72300,w:800,d:560}
 };
-const HEIAN_OFFICIAL_COMPOUND_IDS=Object.freeze(['daigakuryo','kokuso','ukyoShiki','sakyoShiki','kobunin','shogakuin','kangakuin','kamiyain','seyakuin']);
+const HEIAN_OFFICIAL_COMPOUND_IDS=Object.freeze(['daigakuryo','kokuso','ukyoShiki','sakyoShiki','kobunin','shogakuin','kangakuin','kamiyain','seyakuin','hideninUkyo','hideninSakyo']);
 // 🚫 HEIAN_LANDMARK_SITES（東寺・神泉苑・市など）だけを見ていたため、朱雀院・冷泉院・六條院などの
 //    離宮・大邸宅と町堂（六角堂・因幡堂）の境内が「施設の外」と判定され、牛車や街路MOBがその中に湧いて
 //    塀を抜けて出てきていた（2026-08-30井内さん「夜なのに朱雀院から壁を通り抜けて出てきた」。
@@ -30108,6 +30174,19 @@ function makeHeianOfficialCompound(id){
    store(345,-300,'薬蔵');store(430,-300,'施薬蔵');store(515,-300,'貯蔵蔵');
    hall(stores,430,-60,200,80,22,14,'調薬所',true);hall(stores,430,110,160,70,20,12,'煎薬所',true);
    plant(-100,-10,'前庭梅',.9);plant(100,-10,'前庭梅',.9);plant(-250,480,'外周松',.9);plant(250,480,'外周松',.9);plant(-560,480,'外周松',.9);plant(560,480,'外周松',.9);plant(-100,420,'前庭梅',.9);plant(100,420,'前庭梅',.9);
+  }else if(id==='hideninUkyo'||id==='hideninSakyo'){
+   // 悲田院＝西寺の倉垣院（本院の堂300×130と倉3棟90×140・同じ高さ）を一町に写す（2026-10-08 井内さん）。
+   //  倉垣院は北の堂（0,-260）と倉の列。門は南の中央なので、倉の列は中心線（x±100）を空けて片側へ寄せる。
+   //  🚫 西寺の倉垣院は倉の列を堂と同じ高さ・重なる位置に置いている（x-690が堂の中）。ここでは重ねず南へ下げた
+   const sx=id==='hideninSakyo'?1:-1; // 右京は西側・左京は東側（外側）へ倉を寄せる
+   formalHall(main,0,-260,300,130,24,14,'本院の堂');
+   for(let i=0;i<3;i++)formalHall(stores,sx*(160+i*130),60,90,140,24,10,'倉');
+   // 蔵を2棟足す（2026-10-08 井内さん「悲田院には蔵を2個」）。倉の列の反対側（門の道を挟んだ向かい）に高床の板倉を2棟。扉は中心線の側へ向く（store が z>0 で北向きにする）
+   store(-sx*260,300,'板倉');store(-sx*390,300,'板倉');
+   // 木（2026-10-08 井内さん「いくつかの木を植えたい」）。北の塀ぎわに松、東西の塀ぎわに松、門の前庭に柳と梅。倉の列(x115〜465・z-10〜130)・新しい板倉・堂・門の道(x±100)は避ける
+   for(const[x,z]of[[-450,-480],[-250,-500],[250,-500],[450,-480],[-520,-200],[520,-200],[-520,100],[520,100],[-520,420],[520,420]])plant(x,z,'外周松',.95);
+   for(const[x,z]of[[-200,440],[200,440],[-350,500],[350,500]])plant(x,z,'前庭柳',1);
+   plant(-sx*300,60,'中庭松',1);plant(-140,-60,'前庭梅',.9);plant(140,-60,'前庭梅',.9);
   }else{
    formalHall(main,0,-300,430,140,27,18,'講堂');hall(lodgings,-350,100,110,430,22,14,'西寄宿舎',true);hall(lodgings,350,100,110,430,22,14,'東寄宿舎',true);
    hall(lodgings,0,230,320,100,21,13,id==='kangakuin'?'政所':'学頭所',true);store(-200,390,'倉');
@@ -32325,7 +32404,7 @@ async function makeHeianTerrain(){
   // 羅城門の内の空閑地2町も坊城で囲む
   if(city.bomonGates!==13||city.bomonRoads!==7||city.bomonSides!==2||city.bomonOpening!==72||city.suzakuWallSegments<25
    ||city.suzakuWallThick!==15||city.suzakuWallHeight!==24||city.suzakuWallInnerFace!==424.2||city.suzakuWallMeshes!==3||city.rajomonVacant?.length!==2)throw new Error('坊門・坊城が不正です '+JSON.stringify({gates:city.bomonGates,roads:city.bomonRoads,sides:city.bomonSides,opening:city.bomonOpening,walls:city.suzakuWallSegments,thick:city.suzakuWallThick,height:city.suzakuWallHeight,inner:city.suzakuWallInnerFace,meshes:city.suzakuWallMeshes,vacant:city.rajomonVacant}));
-  if(city.blocks!==1062/* 1064→1062: 紙屋院・施薬院を官式敷地として予約（2026-10-07）。 1069→1064: 菅原院1町・紅梅殿白梅殿2町・亭子院2町を史料位置へ予約（2026-08-20） */||city.roads!==90||!city.canalRoadSplit||city.canalRoadRecords!==5||Math.abs(city.canalOpeningWidth-76.6)>.001||Math.abs(city.canalSideRoadWidth-22.3)>.001||city.roadFadeRegion!=='右京南西低湿地'||city.roadFadeVertices<1||city.roadFadeMin>.04||!city.roadVertexAlpha||city.blockFadeRegion!=='右京南西低湿地'||city.blockFadeCells<1||city.blockFadeMin>.02||!city.blockInstanceAlpha||city.northRows!==10||city.northRoads!==23||city.eastMarketX!==7284.6||city.eastMarketZ!==32994||city.westMarketX!==-7284.6||city.westMarketZ!==32994||!city.palaceClear||city.palaceIntrusions!==0||city.templeReservedBlocks!==16||!city.templeRoadClear||city.templeRoadIntrusions!==0||city.shinsenenReservedBlocks!==6||city.shinsenenBoundaryRoads<4 /* 4→1以上: 条坊の実寸化で行ピッチが変わり南北縁が道路に乗らない。東縁=大宮大路の内縁のみ一致（2026-08-18） */||city.officialReservedBlocks!==15/* 13→15: 紙屋院・施薬院（2026-10-07） */||city.officialRoadIntrusions!==0||city.korokanReservedBlocks!==4||city.korokanRoadIntrusions!==0||city.paddyCells!==0||city.paddyWaterPlots!==0||city.paddyLevees!==0||city.paddyRoadIntrusions!==0||city.paddySiteIntrusions!==0||city.reservedSiteIntrusions!==0||!city.sideRoadsContinuous||city.northBoundaryRoadSpans!==1||city.northBoundaryRoadWidth!==242.4 /* 一条大路は通常の大路24m（2026-08-18） */||city.northBoundaryRoadZ!==-7150||city.palaceSideRoadX!==5817.6 /* 大内裏を挟むのは大宮大路（2026-08-18） */||city.palaceBoundaryRoads!==4||city.palaceRoadOverlapArea!==0||city.paddyMeshes!==4||city.outerPaddyCells<200||city.outerPaddyMeshes!==0||!city.farmland||city.farmland.squares<600||city.farmland.insideCity!==0||city.farmland.waterIntrusions!==0||city.farmland.hamletIntrusions!==0/* 1.83 都の外の田（heianFarmland） */||city.outerPaddyRoadIntrusions!==0||city.outerPaddyWaterIntrusions!==0||city.outerPaddyInsideCity!==0)throw new Error('街区配置が不正です '+JSON.stringify(city));
+  if(city.blocks!==1060/* 1062→1060: 悲田院2（右京・左京）を官式敷地として予約（2026-10-08）。 1064→1062: 紙屋院・施薬院を官式敷地として予約（2026-10-07）。 1069→1064: 菅原院1町・紅梅殿白梅殿2町・亭子院2町を史料位置へ予約（2026-08-20） */||city.roads!==90||!city.canalRoadSplit||city.canalRoadRecords!==5||Math.abs(city.canalOpeningWidth-76.6)>.001||Math.abs(city.canalSideRoadWidth-22.3)>.001||city.roadFadeRegion!=='右京南西低湿地'||city.roadFadeVertices<1||city.roadFadeMin>.04||!city.roadVertexAlpha||city.blockFadeRegion!=='右京南西低湿地'||city.blockFadeCells<1||city.blockFadeMin>.02||!city.blockInstanceAlpha||city.northRows!==10||city.northRoads!==23||city.eastMarketX!==7284.6||city.eastMarketZ!==32994||city.westMarketX!==-7284.6||city.westMarketZ!==32994||!city.palaceClear||city.palaceIntrusions!==0||city.templeReservedBlocks!==16||!city.templeRoadClear||city.templeRoadIntrusions!==0||city.shinsenenReservedBlocks!==6||city.shinsenenBoundaryRoads<4 /* 4→1以上: 条坊の実寸化で行ピッチが変わり南北縁が道路に乗らない。東縁=大宮大路の内縁のみ一致（2026-08-18） */||city.officialReservedBlocks!==17/* 15→17: 悲田院2（2026-10-08）、13→15: 紙屋院・施薬院（2026-10-07） */||city.officialRoadIntrusions!==0||city.korokanReservedBlocks!==4||city.korokanRoadIntrusions!==0||city.paddyCells!==0||city.paddyWaterPlots!==0||city.paddyLevees!==0||city.paddyRoadIntrusions!==0||city.paddySiteIntrusions!==0||city.reservedSiteIntrusions!==0||!city.sideRoadsContinuous||city.northBoundaryRoadSpans!==1||city.northBoundaryRoadWidth!==242.4 /* 一条大路は通常の大路24m（2026-08-18） */||city.northBoundaryRoadZ!==-7150||city.palaceSideRoadX!==5817.6 /* 大内裏を挟むのは大宮大路（2026-08-18） */||city.palaceBoundaryRoads!==4||city.palaceRoadOverlapArea!==0||city.paddyMeshes!==4||city.outerPaddyCells<200||city.outerPaddyMeshes!==0||!city.farmland||city.farmland.squares<600||city.farmland.insideCity!==0||city.farmland.waterIntrusions!==0||city.farmland.hamletIntrusions!==0/* 1.83 都の外の田（heianFarmland） */||city.outerPaddyRoadIntrusions!==0||city.outerPaddyWaterIntrusions!==0||city.outerPaddyInsideCity!==0)throw new Error('街区配置が不正です '+JSON.stringify(city));
   if(nobles.residences!==176/* 175→176: 紅梅殿・白梅殿を小路を挟む1町邸×2へ分割（2026-08-20） */||nobles.mixedEstateTowns!==32/* 33→32: 紅梅殿・白梅殿の予約街区が従来の混在町1件を置換 */||nobles.plots!==34||nobles.parcelGrid?.cols!==4||nobles.parcelGrid?.rows!==8||nobles.parcelGrid?.units!==32||nobles.parcelSpecErrors!==0||nobles.parcelAlignmentErrors!==0||nobles.architectureScaleErrors!==0||nobles.northSakyo13FullChoPlots<3||nobles.southOfNijoFullChoPlots<2/* 15/20/49/44/48→17/23/45/43/48: 1町の名邸5件（菅原院・小二条院をv1、町尻殿・紅梅殿・白梅殿をv2）を
    敷地に見合うテンプレへ上げた（2026-09-11井内さん「家司の建物、牛車関連、井戸なんかがないよ」） */
    /* 17/23/45/43→19/23/44/42: 紅梅殿v2→v1、亭子院の2棟をv3+v4→v1+v2（2026-09-12） */
@@ -32361,13 +32440,13 @@ async function makeHeianTerrain(){
     throw new Error('車宿の牛車が不正です '+JSON.stringify({...an,kurumaEstates,residences:nobles.residences}));}
   const badGrades=Object.entries(grades).filter(([,g])=>g.vertices<1||g.intrusions!==0||(g.grade==='slope'?(g.northRiseMm<=0||g.reliefMm<=0):g.flatnessMm>.01));
   const entranceGrade=grades.daidairiSouthEntrance||{};
-  if(t.gradedSites!==26||badGrades.length|| /* 24→26: 紙屋院・施薬院（2026-10-07）、17→19: 京内神社2社、→20: 淀津（2026-08-17）、→21: 鳥羽津（2026-08-18）、→22: 朱雀門前の平坦帯（2026-08-19）、→24: 市比賣社（2026-09-11） */entranceGrade.grade!=='flat'||entranceGrade.flatnessMm>.01||entranceGrade.reliefMm>.01)throw new Error('敷地造成が不正です gradedSites='+t.gradedSites+' entranceFlatness='+entranceGrade.flatnessMm+' bad='+badGrades.map(([id,g])=>id+':v'+g.vertices+'/relief'+g.flatnessMm+'/intrusions'+g.intrusions).join(','));
+  if(t.gradedSites!==28||badGrades.length|| /* 26→28: 悲田院2（2026-10-08）、24→26: 紙屋院・施薬院（2026-10-07）、17→19: 京内神社2社、→20: 淀津（2026-08-17）、→21: 鳥羽津（2026-08-18）、→22: 朱雀門前の平坦帯（2026-08-19）、→24: 市比賣社（2026-09-11） */entranceGrade.grade!=='flat'||entranceGrade.flatnessMm>.01||entranceGrade.reliefMm>.01)throw new Error('敷地造成が不正です gradedSites='+t.gradedSites+' entranceFlatness='+entranceGrade.flatnessMm+' bad='+badGrades.map(([id,g])=>id+':v'+g.vertices+'/relief'+g.flatnessMm+'/intrusions'+g.intrusions).join(','));
   if(approach.routes!==13||approach.yellowIncluded!==false||approach.width!==140||approach.color!==HEIAN_ROAD_COLOR/* 道の不透明化と同色（2026-08-19） */||approach.segments!==235/* 160→235: 東海道・北東街道・南東街道を地形DEMの谷筋へ引き直した（2026-08-25） */||approach.outOfBounds!==0||approach.drawCalls!==1||approach.kamoCrossings!==5||approach.kamoBankRoutes!==1||approach.cityEdgeStarts!==11||approach.gateStarts!==12||approach.northeastCornerEast!==true||approach.imadegawaEastWest!==true||approach.shirakawaFromKonoe!==true||approach.tokaidoFromSanjo!==true||approach.riverFollowingRoutes!==7||approach.riverAnchors!==7||approach.riverAligned!==7||approach.valleyAnchors!==10||approach.valleyAligned!==10||approach.passAnchors!==4||approach.passAligned!==4||approach.mountainFoots!==1||approach.mountainFootsAligned!==1||approach.avenueExtensions!==2||!approach.avenueStraight||approach.avenueWidths?.['nijo-east']!==140||approach.avenueWidths?.['sanjo-east']!==300||approach.ridgeWarnings!==0||approach.lakeShoreConnections!==5||approach.lakeShoreAligned!==5||approach.waterIntrusions!==0||!approach.southStraightToFirstRiver||approach.bankAdjustedPoints<1||approach.maxBankPasses!==6||approach.riverOverlapSamples!==0||approach.southwestBranch?.southOfRajomonM!==20||!approach.southwestBranch?.onSouthRoad||approach.traceVersion!==10)throw new Error('周辺街道が不正です '+JSON.stringify(approach));
   // ?skipDaidairi=1（検証モード）は大内裏を作らないので、大内裏に依存する3条件だけ外す。
   // 🚫 地形66.4分のうち大内裏が66.2分。これを外せば14秒で地形が作れ、荷車の接地影・町堂の門・
   //    住宅・群衆といった「地形の中にしか無いもの」を焼かずに確認できる（2026-08-30）
   const skipD=HEIAN_SKIP_DAIDAIRI;
-  if((skipD?landmarks.models!==21:landmarks.models!==22)|| /* →21/22: 紙屋院・施薬院（2026-10-07）。17→18: 神泉苑の乾臨閣・塀・門（2026-08-19）、→20: 市比賣社（2026-09-11） */landmarks.sites!==18||landmarks.siteCanalIntrusions?.length!==0/* 敷地が堀川・西堀川の開渠に載っていないか（2026-09-11） */||landmarks.officialCompounds!==9/* 7→9: 紙屋院・施薬院 */||landmarks.kokusoCarts!==3||landmarks.kokusoCartDeckSizes?.length!==3||landmarks.kokusoCartDeckSizes.some(size=>size[0]!==22||size[1]!==46)||landmarks.kokusoCartWheels!==6||landmarks.kokusoCartWheelSizes?.length!==6||landmarks.kokusoCartWheelSizes.some(size=>size[0]!==1.8||size[1]!==17.2||size[2]!==17.2)||landmarks.meshes<2000||landmarks.gradedSites!==26/* 24→26: 紙屋院・施薬院（2026-10-07） */|| /* 京内神社2社＋淀津（2026-08-17）＋鳥羽津（2026-08-18）＋朱雀門前平坦帯（2026-08-19）＋市比賣社（2026-09-11） */landmarks.terrainIntrusions!==0||landmarks.shinsenenPondMeshes!==1||landmarks.shinsenenShoreMeshes!==1||landmarks.shinsenenShoreMode!=='outer-offset-jitter'||landmarks.shinsenenShoreColor!=='#d9eff0'||landmarks.shinsenenShoreOpacity!==HEIAN_POND_SHORE_OPACITY||landmarks.shinsenenPondShape!=='irregular-closed-curve'||landmarks.shinsenenPondVertices<48||landmarks.shinsenenX!==4363.2||landmarks.ryubidanFlags!==12/* 8→12: 朱6・白6（2026-10-01） */||landmarks.ryubidanFlagPoles!==12||window.__heianWindFlagInfo?.()?.red!==6||window.__heianWindFlagInfo?.()?.white!==6||landmarks.eastMarket?.z!==32994||landmarks.marketStalls?.stalls!==95/* 96→95: 北東角の1つを市比賣社へ（2026-09-12） */||landmarks.marketStalls?.removedForShrine!==1||landmarks.marketStalls?.drawCalls!==8/* 4→6: 周囲の商いゴザと野菜の2meshを追加した分（2026-08-24）。6→8: 店の標の柱と札（2026-10-02） */||landmarks.marketStalls?.roofStyle!=='板葺き切妻'||landmarks.marketStalls?.roofColor!==SHINDEN_PART_PALETTE.roof/* #594939→庶民の家と同じ屋根（2026-10-02） */||!(landmarks.marketStalls?.signs>=90)||landmarks.marketStalls?.canopySize?.[0]!==80||landmarks.marketStalls?.canopySize?.[2]!==50||landmarks.marketStalls?.coverage?.[0]<2000||landmarks.marketStalls?.coverage?.[1]<1700||landmarks.eastKorokan?.x!==1030.2 /* 町割りへ合わせた（2026-08-18） */ /* 朱雀大路の縁へ戻した（2026-08-18） */||landmarks.eastKorokan?.z!==32994||landmarks.eastKorokan?.w!==1212||landmarks.eastKorokan?.d!==2503.5||landmarks.westKorokan?.x!==-1030.2||landmarks.westKorokan?.z!==32994||landmarks.westKorokan?.w!==1212||landmarks.westKorokan?.d!==2503.5||landmarks.korokanSymmetry?.eastBodies!==landmarks.korokanSymmetry?.westBodies||!landmarks.korokanSymmetry?.sameOrientation||!landmarks.korokanSymmetry?.samePlan||!landmarks.korokanSymmetry?.siteContainment||!landmarks.korokanSymmetry?.internalSymmetry||(!skipD&&(landmarks.placements?.daidairi?.grade!=='slope'||landmarks.placements?.daidairi?.hiddenGround!==1||landmarks.placements?.daidairi?.southGateMinClearanceMm<-.05||landmarks.placements?.daidairi?.southGateTerrainSpreadMm>.6))/* .01→.6: 官学地区を二条大路へ寄せた分、学寮の造成テラスが朱雀門前台地に隣接し、翼部の標本点が段差の補間帯へ掛かる（実測spread=.467=実寸5cm・2026-08-19） */||landmarks.placements?.rajomon?.z!==HEIAN_RAJOMON_Z||landmarks.placements?.toji?.x!==4363.2||landmarks.placements?.toji?.z!==42504.7 /* 南端を九条大路の北縁へ載せた（2026-08-18） */||landmarks.placements?.saiji?.x!==-4363.2||landmarks.placements?.saiji?.z!==42504.7)throw new Error('主要施設配置が不正です models='+landmarks.models+' sites='+landmarks.sites+' meshes='+landmarks.meshes+' gradedSites='+landmarks.gradedSites+' terrainIntrusions='+landmarks.terrainIntrusions+' shinsenenPondMeshes='+landmarks.shinsenenPondMeshes+' shinsenenX='+landmarks.shinsenenX+' eastKorokan='+landmarks.eastKorokan?.x+','+landmarks.eastKorokan?.z+' westKorokan='+landmarks.westKorokan?.x+','+landmarks.westKorokan?.z+' daidairiGrade='+landmarks.placements?.daidairi?.grade+' hiddenGround='+landmarks.placements?.daidairi?.hiddenGround+' toji='+landmarks.placements?.toji?.x+','+landmarks.placements?.toji?.z+' saiji='+landmarks.placements?.saiji?.x+','+landmarks.placements?.saiji?.z);
+  if((skipD?landmarks.models!==23:landmarks.models!==24)|| /* →23/24: 悲田院2（2026-10-08）、→21/22: 紙屋院・施薬院（2026-10-07）。17→18: 神泉苑の乾臨閣・塀・門（2026-08-19）、→20: 市比賣社（2026-09-11） */landmarks.sites!==18||landmarks.siteCanalIntrusions?.length!==0/* 敷地が堀川・西堀川の開渠に載っていないか（2026-09-11） */||landmarks.officialCompounds!==11/* 9→11: 悲田院2（2026-10-08）、7→9: 紙屋院・施薬院 */||landmarks.kokusoCarts!==3||landmarks.kokusoCartDeckSizes?.length!==3||landmarks.kokusoCartDeckSizes.some(size=>size[0]!==22||size[1]!==46)||landmarks.kokusoCartWheels!==6||landmarks.kokusoCartWheelSizes?.length!==6||landmarks.kokusoCartWheelSizes.some(size=>size[0]!==1.8||size[1]!==17.2||size[2]!==17.2)||landmarks.meshes<2000||landmarks.gradedSites!==28/* 26→28: 悲田院2（2026-10-08）、24→26: 紙屋院・施薬院（2026-10-07） */|| /* 京内神社2社＋淀津（2026-08-17）＋鳥羽津（2026-08-18）＋朱雀門前平坦帯（2026-08-19）＋市比賣社（2026-09-11） */landmarks.terrainIntrusions!==0||landmarks.shinsenenPondMeshes!==1||landmarks.shinsenenShoreMeshes!==1||landmarks.shinsenenShoreMode!=='outer-offset-jitter'||landmarks.shinsenenShoreColor!=='#d9eff0'||landmarks.shinsenenShoreOpacity!==HEIAN_POND_SHORE_OPACITY||landmarks.shinsenenPondShape!=='irregular-closed-curve'||landmarks.shinsenenPondVertices<48||landmarks.shinsenenX!==4363.2||landmarks.ryubidanFlags!==12/* 8→12: 朱6・白6（2026-10-01） */||landmarks.ryubidanFlagPoles!==12||window.__heianWindFlagInfo?.()?.red!==6||window.__heianWindFlagInfo?.()?.white!==6||landmarks.eastMarket?.z!==32994||landmarks.marketStalls?.stalls!==95/* 96→95: 北東角の1つを市比賣社へ（2026-09-12） */||landmarks.marketStalls?.removedForShrine!==1||landmarks.marketStalls?.drawCalls!==8/* 4→6: 周囲の商いゴザと野菜の2meshを追加した分（2026-08-24）。6→8: 店の標の柱と札（2026-10-02） */||landmarks.marketStalls?.roofStyle!=='板葺き切妻'||landmarks.marketStalls?.roofColor!==SHINDEN_PART_PALETTE.roof/* #594939→庶民の家と同じ屋根（2026-10-02） */||!(landmarks.marketStalls?.signs>=90)||landmarks.marketStalls?.canopySize?.[0]!==80||landmarks.marketStalls?.canopySize?.[2]!==50||landmarks.marketStalls?.coverage?.[0]<2000||landmarks.marketStalls?.coverage?.[1]<1700||landmarks.eastKorokan?.x!==1030.2 /* 町割りへ合わせた（2026-08-18） */ /* 朱雀大路の縁へ戻した（2026-08-18） */||landmarks.eastKorokan?.z!==32994||landmarks.eastKorokan?.w!==1212||landmarks.eastKorokan?.d!==2503.5||landmarks.westKorokan?.x!==-1030.2||landmarks.westKorokan?.z!==32994||landmarks.westKorokan?.w!==1212||landmarks.westKorokan?.d!==2503.5||landmarks.korokanSymmetry?.eastBodies!==landmarks.korokanSymmetry?.westBodies||!landmarks.korokanSymmetry?.sameOrientation||!landmarks.korokanSymmetry?.samePlan||!landmarks.korokanSymmetry?.siteContainment||!landmarks.korokanSymmetry?.internalSymmetry||(!skipD&&(landmarks.placements?.daidairi?.grade!=='slope'||landmarks.placements?.daidairi?.hiddenGround!==1||landmarks.placements?.daidairi?.southGateMinClearanceMm<-.05||landmarks.placements?.daidairi?.southGateTerrainSpreadMm>.6))/* .01→.6: 官学地区を二条大路へ寄せた分、学寮の造成テラスが朱雀門前台地に隣接し、翼部の標本点が段差の補間帯へ掛かる（実測spread=.467=実寸5cm・2026-08-19） */||landmarks.placements?.rajomon?.z!==HEIAN_RAJOMON_Z||landmarks.placements?.toji?.x!==4363.2||landmarks.placements?.toji?.z!==42504.7 /* 南端を九条大路の北縁へ載せた（2026-08-18） */||landmarks.placements?.saiji?.x!==-4363.2||landmarks.placements?.saiji?.z!==42504.7)throw new Error('主要施設配置が不正です models='+landmarks.models+' sites='+landmarks.sites+' meshes='+landmarks.meshes+' gradedSites='+landmarks.gradedSites+' terrainIntrusions='+landmarks.terrainIntrusions+' shinsenenPondMeshes='+landmarks.shinsenenPondMeshes+' shinsenenX='+landmarks.shinsenenX+' eastKorokan='+landmarks.eastKorokan?.x+','+landmarks.eastKorokan?.z+' westKorokan='+landmarks.westKorokan?.x+','+landmarks.westKorokan?.z+' daidairiGrade='+landmarks.placements?.daidairi?.grade+' hiddenGround='+landmarks.placements?.daidairi?.hiddenGround+' toji='+landmarks.placements?.toji?.x+','+landmarks.placements?.toji?.z+' saiji='+landmarks.placements?.saiji?.x+','+landmarks.placements?.saiji?.z);
   if(!(t.kamoGravelVertices>0)||!(t.kamoWaterVertices>0)||!(t.kamoSourceWays>0)||t.kamoChannels!==t.kamoSourceWays*3||!(t.kamoWaterWidthRatio>0&&t.kamoWaterWidthRatio<.4)||t.kamoWidthProfile?.upstream!==0||t.kamoWidthProfile?.mountainFoot!==.25||t.kamoWidthProfile?.sanjo!==1||t.kamoWidthProfile?.tobatsu!==2.4/* 三条以南の連続拡幅（2026-08-20） */||t.kamoWidthProfile?.waterAtKujo!==1||Math.abs(t.kamoWidthProfile?.waterSouthOfKujo-1.15)>.001||Math.abs(t.kamoWidthProfile?.waterTobatsu-1.15)>.001||t.kamoWidthProfile?.waterFlowStartZ!==46500||t.kamoWidthProfile?.waterFlowFullZ!==55000||t.kamoWidthProfile?.waterFlowGain!==.15||!(t.kamoMainChannelScale>1&&t.kamoMainChannelScale<1.4)||t.takanoWidthScale!==.55||!t.kamoFord||t.kamoWalkable!==true)throw new Error('鴨川の河原・細流・徒歩横断設定が不正です '+JSON.stringify({gravel:t.kamoGravelVertices,water:t.kamoWaterVertices,ways:t.kamoSourceWays,channels:t.kamoChannels,ratio:t.kamoWaterWidthRatio,ford:t.kamoFord,walkable:t.kamoWalkable}));
   if(!(t.katsuraGravelVertices>0)||!(t.katsuraWaterVertices>0)||!(t.katsuraSourceWays>0)||t.katsuraChannels!==t.katsuraSourceWays||t.katsuraWaterWidthRatio!==.6||!(t.katsuraWidthProfile?.mountain<t.katsuraWidthProfile?.foothill&&t.katsuraWidthProfile?.foothill<t.katsuraWidthProfile?.cityWest&&t.katsuraWidthProfile?.cityWest<t.katsuraWidthProfile?.plain)||t.katsuraWalkable!==true)throw new Error('桂川の白石河原・単流路・裾野拡幅が不正です '+JSON.stringify({gravel:t.katsuraGravelVertices,water:t.katsuraWaterVertices,ways:t.katsuraSourceWays,channels:t.katsuraChannels,ratio:t.katsuraWaterWidthRatio,profile:t.katsuraWidthProfile}));
   if(!(t.ukyoMinorRivers>0)||t.ukyoMinorWidthScale!==.55||!t.westHorikawaPreserved)throw new Error('右京周辺の細流縮小または西堀川除外が不正です '+JSON.stringify({rivers:t.ukyoMinorRivers,scale:t.ukyoMinorWidthScale,westHorikawa:t.westHorikawaPreserved}));
