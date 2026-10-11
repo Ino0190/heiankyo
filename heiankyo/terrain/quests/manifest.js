@@ -12,6 +12,11 @@ window.HEIAN_CONTENT_FILES=[
  // 'quests/ban-family.js',        // 伴吉継・伴真成・伴若成
  // 'quests/relationships.js',     // 人物横断（誰と誰が知り合いか）
  // 'quests/seasonal-autumn.js',   // 重陽・紅葉・初寒
+ 'quests/facilities-kamiyain.js',    // 紙屋院（paper・dry・carry）＋「乾かない一枚」（2026-10-10）
+ 'quests/facilities-mokumachi.js',   // 木工町（carry・saw）
+ 'quests/facilities-shurishiki.js',  // 修理職町（hammer・raft）
+ 'quests/facilities-seyakuin.js',    // 施薬院（herb・cook）
+ 'quests/facilities-hidenin.js',     // 悲田院（wait・sit・sweep）
 ];
 // 試験用。ゲームを ?devpacks=1 で開いたときだけ読む（本番の人は読まない）。データだけで追加できることの確認用
 window.HEIAN_CONTENT_DEV_FILES=[

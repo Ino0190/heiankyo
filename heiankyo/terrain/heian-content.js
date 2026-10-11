@@ -23,7 +23,8 @@ const eraParse=s=>/^(>=|<=|<|>)?(\w+)$/.exec(String(s));
 const eraOK=e=>arr(e).length>0&&arr(e).every(s=>{const m=eraParse(s);return !!m&&ERA.has(m[2]);});
 const dateOK=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isInteger)&&v[0]>=900&&v[0]<=922&&v[1]>=1&&v[1]<=12&&v[2]>=1&&v[2]<=30;
 // 条件 'a&b&c'（スペースは入れない）。使える項: q:名前(>=|<=|=|<|>)数／gate:名前／!gate:名前／done>=数／days:名前>=数／IFS の語。q: には ! を付けられない（本体が読まない）
-const QCOND=/^(q:\w+(>=|<=|=|<|>)\d+|!?gate:\w+|done>=\d+|days:\w+>=\d+)$/;
+// 2026-10-11 carry:stone|wood|bale（ロボが抱えている荷）・carrying（何か抱えている）。本体 heianSpeechCond が読む
+const QCOND=/^(q:\w+(>=|<=|=|<|>)\d+|!?gate:\w+|done>=\d+|days:\w+>=\d+|carry:(stone|wood|bale)|carrying)$/;
 function condProblem(c){
  if(typeof c!=='string'||!c)return '条件は空でない文字列';
  for(const p of c.split('&')){
@@ -34,12 +35,13 @@ function condProblem(c){
   return '「'+p+'」は使えない条件';}
  return null;}
 // 本体 heianSpeechTags が出す場所タグ（固定のもの）。地点 id・曹司の類・estate_／interior_／quirk_ は本体から受け取るか接頭辞で判定する
-const FIXED_AT=['any','street','daidairi','suzaku','matsunohara','sakyo','ukyo','kitabe','minamibe','kamo','tsuji','ikuhomon','kemari','kokuso','kokyu','soshi','south','suzakumon','yomeimon','interior','meryo','okura','efu','kuriya','jingikan','onmyo','tenyaku','shoin','kobo','gaku','shingon','zusho'];
-const FIXED_WHO=['売り子','客','官人','女房','家司','僧','検非違使','人夫','行商','童','母','女','衛士','学生','博士','旅人','船頭','庶民','牛飼童','従者','馬部','洗い女','炊女','下人','厩の者','火長'];
-const FN_NAMES=['omenDir','omenImi','omenHour','market','area','rumor','greet','lore','hoshi']; // 本体が渡せないときの控え。普段は engine.fns（heianDialogFn のキー）
-const SAY_KEYS=['at','who','when','if','t','n','kind','kishitsu','ware','era','from','until','go'];
+const FIXED_AT=['any','street','daidairi','suzaku','matsunohara','sakyo','ukyo','kitabe','minamibe','kamo','tsuji','ikuhomon','kemari','kokuso','kokyu','soshi','south','suzakumon','yomeimon','interior','meryo','okura','efu','kuriya','jingikan','onmyo','tenyaku','shoin','kobo','gaku','shingon','zusho',
+ 'kamiyain','seyakuin','mokumachi','shurishikimachi','hideninUkyo','hideninSakyo']; // 2026-10-10: 紙屋院・施薬院・木工町・修理職町・悲田院2（HEIAN_GAME_LOCATIONS の正式な地点id）
+const FIXED_WHO=['売り子','客','官人','女房','家司','僧','検非違使','人夫','行商','童','母','女','衛士','学生','博士','旅人','船頭','庶民','牛飼童','従者','馬部','洗い女','炊女','下人','厩の者','火長','施しを受ける人','施しを待つ人'];
+const FN_NAMES=['omenDir','omenImi','omenHour','market','area','rumor','greet','lore','hoshi','omenHyakki','rumorHyakki']; // 本体が渡せないときの控え。普段は engine.fns（heianDialogFn のキー）
+const SAY_KEYS=['at','who','when','if','t','n','kind','kishitsu','ware','era','from','until','go','life'];
 const TALK_KEYS=['at','who','when','if','lines','n','kind','era','from','until'];
-const DIALOG_KEYS=['id','char','who','at','if','when','title','start','nodes','n','era','from','until','tier','auto','keep','noExtra'];
+const DIALOG_KEYS=['id','char','who','at','if','when','title','start','nodes','n','era','from','until','tier','auto','keep','noExtra','life'];
 const NODE_KEYS=['t','c','set','end','gate','n'];
 const internalState=k=>/^[a-z]{1,2}_/.test(k); // 途中の印（bk_・xx_・bn_・iy_ など2字までの接頭辞）。頼みごと名の登録は要らない
 
@@ -56,6 +58,9 @@ function validate(L,opt){
  for(const o of [...say,...talk,...dialogs])if(isObj(o)&&isBase(o)){arr(o.at).forEach(a=>knownAt.add(a));arr(o.who).forEach(w=>knownWho.add(w));}
  const atOK=a=>knownAt.has(a)||/^(estate_|interior_|quirk_)\w+$/.test(a);
  const fnOK=new Set(eng.fns&&eng.fns.length?eng.fns:FN_NAMES);
+ // 2026-10-10: 作業役（life）の一覧は本体 HEIAN_DAILY_LIFE_HOURS が正本（opt.engine.life 経由）。role 名をここへハードコードしない
+ const knownLife=new Set(eng.life&&eng.life.length?eng.life:(()=>{const s=new Set();for(const o of [...say,...dialogs])if(isObj(o))arr(o.life).forEach(l=>s.add(l));return s;})());
+ const lifeOK=l=>knownLife.has(l);
  const uses=[],setNames=new Set(); // 頼みごとの状態名の使われ方 [名前,持ち主,場所]
  const useCond=(c,o,w)=>{if(typeof c!=='string')return;for(const m of c.matchAll(/q:(\w+)/g))uses.push([m[1],o,w]);};
  const lab=(o,i,kind)=>kind+'['+i+']'+(o.id?'('+o.id+')':typeof o.t==='string'?' 「'+o.t.slice(0,14)+'」':'');
@@ -63,6 +68,7 @@ function validate(L,opt){
  function common(o,w,needAt,needWho){
   if(needAt){const ats=arr(o.at);if(!ats.length)add('ng','no-at',o,w,'at が無い');for(const a of ats)if(typeof a!=='string'||!atOK(a))add('warn','unknown-at',o,w,'unknown at: '+a+'（本体が出す場所タグか、heian-lines.js で使われているタグか確かめる）');}
   if(needWho){const ws=arr(o.who);if(!ws.length)add('ng','no-who',o,w,'who が無い');for(const x of ws)if(!knownWho.has(x))add('warn','unknown-who',o,w,'unknown who: '+x+'（話し手の種類が本体に無いと出ない）');}
+  if(o.life!=null)for(const x of arr(o.life)){if(typeof x!=='string')add('ng','bad-life',o,w,'life は文字列（か文字列の配列）: '+JSON.stringify(x));else if(!lifeOK(x))add('warn','unknown-life',o,w,'unknown life: '+x+'（本体の作業役に無いと出ない。既知: '+[...knownLife].join('/')+'）');}
   for(const t of arr(o.when))if(!WHEN.has(t))add('ng','bad-when',o,w,'when「'+t+'」は使えない（'+[...WHEN].join('/')+'）');
   if(o.if!=null){const p=condProblem(o.if);if(p)add('ng','bad-cond',o,w,'if: '+p);else useCond(o.if,o,w);}
   if(o.era!=null&&!eraOK(o.era))add('ng','bad-era',o,w,'era「'+JSON.stringify(o.era)+'」は '+[...ERA.keys()].join('・')+'（>= < 付きも可）');
