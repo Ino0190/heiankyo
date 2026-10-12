@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="6c90bfdd6a61a705ec7e8a7b847ab6b8f4c98c2df939fafea9566c98904ce55a">
+<meta name="heian-release" content="8d797a6630d455f3d840aef2ec5ad11f768cc98ba7111be53b9ba7fe9c29dc69">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -312,7 +312,9 @@ body.heian-game #viewport{position:absolute;inset:0;width:100%;height:100%}
 /* スマホ（2026-09-27井内さん「スマホ版でもレイアウトは大丈夫？」）。🚫 PC と同じ bottom 152px・選択肢1列だと、窓が高さ310px で
    画面の中央（ロボと話し相手）を覆い、下の地点の解説とで下半分が埋まった（撮影 ph-street・ph-in）。
    ⇒ 開いている間は地点の解説を隠して窓を下端へ。選択肢は2列（1つ44px以上）、最後の「じゃあまた」だけ全幅 */
-@media(max-width:600px){
+/* 2026-10-11 スマホの横持ち（幅 667〜932px・高さ 330〜430px）も「スマホ」＝この 600px 以下の規則群を使う。幅だけで決めていたので、横持ちはPCのUIが縦に押し込まれて街がほぼ見えなかった。
+   判定は JS の HEIAN_COMPACT_MQ と同じ（pointer:coarse＝タッチ機。PCの低いウィンドウは対象外） */
+@media(max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
  #heianGameHud.heian-dialog-open .heian-game-info{display:none}
  #heianGameHud.heian-dialog-open .heian-speech{visibility:hidden} /* 話している間はまわりの吹き出しを出さない（狭い画面で窓の上に重なる） */
  .heian-dialog{bottom:10px;width:calc(100vw - 20px);padding:10px 12px}
@@ -362,9 +364,31 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-notebook .nb-day p{margin:0;line-height:1.75}
 .heian-notebook .nb-photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .heian-notebook .nb-photos img{width:160px;height:100px;object-fit:cover;border:1px solid rgba(96,76,52,.25)} /* スマホの縦長の絵が帳面いっぱいに伸びていた → 横長に切る */
+/* 2026-10-12 撮った絵の窓（日付・場所・天気・ひとこと → 日録に残す／共有する／画像を保存）と、帳面の「写真」 */
+.heian-shot-panel{position:absolute;z-index:7;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:rgba(250,246,236,.98);color:#2b241c;border:1px solid rgba(96,76,52,.35);border-radius:6px;pointer-events:auto;font-size:16px;line-height:1.6}
+.heian-shot-panel .sp-img{display:block;width:100%;max-height:46vh;object-fit:contain;background:#1b1712;border:1px solid rgba(96,76,52,.3)}
+.heian-shot-panel .sp-meta p{margin:0}
+.heian-shot-panel .sp-date,.heian-shot-panel .sp-place{font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:18px}
+.heian-shot-panel .sp-date{font-weight:600}
+.heian-shot-panel .sp-wx{font-size:15px;color:#6b5a44}
+.heian-shot-panel .sp-cap{display:flex;flex-direction:column;gap:4px;font-size:14px;color:#5a4632}
+.heian-shot-panel textarea{font:inherit;font-size:16px;padding:6px 10px;border:1px solid rgba(96,76,52,.35);border-radius:4px;background:#fffdf7;color:#2b241c;resize:vertical}
+.heian-shot-panel .sp-cap small{align-self:flex-end;color:#7a5634}
+.heian-shot-panel .sp-stamp{display:flex;align-items:center;gap:8px;font-size:15px;color:#5a4632}
+.heian-shot-panel .sp-stamp input{width:20px;height:20px}
+.heian-shot-panel .sp-btns{display:flex;flex-wrap:wrap;gap:8px}
+.heian-shot-panel .sp-btns button{flex:1 1 140px;min-height:48px;padding:8px 14px;font:inherit;font-size:16px;background:#f1e8d6;color:#4a3a28;border:1px solid rgba(96,76,52,.35);border-radius:4px;cursor:pointer}
+.heian-shot-panel .sp-btns button.primary{background:#7a5720;border-color:#7a5720;color:#fff4d8}
+.heian-shot-panel .sp-btns button:disabled{opacity:.6;cursor:default}
+.heian-shot-panel .sp-btns button[hidden]{display:none}
+.heian-shot-panel .sp-msg{margin:0;min-height:1.6em;font-size:15px;color:#7a5634}
+.heian-notebook .nb-shot{display:flex;gap:12px;align-items:flex-start}
+.heian-notebook .nb-shot img{width:160px;height:100px;object-fit:cover;flex:none;border:1px solid rgba(96,76,52,.25);cursor:pointer}
+.heian-notebook .nb-photos img.nb-shot-thumb{cursor:pointer}
+@media (max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-shot-panel{top:auto;bottom:8px;transform:translateX(-50%);width:calc(100vw - 16px);max-height:calc(100vh - 16px)}.heian-notebook .nb-shot img{width:120px;height:80px}}
 .heian-notebook .nb-row{display:flex;justify-content:space-between;gap:12px;width:100%;padding:10px 0;font:inherit;text-align:left;background:none;border:0;border-bottom:1px solid rgba(96,76,52,.15);color:#2b241c;cursor:pointer}
 .heian-notebook .nb-row small{color:#7a5634;font-size:14px}
-@media(max-width:600px){.heian-notebook{width:calc(100vw - 16px);height:calc(100vh - 24px)}.heian-notebook header{flex-wrap:wrap}.heian-notebook .nb-tabs{margin-left:0;order:3;width:100%}}
+@media(max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-notebook{width:calc(100vw - 16px);height:calc(100vh - 24px)}.heian-notebook header{flex-wrap:wrap}.heian-notebook .nb-tabs{margin-left:0;order:3;width:100%}}
 .heian-dialog-hint{position:absolute;z-index:3;left:50%;bottom:152px;transform:translateX(-50%);padding:6px 14px;font:inherit;font-size:16px;background:rgba(250,246,236,.92);color:#2b241c;border:1px solid rgba(96,76,52,.3);border-radius:6px;cursor:pointer;pointer-events:auto}
 /* 屋内へ入る・出る（2026-09-27）。話しかけるの案内（bottom 152px）の上に置く */
 .heian-interior-btn{position:absolute;z-index:3;left:50%;bottom:200px;transform:translateX(-50%);padding:6px 14px;font:inherit;font-size:16px;background:rgba(250,246,236,.92);color:#2b241c;border:1px solid rgba(96,76,52,.3);border-radius:6px;cursor:pointer;pointer-events:auto}
@@ -450,7 +474,7 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-mononoke{position:absolute;left:50%;top:96px;transform:translateX(-50%);max-width:min(620px,calc(100% - 32px));padding:8px 16px;background:rgba(8,10,16,.6);color:#c9ccd6;font-size:16px;letter-spacing:.05em;text-align:center;pointer-events:none;opacity:0;transition:opacity 1.2s;z-index:25}
 /* 参拝の一言（2026-09-28）。画面の中ほど上に、淡い金の縁で。光の粒と一緒に4秒で消える */
 .heian-blessing{position:absolute;left:50%;top:22%;transform:translateX(-50%);width:max-content/* 🚫 left:50% だと縮めた幅が画面の半分で打ち切られ、スマホで札が細く折り返した（2026-10-02 bj-p） */;max-width:min(560px,calc(100% - 32px));box-sizing:border-box;padding:16px 24px;background:rgba(24,20,12,.82);border:1px solid rgba(255,217,138,.55);color:#f6ecd4;text-align:center;pointer-events:none;opacity:0;z-index:30}
-@media (max-width:600px){.heian-blessing{top:38%}} /* スマホは右の動作ボタン（16〜36%）と重ねない（2026-10-02 bj-p） */
+@media (max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-blessing{top:38%}} /* スマホは右の動作ボタン（16〜36%）と重ねない（2026-10-02 bj-p） */
 .heian-blessing strong{display:block;font-size:18px;letter-spacing:.12em;color:#ffd98a;margin-bottom:6px}
 .heian-blessing p{margin:0;font-size:16px;line-height:1.7}.heian-blessing small{display:block;margin-top:6px;font-size:14px;color:#cdbf9f}
 .heian-game-info{position:absolute;left:16px;bottom:16px;width:min(700px,calc(100% - 32px));padding:14px 18px;background:rgba(17,24,32,.9)}
@@ -468,10 +492,10 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-clock button{flex:none;white-space:nowrap;padding:5px 10px;font-size:14px;background:#2b3440;color:#e6ebf1;border:1px solid #56616f;cursor:pointer}
 .heian-clock button.primary{background:#c9a077;color:#1c2128;border-color:#c9a077}
 .heian-clock-market{margin-left:auto;font-size:14px;color:#b9c2cc;white-space:nowrap}
-@media(max-width:600px){.heian-clock{width:auto;left:16px;right:16px;bottom:96px}}
+@media(max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-clock{width:auto;left:16px;right:16px;bottom:96px}}
 /* 🚫 撮影barはHUDの直下なので、除外に入れないとこの規則で消えて撮影も復帰もできなくなる
    （2026-08-25井内さん「撮影／戻るボタンが消えたので撮影できませんし、戻れません」） */
-#heianGameHud.heian-photo-mode>:not(.heian-game-bar):not(.heian-photo-bar){display:none!important}
+#heianGameHud.heian-photo-mode>:not(.heian-game-bar):not(.heian-photo-bar):not(.heian-shot-panel){display:none!important}
 #heianGameHud.heian-photo-mode .heian-game-bar>:not(.heian-game-title){display:none!important}
 /* 🚫 見出しの中を.kit-markだけ残すと丸井桁しか出ず、HakoniwaKitと平安京が消える
    （2026-08-25井内さん指摘）。撮影中も残すのはブランド行と「平安京」で、消すのは説明spanだけ */
@@ -507,7 +531,7 @@ body.heian-photo-active .heian-sky-label{display:none!important}
 .heian-menu-toggle{display:block;flex:0 0 40px;width:40px;height:36px;padding:0;background:rgba(24,32,41,.92);border:1px solid #85909a;color:#fff;font-size:20px;line-height:1;pointer-events:auto;cursor:pointer} /* 1.90 PC でも ☰（設定の入口） */
 .heian-game-actions{margin-left:auto}.heian-menu-toggle{margin-left:-10px} /* 1.91 井内さん「ハンバーガーメニューの左にくっつけたい」: 上の操作を ☰ の左 6px に寄せる */
 .heian-menu-toggle[hidden]{display:none!important}
-@media(max-width:600px){
+@media(max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
  .heian-game-bar{top:10px;left:10px;right:10px;gap:8px;align-items:flex-start}
  .heian-game-title{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;padding:0;background:none}
  .heian-game-title-heading{gap:6px;height:22px}.heian-game-title-heading .kit-mark{width:22px;height:22px}
@@ -539,6 +563,19 @@ body.heian-photo-active .heian-sky-label{display:none!important}
  /* 幅302では「東市 月齢0%」が再生・倍速と同じ行に入らず3行に折り返していた。市と月齢は次の行へ */
  .heian-game-actions .heian-clock-row{flex-wrap:wrap;row-gap:6px}
  .heian-game-actions .heian-clock-market{width:100%;margin-left:0;white-space:nowrap}
+}
+/* スマホ横持ち（2026-10-11 井内さん「横位置だと縦が狭いのにPCと同じUIが出て街がほとんど見えない」）。縦持ち用の規則（上）に加えて、縦が足りない前提で寄せ直す:
+   動作ボタンは左下に横並び／地点の解説と対話の窓は右の約45%に重ねず出す（開いている間は解説を隠す既存の規則で、どちらか一方だけ＝排他）／「E：話しかける」は右上。左の約55%は街 */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+ .heian-game-help.heian-game-help-actions{display:flex;top:auto;bottom:8px;left:8px;right:auto;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:4px;padding:0;background:none;max-width:calc(100vw - min(48vw,420px) - 28px)}
+ .heian-game-help-actions button{min-height:36px;padding:3px 9px;font-size:14px;background:rgba(29,40,51,.86)}
+ .heian-game-info{left:auto;right:10px;bottom:10px;width:min(46vw,400px);max-height:44vh;overflow:hidden;padding:8px 12px}
+ .heian-game-info h2{font-size:17px;margin-bottom:2px}
+ .heian-game-info p{font-size:14px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+ .heian-dialog{left:auto;right:10px;bottom:10px;transform:none;width:min(48vw,420px);max-height:calc(100dvh - 20px);overflow-y:auto}
+ .heian-dialog-hint{left:auto;right:10px;bottom:auto;top:58px;transform:none}
+ .heian-speech{max-width:min(240px,40vw)}
+ .heian-blessing{top:54px;padding:8px 16px;max-width:min(52vw,420px)} /* 「今日の都」「参拝の一言」は街の中央を覆わず、上の帯の下へ */
 }
 
 /* ==== BHSレイアウト組み立て（#bhsbuild）。素人がプラレールのように繋ぐ画面 ====
@@ -1771,6 +1808,8 @@ new MutationObserver(records=>{
 }).observe(document.body,{childList:true,subtree:true});
 
 const vp=$('viewport');
+// スマホ（縦持ち＝幅600px以下／横持ち＝タッチ機で高さ520px以下）。UIを減らす条件の正本。CSS の @media にも同じ式を書く（2026-10-11）
+const HEIAN_COMPACT_MQ='(max-width:600px), (pointer:coarse) and (orientation:landscape) and (max-height:520px)';
 const renderer=new THREE.WebGLRenderer({antialias:true,stencil:true});
 renderer.setPixelRatio(devicePixelRatio);
 vp.appendChild(renderer.domElement);
@@ -11237,7 +11276,7 @@ function shotHideHelpers(){
  // 🚫 ここに入れ忘れると「画面には出るのに写真だけに写らない」。bodies 以外を scene へ足す
  //    ランタイムは必ず root を持たせて keep に登録する（2026-09-18 空港BHSの情報タグで踏んだ）
  for(const runtime of[heianMobRuntime,heianCrowdRuntime,heianStreetLifeRuntime,
-   heianCourtLifeRuntime,heianDailyLifeRuntime,bhsFlowRuntime])if(runtime?.root)keep.add(runtime.root);
+   heianCourtLifeRuntime,heianDailyLifeRuntime,heianOfficeRuntime,bhsFlowRuntime])if(runtime?.root)keep.add(runtime.root); // 官司の戸口の間も（2026-10-11）
  // 🚫 空・星・太陽・灯りの層まで隠していたため、**風景の写真に空の物が一切写らなかった**
  //    （2026-09-08: 太陽の不透明度が1で画面中央にあるのに、写真の差分が0画素だった）。
  //    透過PNGはアセット単体用なので、都（heianTerrainGroup）がある時だけ空の層を残す。
@@ -12720,6 +12759,7 @@ function heianSosekiWanted(label){if(!/柱$/.test(label))return false;
  if(/回廊|渡廊|廊|曹司|倉|蔵|厨|舎|小屋|長屋|寝殿|対屋|上層|[2-5２-５]層/.test(n))return false;
  return /(殿|堂|門|楼|塔|閣)$/.test(n)||/楼下層庇?$/.test(n);}
 function heianSosekiFinish(){const list=HEIAN_SOSEKI||[];HEIAN_SOSEKI=null;if(!list.length)return[];
+ if(/[?&]soseki=0(&|$)/.test(location.search))return[]; // 検証用: ?soseki=0 で礎石なしの都（遠景の見え方を比べる・2026-10-11）
  const S=HEIAN_SOSEKI_SPEC,floors=bodies.filter(b=>/基壇|床|竜尾壇|竜尾道/.test(b.name)&&!/階 \/|屋根/.test(b.name)).map(b=>new THREE.Box3().setFromObject(b.mesh)),out=[];
  for(const q of list){const cb=new THREE.Box3().setFromObject(q.b.mesh),cx=(cb.min.x+cb.max.x)/2,cz=(cb.min.z+cb.max.z)/2,y0=cb.min.y,hh=cb.max.y-cb.min.y;
   let top=y0; // 柱の足元から、柱高の maxRise までの範囲にある床の天端のうち最も高いもの（屋根や上の階の床は拾わない）
@@ -13505,6 +13545,19 @@ function heianKit(){
  const columnFrame=(parts,cx,cz,w,d,y0,eave,label,overhang=14,nxOv=null,nzOv=null)=>{const nx=nxOv||Math.max(2,Math.ceil(w/36)),nz=nzOv||Math.max(2,Math.ceil(d/36));colFrames.set(label,{cx,cz,w,d,nx,nz});for(let i=0;i<=nx;i++){const x=cx-w/2+w*i/nx;parts.push(col(x,cz-d/2,y0,eave-y0,1.8,label+'柱'));parts.push(col(x,cz+d/2,y0,eave-y0,1.8,label+'柱'));}for(let i=1;i<nz;i++){const z=cz-d/2+d*i/nz;parts.push(col(cx-w/2,z,y0,eave-y0,1.8,label+'柱'));parts.push(col(cx+w/2,z,y0,eave-y0,1.8,label+'柱'));}parts.push(box(cx,cz-d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx,cz+d/2,w+4,3,eave-4,4,label+'梁'));parts.push(box(cx-w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx+w/2,cz,3,d,eave-4,4,label+'梁'));parts.push(box(cx,cz,w+overhang,d+overhang,eave-1,1,label+'軒裏'));};
  // 白壁の上約3割は朱塗りの小壁（板）にする（2026-08-17井内さん指示=瓦屋根の建物の白壁上部は赤い板がリアル）
  const wallBox=(parts,cx,cz,w,d,y0,h,label)=>{const lower=Math.max(2,Math.round(h*.7));parts.push(box(cx,cz,w,d,y0,lower,label+'内壁'));if(h-lower>0)parts.push(box(cx,cz,w,d,y0+lower,h-lower,label+'内壁上小壁'));};
+ // 戸口を開けた殿舎の壁（2026-10-12 井内さん「殿舎の扉が開いて、その中に働いている人たちがいるのが見える」）。
+ // 🚫 wallBox は殿舎の中身を詰めた1つの箱＝戸を開けても奥が壁。⇒ 四面の壁で囲んだ室にし、南（+z）の壁だけ柱間 i0〜i1 を開ける。
+ //    開口の上は小壁でつなぐ（鴨居）。壁の名前は「内壁」のまま＝歩行の当たり・色の規則・戸口の間の位置合わせ（heianOfficeAnchor）がそのまま使える
+ const doorwayWallBox=(parts,cx,cz,w,d,y0,h,label,dw)=>{
+  const t=4,lower=Math.max(2,Math.round(h*.7)),up=h-lower,X0=cx-w/2,X1=cx+w/2,Z0=cz-d/2,Z1=cz+d/2,sd=dw.side||'S',isX=sd==='N'||sd==='S';
+  const seg=(x0,x1,z0,z1,yy,hh,nm)=>{if(x1-x0>.5&&z1-z0>.5&&hh>0)parts.push(box((x0+x1)/2,(z0+z1)/2,x1-x0,z1-z0,yy,hh,label+nm));};
+  const cut=(a0,a1,c0,c1)=>{const o=[];if(c0>a0)o.push([a0,Math.min(a1,c0)]);if(c1<a1)o.push([Math.max(a0,c1),a1]);return o;}; // 区間から開口を除いた残り
+  const cx0=cx+dw.u0,cx1=cx+dw.u1,cz0=cz+dw.u0,cz1=cz+dw.u1;
+  for(const[a,b]of sd==='N'?cut(X0,X1,cx0,cx1):[[X0,X1]])seg(a,b,Z0,Z0+t,y0,lower,'内壁');
+  for(const[a,b]of sd==='S'?cut(X0,X1,cx0,cx1):[[X0,X1]])seg(a,b,Z1-t,Z1,y0,lower,'内壁');
+  for(const[a,b]of sd==='W'?cut(Z0+t,Z1-t,cz0,cz1):[[Z0+t,Z1-t]])seg(X0,X0+t,a,b,y0,lower,'内壁');
+  for(const[a,b]of sd==='E'?cut(Z0+t,Z1-t,cz0,cz1):[[Z0+t,Z1-t]])seg(X1-t,X1,a,b,y0,lower,'内壁');
+  seg(X0,X1,Z0,Z0+t,y0+lower,up,'内壁上小壁');seg(X0,X1,Z1-t,Z1,y0+lower,up,'内壁上小壁');seg(X0,X0+t,Z0+t,Z1-t,y0+lower,up,'内壁上小壁');seg(X1-t,X1,Z0+t,Z1-t,y0+lower,up,'内壁上小壁');};
  // 正式殿舎・楼上の共通正面。板扉、内法長押、欄間格子を南面（必要時は四方）へ付加する。
  // 🚫 扉の割りspan/(bays+1)と柱の割りcolumnFrameのceil(w/36)が無関係で、柱が扉の中央に立っていた
  //    （2026-08-27井内さん「このタイプの建物も柱と柱の間が両開きの扉。今の見え方だと柱が邪魔して扉が開かない」）。
@@ -13561,7 +13614,9 @@ function heianKit(){
  // opts.eaves（朝堂院・豊楽院の殿舎だけ・2026-09-25）: 柱の上に平三斗、軒裏に二軒の垂木。軒裏の平らな板（columnFrame の overhang 50）はやめる
  const colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{if(!noBase)parts.push(box(cx,cz,w+18,d+18,y0-6,12,label+'基壇'));const floorY=y0+6,eaveH=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);parts.push(box(cx,cz,w+8,d+8,floorY,2,label+'床'));// 🚫 壁高を-8にすると上端がeaveH-6で止まり、軒裏の板（eaveH-1）との間に5mm＝実寸50cmの帯が全周で開く。
 // そこから反対側が透けて「奥の壁がない」ように見えていた（2026-08-24井内さん指摘）。板の下端まで壁を上げる
-wallBox(parts,cx,cz,w-3.6,d-3.6,floorY+2,Math.max(4,eaveH-floorY-3),label);
+if(opts.doorway){const dwS=opts.doorway.side||'S',len0=dwS==='N'||dwS==='S'?w:d,n0=Math.max(2,Math.ceil(len0/36)),pitch0=len0/n0; // 開口の柱間 i0〜i1（面に沿って +x または +z の向きに数える。soshiFront の u と同じ向き）
+  doorwayWallBox(parts,cx,cz,w-3.6,d-3.6,floorY+2,Math.max(4,eaveH-floorY-3),label,{side:dwS,u0:-len0/2+pitch0*opts.doorway.i0,u1:-len0/2+pitch0*opts.doorway.i1});}
+else wallBox(parts,cx,cz,w-3.6,d-3.6,floorY+2,Math.max(4,eaveH-floorY-3),label);
   // opts.sideDoors（朝堂十二堂・朝集堂・2026-10-07井内さん「十二堂にも豊楽殿のようにいくつか柱と柱の間に扉を設置したい。その前には階段がある。階段が前後に3つずつ」）:
   //   長手の2面（前後）の柱間3か所へ両開きの朱扉と欄間格子、その前へ3段の階段。3か所が左右対称に並ぶよう長手の柱間数を奇数にする
   const sd=!!opts.sideDoors,alongXh=w>=d,longLh=alongXh?w:d,oddN=len=>{const m=Math.max(2,Math.ceil(len/36));return m%2===0?m+1:m;};
@@ -14960,6 +15015,10 @@ function buildChodoin(k,cho,dai,options={}){
 const HEIAN_DAIRI_INNER_SHIFT=100;
 const HEIAN_DAIRI_CZ=-2299+HEIAN_DAIRI_INNER_SHIFT;
 const heianDairiX=x=>(x-1650)*1.150+1650+113;
+// 世界のx。🚫 heianDairiX は内裏の中の拡大（1.15倍）までで、大内裏全体の x 縮み（大垣を大宮大路の内縁へ載せる 5635.8/5996）を含まない。
+//    衛士・女官の位置を heianDairiX だけで置いていたので、建春門の衛士は門から約18m東、朔平門の衛士は左右で5〜11mずれて立っていた（2026-10-11 実測: 門の名前つき当たり箱の中心と比べた）。
+//    世界へ置くものは必ずこちらを通す（zは heianDairiZ のまま＝zは縮まない）
+const heianDairiXW=x=>heianDairiX(x)*(5635.8/5996);
 const heianDairiZ=z=>(z-HEIAN_DAIRI_CZ)*1.020+HEIAN_DAIRI_CZ+1029+HEIAN_DAIRI_INNER_SHIFT;
 function buildDairiInner(k,den,kokyu,kaku){
  kokyu=kokyu||den;kaku=kaku||den;
@@ -15024,7 +15083,9 @@ function buildDairiInner(k,den,kokyu,kaku){
  //    建春門は「宮東僻仗門」「左衛門陣」、宜秋門は「宮西僻仗門」「右衛門陣」とも呼ばれた。
  // 詰所は殿舎ではないので低く作る。軒10・棟5＝棟高16（建礼門衛所の18/10＝64.5は高すぎた）。
  // 門（建春門・宜秋門の棟高75）より明確に低く、門際へ寄せる（資料「門を出て南に南舎、北に北舎」）
- const jinsha=(cx,cz,w,d,label)=>gable(kaku,cx,cz,w,d,-1,10,5,label);
+ // 🚫 軒10・棟5 は軒の下端が床から約2m＝ロボ（2.5m）より低く、屋根が床に伏せたように見えた（2026-10-11井内さん「内裏の門前の衛士たちの建物が低すぎる」）。
+ //    ⇒ 軒16・棟8（軒の下端が床から約3.1m・炬屋の2.7mより少し高く、門の棟高75より十分低い）
+ const jinsha=(cx,cz,w,d,label)=>gable(kaku,cx,cz,w,d,-1,16,8,label);
  // 建春門: 門を出て南に「南舎」、北に「北舎」「後庁」「佐宿」（門の東=外側へ出す）
  jinsha(2611+64,-2300+130,38,110,'左衛門陣南舎');
  jinsha(2611+64,-2300-130,38,110,'左衛門陣北舎');
@@ -15582,25 +15643,34 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
   // ⇒ 執務する庁・舎は colonnadeHall（基壇・床・朱柱・白壁・上小壁・軒裏）にし、中庭側の正面へ板扉（中央1〜3間）と連子窓。
   //    小屋・作業場・長屋・厨などの雑舎は k.gable のまま板葺（木の屋根色）へ落として格の差を出す。倉・厩は瓦の k.gable のまま。
   //    colonnadeHall は軒高を内部で1.8倍に伸ばすので、軒の入力を床から .6 倍に縮めて軒高4〜4.5mへ収める（推定）
-  const soshiFront=(pp,x,z,gw,gd,fy,eh,label,side)=>{
+  const soshiFront=(pp,x,z,gw,gd,fy,eh,label,side,sk=null)=>{
    const ns=side==='S'||side==='N',sg=side==='S'||side==='E'?1:-1,span=ns?gw:gd,face=sg*(ns?gd:gw)/2;
    const n=Math.max(2,Math.ceil((ns?TSX(gw):TSZ(gd))/36)),pitch=span/n; /* columnFrame と同じ柱割り */
    const B=(u,v,uw,vw,y,h,nm)=>pp.push(ns?box(x+u,z+v,uw,vw,y,h,label+nm):box(x+v,z+u,vw,uw,y,h,label+nm));
    const y1=fy+2,H=eh-fy-2,doorH=Math.round(H*.66),winY=y1+H*.3,winH=H*.34,doors=n>=7?3:n>=4?(n%2?1:2):1;
    for(let i=0;i<n;i++){const uc=-span/2+pitch*(i+.5);
+    if(sk&&i>=sk[0]&&i<sk[1])continue; // 戸口を開けた殿舎（doorwayWallBox）は、開口の柱間に板扉・連子窓を付けない
     if(Math.abs(i-(n-1)/2)<doors/2){const leaf=pitch/2-2.3;for(const s of[-1,1])B(uc+s*(leaf/2+.3),face-sg*1.2,leaf,1.2,y1,doorH,'板扉');}
     else{B(uc,face-sg*1.3,pitch-4.4,1,winY,winH,'連子奥');for(const q of[-.25,0,.25])B(uc+(pitch-4.4)*q,face-sg*.6,1,.8,winY,winH,'連子');}
    }
   };
+  // 門のほうへ扉を向ける脇庁のラベル（officeCompound の s.gateHall で入れる）。gable が見る
+  const gateFacing=new Set();
   const gable=(pp,x,z,gw,gd,y0,eave,rise,label,noBase=false)=>{
    if(/倉|蔵\d*$|厩|東側既存舎/.test(label)){ /* 🚫 /蔵/ だと大蔵省・内蔵寮・率分蔵の庁まで倉扱いになった */plainGable(pp,x,z,gw,gd,y0,eave,rise,label);
     if(!/厩|東側既存舎/.test(label))heianKuraRidge(box,pp,x,z,gw,gd,y0,eave,rise,label,true); /* 倉の瓦の棟（1.83・F1-1c） */return;}
    if(/小屋|作業場|長屋|番所|雑舎|井舎|宿所|厨|仕込|調製|八神殿/.test(label)){plainGable(pp,x,z,gw,gd,y0,eave,rise,/板葺|檜皮葺/.test(label)?label:label+'板葺');return;}
    const yc=noBase?y0-6:y0,fy=yc+6,e2=Math.round(fy+(eave-y0)*.6);
-   k.colonnadeHall(pp,x,z,gw,gd,yc,e2,rise,label,noBase);
    const eh=fy+Math.round((e2-fy+Math.max(6,Math.round((e2-fy)*.28)))*1.8); /* colonnadeHall の軒高と同じ式 */
-   const side=gw>=gd?(/南舎/.test(label)?'N':'S'):/西脇庁|西舎$/.test(label)?'E':/東脇庁|東舎$/.test(label)?'W':x<cx?'E':'W';
-   soshiFront(pp,x,z,gw,gd,fy,eh,label,side);
+   let side=gw>=gd?(/南舎/.test(label)?'N':'S'):/西脇庁|西舎$/.test(label)?'E':/東脇庁|東舎$/.test(label)?'W':x<cx?'E':'W';
+   // 2026-10-12 井内さん「門から入ってすぐの建物の扉から中で働く人たちが見えるといい」: 門の側の脇庁は扉の面を庭の中心でなく門のほうへ向ける（gateFacing に入れたラベルだけ）
+   if(gateFacing.has(label))side=side==='E'?'W':side==='W'?'E':side==='S'?'N':'S';
+   // 2026-10-12 井内さん「殿舎の扉が開いて、その中に働いている人たちがいるのが見える」: HEIAN_OFFICES の hall.re に当たる殿舎は、扉の面の柱間3つを壁ごと開ける（doorwayWallBox）。
+   //  開口は柱割り（columnFrame と同じ ceil(幅/36)）に揃える。奇数なら中央の3つ、偶数なら中央から半間ずれた3つ。開口の柱間には板扉・連子窓を付けない。違う建物を足すのでなく、この殿舎の扉を開ける
+   let dw=null;const off=HEIAN_OFFICES.find(o=>o.hall&&o.hall.re.test(label+'内壁 '));
+   if(off){const nb=Math.max(2,Math.ceil((side==='S'||side==='N'?TSX(gw):TSZ(gd))/36)),i0=nb%2?(nb-3)/2:nb/2-2;dw={side,i0,i1:i0+3};if(off.face!==side)console.warn('官司の戸口: 面が表と合いません',label,side,off.face);}
+   k.colonnadeHall(pp,x,z,gw,gd,yc,e2,rise,label,noBase,dw?{doorway:dw}:{});
+   soshiFront(pp,x,z,gw,gd,fy,eh,label,side,dw?[dw.i0,dw.i1]:null);
   };
   const jx=((seed*73)%13-6)*4,jz=((seed*137)%13-6)*4; // 決定的ジッタ（±24）
   // 塀（門のある辺は開口±34で2分割）＋小門（柱2＋切妻小屋根）
@@ -15652,6 +15722,7 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
    at(gm,G+6,3,PH-3,2.4,gl+'冠木');
    at(gm,G+14,14,PH-.6,1.6,gl+'板葺笠');at(gm,G+14,7,PH+1,1.6,gl+'板葺笠');};
   const officeHall=(label,x,z,pw,pd)=>gable(p,x,z,Math.min(pw-36,190),Math.min(pd-36,86),-1,18,11,label+'庁舎');
+
   // 倉の板扉と梯子（2026-09-26）。🚫 旧の倉は白い箱＝戸口が無く、庁と見分けが付かなかった。壁は板倉の木の色（paintHeianArchitecture）
   // 🚫 扉と梯子が長辺（平側・+x の面）に付いていた（1.83・F1-1c）。倉はどれも棟が z 向き（奥行 sd＞幅）なので、
   //    ⇒ 妻（±z の面）の中央へ移し、区画の中心（cz）を向く方の妻にする。引数は幅 sw から奥行 sd へ
@@ -15667,6 +15738,7 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
   const officeCompound=(label,s)=>{
    const ox=cx+(s.ox||0),mainZ=cz+s.mainZ,sideZ=cz+s.sideZ,baseH=s.baseH||5,hallH=s.hallH||27;
    p.push(box(ox,mainZ,s.mainW+28,s.mainD+22,-1,baseH,label+'正庁基壇'));
+   if(s.gateHall)gateFacing.add(label+s.gateHall+'脇庁'); // s.gateHall＝'東'|'西'（門の側の脇庁）。扉を門のほうへ向ける
    gable(p,ox,mainZ,s.mainW,s.mainD,baseH-1,hallH,s.rise||18,label+'正庁',true); /* 基壇は上の正庁基壇。角柱は colonnadeHall の柱列へ（2026-09-26） */
    gable(p,ox-s.sideX,sideZ,s.sideW,s.sideD,-1,s.sideH||23,s.sideRise||15,label+'西脇庁');
    gable(p,ox+s.sideX,sideZ,s.sideW,s.sideD,-1,s.sideH||23,s.sideRise||15,label+'東脇庁');
@@ -15678,11 +15750,14 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
   if(name==='茶園'){
    // 北東隅の茶園。南門から中央通路を空け、西側に畝、東側に管理小屋を置く。
    for(let i=0;i<5;i++)p.push(box(cx-240,cz-250+i*105,390,18,-1,11,'茶園茶畝生垣'+(i+1)));
-   gable(p,cx+240,cz-255,170,90,-1,18,11,'茶園管理小屋一');
+   // 2026-10-12 井内さん「茶園でも同様にできると思う」: 管理小屋一を殿舎「茶園所」にして、中央の通路のほう（西）へ扉を開ける。小屋二はそのまま
+   gable(p,cx+240,cz-255,90,170,-1,23,14,'茶園所');
    gable(p,cx+240,cz+270,150,80,-1,17,10,'茶園管理小屋二');
   }else if(name==='木工内候'){
    /* 🚫 軒が区画の塀の笠に掛かっていた（officeDiag roofWallHits・2026-09-26）。塀の内面（中心±138）へ収まるよう寄せ、南北作業場を170→140に */
-   gable(p,cx-25,cz-75,190,70,-1,20,12,'木工内候東西作業場');
+   // 2026-10-12 井内さん「木工寮に、1つだけ殿舎を追加するのもあり」: 北の東西作業場を殿舎「木工寮庁」（柱・内壁・瓦ではなく板葺の庁）に替え、南面の扉を開けて中で働く人が見えるようにする。
+   //  敷地は30m四方で他の作業場と重ならない広さが無いので、足すのでなく東西作業場の位置を殿舎にする（寸法は軒が塀の笠に掛からない範囲で190→176）
+   gable(p,cx-32,cz-77,176,66,-1,23,14,'木工寮庁');
    gable(p,cx+70,cz+50,70,140,-1,20,12,'木工内候南北作業場');
    gable(p,cx-75,cz+75,82,58,-1,17,10,'木工内候資材小屋');
   }else if(name==='真言院'){
@@ -15698,6 +15773,8 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
   }else if(name==='造酒司'||name==='漆室'){
    const storeLabel=name==='造酒司'?'蔵':'漆保管蔵';
    for(let i=0;i<5;i++){const x=cx-360+i*180;for(const sx of[-1,1])for(const sz of[-1,0,1])p.push(col(x+sx*34,cz-260+sz*66,-1,10,2.8,name+storeLabel+(i+1)+'高床柱'));gable(p,x,cz-260,82,150,8,32,13,name+storeLabel+(i+1));kuraDoor(x,cz-260,150,name+storeLabel+(i+1),18);}
+   // 2026-10-12 井内さん「造酒司でも同様にできると思う」: 東の門から入った敷地の中ほどに殿舎「造酒司庁」を置き、東（門のほう）へ扉を開ける。蔵の列と仕込舎の間（各5m以上あける）
+   if(name==='造酒司')gable(p,cx-100,cz+10,100,280,-1,23,14,'造酒司庁');
    gable(p,cx-350,cz+210,96,Math.min(520,d-260),-1,23,14,name+(name==='造酒司'?'南北酒造長屋':'南北作業長屋'));
    gable(p,cx+60,cz+250,300,90,-1,20,12,name+(name==='造酒司'?'麹・仕込舎':'漆調製舎'));
   }else if(name==='内匠寮'){
@@ -15713,7 +15790,8 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
    innerPartition('式部省諸司','z',splitX,z0,z1);innerPartition('式部省諸厨','x',splitZ,splitX,x1);
    for(const x of[cx+w*.16,cx+w*.32])innerPartition('式部省諸厨','z',x,z0,splitZ);
    const officeCX=(x0+splitX)/2;
-   officeCompound('式部省',{ox:officeCX-cx,mainZ:-300,mainW:410,mainD:130,sideX:350,sideZ:0,sideW:72,sideD:340,
+   // 2026-10-12 西門から西脇庁までの庭 72→222。庁の一群を東へ50寄せ（ox+50）、脇庁を内へ（sideX 350→250）。東脇庁は x=cx-256 で、東の仕切り（splitX=cx-w*.055≈cx-112）とは約108あく
+   officeCompound('式部省',{gateHall:'西',ox:officeCX-cx+50,mainZ:-300,mainW:410,mainD:130,sideX:250,sideZ:0,sideW:72,sideD:340,
     record:{x:0,z:315,w:240,d:78},hedges:[[0,410,280,12,12]]});
    for(const[label,x]of[['主税厨',cx+w*.08],['民部厨',cx+w*.24],['主計厨',cx+w*.4]])officeHall(label,x,cz-d*.2,w*.14,d*.34);
    officeHall('式部厨',cx+w*.24,cz+d*.3,w*.45,d*.28);
@@ -15722,16 +15800,23 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
    officeHall('大舎人寮',cx,cz-d*.25,w*.72,d*.38);officeHall('侍従厨',cx,cz+d*.25,w*.72,d*.38);
   }else if(name==='民部省'){
    const splitZ=cz+d*.12,x0=cx-w/2+18,x1=cx+w/2-18,z1=cz+d/2-18;
-   innerPartition('民部省・主計・主税','x',splitZ,x0,x1,.3);/* 真ん中は主計・主税の仕切りが突き当たり、北に生垣がある */innerPartition('主計・主税','z',cx,splitZ,z1);
+   // 2026-10-12 井内さん「民部省など門を入ってすぐに敷地を分ける塀になっているケースがあるが、それはやめたい。通れない」
+   //  「門を入ってすぐ敷地が分割される場合は、門から真っ直ぐ通路があって、左右に壁で敷地を分けて、それぞれに門をつけてほしい」。
+   //  旧: 南門（cx）の正面に南北の仕切り（x=cx）が立ち、門を入って1.4mで塀（実測 14）。
+   //  ⇒ 南門から北へ幅 AIS（120）の通路を真っ直ぐ取り、東西の境界塀は通路の幅だけ切って開口に、通路の左右（cx±AIS/2）に南北の壁を立ててそれぞれ板門（主税・主計へ）
+   const AIS=120,aL=cx-AIS/2,aR=cx+AIS/2;
+   {const seg=(b0,b1)=>{if(b1-b0>1)wallSegment(p,'x',(b0+b1)/2,splitZ,b1-b0,'民部省・主計・主税境界塀','板塀');};seg(x0,aL);seg(aR,x1);} // 通路の幅は塀を作らない（開口）。板門は左右の壁のほうに付ける
+   innerPartition('主税の壁','z',aL,splitZ,z1,.45);innerPartition('主計の壁','z',aR,splitZ,z1,.45);
    officeCompound('民部省',{mainZ:-350,mainW:620,mainD:150,sideX:760,sideZ:-130,sideW:90,sideD:300,
-    record:{x:0,z:40,w:230,d:70,name:'文書所'},hedges:[[0,90,300,12,12]],baseH:6,hallH:28,rise:18});
+    record:{x:0,z:40,w:230,d:70,name:'文書所'},hedges:[[-105,90,90,12,12],[105,90,90,12,12]]/* 2026-10-12 通路（幅120）の正面を生垣が塞ぐので、通路の幅だけ切って左右の2本に */,baseH:6,hallH:28,rise:18});
    officeHall('主税',cx-w*.24,cz+d*.31,w*.42,d*.28);officeHall('主計',cx+w*.24,cz+d*.31,w*.42,d*.28);
   }else if(name==='太政官'){
    const splitZ=cz-d*.18,x0=cx-w/2+18,x1=cx+w/2-18;
    innerPartition('太政官諸司','x',splitZ,x0,x1);
    innerPartition('太政官諸司','z',cx-w*.18,cz-d/2+18,splitZ);innerPartition('太政官諸司','z',cx+w*.18,cz-d/2+18,splitZ);
    officeHall('勘解由',cx-w*.34,cz-d*.33,w*.26,d*.26);officeHall('朝所',cx+w*.34,cz-d*.33,w*.26,d*.26);
-   officeCompound('太政官',{mainZ:-60,mainW:620,mainD:190,sideX:760,sideZ:160,sideW:90,sideD:330,
+   // 2026-10-12 井内さん「各省庁の門からすぐに建物があるのは変なので、少し離すこと」: 東門から東脇庁までの庭 132→250（sideX 760→642）。東脇庁の扉は門のほうへ
+   officeCompound('太政官',{gateHall:'東',mainZ:-60,mainW:620,mainD:190,sideX:642,sideZ:160,sideW:90,sideD:330,
     record:{x:-190,z:455,w:300,d:76},stores:[[560,450,'文書倉',80,110]],baseH:7,hallH:31,rise:20,sideH:25,sideRise:16});
   }else if(name==='西院・醤院・主水司'){
    const splitX=cx+w*.065,splitZ=cz+d*.045,z0=cz-d/2+18,z1=cz+d/2-18,x1=cx+w/2-18;
@@ -15744,15 +15829,18 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
    gable(p,cx+w*.2,cz,Math.min(w*.45,340),Math.min(d*.5,260),-1,25,17,'大炊寮正庁');
   }else if(officeRank){
    if(name==='宮内省'){
-    officeCompound('宮内省',{mainZ:-320,mainW:460,mainD:145,sideX:500,sideZ:10,sideW:82,sideD:330,
+    // 2026-10-12 西門から西脇庁までの庭 71→250（sideX 500→321）。西脇庁の扉は門のほうへ
+    officeCompound('宮内省',{gateHall:'西',mainZ:-320,mainW:460,mainD:145,sideX:321,sideZ:10,sideW:82,sideD:330,
      record:{x:-130,z:295,w:280,d:80},stores:[[360,360,'文書倉',76,110]],hedges:[[0,500,420,12,12]],baseH:5,hallH:28});
    }else if(name==='大蔵省'){
     const stores=[];let n=0;
     for(const z of[276,516])for(const x of[-375,-225,-75,75,225,375])stores.push([x,z,'整列倉'+String(++n).padStart(2,'0'),76,126]);
-    officeCompound('大蔵省',{mainZ:-360,mainW:460,mainD:140,sideX:500,sideZ:-90,sideW:80,sideD:300,
+    // 2026-10-12 東門から東脇庁までの庭 78→250（sideX 500→328）。東脇庁の扉は門のほうへ
+    officeCompound('大蔵省',{gateHall:'東',mainZ:-360,mainW:460,mainD:140,sideX:328,sideZ:-90,sideW:80,sideD:300,
      record:{x:0,z:100,w:260,d:70},stores,baseH:5,hallH:28});
    }else if(name==='兵部省'){
-    officeCompound('兵部省',{mainZ:-200,mainW:390,mainD:120,sideX:420,sideZ:5,sideW:76,sideD:300,
+    // 2026-10-12 東門から東脇庁までの庭 67→220（sideX 420→267。敷地が狭く、これ以上寄せると正庁の基壇に近づく）。東脇庁の扉は門のほうへ
+    officeCompound('兵部省',{gateHall:'東',mainZ:-200,mainW:390,mainD:120,sideX:267,sideZ:5,sideW:76,sideD:300,
      record:{x:-90,z:265,w:220,d:72},stores:[[300,300,'文書倉',70,100]],hedges:[[-170,365,220,12,11]],baseH:4,hallH:26});
    }else{
     const mainW=Math.min(w-180,officeRank===2?460:400),mainD=Math.min(130,Math.max(90,d*.18)),hallZ=cz-d*.26;
@@ -15835,7 +15923,7 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
   }else if(type==='rows'){ // 並列2〜3棟
    const rows=d>1300?3:2;
    for(let r=0;r<rows;r++)
-    gable(p,cx+(r%2?jx:-jx),cz-d/4+r*(d/2/(rows-1||1))*0.9,hw,Math.min(130,hd),-1,24,16,name);
+    gable(p,cx+(r%2?jx:-jx),cz-d/4+r*(d/2/(rows-1||1))*0.9,hw,Math.min(130,hd),-1,24,16,name==='陰陽寮'&&r===0?name+'庁':name); /* 陰陽寮の北の棟だけ「庁」＝戸口を開ける殿舎（2棟が同じ名前だと区別できない・2026-10-12） */
   }else if(name==='大蔵'||type==='kura'){ // 高床式倉庫の並び。名称が大蔵の全区画は穀倉院型で統一する。
    const kuraW=90,kuraD=Math.min(220,d-300),pitchX=220,pitchZ=kuraD+120;
    const cols=Math.min(5,Math.max(2,Math.floor((w-200)/pitchX)));
@@ -16278,7 +16366,7 @@ function heianHeritageDetailKit(k,state){
  out.gable=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,sOverhang=8,lOverhang=10)=>{const n=bodies.length,r=k.gable(parts,cx,cz,w,d,y0,eave,rise,label,noBase,sOverhang,lOverhang);if(nonTile(label))return r;const found=capture(n),roofEave=y0+Math.round((eave-y0)*1.2),roofRise=Math.round(rise*1.8);detail(parts,cx,cz,w,d,roofEave,label+'屋根','gable',.9,{rise:roofRise/1.5,sOverhang,lOverhang,rank:'small',samples:2,gableWall:true},found);return r;};
  out.gableRoof=(parts,cx,cz,w,d,eave,rise,label,sOverhang=8,lOverhang=0)=>{const n=bodies.length,r=k.gableRoof(parts,cx,cz,w,d,eave,rise,label,sOverhang,lOverhang);if(nonTile(label))return r;const found=capture(n);detail(parts,cx,cz,w,d,eave,label,'gable',.9,{rise,sOverhang,lOverhang,rank:'small',samples:2},found);return r;};
  out.openGallery=(parts,cx,cz,len,axis,lift=0,label='回廊',width=26)=>{const n=bodies.length,r=k.openGallery(parts,cx,cz,len,axis,lift,label,width),found=capture(n),w=axis==='x'?len:width,d=axis==='x'?width:len;detail(parts,cx,cz,w,d,33+lift,label+'屋根','gable',.9,{rise:13,sOverhang:8,rank:'small',samples:2},found);return r;};
- out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const n=bodies.length,r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),found=capture(n),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);detail(parts,cx,cz,w,d,roofY,label+'屋根','gable',.9,{rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',samples:3,gableWall:true,verge:!opts.hiwada,...(opts.eaves?{eaves:false}/* 平三斗・垂木は本体（2026-09-25） */:{})},found.filter(b=>!/垂木|組物/.test(b.name)));if(!opts.sideDoors&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
+ out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const n=bodies.length,r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),found=capture(n),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);detail(parts,cx,cz,w,d,roofY,label+'屋根','gable',.9,{rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',samples:3,gableWall:true,verge:!opts.hiwada,...(opts.eaves?{eaves:false}/* 平三斗・垂木は本体（2026-09-25） */:{})},found.filter(b=>!/垂木|組物/.test(b.name)));if(!opts.sideDoors&&!opts.doorway&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
  out.templeGate=(parts,cx,cz,w,d,y0,eave,rise,label,inward=1)=>{const n=bodies.length,r=k.templeGate(parts,cx,cz,w,d,y0,eave,rise,label,inward),found=capture(n),beamY=Math.max(y0+21,eave+10),roofEave=beamY+12;detail(parts,cx,cz,w,d,roofEave,label+'屋根','gable',.9,{rise:Math.round(rise*1.2),sOverhang:6,lOverhang:7,rank:'small',samples:2},found);return r;};
  out.gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{const n=bodies.length,r=k.gate2(cx,cz,w,label,parts,monumental,columnCount),found=capture(n);state.lowerRoofs++;// 軒桁・組物を壁の通りへ寄せるため、各屋根が載る身舎の平面をwallで渡す（gate2の一階は幅w・奥行64、
  // 楼上は重層でw×64・非重層でw-40×52。formalFacadeへ渡している値と同じ・2026-08-26）
@@ -16309,7 +16397,7 @@ function heianDistantHeritageKit(k,details=null){const out={...k,heritageDetail:
   return b;};
  out.colonnadeHall=(parts,cx,cz,w,d,y0,eave,rise,label,noBase=false,opts={})=>{const r=k.colonnadeHall(parts,cx,cz,w,d,y0,eave,rise,label,noBase,opts),floorY=y0+6,roofY=floorY+Math.round((eave-floorY+Math.max(6,Math.round((eave-floorY)*.28)))*1.8);
   // けらばの降棟と降鬼だけ重ねる（1.76）。大棟は本体の殻の帯があるので出さない（mainRidge:false）。檜皮葺（内裏・朱雀院）・板葺は除く
-  if(!opts.hiwada&&!/板葺|檜皮|草葺|^朱雀院/.test(label))k.detailedTileRoof(sink,cx,cz,w,d,roofY,label+'屋根','gable',.9,{surface:false,rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',mainRidge:false,eaves:false,dense:false});if(!opts.sideDoors&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
+  if(!opts.hiwada&&!/板葺|檜皮|草葺|^朱雀院/.test(label))k.detailedTileRoof(sink,cx,cz,w,d,roofY,label+'屋根','gable',.9,{surface:false,rise:Math.round(rise*1.28),sOverhang:26,lOverhang:27,rank:'hall',mainRidge:false,eaves:false,dense:false});if(!opts.sideDoors&&!opts.doorway&&w>=d&&w>=180)k.formalFacade(parts,cx,cz,w,d-4,floorY+3,roofY-9,label,'S',Math.max(3,Math.min(7,Math.round(w/80))),Math.max(2,Math.ceil(w*(k.planScale?.sx||1)/36)))/* 幅はcolumnFrameへ渡したwのままにしてspanと柱割りの基準を一致させ、柱間数もceil(w*sx/36)で同じ式から出す（2026-08-27） */;return r;};
  out.gate2=(cx,cz,w,label,parts,monumental=false,columnCount=null)=>{const r=k.gate2(cx,cz,w,label,parts,monumental,columnCount),lw=monumental?w+58:w+50,ld=monumental?120:108,ly1=monumental?85:88,uw=monumental?(heianGate2Small(label,monumental)?w+68:w+90):w+16,ud=monumental?(heianGate2Small(label,monumental)?126:144):88,slope=monumental?.85:.818,lowerLabel=label+(monumental?'下屋根':'裳階'),G=HEIAN_GATE2,ly0=monumental?G.lowerEave:77,ly1b=monumental?G.lowerTop:ly1,ue=monumental?G.upperEave:106,lift=monumental?G.lift:0;k.bandRidges(parts,cx,cz,lw,ld,ly0,ly1b,lowerLabel,{cornerSori:monumental});k.detailedTileRoof(parts,cx,cz,uw,ud,ue,label+'屋根','irimoya',slope,{surface:false,dense:false,rank:'major',samples:2,wall:[monumental?w:w-40,monumental?64:52]/* 遠景kitでも軒桁・組物を楼上の壁の通りへ寄せる（2026-08-27） */,eaves:!monumental/* 重層門は gate2 本体の三手先・丸桁・垂木を使う（2026-09-23/24） */,cornerSori:monumental/* 隅反りに隅棟を沿わせる（2026-09-25） */});k.formalFacade(parts,cx,cz,monumental?w:w-40,monumental?64:52,88+lift,105+lift,label+'楼上','S',Math.max(3,Math.round(w/55)));return r;};
  out.tower=(parts,cx,cz,label,yOffset=0,palatial=false,ornate=false)=>{if(palatial&&ornate){const O=HEIAN_TOWER.ornate;buildChodoinDetailTower(k,parts,cx,cz,label,yOffset,true,true);k.formalFacade(parts,cx,cz,O.cSize,O.cSize,O.cLowY+yOffset+1,O.cTopY+yOffset-2,label+'楼上','S',3);return;}
   const r=k.tower(parts,cx,cz,label,yOffset,palatial,ornate);if(!palatial){const TP=HEIAN_TOWER.temple;k.detailedTileRoof(parts,cx,cz,122,94,TP.eave+yOffset,label+'東西棟入母屋屋根','irimoya',.88,{surface:false,dense:false,rank:'tower',samples:2,sori:false,eaves:false,cornerSori:true});if(/経蔵/.test(label))k.formalFacade(parts,cx,cz,72,62,2+yOffset,TP.wall+yOffset-4,label,'S',3,3);return r;}
@@ -16652,7 +16740,7 @@ const HEIAN_SPEECH=Object.freeze({radius:600,near:250,max:3,scanMs:400,spawnMs:2
 // 地点idの言い換え（歩行の地点id → 台詞の at）
 const HEIAN_SPEECH_ALIAS={suzakuRoad:'suzaku',suzakuGateApron:'suzakumon',daidairiSouthEntrance:'suzakumon',daigokudenWalk:'daigokuden',burakudenWalk:'burakuin',dairiWalk:'dairi',otenmonWalk:'otenmon',funaoka:'funaokaTop'};
 // 曹司の区画名 → 台詞の場所の類（heian-lines.js の at に使える）
-const HEIAN_SPEECH_SOSHI_GROUPS=[['meryo',/馬寮/],['okura',/^大蔵$|大蔵省|率分蔵|内蔵寮|廩院/],['efu',/近衛府|兵衛府/],
+const HEIAN_SPEECH_SOSHI_GROUPS=[['chaen',/茶園/],['meryo',/馬寮/],['okura',/^大蔵$|大蔵省|率分蔵|内蔵寮|廩院/],['efu',/近衛府|兵衛府/],
  ['kuriya',/造酒司|内膳司|大膳職|大炊寮|中務厨|主水司|醤院|厨/],['jingikan',/神祇官/],['onmyo',/陰陽寮/],['tenyaku',/典薬寮/],
  ['shoin',/太政官|民部省|式部省|治部省|兵部省|刑部省|宮内省|中務省|大蔵省|外記庁|弾正台|判事/],['kobo',/内匠寮|木工|漆室|縫殿寮|掃部寮|主殿寮|兵庫寮|糸所/],
  ['gaku',/雅楽寮|内教坊|大歌所/],['shingon',/真言院/],['zusho',/図書寮/]];
@@ -16849,6 +16937,7 @@ function heianSpeechTags(x,z){
   for(const q of heianQuirkSpots)if(Math.hypot(x-q.x,z-q.z)<(q.tr||300))tags.add('quirk_'+q.id); /* 街かどの出来事の近く（2026-10-07） */
   if(x>5640&&x<6400&&Math.abs(z+1422)<600)tags.add('yomeimon');if(x>5640&&x<6400&&Math.abs(z-4297)<600)tags.add('ikuhomon');}
  // 1.75: 歩行の地点一覧に無い4つ（朱雀門・後宮・穀倉院・羅城門の南）。🚫 at:'suzakumon' 20行・'kokyu' 8行・'kokuso' 3行・'south' 5行が、どこでもタグにならず一度も出ていなかった
+ for(const o of heianOfficeRuntime?.offices||[])if(Math.hypot(x-o.ax,z-o.az)<(o.def.tagR||700))tags.add(o.def.tag); // 官司の戸口の間の近く（左京職など区画名の無い所の場所タグ・2026-10-11）
  if(Math.hypot(x,z-6860)<700)tags.add('suzakumon');
  if(inPalace&&Math.abs(x-1725)<620&&z<-1350&&z>-2500)tags.add('kokyu');
  if(Math.hypot(x+1696.8,z-8639.4)<650)tags.add('kokuso');
@@ -16894,13 +16983,13 @@ function heianSpeechCollect(rx,rz){
  // 朝堂院の蹴鞠・後宮の女官・内裏の衛士
  const ct=heianCourtLifeRuntime;
  // 宮城門の門衛（q）・馬寮の馬部（u）・大学寮の学生（s）も話す（2026-09-26。安麻呂＝朱雀門の門衛、文麻呂＝学生）
- if(ct)[['k',ct.players,'官人'],['l',ct.ladies,'女房'],['g',ct.guards,'衛士'],['q',ct.miyaGuards,'衛士'],['u',ct.umabe,'馬部'],['s',ct.students,'学生'],['p',ct.parcelFolk,null],['w',ct.kemariWatchers,'官人'],['b',ct.monks,'僧'],['r',ct.bridgeFolk,null],['x',ct.questFolk,null]].forEach(([pre,list,who])=>(list||[]).forEach((q,i)=>{const g=q.group;if(!g||!shown(g))return;g.getWorldPosition(v);
+ if(ct)[['k',ct.players,'官人'],['l',ct.ladies,'女房'],['g',ct.guards,'衛士'],['q',ct.miyaGuards,'衛士'],['y',ct.shisei,'史生'],['u',ct.umabe,'馬部'],['s',ct.students,'学生'],['p',ct.parcelFolk,null],['w',ct.kemariWatchers,'官人'],['b',ct.monks,'僧'],['r',ct.bridgeFolk,null],['x',ct.questFolk,null]].forEach(([pre,list,who])=>(list||[]).forEach((q,i)=>{const g=q.group;if(!g||!shown(g))return;g.getWorldPosition(v);
   push(pre+i,who||q.who,v.x,v.z,()=>shown(g)?g.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,H,0)):null,{obj:g});}));
  // 暮らしの営み（1.77・InstancedMesh）: 刻の外の人は外す。しゃがむ人は頭が低い
  const dl=heianDailyLifeRuntime;
- if(dl&&shown(dl.root))dl.people.forEach((p,i)=>{if(!p.on)return;const who=p.who||(p.role==='talk'?(p.female?'女':'庶民'):HEIAN_DAILY_LIFE_WHO[p.role]);
-  const lift=(p.child?.62:p.ht)*(p.role==='wash'||p.role==='cook'||p.role==='sit'?.62:1);
-  push('d'+i,who,p.wx,p.wz,()=>p.on&&shown(dl.root)?new THREE.Vector3(p.wx,(p.wy??p.y)+H*lift,p.wz):null,{life:p.role});});
+ if(dl&&shown(dl.root))dl.people.forEach((p,i)=>{if(!p.on||p.cull||p.bg)return;const who=p.who||(p.role==='talk'?(p.female?'女':'庶民'):HEIAN_DAILY_LIFE_WHO[p.role]);
+  const lift=(p.child?.62:p.ht)*(p.role==='wash'||p.role==='cook'||p.role==='sit'||p.kind==='write'||p.kind==='read'||p.kind==='count'||p.kind==='grind'||p.kind==='sort'||p.kind==='chart'||p.kind==='beads'||p.kind==='idle'?.68:1);
+  push('d'+i,who,p.wx,p.wz,()=>p.on&&shown(dl.root)?new THREE.Vector3(p.wx,(p.wy??p.y)+H*lift,p.wz):null,{life:p.role,...(p.office?{reach:Math.max(0,HEIAN_OFFICE_LOD.workerInteractiveDistance-HEIAN_DIALOG.reach)}:{})});}); // 官司の勤務者は戸口越しに話すので、話しかけられる距離を少し長く
  // 主要人物の割り当て（市と群衆の1人は初回に決めて覚える）
  if(!heianSpeech.bindCache&&sl&&cr){const mp=sl.marketPeoplePositions||[],ki=mp.findIndex(m=>m.id==='eastMarket'&&m.role==='seller');
   let kg=-1,kd=Infinity;if(ki>=0)mp.forEach((m,j)=>{if(m.id!=='eastMarket'||m.role!=='customer')return;const d=Math.hypot(m.x-mp[ki].x,m.z-mp[ki].z);if(d<kd){kd=d;kg=j;}});
@@ -17113,7 +17202,7 @@ const HEIAN_UI_LINES_EN={
  検非違使:'kebiishi (police)',馬部:'groom',母:'mother',庶民:'townsperson',家司:'steward',僧:'monk',女:'woman',塩売り:'salt seller',工人:'craftsman',暦生:'calendar student',
  沙弥:'novice monk',老女:'old woman',放免:'police hand',北の方:'lady of the house',乳母:'nurse',姫君:'young lady',雑色:'servant',介添えの女:'birth helper',水夫:'boatman',行商:'peddler',
  祝:'shrine priest',旅人:'traveler',客:'customer',博士:'scholar',船頭:'boatman',洗い女:'washerwoman',炊女:'cook',下人:'servant',厩の者:'stable hand',闇市の売り手:'black-market seller',
- 大納言家:'Major Counselor’s house',右大臣家:'house of the Minister of the Right',後宮:'the Empress’s quarters',河原院:'Kawara-in',東三条殿:'Higashi-Sanjo mansion',中納言家:'Middle Counselor’s house',左大臣家:'house of the Minister of the Left',仁和寺:'Ninna-ji',
+ 大納言家:'Major Counselor’s house',右大臣家:'house of the Minister of the Right',後宮:'the Empress’s quarters',河原院:'Kawara-no-in',東三条殿:'Higashi-Sanjo mansion',中納言家:'Middle Counselor’s house',左大臣家:'house of the Minister of the Left',仁和寺:'Ninna-ji',
  北:'north',北東:'northeast',東:'east',南東:'southeast',南:'south',南西:'southwest',西:'west',北西:'northwest',
  '身の上を聞く':'Ask about their life','近ごろ見たものを聞く':'Ask what they’ve seen lately','望みを聞く':'Ask what they wish for','知り合いのことを聞く':'Ask about people they know',
  'この土地の言い伝えを聞く':'Ask about local tales','ほかの言い伝え':'Another tale','ほかの話':'Something else','じゃあまた':'See you','もっと聞く':'Tell me more','閉じる':'Close',
@@ -17394,7 +17483,8 @@ function heianDialogFor(c,tags,auto=false,ctx=null){
   const k=c.char.id,turn=heianDialog.entryTurn||(heianDialog.entryTurn={});
   const own=prog[0]||(rot.length?rot[(auto?Math.max(0,turn[k]??0):(turn[k]=((turn[k]??-1)+1)))%rot.length]:null)||mine.find(d=>!d.if&&!d.keep);
   if(own)return own;return auto?null:heianCharDialog(c.char);}
- const pool=list.filter(d=>!d.char&&qok(d)&&(auto?autoOK(d):true)&&heianDialogMatch(d,c,tags));
+ let pool=list.filter(d=>!d.char&&qok(d)&&(auto?autoOK(d):true)&&heianDialogMatch(d,c,tags));
+ if(c.life){const own=pool.filter(d=>d.life);if(own.length)pool=own;} // 2026-10-11 作業役（life）の人は、その役専用の対話があれば役に関係しない一般の対話（official など）を混ぜない（一言 say の規則と同じ）
  {const q=!auto&&pool.find(d=>d.if);if(q)return q;}
  const local=pool.filter(d=>d.at);return heianDialogRand(local.length?local:pool)||(auto?null:HEIAN_CHAT_DIALOG);
 }
@@ -17468,7 +17558,7 @@ const heianNbWho=x=>{if(x.char){const p=(heianSpeechData?.people||[]).find(q=>q.
 const heianNbWhen=x=>heianLang==='en'?heianCalendarLabelEn(x.day)+', '+heianHourEn(x.hour):heianCalendar(x.day).label+'　'+heianHourLabel(x.hour);
 const heianNbPlace=x=>{if(!x.place)return'';if(heianLang!=='en')return x.place;const l=HEIAN_GAME_LOCATIONS.find(p=>p.name===x.place);return l?locName(l):heianTr(x.place);};
 function heianNbTopicLabel(x){if(x.topic){const t=window.HEIAN_KB?.TOPICS?.[x.topic];return t?heianTr(t.label):null;}if(x.term){const t=heianLoreTerms()[x.term];return t?heianTr(t.q).replace(/とは？$|\?$/,'').replace(/^What (is|are|was) /,''):null;}if(x.quest)return heianLang==='en'?(HEIAN_QUEST_NAMES_EN[x.quest]||null):(HEIAN_QUEST_NAMES[x.quest]||null);return null;}
-function heianNotebookClose(){heianNb.el?.remove();heianNb.el=null;}
+function heianNotebookClose(){heianNb.el?.remove();heianNb.el=null;heianNb.rerender=null;}
 function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heianTraceClose();const hud=document.getElementById('heianGameHud');if(!hud)return;if(tab)heianNb.tab=tab;
  const el=document.createElement('div');el.className='heian-notebook';el.setAttribute('role','dialog');el.setAttribute('aria-label',heianNbT('聞き書き帳','Notebook'));
  for(const ev of['pointerdown','pointerup','mousedown','mouseup','click','dblclick','wheel','touchstart','keydown'])el.addEventListener(ev,e=>{e.stopPropagation();if(ev==='keydown'&&e.key==='Escape')heianNotebookClose();},{passive:ev!=='keydown'&&ev!=='wheel'?true:false});
@@ -17478,7 +17568,7 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
  const tools=document.createElement('div');tools.className='nb-tools';const search=document.createElement('input');search.type='search';search.placeholder=heianNbT('語で探す（例: 紅）','Search (e.g. rouge)');search.value=heianNb.q;search.setAttribute('aria-label',search.placeholder);
  const filt=document.createElement('div');filt.className='nb-filter';tools.append(search);
  const list=document.createElement('div');list.className='nb-list';
- const TABS=[['notes',heianNbT('聞き書き','Heard')],['diary',heianNbT('日録','Diary')],['people',heianNbT('人物','People')],['places',heianNbT('場所','Places')]];
+ const TABS=[['notes',heianNbT('聞き書き','Heard')],['diary',heianNbT('日録','Diary')],['photos',heianNbT('写真','Photos')],['people',heianNbT('人物','People')],['places',heianNbT('場所','Places')]]; // 2026-10-12 写真（日録に残した撮った絵）
  const render=()=>{for(const b of tabs.children)b.setAttribute('aria-selected',String(b.dataset.tab===heianNb.tab));list.replaceChildren();filt.replaceChildren();
   const items=heianNotebook.items.slice().reverse(),F=heianNb.filter,q=heianNb.q.trim();
   if(F){filt.textContent=(F.kind==='char'?heianNbT('人: ','Person: '):F.kind==='place'?heianNbT('場所: ','Place: '):heianNbT('話題: ','Topic: '))+F.label;const x=document.createElement('button');x.type='button';x.textContent=heianNbT('すべて','Show all');x.addEventListener('click',()=>{heianNb.filter=null;render();});filt.append(x);}
@@ -17502,6 +17592,7 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
     row.append(meta,t,chips);list.append(row);}
    return;}
   if(heianNb.tab==='diary')return heianDiaryRender(list,q,empty);
+  if(heianNb.tab==='photos')return heianShotsRender(list,q,empty,render);
   // 人物・場所: 帳面に出てくる人と場所を、話の数と最後に聞いた日で並べる
   const key=heianNb.tab==='people'?(x=>x.char||x.who):(x=>x.place),groups=new Map();
   for(const x of items){const k=key(x);if(!k)continue;const g=groups.get(k)||{k,n:0,last:x,refer:0};g.n++;groups.set(k,g);}
@@ -17515,7 +17606,8 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
    b.append(a,s);b.addEventListener('click',()=>{heianNb.filter={kind:heianNb.tab==='people'?'char':'place',id:g.k,label};heianNb.tab='notes';render();});list.append(b);}};
  for(const[id,label]of TABS){const b=document.createElement('button');b.type='button';b.dataset.tab=id;b.setAttribute('role','tab');b.textContent=label;b.addEventListener('click',()=>{heianNb.tab=id;heianNb.filter=null;render();});tabs.append(b);}
  search.addEventListener('input',()=>{heianNb.q=search.value;render();});
- head.append(h,tabs,close);el.append(head,tools,filt,list);hud.append(el);heianNb.el=el;render();search.focus({preventScroll:true});}
+ head.append(h,tabs,close);el.append(head,tools,filt,list);hud.append(el);heianNb.el=el;heianNb.rerender=render;render();search.focus({preventScroll:true});
+ if(!heianShots)heianShotsLoad().then(()=>{if(heianNb.el===el)render();});} // 2026-10-12 写真は帳面を開いた時に読む（起動では読まない）
 // 1.90 最初の5分: 初めて歩き出したときに一度だけ、歩き方・話し方・帳面・最初に訪ねる人を短く出す（10秒で消える）。localStorage heian-first-guide
 function heianFirstGuide(){try{if(localStorage.getItem('heian-first-guide'))return;localStorage.setItem('heian-first-guide','1');}catch(e){return;}
  const hud=document.getElementById('heianGameHud');if(!hud||!heianWalk.active)return;const en=heianLang==='en';
@@ -17539,7 +17631,7 @@ let heianDiaryLastDay=null;
 function heianDiarySave(){try{localStorage.setItem('heian-diary',JSON.stringify(heianDiary));}catch(e){}}
 function heianDiaryDay(day){day=Math.floor(day);return heianDiary.days[day]||(heianDiary.days[day]={visits:[],w:null,night:false});}
 function heianDiaryFound(id){const d=heianDiaryDay(heianClock.day);(d.found||(d.found=[])).includes(id)||d.found.push(id);heianDiarySave();} // 2026-10-05 その日に初めて歩いて着いた所
-const heianDiaryHas=day=>!!(heianDiary.days[day]?.visits?.length||heianNotebook.items.some(x=>x.day===day)||heianDiaryPhotos.some(x=>x.day===day));
+const heianDiaryHas=day=>!!(heianDiary.days[day]?.visits?.length||heianNotebook.items.some(x=>x.day===day)||heianDiaryPhotos.some(x=>x.day===day)||!!heianShots?.some(x=>x.day===day)); // heianShots は撮った絵の共有の節（帳面を開くまで null）
 // 1秒ごと（heianKnownTick から・歩いている間だけ）。日が変わったら「昨日のことを書いた」と知らせる
 function heianDiaryTick(p){const day=Math.floor(heianClock.day),hour=heianClock.hour;
  if(heianDiaryLastDay!=null&&day!==heianDiaryLastDay&&heianDiaryHas(heianDiaryLastDay))heianDiaryToast(day-heianDiaryLastDay>1?heianDiaryLastDay:null);heianDiaryLastDay=day;
@@ -17586,14 +17678,16 @@ function heianDiaryLines(day){const en=heianLang==='en',d=heianDiary.days[day]||
  while(out.length>5)out.splice(out.length-1,1);
  return out;}
 function heianDiaryRender(list,q,empty){const en=heianLang==='en',today=Math.floor(heianClock.day);
- const days=[...new Set([...Object.keys(heianDiary.days).map(Number),...heianNotebook.items.map(x=>x.day),...heianDiaryPhotos.map(x=>x.day)])].filter(d=>Number.isFinite(d)&&heianDiaryHas(d)).sort((a,b)=>b-a);
+ const days=[...new Set([...Object.keys(heianDiary.days).map(Number),...heianNotebook.items.map(x=>x.day),...heianDiaryPhotos.map(x=>x.day),...(heianShots||[]).map(x=>x.day)])].filter(d=>Number.isFinite(d)&&heianDiaryHas(d)).sort((a,b)=>b-a);
  let shown=0;
  for(const day of days.slice(0,90)){const lines=heianDiaryLines(day);if(q&&!lines.some(s=>s.toLowerCase().includes(q.toLowerCase())))continue;
   const sec=document.createElement('section');sec.className='nb-day nb-item';const h=document.createElement('h3');h.textContent=en?heianCalendarLabelEn(day):heianCalendar(day).label;
   if(day===today){const s=document.createElement('small');s.textContent=en?'today, still writing':'今日・書きかけ';h.append(s);}
   const p=document.createElement('p');p.textContent=lines.join(en?' ':'');if(en)p.lang='en';sec.append(h,p);
-  const ph=heianDiaryPhotos.filter(x=>x.day===day);if(ph.length){const box=document.createElement('div');box.className='nb-photos';
-   for(const x of ph){const img=document.createElement('img');img.src=x.url;img.loading='lazy';const l=HEIAN_GAME_LOCATIONS.find(q=>q.id===x.place);img.alt=l?locName(l):(en?'Photo':'撮った絵');box.append(img);}sec.append(box);}
+  // 撮った絵: 1.92 からの小さな絵（localStorage・自動で残していた）と、2026-10-12 からの日録に残した写真（IndexedDB・押すと共有・保存の窓）
+  const ph=heianDiaryPhotos.filter(x=>x.day===day),sh=(heianShots||[]).filter(x=>x.day===day);if(ph.length||sh.length){const box=document.createElement('div');box.className='nb-photos';
+   for(const x of ph){const img=document.createElement('img');img.src=x.url;img.loading='lazy';const l=HEIAN_GAME_LOCATIONS.find(q=>q.id===x.place);img.alt=l?locName(l):(en?'Photo':'撮った絵');box.append(img);}
+   for(const x of sh){const img=document.createElement('img');img.src=x.thumb;img.loading='lazy';img.className='nb-shot-thumb';img.alt=heianShotLabels(x).place;if(x.caption)img.title=x.caption;img.addEventListener('click',()=>heianShotReopen(x.id));box.append(img);}sec.append(box);}
   list.append(sec);shown++;}
  if(!shown)empty(days.length?heianNbT('当てはまる日はまだない','No day matches yet'):heianNbT('日録はまだ白い。歩いて一日を過ごすと、ここに書かれる','Your diary is still blank. Spend a day walking and it will be written here.'));}
 window.__heianDiary=day=>{const d=day??Math.floor(heianClock.day);return{day:d,lines:heianDiaryLines(d),raw:heianDiary.days[d]||null,photos:heianDiaryPhotos.filter(x=>x.day===d).length,days:Object.keys(heianDiary.days).length};};
@@ -17604,7 +17698,7 @@ window.__heianNoteAdd=o=>heianNoteAdd(o); // 検証用（日録の文の型を�
 const HEIAN_TIMELINE=[
  {y:785,era:'延暦4年',ja:'藤原種継が暗殺され、早良親王が皇太子を廃される',en:'Fujiwara no Tanetsugu is murdered; Prince Sawara loses his place as heir',term:'sawara'},
  {y:794,era:'延暦13年',ja:'桓武天皇が都を平安京へ移す',en:'Emperor Kanmu moves the capital to Heian-kyo',go:'rajomon'},
- {y:796,era:'延暦15年',ja:'羅城門の東西に東寺・西寺が建てられ始める',en:'Building begins on To-ji and Sai-ji, east and west of Rashomon',go:'toji'},
+ {y:796,era:'延暦15年',ja:'羅城門の東西に東寺・西寺が建てられ始める',en:'Building begins on To-ji and Sai-ji, east and west of Rajomon',go:'toji'},
  {y:823,era:'弘仁14年',ja:'空海が東寺を賜り、真言の道場にする',en:'Kukai is given To-ji and makes it a center of Shingon Buddhism',term:'kukai',go:'toji'},
  {y:824,era:'天長元年',ja:'日照りに、空海が神泉苑で雨乞いをしたと伝わる',en:'In a drought, Kukai is said to pray for rain at Shinsen-en',term:'ryuo',go:'shinsenen'},
  {y:863,era:'貞観5年',ja:'神泉苑で初めての御霊会が開かれる',en:'The first goryo-e, a rite to calm angry spirits, is held at Shinsen-en',term:'goryoe',go:'shinsenen'},
@@ -17865,8 +17959,19 @@ function heianDialogOpen(c,d,ctx,auto=false){
  Object.assign(heianDialog,{open:true,cand:c,dlg:d,el,ctx,seen:new Set(),seenTerms:new Set(),kbAsked:new Set(),loreLine:null,openDist:rp&&hp?Math.hypot(hp.x-rp.x,hp.z-rp.z):0,openPos:rp?{x:rp.x,z:rp.z}:null,place:rp?(heianPlaceNameAt(rp.x,rp.z)||''):'',placeAt:0,closedBy:null});heianDialog.opened++;if(auto)heianDialog.auto++;
  heianDialog.nextAuto=performance.now()/1000+HEIAN_DIALOG.autoGap;heianDialogShow(d.start||'s',ctx);return true;
 }
+// スマホ横持ちの対話: 窓は右の約48%に出る（CSS）。ロボと相手が窓の下に隠れないよう、描く範囲をずらして街の中心を左の空きの中央へ寄せる。
+//  camera.setViewOffset は射影行列に入るので、吹き出しの位置・クリックの当たり（project / Raycaster）も同じずれで揃う。窓を閉じたら元へ戻す
+let heianViewShift=0;
+function heianCompactViewShift(){
+ const open=heianGameMode&&document.getElementById('heianGameHud')?.classList.contains('heian-dialog-open'),want=open&&matchMedia(HEIAN_COMPACT_MQ).matches&&matchMedia('(orientation:landscape)').matches?.22:0;
+ if(want===heianViewShift)return;
+ heianViewShift+=(want-heianViewShift)*.25;if(Math.abs(want-heianViewShift)<.004)heianViewShift=want;
+ const w=vp.clientWidth,h=vp.clientHeight;
+ if(heianViewShift>.001&&camera.setViewOffset)camera.setViewOffset(w,h,Math.round(w*heianViewShift),0,w,h);else if(camera.clearViewOffset)camera.clearViewOffset();
+}
+window.__heianViewShift=()=>({shift:heianViewShift,view:camera.view?{enabled:camera.view.enabled,x:camera.view.offsetX,w:camera.view.width}:null}); // 検証用
 // 画面に映っている、話しかけられる距離の人（いちばん近い人）
-function heianDialogTarget(reach=HEIAN_DIALOG.reach){let best=null,bd=reach;for(const c of heianSpeech.cands){if(c.dist>=bd)continue;const p=c.head();if(!p||!heianSpeechProject(p))continue;bd=c.dist;best=c;}return best;}
+function heianDialogTarget(reach=HEIAN_DIALOG.reach){let best=null,bd=reach;for(const c of heianSpeech.cands){const dd=c.dist-(c.reach||0);if(dd>=bd)continue;const p=c.head();if(!p||!heianSpeechProject(p))continue;bd=dd;best=c;}return best;}
 function updateHeianDialog(now,ctx,rp,hud){
  heianDialog.ctx=ctx;
  // 開いている対話を閉じるのは「こちらが動いたとき」だけ（2026-09-27井内さん「こっちが終わらせたら終了」→「他の場所に移動しても閉じて」「少し離れたら自動で閉じて」）。
@@ -17937,7 +18042,7 @@ window.__heianDialogInfo=()=>({open:heianDialog.open,opened:heianDialog.opened,a
  openPos:heianDialog.openPos||null,openDist:Math.round(heianDialog.openDist||0),moved:Math.round(heianDialog.moved||0),rp:heianDialog.rp||null,farDist:heianDialog.farDist==null?null:Math.round(heianDialog.farDist)});
 window.__heianDialogTalk=()=>heianDialogTalk();
 // 検証用（1.56）: 近くの候補から人物id（char）か who で選んで話しかける。距離は問わない
-window.__heianDialogTalkTo=(k,near)=>{heianSpeech.lastScan=0;updateHeianSpeech();const c=heianSpeech.cands.filter(q=>q.char?.id===k||(!q.char&&q.who===k)).sort((a,b)=>a.dist-b.dist)[0];
+window.__heianDialogTalkTo=(k,near)=>{heianSpeech.lastScan=0;updateHeianSpeech();const c=heianSpeech.cands.filter(q=>q.char?.id===k||(!q.char&&(q.who===k||q.life===k))).sort((a,b)=>a.dist-b.dist)[0];
  return c?{ok:heianDialogTalk(c),dist:Math.round(c.dist),who:c.who,char:c.char?.id||null,dlg:heianDialog.dlg?.id||null}:{ok:false,cands:[...new Set(heianSpeech.cands.map(q=>q.char?.id||q.who))].slice(0,30)};};
 // 検証用（1.56）: (x,z) のまわりの候補を集め、人物id の体の位置を返す
 window.__heianCharsAt=(x,z)=>heianSpeechCollect(x,z).filter(q=>q.char).map(q=>({id:q.char.id,key:q.key,kugyo:q.kugyo||null,x:Math.round(q.x),z:Math.round(q.z)}));
@@ -17954,6 +18059,9 @@ window.__heianWhoNear=(x,z)=>{const near={};for(const q of heianSpeechCollect(x,
 // 検証用（1.87）: 人物id に n 回話しかけたときに選ばれる対話の id（入口が訪ねるたびに順番に出るか）
 window.__heianDialogPickFor=(id,n=3)=>{const p=(heianSpeechData?.people||[]).find(q=>q.id===id);if(!p)return null;const out=[];
  for(let i=0;i<n;i++){const d=heianDialogFor({char:p,key:'probe:'+id},new Set(['any']));out.push(d?.id||null);}return out;};
+// 検証用（2026-10-11）: 官司の勤務の役（life）の人に話しかけたときに選ばれる対話の id。戸口の間の近くのタグ付きで n 回
+window.__heianDialogPickLife=(life,n=1)=>{const o=heianOfficeRuntime?.workers.find(w=>w.role===life),tag=heianOfficeRuntime?.offices.find(q=>q.id===o?.office)?.def.tag,out=[];if(!o)return null;
+ for(let i=0;i<n;i++){const d=heianDialogFor({who:o.who,life,key:'probe:'+life},new Set(['any',tag]));out.push(d?.id||null);}return out;};
 // 検証用（1.87）: 全対話の全節で、深掘り・聞き込みが付いたときの選択肢の数（4つまでか）
 window.__heianDialogChoiceStats=()=>{const hist={},big=[];let max=0,lost=0;
  for(const d of heianSpeechData?.dialogs||[])for(const[id,n]of Object.entries(d.nodes||{})){if(!n.c)continue;
@@ -19719,6 +19827,7 @@ function applyHeianPeopleHour(hour,day){
    const northbound=h>=4.5&&h<10,southbound=h>=12&&h<18.5;
    if(northbound)f.direction=-1;else if(southbound)f.direction=1;}
  }
+ heianOfficeRuntime?.setHour(h); // 官司の戸口の間の戸の開け閉め（勤務の刻・2026-10-11）
  heianDailyLifeRuntime?.setHour(h); // 暮らしの営み（洗い物・炊事・水汲み・掃除・厩・世間話・子の遊び）の刻（1.77）
  heianStreetLifeRuntime?.setHour?.(h); // 街の行列を時刻で出し入れ（夜は荷役・行商を引き上げる・2026-08-30）
  if(heianStreetLifeRuntime?.setMarketOpen){
@@ -20255,7 +20364,7 @@ function heianCloudShadowTick(){
    if(m.isMeshLambertMaterial||m.isMeshStandardMaterial||m.isMeshPhongMaterial){heianApplyCloudShadow(m,false);heianCloudCount.lit++;}
    else if(m.isMeshBasicMaterial&&/街路|大路|小路|道|水面|堀|川|池|溝/.test(o.name||'')&&!/影|空|星|月|灯|印|線/.test(o.name||'')){heianApplyCloudShadow(m,true);heianCloudCount.basic++;}}});}
 window.__heianCloudShadowInfo=()=>({...heianCloudCount,k:heianCloudShadowU.heianCloudK.value,kBasic:heianCloudShadowU.heianCloudB.value,off:heianCloudShadowU.heianCloudOff.value.toArray().map(Math.round),flowRate:Math.round(heianCloudShadowFlow.rate*100)/100});
-function heianRealWanted(){const q=new URLSearchParams(location.search).get('real');if(q==='0')return false;if(q==='1')return true;return!matchMedia('(max-width:600px)').matches;}
+function heianRealWanted(){const q=new URLSearchParams(location.search).get('real');if(q==='0')return false;if(q==='1')return true;return!matchMedia(HEIAN_COMPACT_MQ).matches;}
 const heianRealSkipName=n=>/下草|写実影受け|接地影|影$|建築影|川|水面|水|池|運河|湖|苑池|空|星|月|灯|glow|稜線|外形線/.test(n);
 // 影を落とす・受ける印を付ける。後から出来る mesh（歩行で出る街並み・群衆）も拾えるよう定期的に呼ぶ
 function heianRealTagMeshes(){
@@ -20281,7 +20390,7 @@ function setHeianReal(on){
  on=!!on;if(on===!!heianRealRuntime)return on;
  const allMats=()=>{const s=new Set();scene.traverse(o=>{const m=o.material;if(!m)return;for(const q of Array.isArray(m)?m:[m])s.add(q);});return s;};
  if(on){
-  const small=matchMedia('(max-width:600px)').matches||(navigator.hardwareConcurrency||8)<=4,size=small?HEIAN_REAL.mapSizeSmall:HEIAN_REAL.mapSize;
+  const small=matchMedia(HEIAN_COMPACT_MQ).matches||(navigator.hardwareConcurrency||8)<=4,size=small?HEIAN_REAL.mapSizeSmall:HEIAN_REAL.mapSize;
   heianRealRuntime={saved:{shadow:renderer.shadowMap.enabled,type:renderer.shadowMap.type,tone:renderer.toneMapping,exposure:renderer.toneMappingExposure,fog:scene.fog,cast:dir.castShadow,pos:dir.position.clone(),color:dir.color.getHex(),targetPos:dir.target.position.clone(),targetParent:dir.target.parent,
     hemiSky:dayHemi.color.getHex(),hemiGround:dayHemi.groundColor.getHex(),fill:dir2.color.getHex()},
    tagged:new Set(),prev:[],mats:new Set(),basicMats:new Set(),overlays:[],overlayMat:new THREE.ShadowMaterial({opacity:HEIAN_REAL.overlayOpacity,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),
@@ -20429,6 +20538,18 @@ window.__heianMeshSet=(re,o={})=>{const R=new RegExp(re);let n=0;scene.traverse(
 window.__heianRenderTime=(k=8,hide=null)=>{const gl=renderer.getContext(),px=new Uint8Array(4),hidden=[];if(hide){const re=new RegExp(hide);scene.traverse(o=>{if(o.isMesh&&o.visible&&re.test(o.name||'')){o.visible=false;hidden.push(o);}});}
  renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);const t0=performance.now();for(let i=0;i<k;i++){renderer.info.reset();renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);}
  const ms=(performance.now()-t0)/k,calls=renderer.info.render.calls,tris=renderer.info.render.triangles;for(const o of hidden)o.visible=true;return{ms:Math.round(ms*10)/10,calls,tris,hidden:hidden.length};};
+// 検証用（2026-10-12 軽量化）: 1コマの内訳。行列の更新（scene.updateMatrixWorld）・描画の命令を出す時間（CPU・GPUを待たない）・GPUを待った合計、
+//  場面の物の数（全部・見えている mesh・matrixAutoUpdate の物）。描画の解像度を pr 倍にした時間も（塗りの重さの見当）
+window.__heianFrameSplit=(k=5,pr=null)=>{const gl=renderer.getContext(),px=new Uint8Array(4),sync=()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);
+ let objs=0,meshes=0,auto=0;scene.traverse(o=>{objs++;if(o.matrixAutoUpdate)auto++;if(o.isMesh&&o.visible)meshes++;});
+ const prev=renderer.getPixelRatio();if(pr)renderer.setPixelRatio(prev*pr);
+ renderer.render(scene,camera);sync();let mw=0,cpu=0,all=0;
+ for(let i=0;i<k;i++){let t=performance.now();scene.updateMatrixWorld();mw+=performance.now()-t;t=performance.now();renderer.render(scene,camera);cpu+=performance.now()-t;sync();all+=performance.now()-t;}
+ if(pr)renderer.setPixelRatio(prev);
+ const r=v=>Math.round(v/k*10)/10;return{matrixWorld:r(mw),renderCpu:r(cpu),renderWithGpu:r(all),objs,meshes,autoUpdate:auto,pixelRatio:prev*(pr||1),calls:renderer.info.render.calls};};
+// 検証用（2026-10-12 軽量化）: 場面の木の上の方の枝ごとの物の数（行列の自動更新の数）。どの枝が静止しているかを見る
+window.__heianSceneTree=(depth=2,min=200)=>{const out=[];const walk=(o,d,path)=>{let n=0,auto=0;o.traverse(q=>{n++;if(q.matrixAutoUpdate)auto++;});
+ if(n>=min)out.push({path:path+(o.name||o.type),n,auto,wauto:o.matrixWorldAutoUpdate!==false,vis:o.visible});if(d<depth)o.children.forEach(c=>walk(c,d+1,path+(o.name||o.type)+' / '));};walk(scene,0,'');return out;};
 window.__heianPerf=()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,pixelRatio:renderer.getPixelRatio(),drawingSize:[renderer.domElement.width,renderer.domElement.height]});
 // ロード画面の文言は内部用語を出さない（2026-08-18井内さん指示）。英語モードでは対訳へ差し替える
 const HEIAN_PROGRESS_EN={'3Dの準備中':'Preparing 3D','地形データを読み込み中':'Loading terrain data',
@@ -20513,8 +20634,9 @@ function resolveHeianWalkPoint(x,z,radius=5){if(!heianWalkBlocked(x,z,radius))re
 // 🚫 回廊の梁（柱頭の上・軒の高さ）も障害物にしていた。豊楽院は地形が回廊の基準面より高く、梁の下端が「地面+23」の判定に入って
 //    回廊の全長（z2455〜5370）が帯状の壁として登録され、壁のない回廊なのに柱間を横断できなかった
 //    （2026-10-03井内さん「豊楽院の回廊だけど、壁がなくていいんだけど通り抜けられない。壁のない回廊は横断できるはず」）。梁は頭の上なので除き、柱だけで塞ぐ
+// 🚫 除外の「木」（樹木）が「木工内候塀」「木工寮庁内壁」の名前にも当たり、木工内候は塀も殿舎も障害物に入っていなかった（2026-10-12 木工寮の戸口を作って発覚）。「木工」は除く
 // 🚫 柱の礎石（2026-10-11）を障害物にしたら、竜尾壇の上（地形より10高い）の礎石が柱より太い箱として登録され、広義門の脇で回廊が通れなくなった。礎石は踏める低い石＝除く（柱が塞ぐ）
-function collectHeianWalkObstacles(group){group.updateMatrixWorld(true);group.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||/(?:地面|敷地|屋根|床|水面|苑池|基壇|石段|階|竜尾壇|竜尾道|旗|道路|街路|参道|道|田|畦|松|木|樹|植栽|敷石|石敷|板敷|甃|白砂|車寄せ|夜間閉鎖扉|瓦笠|板葺笠|塀笠|塀屋根|注連縄|笠木|鳥居貫|鳥居$|鳥居\s\d+$|回廊梁|礎石)/.test(o.name))return;
+function collectHeianWalkObstacles(group){group.updateMatrixWorld(true);group.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||/(?:地面|敷地|屋根|床|水面|苑池|基壇|石段|階|竜尾壇|竜尾道|旗|道路|街路|参道|道|田|畦|松|木(?!工)|樹|植栽|敷石|石敷|板敷|甃|白砂|車寄せ|夜間閉鎖扉|瓦笠|板葺笠|塀笠|塀屋根|注連縄|笠木|鳥居貫|鳥居$|鳥居\s\d+$|回廊梁|礎石)/.test(o.name))return;
   // 🚫 `敷石`が除外に無かったため、**上東門・上西門は門自身の敷石（厚さ0.2m・開口124単位を覆う）が
   //    壁と同格の障害物として登録され、見た目は抜けているのに通れなかった**（2026-09-07実測。
   //    比較: 陽明門は脚2本だけなので間の50単位=5mが空いている）。井内さん「上東門、上西門も牛車が
@@ -20694,6 +20816,11 @@ const HEIAN_DANCE_B={体ロール:-8,胴ひねり:-18,首左右:-6,右肩振り:
 const HEIAN_PRAY={腰前屈:8,首前後:12,右肩振り:-20,左肩振り:-20,右肩開き:-110,左肩開き:-110,右肘曲げ:-50,左肘曲げ:-50,右腕伸縮:1.1,左腕伸縮:1.1,右手開閉:0,左手開閉:0,目閉じ:5};
 window.__heianPrayTune=o=>{for(const k of Object.keys(HEIAN_PRAY))delete HEIAN_PRAY[k];Object.assign(HEIAN_PRAY,o||{});return{...HEIAN_PRAY};}; // 検証用: 祈りの関節角を差し替えて撮り比べる
 const HEIAN_BOW={腰前屈:40,首前後:18,右肩振り:-6,左肩振り:-6,右手開閉:6,左手開閉:6};
+// 2026-10-12 井内さん「お辞儀などで足は揃っていません」。足の12関節は stand で元から0（直立）に揃っていたが、ロボの構えの 0 は足幅が広く（左右の足の間 8）、
+//  つま先が外へ向いた「ガニ股」に見えていた。祈る・お辞儀（closeLegs:true）は、動作の出し入れに合わせて股開きを内へ −18°（足の間 約3.9・つま先がほぼ接する。−12 はまだ離れ、−24 は内股）寄せる。
+//  持ち上げ・下ろしはしゃがむ動作で足幅も使うので対象外。値は __heianLegClose(度) で撮り比べられる
+const HEIAN_LEG_CLOSE={右股開き:-18,左股開き:-18};
+window.__heianLegClose=v=>{if(Number.isFinite(v))HEIAN_LEG_CLOSE.右股開き=HEIAN_LEG_CLOSE.左股開き=v;return{...HEIAN_LEG_CLOSE};};
 const HEIAN_WAVE_A={右肩振り:-150,右肩開き:25,右肘曲げ:-40,右手開閉:-15,首左右:-4,目笑い:5};
 const HEIAN_WAVE_B={右肩振り:-150,右肩開き:55,右肘曲げ:-12,右手開閉:-15,首左右:4,目笑い:5};
 // ---- 持ち上げる・運ぶ（2026-10-11井内さん「ロボットに持ち上げるという動作を追加したい。将来クエストなどで石、木材、食料などを持ち上げたり運ぶ」）。
@@ -20751,8 +20878,9 @@ const HEIAN_ROBOT_ACTIONS=Object.freeze({
   [.94,{ルート上下:1.2,腰前屈:2,腰伸縮:.7,胴伸縮:1.2,右股:2,左股:2,右膝曲げ:10,左膝曲げ:10,右足首:-12,左足首:-12,右脚伸縮:.6,左脚伸縮:.6,右肩振り:5,左肩振り:5,右腕伸縮:.6,左腕伸縮:.6,首伸縮:1},0],[1.1,{},0]]},
  dance:{label:'踊る',key:'KeyQ',dur:3.6,spin:[1.35,2.7],keys:[[0,{},0],[.45,HEIAN_DANCE_A,2.5],[.9,HEIAN_DANCE_B,0],[1.35,HEIAN_DANCE_A,2.5],[1.8,HEIAN_DANCE_B,0],[2.25,HEIAN_DANCE_A,2.5],[2.7,HEIAN_DANCE_B,0],[3.15,HEIAN_DANCE_A,1.5],[3.6,{},0]]},
  // 2026-10-10 井内さん「祈る、お辞儀の時は両足は揃えてください」: stand:true で歩きの脚angleを無視し、脚12関節を直立(0)へ固定する
- pray:{label:'祈る',key:'KeyF',dur:3.2,stand:true,keys:[[0,{},0],[.6,HEIAN_PRAY,0],[2.5,HEIAN_PRAY,0],[3.2,{},0]]},
- bow:{label:'お辞儀',key:'KeyB',dur:1.8,stand:true,keys:[[0,{},0],[.45,HEIAN_BOW,0],[1.15,HEIAN_BOW,0],[1.8,{},0]]},
+ // 2026-10-12: closeLegs:true の動作は、足幅も内へ寄せる（HEIAN_LEG_CLOSE・heianRobotActionState が姿勢の入り具合に合わせて混ぜる）
+ pray:{label:'祈る',key:'KeyF',dur:3.2,stand:true,closeLegs:true,keys:[[0,{},0],[.6,HEIAN_PRAY,0],[2.5,HEIAN_PRAY,0],[3.2,{},0]]},
+ bow:{label:'お辞儀',key:'KeyB',dur:1.8,stand:true,closeLegs:true,keys:[[0,{},0],[.45,HEIAN_BOW,0],[1.15,HEIAN_BOW,0],[1.8,{},0]]},
  // 1.86 手を振る（2026-10-05井内さん「手を振ると振り返すとかも入れたい」）。右腕を上げ、肩の開きを3往復させる。近くの人が振り返す（heianWaveBack）
  wave:{label:'手を振る',key:'KeyG',dur:2,keys:[[0,{},0],[.3,HEIAN_WAVE_A,0],[.55,HEIAN_WAVE_B,0],[.8,HEIAN_WAVE_A,0],[1.05,HEIAN_WAVE_B,0],[1.3,HEIAN_WAVE_A,0],[1.55,HEIAN_WAVE_B,0],[2,{},0]]},
  // 2026-10-11 持ち上げる（R）。抱えているときは同じボタンが「下ろす」（putdown・ボタンは出さない）。stand:true＝脚は歩きの値を捨て、この動作の値（しゃがみ）だけにする
@@ -20773,6 +20901,10 @@ function heianRobotActionState(rt){
  let i=0;while(i<K.length-2&&t>=K[i+1][0])i++;const[t0,a0,l0]=K[i],[t1,a1,l1]=K[i+1],u=THREE.MathUtils.smoothstep(t,t0,t1),angles={};
  for(const n of new Set([...Object.keys(a0),...Object.keys(a1)]))angles[n]=(a0[n]||0)+((a1[n]||0)-(a0[n]||0))*u;
  if(D.stretchK)for(const n in angles)if(/伸縮$/.test(n))angles[n]*=D.stretchK;
+ // 足幅を内へ寄せる量 w は、動作の「山の姿勢」に対する今の姿勢の入り具合（0〜1）。始め・終わりは姿勢が空なので0、山では1。
+ //  山の姿勢＝キー列で最も多くの関節を動かしているキー（祈る＝HEIAN_PRAY・お辞儀＝HEIAN_BOW）。腰前屈の比で決める（どちらの姿勢も腰前屈を持つ）
+ if(D.closeLegs){const full=Math.max(...K.map(q=>Math.abs(q[1].腰前屈||0))),w=full>0?Math.min(1,Math.abs(angles.腰前屈||0)/full):0;
+  for(const n in HEIAN_LEG_CLOSE)angles[n]=(angles[n]||0)+HEIAN_LEG_CLOSE[n]*w;}
  let heading=rt.heading;if(D.spin)heading+=Math.PI*2*THREE.MathUtils.smoothstep(t,D.spin[0],D.spin[1]);
  if(A.face!=null){const w=Math.min(THREE.MathUtils.smoothstep(t,0,.35),1-THREE.MathUtils.smoothstep(t,D.dur-.35,D.dur)),d=Math.atan2(Math.sin(A.face-heading),Math.cos(A.face-heading));heading+=d*w;}
  return{angles,lift:((l0||0)+((l1||0)-(l0||0))*u)*(A.lk||1),heading,t,stand:!!D.stand};}
@@ -20826,6 +20958,7 @@ function heianRobotAct(name,opt={}){
  if(name==='lift')heianActionBarSync();
  return true;}
 window.__heianRobotAction=(name,opt)=>heianRobotAct(name,opt);
+window.__heianLegDebug=()=>heianTinRobotRuntime?.legDbg||null; // 検証用: 動作の最中に足の12関節（HEIAN_LEG_JOINTS の順）が上書きされた直後の角度
 // 検証用（1.97）: 姿勢を止めて撮る。{t: 動作の秒, hover: ホバーの速さ, face: 向き（rad）}。null で解除
 window.__heianRobotPosePin=o=>{const rt=heianTinRobotRuntime;if(!rt)return null;rt.posePin=o||null;if(o&&Number.isFinite(o.t)&&rt.action)rt.action.t0=-1e9;
  // アンテナの向き: 軸の根元→球の向きを、頭の上向き（首の位置→軸の根元）と比べる。fwd＞0＝前へ、＜0＝後ろへ傾いている（進む向き基準・度）
@@ -20932,6 +21065,7 @@ function createHeianTinRobotRuntime(options={}){
    //  2026-10-11: 動作が脚の値を持つとき（持ち上げるのしゃがみ）はその値にする（0＋動作の値）。祈る・お辞儀は脚の値が無い＝従来どおり 0
    const standLegs=ac?.stand?HEIAN_LEG_JOINTS.map(n=>{const j=joints.find(q=>q.name===n);return j?[j,j.angle||0]:null;}).filter(Boolean):[];
    for(const[j]of standLegs)j.angle=ac.angles[j.name]||0; // 歩きの値を捨てて動作の値だけ（戻すのは下で ajs・hjs より先＝掛けた順の逆）
+   runtime.legDbg=ac?{action:runtime.action?.name||null,stand:!!ac.stand,legs:HEIAN_LEG_JOINTS.map(n=>{const j=joints.find(q=>q.name===n);return j?Math.round((j.angle||0)*10)/10:null;}),gait:runtime.gaitKind,hover:!!runtime.hovering}:null; // 検証用（__heianLegDebug）
    // 2026-10-11 荷を抱えている間は腕を HEIAN_CARRY_POSE に固める（持ち上げ・下ろしの動作の間は動作の値が腕を動かすので重ねない）。脚は歩きのまま
    runtime.actionT=ac?.t??null;
    const carryOn=!!runtime.carry&&!(runtime.action&&/^(lift|putdown)$/.test(runtime.action.name)),cjs=carryOn?Object.entries(HEIAN_CARRY_POSE).map(([n,v])=>{const j=joints.find(q=>q.name===n);return j?[j,j.angle||0,v]:null;}).filter(Boolean):[];
@@ -22594,7 +22728,7 @@ function createHeianCourtLifeRuntime(){
    {axis:'z',fixed:2190,a:-2510,b:-2210,name:'東の帯の南北廊'}       // kairo(kokyu,'z',2190,-2510,-2210,30)
   ];
   const ladyRoutes=ladyLocalRoutes.map(r=>{const inset=20; // 端で殿舎へ踏み込まないよう両端を詰める
-   const along=r.axis==='x'?heianDairiX:heianDairiZ,across=r.axis==='x'?heianDairiZ:heianDairiX;
+   const along=r.axis==='x'?heianDairiXW:heianDairiZ,across=r.axis==='x'?heianDairiZ:heianDairiXW; // x は世界の縮み込み（heianDairiXW・2026-10-11）
    return{axis:r.axis,a:along(r.a)+inset,b:along(r.b)-inset,fixed:across(r.fixed),floorLift:3,name:r.name};});
   // 2026-10-10: 4本の廊に1人ずつ(計4人)だと、同じ廊を bind する住人2人（nyobo_yomi・ise）が1人の体を取り合い、
   //   どちらかが体を得られない時間帯が生まれた（井内さん「女房を増やしたらどうか」）。1本の廊に2人（半位相ずらし）、計8人にする
@@ -22622,10 +22756,13 @@ function createHeianCourtLifeRuntime(){
    [689-56,-2300-40,Math.PI/2,'右衛門陣の衛士（宜秋門前・北）'],
    [1650-46,-3878-118,0,'北陣の衛士（朔平門西脇）'],
    [1650+46,-3878-118,0,'北陣の衛士（朔平門東脇）'],
+   // 2026-10-11井内さん「建礼門に衛士がいない」: 内裏外郭の南の正門。門の外（南＝+z）の左右の脚の前に立てる（開口 ±34 は塞がない）。担当は衛門府（推定）
+   [1650-52,-1100+52,Math.PI,'衛門府の衛士（建礼門西脇）'],
+   [1650+52,-1100+52,Math.PI,'衛門府の衛士（建礼門東脇）'],
   ];
   const guards=guardSpots.map(([lx,lz,yaw,name])=>{
    const g=buildHeianStreetPerson(k,mats,kachie,name,{hat:'eboshi',guard:true});
-   const x=heianDairiX(lx),z=heianDairiZ(lz);
+   const x=heianDairiXW(lx),z=heianDairiZ(lz);
    g.group.position.set(x,heianWalkGroundY(x,z),z);g.group.rotation.y=yaw+Math.PI;
    g.group.add(heianShadowBlob(4.2,4.2,0,0,.3));root.add(g.group);
    return{...g,name,x,z};
@@ -22635,8 +22772,12 @@ function createHeianCourtLifeRuntime(){
   // 衛門府の担当は東面=左衛門・西面=右衛門・北面=衛門府（上の内裏の衛士と同じ分担に合わせる）。
   // 座標は大内裏の世界座標（内裏ローカルの倍率は掛けない）。東面 x=5990／西面 x=-5990／
   // 南面 z=6860（朱雀門・皇嘉門・美福門）／北面 z=-7150。門の外側へ立て、開口は塞がない。
+  // 🚫 座標を大内裏ローカル（大垣の中心 ±5990・南北の門 x±3224）のまま置いていたので、x を 5635.8/5996 に縮めた実際の門から
+  //    南北の門で約19m（美福門・皇嘉門・安嘉門・達智門）、東西の門で約36m（大垣の外、大宮川の向こう）ずれて立っていた（2026-10-11井内さん「美福門の衛士が門とズレたところに立ってる」「他の門も」）。
+  //    ⇒ x にも makeDaidairi の縮尺 sx を掛ける。東西の面は大垣の外面（5635.8）と大宮川（x5685〜）の間の帯に立てる（out は大垣の中心から）
   const miyaGuardSpots=[];
-  {const X=5990,ZS=6860,ZN=-7150,out=52,off=44; // out=門の外側への距離・off=開口の両脇へ振る距離
+  {const sx=5635.8/5996,X=5990*sx,ZS=6860,ZN=-6990,outNS=52,outEW=34,off=44; // ZN: 北の門の実際の中心 z=-6990（旧 -7150 は約16m北へずれていた） // out＝門の外側への距離・off＝開口の両脇へ振る距離
+   const out=outEW;
    const ku=gx=>gx>0?'左衛門府':'右衛門府';
    for(const[gz,name]of[[-1422,'陽明門'],[1431,'待賢門'],[4297,'郁芳門'],[-4274,'上東門']])
     for(const s of[-1,1])miyaGuardSpots.push([X+out,gz+s*off,-Math.PI/2,ku(X)+'の門衛（'+name+(s<0?'北':'南')+'脇）']);
@@ -22644,10 +22785,12 @@ function createHeianCourtLifeRuntime(){
     for(const s of[-1,1])miyaGuardSpots.push([-X-out,gz+s*off,Math.PI/2,ku(-X)+'の門衛（'+name+(s<0?'北':'南')+'脇）']);
    // 南面3門は朱雀大路・皇嘉門大路・美福門大路の側。朱雀門は儀式の門だが門衛は常駐する
    for(const[gx,name]of[[0,'朱雀門'],[-3224,'皇嘉門'],[3224,'美福門']])
-    for(const s of[-1,1])miyaGuardSpots.push([gx+s*off,ZS+out,Math.PI,'衛門府の門衛（'+name+(s<0?'西':'東')+'脇）']);
+    for(const s of[-1,1])miyaGuardSpots.push([(gx+s*off)*sx,ZS+outNS,Math.PI,'衛門府の門衛（'+name+(s<0?'西':'東')+'脇）']);
    // 北面3門
    for(const[gx,name]of[[-3224,'安嘉門'],[0,'偉鑒門'],[3224,'達智門']])
-    for(const s of[-1,1])miyaGuardSpots.push([gx+s*off,ZN-out,0,'衛門府の門衛（'+name+(s<0?'西':'東')+'脇）']);
+    for(const s of[-1,1])miyaGuardSpots.push([(gx+s*off)*sx,ZN-outNS,0,'衛門府の門衛（'+name+(s<0?'西':'東')+'脇）']);
+   // 立つ所が塀・門の脚・川に掛かれば、大垣から離れる向き（東面＋x・西面−x・南面＋z・北面−z）へ少しずつずらす
+   for(const q of miyaGuardSpots){let n=0;const ew=Math.abs(q[0])>5000,fx=ew?Math.sign(q[0]):0,fz=ew?0:Math.sign(q[1]);while(n<12&&heianWalkBlocked(q[0],q[1],3)){q[0]+=fx*4;q[1]+=fz*4;n++;}}
   }
   const miyaGuards=miyaGuardSpots.map(([x,z,yaw,name])=>{
    const g=buildHeianStreetPerson(k,mats,kachie,name,{hat:'eboshi',guard:true});
@@ -22655,6 +22798,23 @@ function createHeianCourtLifeRuntime(){
    g.group.add(heianShadowBlob(4.2,4.2,0,0,.3));root.add(g.group);
    return{...g,name,x,z};
   });
+  // ---- 省庁の門前の説明役（史生・2026-10-11井内さん「応天門の前にいる人が『ここは兵部省』とか言う」「省庁の説明をする人が立ってない」「門の近くにいると思ってた」）。
+  // 🚫 台帳の説明役9人（橘保成ら）は bind:{x,z,who:['官人'],r:1500} で「門の座標から150m以内でいちばん近い群衆の官人」へ載せていた。
+  //    門の前に決まった人が立っているわけではなく、通りがかりの官人に載るので、兵部省の門から約110mの応天門の前の官人が「ここは兵部省」と言った。
+  // ⇒ 各省の小門の外に史生を1人ずつ立たせ（who='史生'）、台帳の bind を who:['史生']・r:500 に変えて、その人にだけ載せる。
+  //    位置は小門の名前つき当たり箱の中心（台帳の bind の座標と同じ）の外へ、開口を塞がない横へずらした所。向きは外（道）向き。装いは浅縹の袍（初位の色・推定）
+  const shisei=[];
+  {const robe=material(0x7fa2b8),spots=[ // [省, 門の中心x, z, 外向き]
+    ['太政官',2867,3549,'E'],['宮内省',3176,3549,'W'],['中務省',1105,2519,'W'],['式部省',960,6217,'W'],['民部省',1986,5404,'S'],
+    ['治部省',-3176,5001,'E'],['兵部省',-822,6263,'E'],['刑部省',-3176,6263,'E'],['大蔵省',-3163,-5036,'E']];
+   for(const[sho,gx,gz,dir]of spots){const ex=dir==='E'?1:dir==='W'?-1:0,ez=dir==='S'?1:dir==='N'?-1:0,yaw=dir==='E'?-Math.PI/2:dir==='W'?Math.PI/2:dir==='S'?Math.PI:0;
+    let pos=null;
+    // 門の外へ14（小門の奥行の半分17のすぐ外）から離れ、開口を塞がない横（36〜）へ。塀・柱・川に掛かる所は避ける
+    search:for(const out of[31,45,60])for(const al of[36,-36,50,-50,64,-64]){const x=gx+ex*out+(ez?al:0),z=gz+ez*out+(ex?al:0);if(!heianWalkBlocked(x,z,4)){pos={x,z};break search;}}
+    if(!pos)continue;
+    const q=buildHeianStreetPerson(k,mats,robe,sho+'の史生（門前）',{hat:'eboshi'});q.who='史生';
+    q.group.position.set(pos.x,heianWalkGroundY(pos.x,pos.z),pos.z);q.group.rotation.y=yaw+Math.PI;
+    q.group.add(heianShadowBlob(4.2,4.2,0,0,.3));root.add(q.group);shisei.push({...q,name:sho+'の史生（門前）',who:'史生',x:pos.x,z:pos.z,gate:[gx,gz]});}}
   // ---- 馬寮の厩の馬・馬部、大学寮の学生（2026-09-26井内さん「右馬寮とかも精密化」「安麻呂と文麻呂がまだ出てこない」）。
   // 座標は大内裏ローカル（heianMeryoLayout・HEIAN_SOSHI）→都: x に makeDaidairi の scaleKitXY（5635.8/5996）を掛ける
   const soshiSX=5635.8/5996,walkers=[],stableHorseSpots=[],meryoRun=[];let stableHorseMesh=null;
@@ -22773,8 +22933,7 @@ function createHeianCourtLifeRuntime(){
   const parcelFolk=[...scholars];
   {const officerRobe=material(0x5b6b4f),laborRobe=material(0x8a7350);
    const targets=[['太政官','官人'],['民部省','官人'],['式部省・主税厨・民部厨・主計厨・式部厨','官人'],['大蔵','人夫'],['大蔵省','人夫'],['左近衛府','衛士'],['右近衛府','衛士'],
-    ['造酒司','人夫'],['大炊寮','人夫'],['陰陽寮','官人'],['典薬寮','官人'],['神祇官西院','官人'],['内匠寮','人夫'],['雅楽寮','官人'],
-    ['治部省','官人'],['兵部省','官人'],['刑部省','官人'],['宮内省','官人'],['中務省','官人']]; // 2026-10-11 省庁解説員NPCのbind先（官人候補が0だった5区画）
+    ['造酒司','人夫'],['大炊寮','人夫'],['陰陽寮','官人'],['典薬寮','官人'],['神祇官西院','官人'],['内匠寮','人夫'],['雅楽寮','官人']];
    for(const[nm,who]of targets){const row=HEIAN_SOSHI.find(r=>r[0]===nm);if(!row)continue;const[,cx,cz,w,d]=row,wx=cx*soshiSX;let spot=null;
     for(let r=40;r<Math.min(w*soshiSX,d)/2-60&&!spot;r+=30)for(let a=0;a<16&&!spot;a++){const x=wx+Math.cos(a/16*Math.PI*2)*r,z=cz+Math.sin(a/16*Math.PI*2)*r;
      if([-32,0,32].every(dx=>!heianWalkBlocked(x+dx,z,12)))spot=[x,z];}
@@ -22802,7 +22961,7 @@ function createHeianCourtLifeRuntime(){
   const moveWalkers=t=>{for(const w of walkers){const q=(t*w.speed/(w.half*4)+w.phase)%1,u=q<.5?q*2:2-q*2,v=(u*2-1)*w.half,x=w.axis==='x'?w.x0+v:w.x0,z=w.axis==='z'?w.z0+v:w.z0;
    w.group.position.set(x,heianWalkGroundY(x,z),z);w.group.rotation.y=w.axis==='x'?(q<.5?Math.PI/2:-Math.PI/2):(q<.5?0:Math.PI);w.x=x;w.z=z;
    if(w.legs?.length>1){w.legs[0].rotation.x=Math.sin(t*3+w.phase*9)*.3;w.legs[1].rotation.x=-w.legs[0].rotation.x;}}};
-  scene.add(root);const runtime={root,players,ladies,ball,guards,miyaGuards,umabe,students,parcelFolk,kemariWatchers,monks,bridgeFolk,questFolk,stableHorses:stableHorseSpots.length,time:0,lastTime:performance.now(),update(dt){const now=performance.now(),d=Number.isFinite(dt)?dt:Math.min(.1,(now-this.lastTime)/1000);this.lastTime=now;this.time+=d;const t=this.time;
+  scene.add(root);const runtime={root,players,ladies,ball,guards,miyaGuards,shisei,umabe,students,parcelFolk,kemariWatchers,monks,bridgeFolk,questFolk,stableHorses:stableHorseSpots.length,time:0,lastTime:performance.now(),update(dt){const now=performance.now(),d=Number.isFinite(dt)?dt:Math.min(.1,(now-this.lastTime)/1000);this.lastTime=now;this.time+=d;const t=this.time;
    const kickDuration=1.6,kickIndex=Math.floor(t/kickDuration)%players.length,kickPhase=(t%kickDuration)/kickDuration,nextIndex=(kickIndex+1)%players.length,basePositions=players.map(p=>({x:cx+Math.cos(p.angle)*50,z:cz+Math.sin(p.angle)*42}));this.kickIndex=kickIndex;this.kickPhase=kickPhase;
    const footPoint=p=>{const dx=cx-p.x,dz=cz-p.z,len=Math.hypot(dx,dz)||1;return{x:p.x+dx/len*6,z:p.z+dz/len*6};},from=footPoint(basePositions[kickIndex]),to=footPoint(basePositions[nextIndex]),bx=THREE.MathUtils.lerp(from.x,to.x,kickPhase),bz=THREE.MathUtils.lerp(from.z,to.z,kickPhase),by=THREE.MathUtils.lerp(heianWalkGroundY(from.x,from.z),heianWalkGroundY(to.x,to.z),kickPhase);
    ball.position.set(bx,by+4+Math.sin(Math.PI*kickPhase)*22,bz);
@@ -22839,7 +22998,8 @@ window.__heianAnimalPreview=(x=0,z=20000,step=.7)=>{const k=createHeianMobKit(),
  [0xb5723a,0xd9d0bf,0x3a2e25,0x8a7a66].forEach((c,i)=>put(buildHeianDog(k,m(c)),70+i*9));
  put(buildHeianCat(k,m(0x6e6457),{walk:true}),112);put(buildHeianCat(k,m(0x2a2622),{belly:m(0xeeeae0)}),120);scene.add(k.root);return{children:k.root.children.length};};
 window.__heianCourtExtraInfo=()=>{const r=heianCourtLifeRuntime;if(!r)return null;const at=l=>(l||[]).map(q=>[Math.round(q.group.position.x),Math.round(q.group.position.z)]);
- return{stableHorses:r.stableHorses,umabe:r.umabe?.length,students:r.students?.length,monks:(r.monks||[]).map(q=>q.name),monkAt:at(r.monks),miyaGuards:r.miyaGuards?.length,studentAt:at(r.students),umabeAt:at(r.umabe),parcelFolk:(r.parcelFolk||[]).map(q=>q.name),
+ const wv=new THREE.Vector3(),named=l=>(l||[]).map(q=>{q.group.getWorldPosition(wv);return q.name+'@'+Math.round(wv.x)+','+Math.round(wv.z);}); // 世界座標（組の親に縮尺があっても見える・検証用）
+ return{guardNamed:named(r.guards),miyaGuardNamed:named(r.miyaGuards),shiseiNamed:named(r.shisei),shiseiBlocked:(r.shisei||[]).filter(q=>heianWalkBlocked(q.x,q.z,3)).map(q=>q.name),stableHorses:r.stableHorses,umabe:r.umabe?.length,students:r.students?.length,monks:(r.monks||[]).map(q=>q.name),monkAt:at(r.monks),miyaGuards:r.miyaGuards?.length,studentAt:at(r.students),umabeAt:at(r.umabe),parcelFolk:(r.parcelFolk||[]).map(q=>q.name),
   blocked:[...(r.umabe||[]),...(r.students||[]),...(r.parcelFolk||[]),...(r.monks||[])].filter(q=>heianWalkBlocked(q.group.position.x,q.group.position.z,2)).map(q=>q.name)};};
 function disposeHeianStreetLife(){heianStreetLifeRuntime?.dispose();}
 const HEIAN_CROWD_LOD=Object.freeze({far:2000,every:6}); // 群衆の更新の間引き（1.56）: 200m より遠い歩く人は6フレームに1回
@@ -23344,6 +23504,217 @@ const HEIAN_COMPOUND_RECIPIENTS=(()=>{
  out.seyakuin=sey;
  return out;})();
 const heianLifeHash=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v);};
+// ---- 官司の戸口の間（2026-10-11 井内さん「官司勤務NPC＋見える室内空間」）
+// 焼き込み済みの官司の殿舎は壁が中身の無い一枚で、戸口を開けても奥が見えない。⇒ 殿舎の戸口の前に「戸口の間」（板敷・袖壁・庇の小さな間）を実行時に足し、
+// 開いた戸口から低い案に向かう床座の官人・紙・巻物・道具が見えるようにする。プレイヤーは間の矩形に当たって中へ入れない（当たりは間の外へ出さない）。
+// 勤務者は暮らしの営み（createHeianDailyLifeRuntime）の人として置く＝会話は at＋who＋life の既存のまま（別の会話エンジンは作らない）。戸は勤務の刻だけ開く。
+// 考証（推定）: 900年ごろの官衙は板敷に案（低い机）・円座・置畳で執務した（椅子は長官や儀式の場）。間の寸法・配置・持ち物はすべて推定
+// 🚫 殿舎の壁をくり抜く案は、焼き込み済みの大内裏の作り直しになるので採らない。間は実行時の追加（焼き込み不要）
+const HEIAN_OFFICE_LOD=Object.freeze({structVisibleDistance:9000,interiorVisibleDistance:3500,workerVisibleDistance:2500,workerInteractiveDistance:260});
+// 勤務の役（life）。kind＝姿勢と持ち物／who＝話し手の種類／walk＝往復する点の種類（無ければ持ち場で作業）
+const HEIAN_OFFICE_LIVES={
+ copying:{kind:'write',who:'官人'},reading:{kind:'read',who:'官人'},'paper-count':{kind:'count',who:'官人'},'scroll-carry':{kind:'carry',who:'人夫',walk:'shelf'},binding:{kind:'write',who:'官人'},ledger:{kind:'write',who:'官人'},
+ 'timber-check':{kind:'stand',who:'官人'},measure:{kind:'measure',who:'人夫'},supervise:{kind:'stand',who:'官人'},'carry-timber':{kind:'shoulder',who:'人夫',walk:'timber'},
+ 'herb-sort':{kind:'sort',who:'下人'},grind:{kind:'grind',who:'下人'},mix:{kind:'grind',who:'下人'},'medical-study':{kind:'read',who:'官人'},record:{kind:'write',who:'官人'},'carry-medicine':{kind:'box',who:'人夫',walk:'jar'},
+ calendar:{kind:'read',who:'官人'},'star-chart':{kind:'chart',who:'官人'},calculate:{kind:'beads',who:'官人'},'record-sky':{kind:'write',who:'官人'},'copy-calendar':{kind:'write',who:'官人'},
+ 'ritual-record':{kind:'write',who:'官人'},'ritual-tool':{kind:'box',who:'官人',walk:'altar'},'offering-check':{kind:'count',who:'官人'},messenger:{kind:'tablet',who:'官人',walk:'door'},
+ petition:{kind:'idle',who:'庶民'},'ward-report':{kind:'idle',who:'庶民'},'listen-resident':{kind:'idle',who:'官人'},
+ // 造酒司・茶園（2026-10-12 井内さん「造酒司、茶園とかでも同様にできると思う」）。姿勢は既存の kind を使う（新しい姿勢は足さない）
+ 'koji-mix':{kind:'grind',who:'下人'},'sake-check':{kind:'stand',who:'官人'},'carry-sake':{kind:'box',who:'人夫',walk:'jar'},
+ 'tea-sort':{kind:'sort',who:'下人'},'tea-roll':{kind:'grind',who:'下人'},'carry-leaf':{kind:'box',who:'人夫',walk:'jar'}};
+// 作業役の刻と話し手の既定（勤務の人は官司ごとの hours で上書きする）。HEIAN_DAILY_LIFE_HOURS のキーが台詞検査の life 語彙になる
+for(const[k,v]of Object.entries(HEIAN_OFFICE_LIVES)){HEIAN_DAILY_LIFE_HOURS[k]=[[7,17]];HEIAN_DAILY_LIFE_WHO[k]=v.who;}
+// 室内セット。座席 [u,v,向き,種類]（u＝戸口を外から見て右が+・v＝奥の壁0から外へ・向き0＝外を向く・+は右を向く）／点 {type,u,v,fa,dy}／置き物 [種類,u,v,向き,(高さ補正)]
+const OSEAT5=[[-26,24,0,'desk'],[0,24,0,'desk'],[26,24,0,'desk'],[-31,45,1.2,'desk'],[31,45,-1.2,'desk']];
+const HEIAN_OFFICE_SETS={
+ 'office-basic':{seats:OSEAT5,fix:[['chest',-42,14,Math.PI/2],['chest',42,14,-Math.PI/2],['tatami',-26,33,0],['tatami',26,33,0]]},
+ 'office-books':{fix:[['shelf',-28,4.8,0],['shelf',28,4.8,0],['paperstack',-39,30,.3]],points:[{type:'shelf',u:-28,v:14},{type:'shelf',u:28,v:14}]},
+ 'office-craft':{seats:[[-26,24,0,'desk']],fix:[['timber',22,12,0],['timber',-18,10,.1],['pole',-44,6,0],['ink',38,30,0],['plank',0,9,0]],
+  points:[{type:'stand',u:8,v:24,fa:.7},{type:'stand',u:-4,v:37,fa:-.5},{type:'stand',u:22,v:38,fa:-.9},{type:'timber',u:-30,v:47},{type:'timber',u:30,v:47}]},
+ 'office-medical':{seats:[[-26,24,0,'worktable'],[0,24,0,'worktable'],[26,24,0,'worktable'],[-31,45,1.2,'desk'],[31,45,-1.2,'desk']],
+  fix:[['herbrack',0,4.8,0],['jar',-42,24,0],['jar',-38,10,0],['basket',40,26,0],['basket',34,12,0]],points:[{type:'jar',u:-36,v:14},{type:'jar',u:36,v:14}]},
+ // 酒造り（造酒司）：酒甕と麹の台。茶園は茶籠と茶箱。座る場所は医の作業台（worktable）と同じ並び
+ 'office-brew':{seats:[[-26,24,0,'worktable'],[0,24,0,'worktable'],[26,24,0,'desk'],[-31,45,1.2,'desk'],[31,45,-1.2,'desk']],
+  fix:[['jar',-42,24,0],['jar',-38,10,0],['jar',42,24,0],['jar',36,10,0],['shelf',0,4.8,0,'box']],
+  points:[{type:'jar',u:-36,v:14},{type:'jar',u:36,v:14},{type:'stand',u:8,v:30,fa:.6},{type:'stand',u:-14,v:38,fa:-.5}]},
+ 'office-tea':{seats:[[-26,24,0,'worktable'],[0,24,0,'worktable'],[26,24,0,'desk'],[-31,45,1.2,'desk'],[31,45,-1.2,'desk']],
+  fix:[['basket',-42,24,0],['basket',-38,10,0],['basket',40,26,0],['jar',34,12,0],['shelf',0,4.8,0,'box']],
+  points:[{type:'jar',u:-36,v:14},{type:'jar',u:36,v:14}]},
+ 'office-calendar':{seats:OSEAT5,fix:[['chart',-18,2.4,0],['calboard',18,2.4,0],['clock',40,12,0]]},
+ 'office-ritual':{seats:[[-26,24,0,'desk'],[26,24,0,'desk'],[-31,45,1.2,'desk'],[31,45,-1.2,'desk']],fix:[['altar',0,14,0],['shelf',-34,4.8,0,'box'],['shelf',34,4.8,0,'box']],
+  points:[{type:'altar',u:-14,v:31},{type:'altar',u:14,v:31},{type:'door',u:-22,v:48},{type:'door',u:22,v:48}]},
+ 'office-petition':{seats:[[-26,24,0,'desk'],[0,24,0,'desk'],[-18,44,1.2,'desk'],[18,44,-1.2,'floor']],fix:[['waitmat',-24,66,0,-2,1]],points:[{type:'wait',u:-24,v:66,fa:0,dy:-2,abs:true}]}};
+// 官司の表（データ駆動）。hall＝戸口を付ける殿舎（歩行の当たりの名前で探す）／face＝戸口を向ける辺／open＝勤務の刻 [開, 閉]／nightOpen＝夜も開ける（宿直がいる）
+// workers: who＝話し手の種類／life＝作業役／count／workPoint＝持ち場の種類／bg＝背景（話しかけ不可・軽い）／leave＝退勤を閉門より何時間早めるか（夕方に減る）
+// 木工寮は、木工内候の北の作業場を殿舎「木工寮庁」にして、その南面の扉を開ける（2026-10-12）。左京職は京内の正庁（瓦葺）
+const HEIAN_OFFICES=[
+ {id:'zusho',name:'図書寮',tag:'zusho',hall:{re:/図書寮正殿内壁 /},face:'S',sets:['office-basic','office-books'],open:[6.5,17],
+  workers:[{who:'官人',life:'copying',count:2,workPoint:'desk'},{who:'官人',life:'paper-count',count:1,workPoint:'desk'},{who:'官人',life:'reading',count:1,workPoint:'desk',bg:true,leave:-1.5},
+   {who:'官人',life:'copying',count:1,workPoint:'desk',bg:true,leave:-3},{who:'人夫',life:'scroll-carry',count:1,workPoint:'shelf'}]},
+ {id:'mokuryo',name:'木工寮',tag:'kobo',hall:{re:/木工寮庁内壁 /},face:'S',sets:['office-basic','office-craft'],open:[6,17],
+  workers:[{who:'官人',life:'ledger',count:1,workPoint:'desk'},{who:'官人',life:'timber-check',count:1,workPoint:'stand'},{who:'人夫',life:'measure',count:1,workPoint:'stand'},
+   {who:'官人',life:'supervise',count:1,workPoint:'stand',bg:true,leave:-2},{who:'人夫',life:'carry-timber',count:1,workPoint:'timber'}]},
+ {id:'tenyaku',name:'典薬寮',tag:'tenyaku',hall:{re:/典薬寮正殿内壁 /},face:'S',sets:['office-basic','office-medical'],open:[6.5,16.5],
+  workers:[{who:'下人',life:'herb-sort',count:1,workPoint:'worktable'},{who:'下人',life:'grind',count:1,workPoint:'worktable'},{who:'下人',life:'mix',count:1,workPoint:'worktable',bg:true},
+   {who:'官人',life:'record',count:1,workPoint:'desk'},{who:'官人',life:'medical-study',count:1,workPoint:'desk',bg:true,leave:-2},{who:'人夫',life:'carry-medicine',count:1,workPoint:'jar'}]},
+ {id:'onmyo',name:'陰陽寮',tag:'onmyo',hall:{re:/陰陽寮庁内壁 /},face:'S',sets:['office-basic','office-calendar'],open:[6.5,17],nightOpen:true,d:54,
+  workers:[{who:'官人',life:'calendar',count:1,workPoint:'desk'},{who:'官人',life:'star-chart',count:1,workPoint:'desk'},{who:'官人',life:'calculate',count:1,workPoint:'desk',bg:true},
+   {who:'官人',life:'copy-calendar',count:1,workPoint:'desk',leave:-2},{who:'官人',life:'record-sky',count:1,workPoint:'desk',hours:[[19,24],[0,4.5]]}]},
+ {id:'jingikan',name:'神祇官',tag:'jingikan',hall:{re:/神祇官西院北庁内壁 /},face:'S',sets:['office-basic','office-ritual'],open:[6.5,16.5],
+  workers:[{who:'官人',life:'ritual-record',count:1,workPoint:'desk'},{who:'官人',life:'offering-check',count:1,workPoint:'desk'},{who:'官人',life:'ritual-tool',count:1,workPoint:'altar'},
+   {who:'官人',life:'messenger',count:1,workPoint:'door',leave:-1.5}]},
+ {id:'sakyoshiki',name:'左京職',tag:'sakyoshiki',hall:{re:/左京職正庁瓦葺内壁 /},face:'S',sets:['office-basic','office-petition'],open:[6.5,16],
+  workers:[{who:'官人',life:'ledger',count:2,workPoint:'desk'},{who:'官人',life:'listen-resident',count:1,workPoint:'desk'},{who:'庶民',life:'ward-report',count:1,workPoint:'floor'},
+   {who:'庶民',life:'petition',count:1,workPoint:'wait',leave:-2}]},
+ // 2026-10-12 井内さん「門から入ってすぐの建物の扉から中で働く人たちが見えるといい」: 二官八省で、門のすぐ内側の建物（門の側の脇庁）。扉は門のほうを向く（soshi の gateFacing）。
+ //  台詞の作業役は既存のもの（ledger・copying・reading・calculate・record）だけ使い、台詞データは増やさない。tag は省の曹司の類 shoin
+ {id:'dajokan',name:'太政官',tag:'shoin',hall:{re:/太政官東脇庁内壁 /},face:'E',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'ledger',count:2,workPoint:'desk'},{who:'官人',life:'reading',count:1,workPoint:'desk'},{who:'官人',life:'copying',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ {id:'kunai',name:'宮内省',tag:'shoin',hall:{re:/宮内省西脇庁内壁 /},face:'W',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'ledger',count:1,workPoint:'desk'},{who:'官人',life:'copying',count:2,workPoint:'desk'},{who:'官人',life:'record',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ {id:'okura',name:'大蔵省',tag:'shoin',hall:{re:/大蔵省東脇庁内壁 /},face:'E',sets:['office-basic','office-books'],open:[6,16],
+  workers:[{who:'官人',life:'calculate',count:1,workPoint:'desk'},{who:'官人',life:'ledger',count:2,workPoint:'desk'},{who:'官人',life:'record',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ {id:'hyobu',name:'兵部省',tag:'shoin',hall:{re:/兵部省東脇庁内壁 /},face:'E',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'record',count:2,workPoint:'desk'},{who:'官人',life:'reading',count:1,workPoint:'desk'},{who:'官人',life:'copying',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ {id:'shikibu',name:'式部省',tag:'shoin',hall:{re:/式部省西脇庁内壁 /},face:'W',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'ledger',count:2,workPoint:'desk'},{who:'官人',life:'reading',count:1,workPoint:'desk'},{who:'官人',life:'copying',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ // 民部省は南門から通路が北へ抜ける。通路の左右の庭にある主税庁舎・主計庁舎の南面（門のほう）が最初に見える建物
+ {id:'minbu-shuzei',name:'民部省（主税）',tag:'shoin',hall:{re:/主税庁舎内壁 /},face:'S',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'calculate',count:1,workPoint:'desk'},{who:'官人',life:'ledger',count:1,workPoint:'desk'},{who:'官人',life:'copying',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ {id:'minbu-shukei',name:'民部省（主計）',tag:'shoin',hall:{re:/主計庁舎内壁 /},face:'S',sets:['office-basic','office-books'],open:[6,15],
+  workers:[{who:'官人',life:'calculate',count:1,workPoint:'desk'},{who:'官人',life:'record',count:1,workPoint:'desk'},{who:'官人',life:'reading',count:1,workPoint:'desk',bg:true,leave:-2}]},
+ // 造酒司：敷地の中ほどの殿舎「造酒司庁」。東の門から入ると、扉は東向き（gate が見える）。酒甕・麹の台・酒を検める官人（創作）
+ {id:'sake',name:'造酒司',tag:'kuriya',hall:{re:/造酒司庁内壁 /},face:'E',sets:['office-basic','office-brew'],open:[6,17],
+  workers:[{who:'官人',life:'ledger',count:1,workPoint:'desk'},{who:'官人',life:'sake-check',count:1,workPoint:'stand'},{who:'下人',life:'koji-mix',count:1,workPoint:'worktable'},
+   {who:'下人',life:'koji-mix',count:1,workPoint:'worktable',bg:true,leave:-2},{who:'人夫',life:'carry-sake',count:1,workPoint:'jar'}]},
+ // 茶園：北東隅の茶園の管理所「茶園所」。中央の通路に向けて扉を西向きに開ける。茶を摘んで選り、揉む人（創作・推定）
+ {id:'chaen',name:'茶園',tag:'chaen',hall:{re:/茶園所内壁 /},face:'W',sets:['office-basic','office-tea'],open:[6,16.5],
+  workers:[{who:'官人',life:'ledger',count:1,workPoint:'desk'},{who:'下人',life:'tea-sort',count:1,workPoint:'worktable'},{who:'下人',life:'tea-roll',count:1,workPoint:'worktable'},
+   {who:'人夫',life:'carry-leaf',count:1,workPoint:'jar',leave:-1.5}]}];
+// 置き物の部品（['b',u,y,v,sx,sy,sz,ry,色]＝箱／['c',u,y,v,半径,高さ,色,rx,rz,ry]＝円柱）。(u,v,r) は置き物の中心と向き。単位は 0.1m、y は間の床から
+const OFFICE_PAPER=[0xe8dfc4,0xd9cfae,0xc9b98e,0xeeeadb];
+function heianOfficeFixture(kind,u,v,r,opt,dy=0){
+ const out=[],cs=Math.cos(r),sn=Math.sin(r),X=(dx,dz)=>u+dx*cs+dz*sn,Z=(dx,dz)=>v-dx*sn+dz*cs;
+ const b=(dx,y,dz,sx,sy,sz,col,ry=0)=>out.push(['b',X(dx,dz),y+dy,Z(dx,dz),sx,sy,sz,r+ry,col]);
+ const c=(dx,y,dz,rad,h,col,rx=0,rz=0)=>out.push(['c',X(dx,dz),y+dy,Z(dx,dz),rad,h,col,rx,rz,r]);
+ const wood=0x5a4130,pale=0xcdb892;
+ if(kind==='chest'){b(0,4,0,14,8,9,0x5a3f2c);b(0,8.6,0,15,1.6,10,0x6b4a35);b(0,4,0,14.4,.8,9.4,0x2e2a26);}
+ else if(kind==='tatami'){b(0,.25,0,30,.5,18,0xb2a574);}
+ else if(kind==='paperstack'){b(0,2,0,10,4,7,0xeee8d6);b(.6,5,-.4,9,2,6.5,0xe6dfc6);}
+ else if(kind==='shelf'){const box=opt==='box';
+  for(const s of[-1,1])b(s*15,16,0,1.4,32,6,wood);for(const y of[2,12,22])b(0,y,0,31,1,6.4,wood);
+  for(const[t,y]of[[0,3.6],[1,13.6],[2,23.6]])for(let i=0;i<9;i++){const col=OFFICE_PAPER[(i+t)%4];
+   if(box)b(-12.4+i*3.1,y+1.4,0,2.6,3.6,4.6,i%2?0x8a6a47:0xa98a5c);else c(-13.6+i*3.4,y+1.2,0,1.4,5.2,col,Math.PI/2);}}
+ else if(kind==='timber'){c(0,2.4,-2.6,2.4,24,0xa07c4e,0,Math.PI/2);c(0,2.4,2.6,2.4,24,0x9a7648,0,Math.PI/2);c(0,6.6,0,2.4,24,0xa88556,0,Math.PI/2);b(0,.4,0,26,.8,10,0x6a5238);}
+ else if(kind==='plank'){for(let i=0;i<5;i++)b(0,1+i*1.6,0,36,1.4,6,i%2?0xb59462:0xa98a58);}
+ else if(kind==='pole'){c(0,15,0,.7,30,0x8a6a44);c(0,6,0,.8,.6,0x2c2420);}
+ else if(kind==='ink'){b(0,2,0,8,4,6,wood);c(-1.6,5.2,0,1.8,2.4,0x1c1a18);c(2,5.2,0,1.2,2.4,0x7a2a1c);}
+ else if(kind==='jar'){c(0,4,0,3.6,8,0x7a6a55);c(0,8.8,0,2.2,1.6,0x6a5a46);}
+ else if(kind==='basket'){c(0,2.6,0,4.2,5.2,0x9a8052);c(0,5.2,0,3.4,.8,0x7aa05a);}
+ else if(kind==='herbrack'){b(0,15,0,30,30,7,0x6d5238);
+  for(let j=0;j<3;j++)for(let i=0;i<5;i++)b(-11.6+i*5.8,5.5+j*9.5,3.7,5,7.4,.6,(i+j)%2?0x8a6a47:0x7a5c3e);
+  for(const s of[-1,1])for(let k=0;k<3;k++)c(s*(17.5+k*1.6),24-k*1.5,1.5,.9,7,0x6f8f4a);}
+ else if(kind==='chart'){b(0,18,0,26,22,.5,0x20324b);for(let i=0;i<9;i++)b(-10+((i*7)%5)*5,12+((i*5)%4)*4,.4,.9,.9,.3,0xf2ecc8);b(0,29.4,0,28,1,.7,wood);}
+ else if(kind==='calboard'){b(0,18,0,16,14,.5,0xe6dfc6);b(0,24.8,.1,16,1.4,.4,0x8a3a2a);for(let i=0;i<4;i++)b(0,21-i*3,.3,13,.35,.2,0x6a5a46);}
+ else if(kind==='clock'){b(0,4,0,12,8,9,wood);c(0,11.5,0,4,7,0x7a6a55);c(3.6,14.5,0,3.2,5,0x6a5a46);c(-3.6,8.6,0,3.2,4.4,0x7a6a55);}
+ else if(kind==='altar'){b(0,4,0,22,8,13,pale);for(let i=0;i<4;i++){c(-8+i*5.3,13.5,-1,.35,10,0xd8cdb4);b(-8+i*5.3,17,-1,2.2,3.4,.3,0xf4f1e8);}c(-6,9.4,3,2,2.2,0xb07a52);c(6,9.4,3,2,2.2,0xb07a52);}
+ else if(kind==='waitmat'){c(0,.6,0,6,1.2,0xb8a36a);}
+ return out;}
+// 座席ごとの小さな座の道具（円座・案・作業台・机上の紙）。使う座席にだけ置く
+function heianOfficeSeatProps(type,u,v,fa,kind){
+ const out=[],dx=Math.sin(fa)*9.5,dz=Math.cos(fa)*9.5;
+ out.push(['c',u,.6,v,5.6,1.2,0xb8a36a,0,0,0]);
+ if(type==='floor')return out;
+ const big=type==='worktable',w=big?26:19,h=big?5:4;
+ out.push(['b',u+dx,h/2,v+dz,w,h,big?12:10,fa,big?0x6b5038:0x5a4130]);
+ if(kind==='write'||kind==='count'||kind==='chart')out.push(['b',u+dx-1,h+.15,v+dz,8,.3,5.5,fa+.08,0xeee8d6]);
+ return out;}
+// 戸口を付ける殿舎の壁の位置。歩行の当たり（殿舎の内壁）の外接矩形から、戸口の向きの辺の中央を取る。無ければ固定の座標
+let heianOfficeRuntime=null;
+const HEIAN_OFFICE_FACE={S:[0,1],N:[0,-1],E:[1,0],W:[-1,0]};
+function heianOfficeAnchor(O){
+ // 殿舎の内壁（四面。開口の面は2つに割れている）の外接矩形と、開口の位置。開口の柱間の取り方は soshi の gable（doorwayWallBox 呼び出し）と同じ式
+ const recs=O.hall?heianWalkObstacleRecords.filter(b=>O.hall.re.test(b.name||'')):[];if(!recs.length)return null;
+ const R={minX:Math.min(...recs.map(b=>b.minX)),maxX:Math.max(...recs.map(b=>b.maxX)),minZ:Math.min(...recs.map(b=>b.minZ)),maxZ:Math.max(...recs.map(b=>b.maxZ))};
+ const face=O.face||'S',out=HEIAN_OFFICE_FACE[face],isX=face==='N'||face==='S',len=(isX?R.maxX-R.minX:R.maxZ-R.minZ)+3.6,nb=Math.max(2,Math.ceil(len/36)),pitch=len/nb,i0=nb%2?(nb-3)/2:nb/2-2;
+ return{c:(isX?R.minX:R.minZ)-1.8+pitch*(i0+1.5),outer:face==='S'?R.maxZ:face==='N'?R.minZ:face==='E'?R.maxX:R.minX,out,face,pitch,Dw:pitch*3,depthExt:isX?R.maxZ-R.minZ:R.maxX-R.minX,rect:R,from:'hall'};}
+// 戸口の間の本体。u＝戸口を外から見て右、v＝殿舎の壁から外へ。間の座標系を殿舎の向きに回して置く（中身は全部この座標系で作る）
+function createHeianOfficeRuntime(){
+ if(heianOfficeRuntime)return heianOfficeRuntime;
+ try{
+  const root=new THREE.Group();root.name='官司の戸口の間';const geos=new Set(),mats=new Set(),LOD=HEIAN_OFFICE_LOD;
+  const mat=c=>{const m=new THREE.MeshLambertMaterial({color:c});mats.add(m);return m;};
+  const MT={floor:mat(0x8d7250),wall:mat(0xb9ad92),back:mat(0x4d3b2a),post:mat(0xa64032),roof:mat(0x3a342f),stone:mat(0x8a8478),leaf:mat(0x6b4f35),shut:mat(0x5d4430)},prim=mat(0xffffff);
+  MT.ceil=new THREE.MeshBasicMaterial({color:0x6b5640});mats.add(MT.ceil);MT.back.color.setHex(0x6b563f); // 天井は光を受けない面なので陰影の無い色で（昼は戸口の光で奥が少し暗い程度に）
+  const bg=new THREE.BoxGeometry(1,1,1),cg=new THREE.CylinderGeometry(1,1,1,10);geos.add(bg);geos.add(cg);
+  const offices=[],workers=[];
+  for(const O of HEIAN_OFFICES){
+   if(O.off)continue;
+   const A=heianOfficeAnchor(O);if(!A){console.warn('官司の戸口: 殿舎が見つかりません',O.id);continue;}
+   // 殿舎（doorwayWallBox で扉の面の柱間3つを開けた既存の殿舎）の中の「持ち場」の座標系。u＝戸口を外から見て右、v＝奥（0）から戸口へ。
+   //  殿舎を足すのでなく、開いた戸口の奥に衝立で区切った持ち場（幅=開口・奥行 D）を取り、その中に机・棚・人を置く。原点は開口の中心の、奥へ T+D の所
+   const T=4,Dw=A.Dw,D=O.d||Math.min(54,Math.max(26,A.depthExt-14)),H=24,[ox,oz]=A.out,rx=oz,rz=-ox,th=Math.atan2(ox,oz);
+   const P0=A.face==='S'||A.face==='N'?[A.c,A.outer]:[A.outer,A.c],base=[P0[0]-ox*(T+D),P0[1]-oz*(T+D)],toW=(u,v)=>[base[0]+u*rx+v*ox,base[1]+u*rz+v*oz];
+   const fr=toW(0,D+T+14),FY=heianWalkGroundY(fr[0],fr[1])+(O.floorUp??7); // 殿舎の床は地面から0.7m（colonnadeHall の基壇5＋床2）。基壇の高い正庁は floorUp で
+   const f=D/54; // 座席・点・置き物の v は奥行54の想定で書いてある。奥行が浅い殿舎は v を縮める
+   const parts={back:[],wall:[]};
+   const S=(m,u,y,v,sx,sy,sz)=>{const g=new THREE.BoxGeometry(sx,sy,sz);g.translate(u,y,v);parts[m].push(g);};
+   S('back',0,H/2,.8,Dw+2.4,H,1.6);
+   for(const s of[-1,1])S('wall',s*(Dw/2-1.2),H/2,D/2,2.4,H,D); // 衝立の脇（開口の柱間の内側）。広い殿舎の奥の暗がりを斜めから見せない
+   const MO=O.nightOpen?{back:MT.back.clone(),wall:MT.wall.clone()}:null,primO=MO?prim.clone():prim; // 夜も開ける間（宿直）は灯の色を少し差す専用の材質
+   if(MO){mats.add(MO.back);mats.add(MO.wall);mats.add(primO);}
+   const grp=new THREE.Group();grp.name='戸口の持ち場・'+O.name;grp.position.set(base[0],FY,base[1]);grp.rotation.y=th;
+   const st=new THREE.Group(),inn=new THREE.Group();st.name='持ち場・衝立と戸';inn.name='持ち場・室内';grp.add(st,inn);
+   for(const k of Object.keys(parts)){const g=mergeGeometries(parts[k],false);geos.add(g);const m=new THREE.Mesh(g,(MO&&MO[k])||MT[k]);m.name='戸口の持ち場・'+O.name+'・'+k;st.add(m);}
+   // 戸: 開いた戸（開口の内側の脇へ寄せた板戸）と、勤務の刻の外に閉じる戸（開口をふさぐ）
+   const gl=[];for(const s of[-1,1]){const g=new THREE.BoxGeometry(1.2,H-2,14);g.translate(s*(Dw/2-3.2),(H-2)/2,D-8);gl.push(g);}
+   const leaf=new THREE.Mesh(mergeGeometries(gl,false),MT.leaf);leaf.name='戸口の持ち場・'+O.name+'・開いた戸';
+   const gs=new THREE.BoxGeometry(Dw-.6,H+1,1.8);gs.translate(0,(H+1)/2,D+1.2);const shut=new THREE.Mesh(gs,MT.shut);shut.name='戸口の持ち場・'+O.name+'・閉じた戸';
+   geos.add(leaf.geometry);geos.add(gs);st.add(leaf,shut);
+   const prims=[],sets=(O.sets||[]).map(k=>HEIAN_OFFICE_SETS[k]).filter(Boolean),pts=[];let seats=[];
+   for(const s of sets){if(s.seats)seats=s.seats.map(q=>({u:q[0],v:q[1]*f,fa:q[2],type:q[3]||'desk',used:false}));for(const q of s.points||[])pts.push({fa:0,used:false,...q,v:q.abs?q.v-54+D:q.v*f}); // abs＝戸口の面（v=54）からの距離で書いた点（戸口の外）
+    for(const fx of s.fix||[]){const ex=fx[4];prims.push(...heianOfficeFixture(fx[0],fx[1],fx[5]?fx[2]-54+D:fx[2]*f,fx[3],typeof ex==='number'?undefined:ex,typeof ex==='number'?ex:0));}}
+   // 勤務者: 座席・点を種類で割り当てる（手書きの配置は無い）。座る人は円座の上（床+1）、待つ人は段の上
+   let nSit=0;
+   for(const w of O.workers||[]){const L=HEIAN_OFFICE_LIVES[w.life];if(!L){console.warn('官司の勤務: 役が未定義',w.life);continue;}
+    for(let n=0;n<(w.count||1);n++){
+     const rec={office:O.id,role:w.life,who:w.who||L.who,kind:L.kind,bg:!!w.bg,hours:w.hours||[[O.open[0]+(w.arrive||0),O.open[1]+(w.leave||0)]],face:0},wp=w.workPoint||'desk';
+     if(L.walk){const e=pts.filter(q=>q.type===(w.workPoint||L.walk));if(e.length<2){console.warn('官司の勤務: 往復の点が足りません',O.id,w.life);continue;}
+      const[ax,az]=toW(e[0].u,e[0].v),[bx,bz]=toW(e[1].u,e[1].v);Object.assign(rec,{x:ax,z:az,y:FY,walk:{ax,az,bx,bz,spd:3.6}});}
+     else{const q=seats.find(s=>!s.used&&s.type===wp);
+      if(q){q.used=true;const[x,z]=toW(q.u,q.v);Object.assign(rec,{x,z,y:FY+1,face:th+q.fa,sit:['cross','kneel','cross','knee1'][nSit++%4]});prims.push(...heianOfficeSeatProps(q.type,q.u,q.v,q.fa,L.kind));}
+      else{const q2=pts.find(s=>!s.used&&s.type===wp);if(!q2){console.warn('官司の勤務: 持ち場が足りません',O.id,w.life,wp);continue;}q2.used=true;const[x,z]=toW(q2.u,q2.v);
+       Object.assign(rec,{x,z,y:FY+(q2.dy||0)+(L.kind==='idle'?1:0),face:th+q2.fa,sit:'kneel'});}}
+     workers.push(rec);}}
+   // 置き物・座の道具は種類ごとに1本の InstancedMesh（色は個体ごと）。施設ごとに箱と円柱の2本だけ
+   const mk=(geo,list,name,cyl)=>{if(!list.length)return;const im=new THREE.InstancedMesh(geo,primO,list.length),d=new THREE.Object3D(),col=new THREE.Color();im.name='戸口の間・'+O.name+'・'+name;im.frustumCulled=false;
+    list.forEach((q,i)=>{d.position.set(q[1],q[2],q[3]);if(cyl){d.rotation.set(q[7],q[9],q[8],'YXZ');d.scale.set(q[4],q[5],q[4]);col.setHex(q[6]);}
+     else{d.rotation.set(0,q[7],0,'YXZ');d.scale.set(q[4],q[5],q[6]);col.setHex(q[8]);}
+     d.updateMatrix();im.setMatrixAt(i,d.matrix);im.setColorAt(i,col);});
+    im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;inn.add(im);};
+   mk(bg,prims.filter(q=>q[0]==='b'),'小物（箱）',false);mk(cg,prims.filter(q=>q[0]==='c'),'小物（円柱）',true);
+   // 当たり: 開口をふさぐ見えない板（壁の厚さの内側〜外へ2）。殿舎の壁は元から当たりなので、開口だけ塞げば中へは入れない。透明な壁は開口の幅・壁の厚さの外へ出さない
+   const cs=[[-Dw/2,D-1],[Dw/2,D-1],[-Dw/2,D+T+2],[Dw/2,D+T+2]].map(([u,v])=>toW(u,v)),rect=[Math.min(...cs.map(c=>c[0])),Math.max(...cs.map(c=>c[0])),Math.min(...cs.map(c=>c[1])),Math.max(...cs.map(c=>c[1]))],nm='官司の戸口の栓・'+O.name;
+   if(!heianWalkObstacleRecords.some(b=>b.name===nm))addHeianWalkObstacle(rect[0],rect[1],rect[2],rect[3],nm);
+   const ctr=toW(0,D+T);
+   root.add(grp);offices.push({def:O,id:O.id,ax:ctr[0],az:ctr[1],th,FY,from:A.from,Dw,D,grp,st,inn,leaf,shut,open:null,rect,props:prims.length,dist:null,glow:MO?[MO.back,MO.wall,primO]:null});
+  }
+  scene.add(root);
+  const rt={root,offices,workers,hour:null,at:0,
+   setHour(h){this.hour=h;const CL=heianClockLight(h); // 宿直の間だけ夜に灯の色が差す
+    for(const o of offices){const[a,b]=o.def.open,open=!!o.def.nightOpen||(h>=a&&h<b);if(open!==o.open){o.open=open;o.leaf.visible=open;o.shut.visible=!open;this.at=0;}
+     const g=o.glow&&o.open?CL.lamp:0;if(o.glow)for(const m of o.glow)m.emissive.setHex(0xff9a40).multiplyScalar(.035*g);}},
+   update(){const now=performance.now();if(now-this.at<400)return;this.at=now;const cx=camera.position.x,cz=camera.position.z;
+    for(const o of offices){const d=Math.hypot(cx-o.ax,cz-o.az);o.st.visible=d<LOD.structVisibleDistance;o.inn.visible=o.open&&d<LOD.interiorVisibleDistance;o.dist=d;}},
+   inspect(){return offices.map(o=>({id:o.id,name:o.def.name,from:o.from,anchor:[Math.round(o.ax),Math.round(o.az)],th:+o.th.toFixed(2),floorY:+o.FY.toFixed(1),open:o.open,structVisible:o.st.visible,interiorVisible:o.inn.visible,dist:Math.round(o.dist??-1),
+    obstacle:o.rect.map(Math.round),workers:workers.filter(w=>w.office===o.id).length,props:o.props}));},
+   dispose(){scene.remove(root);for(const g of geos)g.dispose();for(const m of mats)m.dispose();heianOfficeRuntime=null;}};
+  heianOfficeRuntime=rt;try{const h=window.__heianClock?.().hour;rt.setHour(Number.isFinite(h)?h:12);}catch(e){rt.setHour(12);}rt.update();return rt;
+ }catch(e){console.error('官司の戸口の間の生成失敗',e);return null;}
+}
+function disposeHeianOffice(){heianOfficeRuntime?.dispose();}
+window.__heianOfficeInfo=()=>heianOfficeRuntime?.inspect()||null; // 検証用
+window.__heianOfficeWorkers=()=>heianOfficeRuntime?.workers||[];
 // 辻と堀川の岸の置き場。小路と大路の交点の角（道の端寄り）から、左京は半分・右京は2割ほどを選ぶ
 function heianDailyLifeStreetSpots(){
  const T=heianAvenueTable;if(!T)return[];const out=[],h=heianLifeHash,st={blocked:0,water:0,site:0,ok:0};
@@ -23423,6 +23794,12 @@ function createHeianDailyLifeRuntime(){
    for(const[role,lx,lz,face,o]of list){const x=S.x+lx,z=S.z+lz;add(role,x,z,face,{who:o.who,child:!!o.child,female:!o.child&&h(x,z,55)<.45,...(o.child?{color:kidColors[Math.floor(h(x,z,56)*kidColors.length)]}:{})});compoundWorkers++;}}
   for(const[id,list]of Object.entries(HEIAN_COMPOUND_PORTERS)){const S=HEIAN_LANDMARK_SITES[id];if(!S)continue;
    for(const[role,ax,az,bx,bz]of list)if(walker(role,S.x+ax,S.z+az,S.x+bx,S.z+bz,{spd:3.2,who:'人夫',servant:true,ph:h(S.x+ax,S.z+az,53)*6.283}))compoundWorkers++;}
+  // 官司の勤務者（2026-10-11・戸口の間）。位置・向き・刻・役は heianOfficeRuntime の表から。bg は背景（話しかけ不可）。官人は位で衣の色を変える（初位・八位・六位の色は推定）
+  let officeWorkers=0;const officerColors=[0x5b6b4f,0x7fa2b8,0x9bb27a,0x5b6b4f];
+  for(const w of window.__heianOfficeWorkers?.()||[]){const o={who:w.who,hours:w.hours,kind:w.kind,office:w.office,bg:w.bg,sit:w.sit,y:w.y,female:false,
+    color:w.who==='官人'?officerColors[Math.floor(h(w.x,w.z,61)*officerColors.length)]:w.who==='人夫'?0x8a7350:w.who==='下人'?0x7b6a58:commonColors[Math.floor(h(w.x,w.z,21)*commonColors.length)]};
+   if(w.walk){add(w.role,w.walk.ax,w.walk.az,0,{...o,ax:w.walk.ax,az:w.walk.az,bx:w.walk.bx,bz:w.walk.bz,ya:w.y,yb:w.y,spd:w.walk.spd,ph:h(w.walk.ax,w.walk.az,62)*6.283});}
+   else add(w.role,w.x,w.z,w.face,o);officeWorkers++;}
   const N=Math.max(1,people.length);
   const make=(name,g,m,edges=true)=>{const x=new THREE.InstancedMesh(g,m,N);x.name=name;x.count=people.length;x.instanceMatrix.setUsage(THREE.DynamicDrawUsage);x.frustumCulled=false;root.add(x);if(edges)heianAddInstancedEdges(x,.6);return x;};
   const G=k.geometry;if(!heianShadowBlobGeom)heianShadowBlobGeom=new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2);
@@ -23431,25 +23808,27 @@ function createHeianDailyLifeRuntime(){
    legL:make('営み・左脚',G.cylinder,k.mats.dark),legR:make('営み・右脚',G.cylinder,k.mats.dark),footL:make('営み・左足',G.box,k.mats.dark),footR:make('営み・右足',G.box,k.mats.dark),
    tub:make('営み・盥',geo(new THREE.CylinderGeometry(3.2,2.7,1.8,14)),M.tub),kamado:make('営み・竈',G.box,M.clay),pot:make('営み・鍋',G.sphere,M.pot),
    stick:make('営み・箒の柄と釣瓶の縄',G.cylinder,M.rope),broom:make('営み・箒',G.box,M.broom),bucket:make('営み・桶',geo(new THREE.CylinderGeometry(1.5,1.3,2.6,10)),M.tub),
-   tool:make('営み・木材',G.box,M.timber),sheet:make('営み・紙',G.box,M.paper),
+   tool:make('営み・木材',G.box,M.timber),sheet:make('営み・紙',G.box,M.paper),scroll:make('営み・巻物',G.cylinder,M.paper),
    shadow:make('営み・足元影',heianShadowBlobGeom,heianShadowMaterial(.22),false)};
   parts.shadow.renderOrder=2;
   people.forEach((p,i)=>{const c=new THREE.Color(p.color);for(const m of[parts.robe,parts.armL,parts.armR])m.setColorAt(i,c);});
   for(const m of[parts.robe,parts.armL,parts.armR])if(m.instanceColor)m.instanceColor.needsUpdate=true;
-  const PL=Object.values(parts),PROPS=[parts.tub,parts.kamado,parts.pot,parts.stick,parts.broom,parts.bucket,parts.tool,parts.sheet];
+  const PL=Object.values(parts),PROPS=[parts.tub,parts.kamado,parts.pot,parts.stick,parts.broom,parts.bucket,parts.tool,parts.sheet,parts.scroll];
   const pos=new THREE.Vector3(),scl=new THREE.Vector3(),q0=new THREE.Quaternion(),q1=new THREE.Quaternion(),eu=new THREE.Euler(),B=new THREE.Matrix4(),L=new THREE.Matrix4(),W=new THREE.Matrix4(),Z=new THREE.Matrix4().makeScale(0,0,0),UP=new THREE.Vector3(0,1,0),dv=new THREE.Vector3();
   const set=(m,i,p,s,rx=0,rz=0)=>{pos.set(p[0],p[1],p[2]);scl.set(s[0],s[1],s[2]);q1.setFromEuler(eu.set(rx,0,rz));L.compose(pos,q1,scl);m.setMatrixAt(i,W.multiplyMatrices(B,L));};
   const hide=(m,i)=>m.setMatrixAt(i,Z);
   const rod=(m,i,a,b,r)=>{dv.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]);const len=dv.length()||1e-3;q1.setFromUnitVectors(UP,dv.multiplyScalar(1/len));pos.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);scl.set(r,len,r);L.compose(pos,q1,scl);m.setMatrixAt(i,W.multiplyMatrices(B,L));};
   const lerp3=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
   // 1人分の姿勢。体の座標は前が +z、足もとが原点（群衆と同じ寸法: 顔 y13.2・衣 y4〜12）
-  const pose=(p,i,t)=>{const P=parts;if(!p.on){for(const m of PL)hide(m,i);return;}
-   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,sq=p.role==='wash'||p.role==='cook'||p.role==='fish'||p.role==='hammer'||p.role==='dry'||p.role==='herb'||p.role==='sit';
+  const OSEAT=new Set(['write','read','count','grind','sort','chart','beads','idle']); // 官司で床に座る姿勢（円座の上）
+  const pose=(p,i,t)=>{const P=parts;if(!p.on||p.cull){for(const m of PL)hide(m,i);return;}
+   let x=p.x,z=p.z,y=p.y,hd=p.face,walk=0;const T=t+p.ph,seat=!!p.kind&&OSEAT.has(p.kind),sq=seat||p.role==='wash'||p.role==='cook'||p.role==='fish'||p.role==='hammer'||p.role==='dry'||p.role==='herb'||p.role==='sit';
    if(p.ax!==undefined){const D=Math.hypot(p.bx-p.ax,p.bz-p.az)||1,per=2*D/p.spd,u=((t+p.ph*9)%per)/per,f=u<.5?u*2:2-u*2,s=u<.5?1:-1;
     x=p.ax+(p.bx-p.ax)*f;z=p.az+(p.bz-p.az)*f;y=p.ya+(p.yb-p.ya)*f;hd=Math.atan2((p.bx-p.ax)*s,(p.bz-p.az)*s);walk=1;}
    if(p.role==='play'){if(p.oni)hd=T*.5;else{const a=p.a0+t*p.spd*.55;x=p.cx+Math.sin(a)*p.R;z=p.cz+Math.cos(a)*p.R;hd=a+Math.PI/2;walk=1.6;}}
    if(p.role==='talk')hd=p.face+Math.sin(T*.5)*.15;
    if(p.role==='wait'||p.role==='sit')hd=p.face+Math.sin(T*.4)*.07;
+   if(p.kind==='stand'||p.kind==='measure')hd=p.face+Math.sin(T*.5)*.22; // 立って見回る・測る人は体の向きを少し振る
    p.wx=x;p.wz=z;p.wy=y;const sc=p.child?.62:p.ht;pos.set(x,y+.15,z);q0.setFromAxisAngle(UP,hd);B.compose(pos,q0,scl.set(sc,sc,sc));
    const sw=walk?Math.sin(T*(walk>1?9:5))*.5:0,bob=walk?Math.abs(sw)*.3:0,fem=p.female&&!p.child;
    set(P.shadow,i,[0,.1,0],[4.4,1,4.4]);
@@ -23457,6 +23836,11 @@ function createHeianDailyLifeRuntime(){
    if(sq){set(P.robe,i,[0,4.2,.5],[1.2,.6,1.15],.18);hy=8.5;hz=1.7;shY=6.5;shZ=1.4;hide(P.legL,i);hide(P.legR,i);set(P.footL,i,[-1.3,.3,1.8],[1.5,.6,2]);set(P.footR,i,[1.3,.3,1.8],[1.5,.6,2]);}
    else{set(P.robe,i,[0,8+bob,0],fem?[1.12,1.05,1.08]:[1,1,1]);hy=13.2+bob;hz=walk>1?.5:0;shY=10.2+bob;shZ=0;
     for(const[m,f,sx,a]of[[P.legL,P.footL,-1.1,sw],[P.legR,P.footR,1.1,-sw]]){const fy=.3+Math.max(0,a)*.9,fz=Math.sin(a)*3.4;rod(m,i,[sx,6+bob,0],[sx,fy+.3,fz],.62);set(f,i,[sx,fy,fz+.5],[1.5,.6,2],a*.4);}}
+   if(seat){const K=p.kind,lean=(K==='write'||K==='count'||K==='chart'||K==='beads')?.5+Math.sin(T*.8)*.2:(K==='grind'||K==='sort')?.7:0,sit=p.sit||'cross'; // 官司の床座: 背を伸ばし、書く・数える人は少し前かがみ
+    set(P.robe,i,[0,4.1,.3],[1.3,.62,1.25],.06);hy=8.9;hz=1+lean;shY=6.9;shZ=.5+lean*.5;
+    if(sit==='kneel'){set(P.footL,i,[-1,.3,-2.2],[1.5,.6,2]);set(P.footR,i,[1,.3,-2.2],[1.5,.6,2]);} // 正座: 足は衣の下
+    else if(sit==='knee1'){set(P.footL,i,[-1.8,.3,1.4],[1.5,.6,2]);set(P.footR,i,[2.4,.3,4.3],[1.5,.6,2]);} // 片膝を立てる
+    else{set(P.footL,i,[1.1,.3,3],[1.5,.6,2],0,.3);set(P.footR,i,[-1.1,.3,3.4],[1.5,.6,2],0,-.3);}} // 胡坐: 足先が前で交わる
    set(P.head,i,[0,hy,hz],[1.8,1.8,1.8]);set(P.eyes,i,[0,hy-.2,hz+1.62],[1,1,1]);/* 目は頭頂髪（y≧顔の中心）より下に置く。上だと女と童の目が髪に埋まった */
    if(p.child){hide(P.hat,i);hide(P.hair,i);set(P.bangs,i,[0,hy+.5,hz+.1],[1.95,1.7,1.95]);}
    else if(fem){hide(P.hat,i);set(P.hair,i,[0,hy-1,hz-1.3],[2.4,3.2,1.5]);set(P.bangs,i,[0,hy+.5,hz+.15],[2.05,1.75,2.05]);}
@@ -23486,6 +23870,21 @@ function createHeianDailyLifeRuntime(){
    else if(p.role==='wait'){const b=Math.sin(T*.5)*.3;set(P.bucket,i,[0,shY-3.6,3.2],[.8,.55,.8]);hL=[-1.2,shY-3.7,2.8+b];hR=[1.2,shY-3.7,2.8+b];} // 列に並んで椀を持つ
    else if(p.role==='talk'){const g=Math.max(0,Math.sin(T*.9))**2;hR=[2.4,shY-3.8+g*3.2,g*2.6];}
    else if(p.role==='play'&&p.oni){hL=[-.8,hy,hz+2.1];hR=[.8,hy,hz+2.1];}
+   else if(p.kind){const K=p.kind,s1=Math.sin(T*1.7),s2=Math.sin(T*1.1),c1=Math.cos(T*1.3); // 官司の勤務（2026-10-11）。案は前方9.5・天面は高さ4（置き物側が持つ）
+    if(K==='write'){hR=[1.8+s1*.9,4.7,7.2+s2*.8];hL=[-2.4,4.5,6.4];rod(P.stick,i,[hR[0]+.2,hR[1]+2.6,hR[2]-1.6],[hR[0],hR[1]-.2,hR[2]+.3],.14);} // 筆を走らせる
+    else if(K==='read'){hL=[-3.4,shY-1.2,4.4];hR=[3.4,shY-1.2,4.4];rod(P.scroll,i,hL,hR,.85);} // 巻物を開いて読む
+    else if(K==='count'){set(P.sheet,i,[-3.6,4.7,8.4],[5,1.4,7]);hL=[-3.6,5.6,8.4];hR=[1+s1*1.4,4.9+Math.max(0,s2)*.8,7.6];} // 紙の束を1枚ずつ数える
+    else if(K==='grind'){const a=T*3.2;set(P.bucket,i,[0,3.5,8.6],[1.1,.8,1.1]);hR=[Math.cos(a)*.9,shY-.8,6.6+Math.sin(a)*.9];rod(P.stick,i,[hR[0],hR[1]+1,hR[2]],[0,4.4,8.6],.3);hL=[-2.4,4.6,7.4];} // 鉢を杵ですり潰す
+    else if(K==='sort'){const f=(Math.sin(T*1.4)+1)/2;set(P.broom,i,[-3.2,4.5,8.2],[4,.9,1.6],0,.1);set(P.bucket,i,[5,2.3,7],[1.4,.9,1.4]);hR=lerp3([-2.6,4.8,8],[4.4,4.6,7],f);hL=[-3.8,4.6,8.2];} // 薬草を選り分けて籠へ
+    else if(K==='chart'){set(P.sheet,i,[0,4.4,8.8],[15,.3,10]);hR=[s1*5,4.8,8.6+c1*1.8];hL=[-6,4.6,10];} // 広げた星図を指でたどる
+    else if(K==='beads'){set(P.tool,i,[0,4.5,8.6],[9,.8,3.4]);hR=[-3+Math.abs(s1)*6,5,8.4];hL=[-4.4,4.8,8.5];} // 算木を並べる
+    else if(K==='idle'){hL=[-1.6,4.2,2.8];hR=[1.6+Math.max(0,s2)*.8,4.2+Math.max(0,s1)*1.8,2.8];} // 膝に手を置いて聞く・話す
+    else if(K==='stand'){rod(P.stick,i,[2.9,shY-3.6,1.3],[2.9,shY+3.2,1.8],.28);hR=[2.9,shY-3.6,1.3];hL=[-1,shY-4,2];} // 笏を持って立つ
+    else if(K==='measure'){rod(P.stick,i,[3.2,.5,4],[3.2+s1*.4,16+s2*.8,4],.3);hR=[3.2,9.5,4];hL=[3.2,12.5,4];} // 測り棒を立てて当てる
+    else if(K==='carry'){rod(P.scroll,i,[-3.2,shY-2.4,3],[3.2,shY-2.4,3],1.2);hL=[-3.2,shY-2.6,3];hR=[3.2,shY-2.6,3];} // 巻物の束を抱える
+    else if(K==='shoulder'){set(P.tool,i,[1.6,shY+1.8,.3],[2.4,2.4,13]);hL=[1.2,shY+1.2,2.6];hR=[2.4,shY+1.2,-2.4];} // 材を肩に
+    else if(K==='box'){set(P.tool,i,[0,shY-3.2,3.4],[5.5,4.2,5.5]);hL=[-3.4,shY-3.6,3.4];hR=[3.4,shY-3.6,3.4];} // 小箱を捧げ持つ
+    else if(K==='tablet'){set(P.sheet,i,[0,shY-2.6,3.4],[5,.3,3.8],-.7);hL=[-2,shY-3,3];hR=[2,shY-2.2,3.6];}} // 木札・書付を持って使いに
    rod(P.armL,i,sL,hL,.48);rod(P.armR,i,sR,hR,.48);};
   const inHours=(p,hh)=>(p.hours||HEIAN_DAILY_LIFE_HOURS[p.role]||[]).some(([a,b])=>hh>=a+p.shift*.5&&hh<b+p.shift*.5);
   const flush=()=>{for(const m of PL)m.instanceMatrix.needsUpdate=true;};
@@ -23498,11 +23897,13 @@ function createHeianDailyLifeRuntime(){
    update(){const now=performance.now(),dt=Math.min(.1,(now-this.lastTime)/1000);this.lastTime=now;this.time+=dt;if(!root.visible)return;
     // 近くの人の一覧は0.5秒ごとに引き直す。遠い人は最後の姿勢のまま止める
     if(this.nearAt<0||this.time-this.nearAt>.5){this.nearAt=this.time;const cx=camera.position.x,cz=camera.position.z;this.near=[];
-     people.forEach((p,i)=>{if(p.on&&Math.hypot(p.x-cx,p.z-cz)<NEAR)this.near.push(i);});}
+     let moved=false;const OD=HEIAN_OFFICE_LOD.workerVisibleDistance;
+     people.forEach((p,i)=>{if(p.office&&p.on){const far=Math.hypot(p.x-cx,p.z-cz)>OD;if(far!==!!p.cull){p.cull=far;pose(p,i,this.time);moved=true;}} // 官司の勤務者は遠いと描かない（戻るときに組み直す）
+     if(p.on&&!p.cull&&Math.hypot(p.x-cx,p.z-cz)<NEAR)this.near.push(i);});if(moved)flush();}
     // 姿勢の組み直しは毎秒20回まで（19本の行列を毎フレーム送らない）
     if(!this.near.length||this.time-(this.poseAt??-1)<.05)return;this.poseAt=this.time;for(const i of this.near)pose(people[i],i,this.time);flush();},
    inspect(){const by={},on={};for(const p of people){by[p.role]=(by[p.role]||0)+1;if(p.on)on[p.role]=(on[p.role]||0)+1;}
-    return{people:people.length,byRole:by,onByRole:on,hour:this.hour,near:this.near.length,estateSpots,nobleSpots,spotStats:window.__heianDailyLifeSpotStats||null,drawCalls:Object.keys(parts).length,
+    return{people:people.length,byRole:by,onByRole:on,hour:this.hour,near:this.near.length,officeWorkers:people.filter(p=>p.office).length,officeOn:people.filter(p=>p.office&&p.on).length,officeCulled:people.filter(p=>p.office&&p.on&&p.cull).length,officeBg:people.filter(p=>p.office&&p.bg).length,estateSpots,nobleSpots,spotStats:window.__heianDailyLifeSpotStats||null,drawCalls:Object.keys(parts).length,
      blocked:people.filter(p=>p.ax===undefined&&p.role!=='play'&&heianWalkBlocked(p.x,p.z,2)).length,inCanal:people.filter(p=>heianCityCanalContains(p.x,p.z,0)).length};},
    dispose(){scene.remove(root);for(const g of k.geometries)g.dispose();for(const m of k.materials)m.dispose();heianDailyLifeRuntime=null;}};
   scene.add(root);let h0=12;try{const c=window.__heianClock?.();if(Number.isFinite(c?.hour))h0=c.hour;}catch(e){}
@@ -23887,7 +24288,7 @@ function heianInteriorCands(rx,rz){const I=heianInterior,people=heianSpeechData?
   out.push({key:'in_'+(q.id||q.who+Math.round(q.x)+'_'+Math.round(q.z)),who:ch?.who||q.who||'女房',x:q.x,z:q.z,dist:d,head:()=>heianInterior?new THREE.Vector3(q.x,q.headY,q.z):null,char:ch,interior:true});}
  return out;}
 // 都の層（隠す物）。夜の層は途中で作り直されるので毎回引き直す
-const heianInteriorHideList=()=>[heianTerrainGroup,heianCrowdRuntime?.root,heianMobRuntime?.root,heianStreetLifeRuntime?.root,heianCourtLifeRuntime?.root,heianDailyLifeRuntime?.root,heianNightRuntime?.root].filter(Boolean);
+const heianInteriorHideList=()=>[heianTerrainGroup,heianCrowdRuntime?.root,heianMobRuntime?.root,heianStreetLifeRuntime?.root,heianCourtLifeRuntime?.root,heianDailyLifeRuntime?.root,heianOfficeRuntime?.root,heianNightRuntime?.root].filter(Boolean);
 // 入口: 邸の南の道（地点の spawn）から32m以内か、邸の敷地の際。邸の四至は条坊へスナップした実測（__heianImperialEstates）
 function heianInteriorDoorAt(p){for(const[id,D]of Object.entries(HEIAN_INTERIORS)){const loc=HEIAN_GAME_LOCATIONS.find(l=>l.id===D.estate);if(!loc)continue;
   if(loc.spawn&&Math.hypot(p.x-loc.spawn.x,p.z-loc.spawn.z)<320)return id;
@@ -24113,7 +24514,7 @@ const HEIAN_EN_TEXT={
  suzakuRoad:{name:"Suzaku Avenue",desc:"The roughly 3.9-kilometre, 84-metre-wide central avenue divided the Left and Right Capital. It climbed gently northward across ground that rises about 38 metres from Rajomon to the capital’s northern edge."},
  commoners:{name:"Commoners' quarter",desc:"Townhouses and workshops, where artisans, traders and ordinary people lived their daily lives."},
  ukyoPaddies:{name:"Green spaces of the Right Capital",desc:"Low, wet ground slowed development in the Right Capital, leaving green open land and marshes inside the street grid."},
- daidairi:{name:"Greater Imperial Palace",desc:"The palace city at the north end, containing the emperor’s residence, the Chodoin and government offices. Provincial business passed through governors’ residences in the capital, visiting envoys, and central offices including the Dajokan, Minbu-sho, Shukei-ryo and Shuzei-ryo—not permanent bureaus for every province."},
+ daidairi:{name:"Greater Imperial Palace",desc:"The palace city at the north end, containing the emperor’s residence, the Chodoin and government offices. Provincial business passed through governors’ residences in the capital, visiting envoys, and central offices including the Daijokan, Minbu-sho, Shukei-ryo and Shuzei-ryo—not permanent bureaus for every province."},
  daigokudenWalk:{name:"Daigokuden Hall",desc:"The main hall of the Chodoin, where enthronements and the most important state rites were held."},
  daigokuden:{name:"Daigokuden Hall",desc:"The main hall of the Chodoin, where enthronements and the most important state rites were held."},
  onmyoryo:{name:"Bureau of Divination (Onmyo-ryo)",desc:"An office under the Ministry of the Center in charge of astronomy, the calendar, timekeeping and divination. Its diviners read omens and blocked directions and announced days of abstinence. The building layout is conjectural."},
@@ -24156,6 +24557,18 @@ const HEIAN_EN_TEXT={
  fixedEast:{name:"Above the Left Capital (default)",desc:"The default overview: the capital with the Eastern Hills and the Kamo River beyond."},
  fixedWest:{name:"Above the Right Capital",desc:"From above the Right Capital, taking in the Katsura River and the western lowlands."},
  fixedTop:{name:"Directly above (street grid)",desc:"The grid seen from straight above, showing the palace and the two markets in the plan."},
+ // 2026-10-12 英語の名が無かった地点と施設（英語でも日本語のまま出ていた）。読みは 平安京/residents/en/GUIDE.md の「読みを間違えやすい名」に合わせる。
+ // 〜院・〜殿（どの）・〜宮は音のまま。木工町など読みが確かでない厨町は役目で言い換える。説明（desc）はまだ無い＝日本語のまま
+ gojoTenjinWalk:{name:"Gojo Tenjin Shrine"},ichihimeWalk:{name:"Ichihime Shrine"},daishogunWalk:{name:"Daishogun-do Hall"},
+ sugawaraIn:{name:"Sugawara-in"},kobaiden:{name:"Kobai-dono"},hakubaiden:{name:"Hakubai-dono"},teijiin:{name:"Teiji-no-in"},higashiSanjo:{name:"Higashi-Sanjo-dono"},
+ horikawain:{name:"Horikawa-in"},kanin:{name:"Kan-in"},reizeiin:{name:"Reizei-in"},yozeiin:{name:"Yozei-in"},kayanoin:{name:"Kaya-no-in"},nijoKyu:{name:"Nijo-no-miya"},
+ koNijoin:{name:"Ko-Nijo-in"},machijiri:{name:"Machijiri-dono"},yamabuki:{name:"Yamabuki-dono"},
+ mokumachi:{name:"Carpenters' quarter (Bureau of Carpentry)"},shurishikimachi:{name:"Palace repair workers' quarter"},takumimachi:{name:"Craftsmen's quarter (Bureau of Crafts)"},
+ zushomachi:{name:"Papermakers' and copyists' quarter (Bureau of Books)"},kamiyain:{name:"Kamiya-in Paper Mill"},seyakuin:{name:"Seyakuin Dispensary"},ukyoNorth:{name:"Officials' quarter, northern Right Capital"},
+ // 施設（HEIAN_LANDMARK_SITES の id。撮った絵の場所の英語名などで引く）
+ daigakuryo:{name:"State University (Daigaku-ryo)"},ukyoShiki:{name:"Right Capital Office (Ukyo-shiki)"},sakyoShiki:{name:"Left Capital Office (Sakyo-shiki)"},
+ kobunin:{name:"Kobun-in"},shogakuin:{name:"Shogaku-in"},kangakuin:{name:"Kangaku-in"},hideninUkyo:{name:"Hiden-in (Right Capital)"},hideninSakyo:{name:"Hiden-in (Left Capital)"},
+ daishogun:{name:"Daishogun-do Hall"},gojoTenjin:{name:"Gojo Tenjin Shrine"},ichihime:{name:"Ichihime Shrine"},yodotsu:{name:"Yodo Port"},tobatsu:{name:"Toba Port"},
 };
 const locName=p=>heianLang==='en'?(HEIAN_EN_TEXT[p.id]?.name||p.name):p.name;
 const locDesc=p=>heianLang==='en'?(HEIAN_EN_TEXT[p.id]?.desc||p.description):p.description;
@@ -25558,7 +25971,7 @@ function syncHeianMapPlayer(){
  return true;
 }
 // スマホ幅ではボタン文字が折り返して崩れるため短いラベルへ切り替える（2026-08-18井内さん指摘）
-const heianNarrowUI=()=>matchMedia('(max-width:600px)').matches;
+const heianNarrowUI=()=>matchMedia(HEIAN_COMPACT_MQ).matches;
 const heianLabel=(long,short)=>heianNarrowUI()?short:long;
 // 右下の操作ヒントは状態ごとに実際の操作だけを出す（ドローン中に歩行の説明が出ていた・2026-08-18井内さん指摘）
 let heianGameHelpEl=null;
@@ -26024,7 +26437,7 @@ function heianBuildingNameAtPointer(clientX,clientY,groundT){
 const heianEntryGateActive=()=>!!document.getElementById('heianEntryGate');
 // 2026-10-06 画面の上のボタン・案内・窓に指が乗っている間は、場所の名前（竜尾壇など）を出さない
 // 🚫 「F：大極殿に入る」の上に指を置くと、その下の地面の名前「竜尾壇」がボタンに重なって出ていた（井内さん「これ消せたらいいな」）
-const HEIAN_HOVER_UI='.heian-game-map,button,input,select,.heian-dialog,.heian-board,.heian-dialog-hint,.heian-interior-btn,.heian-game-bar,.heian-clock,.heian-notebook,.heian-game-info,.heian-game-help,.heian-blessing,.heian-note-toast';
+const HEIAN_HOVER_UI='.heian-game-map,button,input,select,.heian-dialog,.heian-board,.heian-dialog-hint,.heian-interior-btn,.heian-game-bar,.heian-clock,.heian-notebook,.heian-game-info,.heian-game-help,.heian-blessing,.heian-note-toast,.heian-shot-panel';
 const heianHoverSuppressed=target=>heianPhotoMode||heianEntryGateActive()||!!heianDroneTour?.openingActive||!!target?.closest?.(HEIAN_HOVER_UI);
 function syncHeianHoverName(clientX,clientY,target=null){
  // 歩行モードでもホバーを出す（2026-08-27井内さん指示）。旧`heianWalk?.active`の除外を外した。
@@ -26161,16 +26574,141 @@ function stampHeianPhoto(canvas,record){
  ctx.fillStyle='rgba(0,0,0,.62)';ctx.fillRect(logoX-pad*.35,logoY-pad*.35,markSize+pad*.7,markSize+pad*.7);ctx.save();ctx.translate(logoX,logoY);ctx.scale(markSize/285,markSize/285);ctx.translate(-414,-291);ctx.fillStyle='#f4f1e9';ctx.fill(markOuter,'evenodd');ctx.fill(markGrid);ctx.restore();ctx.restore();
  canvas.__heianPhotoStamp={logo:true,logoPosition:'top-left',markSize,bottomBand:true,band:[0,bandY,canvas.width,bandHeight],lines:1,fontSize};
 }
-function captureHeianGameCanvas(){
+// stamp=false＝帯と印を入れない元の絵（2026-10-12 共有の窓は、撮影情報の小札を入れるかどうかを後から選ぶ）
+function captureHeianGameCanvas(stamp=true){
  if(!heianGameMode||!heianTerrainGroup)return null;
- scene.updateMatrixWorld(true);camera.updateMatrixWorld();const scale=matchMedia('(max-width:600px)').matches?3:Math.min(devicePixelRatio||1,2),w=Math.max(2,Math.round(vp.clientWidth*scale)),h=Math.max(2,Math.round(vp.clientHeight*scale)),record=heianPhotoRecord();
+ scene.updateMatrixWorld(true);camera.updateMatrixWorld();const scale=matchMedia(HEIAN_COMPACT_MQ).matches?3:Math.min(devicePixelRatio||1,2),w=Math.max(2,Math.round(vp.clientWidth*scale)),h=Math.max(2,Math.round(vp.clientHeight*scale)),record=heianPhotoRecord();
  const r2=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true,stencil:true});
- try{r2.setPixelRatio(1);r2.setSize(w,h,false);r2.outputColorSpace=renderer.outputColorSpace;r2.toneMapping=renderer.toneMapping;r2.toneMappingExposure=renderer.toneMappingExposure;r2.shadowMap.enabled=renderer.shadowMap.enabled;r2.shadowMap.type=renderer.shadowMap.type;r2.render(scene,camera);const out=document.createElement('canvas');out.width=w;out.height=h;out.getContext('2d').drawImage(r2.domElement,0,0);stampHeianPhoto(out,record);out.__heianPhotoRecord=record;return out;}finally{r2.dispose();}
+ try{r2.setPixelRatio(1);r2.setSize(w,h,false);r2.outputColorSpace=renderer.outputColorSpace;r2.toneMapping=renderer.toneMapping;r2.toneMappingExposure=renderer.toneMappingExposure;r2.shadowMap.enabled=renderer.shadowMap.enabled;r2.shadowMap.type=renderer.shadowMap.type;r2.render(scene,camera);const out=document.createElement('canvas');out.width=w;out.height=h;out.getContext('2d').drawImage(r2.domElement,0,0);if(stamp)stampHeianPhoto(out,record);out.__heianPhotoRecord=record;return out;}finally{r2.dispose();}
 }
 async function saveHeianGamePhoto(){
  if(!heianPhotoMode||!heianPhotoBar)return null;heianPhotoBar.hidden=true;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
- try{const canvas=captureHeianGameCanvas();if(!canvas)return null;heianDiaryPhoto(canvas);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('PNG生成に失敗');const record=canvas.__heianPhotoRecord,stamp=new Date().toISOString().replace(/[:T]/g,'-').slice(0,19),name='hakoniwa-heiankyo-'+record.placeId+'-'+Math.round(record.heading)+'deg-'+stamp+'.png',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus('撮影地点と方角を記録した'+canvas.width+'×'+canvas.height+'pxのPNGを保存した');return{width:canvas.width,height:canvas.height,name,size:blob.size,record,stamp:canvas.__heianPhotoStamp};}catch(e){console.error('平安京撮影失敗',e);setStatus('撮影に失敗した');return null;}finally{if(heianPhotoBar)heianPhotoBar.hidden=!heianPhotoMode;/* 🚫 trueのままにしていたため、撮影すると「撮影」「戻る」が消えて戻れなくなっていた（2026-08-27井内さん指摘）。PNGへ写さないため一時的に隠すだけで、撮影後は撮影モード中なら戻す */}
+ // 2026-10-12 撮ったらすぐ PNG を落とす形から、撮った絵の窓（heianShotOpen）を開く形へ。保存・日録・共有は窓のボタンで（勝手に保存も送信もしない）
+ try{const canvas=captureHeianGameCanvas(false);if(!canvas)throw new Error('描画を写せない');const meta=heianShotMeta(),record=canvas.__heianPhotoRecord;heianShotOpen(canvas,meta);
+  setStatus('撮った（'+canvas.width+'×'+canvas.height+'px）。窓から日録に残す・共有・画像を保存できる');return{width:canvas.width,height:canvas.height,record,meta,panel:!!heianShot.el};}
+ catch(e){console.error('平安京撮影失敗',e);setStatus('撮影に失敗した');heianShotToast(heianShotT('撮れなかった。もう一度試してください','Could not take the photo. Please try again.'));return null;}
+ finally{if(heianPhotoBar&&!heianShot.el)heianPhotoBar.hidden=!heianPhotoMode;/* 🚫 trueのままにしていたため、撮影すると「撮影」「戻る」が消えて戻れなくなっていた（2026-08-27井内さん指摘）。PNGへ写さないため一時的に隠すだけで、撮影後は撮影モード中なら戻す（窓を開いている間は窓を閉じた時に戻す） */}
 }
+// ---- 撮った絵の共有（2026-10-12 井内さん「一人で見た平安京を持ち帰って見せる」）。撮る→窓（日付・場所・天気・ひとこと）→日録に残す／共有する／画像を保存。
+//  共有は Web Share API（navigator.share）だけ。SNSごとの投稿・認証・サーバーは作らない。外へ出すのはボタンを押したときだけ。場所はゲーム内の地名だけ（現実の位置は取らない）
+//  日録の写真は IndexedDB（heian-photos）。長辺1600の JPEG と一覧用の幅320の小さな絵。60枚まで。起動では読まない（帳面を開いた時・残す時に読む）
+//  日付・刻・場所・天気は暦（heianCalendar・heianHourLabel）・地名（heianPlaceNameAt）・天気（heianWeather）から取る。ここで持たない
+const HEIAN_SHOT_MAX=60,HEIAN_SHOT_CAPTION_MAX=100,HEIAN_SHOT_LONG=1600;
+// 公開版の入口。GitHub Pages で動いている時はその場所から作る（公開先を移しても追従）。手元・file:// のときだけこの URL
+const HEIAN_PUBLIC_URL='https://ino0190.github.io/heiankyo/heiankyo/';
+const heianShareUrl=()=>/\.github\.io$/.test(location.hostname)&&/CadKit\/index\.html$/.test(location.pathname)?location.origin+location.pathname.replace(/CadKit\/index\.html$/,'heiankyo/'):HEIAN_PUBLIC_URL;
+const HEIAN_WX_JA={clear:'晴',cloudy:'曇',rain:'雨'},HEIAN_WX_EN={clear:'Fine',cloudy:'Cloudy',rain:'Rain'};
+const heianShotT=(ja,en)=>heianLang==='en'?en:ja;
+function heianShotMeta(){const day=Math.floor(heianClock.day),hour=heianClock.hour,c=heianCalendar(day),p=heianWalk?.active?heianWalk.position:controls.target;
+ // 場所は施設の名を先に（悲田院・東寺・朱雀院など。中の堂の名「本院の堂」までは言わない）。大内裏の中・道・左右京は heianPlaceNameAt のまま
+ const siteE=Object.entries(HEIAN_LANDMARK_SITES).find(([,s])=>s.name!=='大内裏'&&s.w&&s.d&&Math.abs(p.x-s.x)<s.w/2&&Math.abs(p.z-s.z)<s.d/2),est=siteE?null:(window.__heianImperialEstates?.()||[]).find(e=>Math.abs(p.x-e.x)<e.w/2&&Math.abs(p.z-e.z)<e.d/2);
+ const raw=siteE?.[1].name||est?.name||heianPlaceNameAt(p.x,p.z)||'平安京',place=String(raw).replace(/（[^）]*(推定|幅|・|[0-9])[^）]*）/g,'').trim()||'平安京'; // 「大宮川（大内裏の外堀・幅2.4m・推定）」の注は落とす。「悲田院（右京）」は残す
+ const placeId=siteE?.[0]||HEIAN_GAME_LOCATIONS.find(l=>l.name===place)?.id||null; // 英語の名はこの id で引く（HEIAN_EN_TEXT）
+ return{type:'screenshot',day,hour,era:c.year,y:c.y,date:c.label,time:heianHourLabel(hour)+'ごろ',place,placeId,weather:heianWeather,caption:'',url:heianShareUrl()};}
+function heianShotLabels(m){if(heianLang!=='en')return{date:m.era+' '+m.date,place:m.place,wx:(HEIAN_WX_JA[m.weather]||'')+'・'+m.time};
+ const l=HEIAN_GAME_LOCATIONS.find(q=>(m.placeId&&q.id===m.placeId)||q.name===m.place),en=l?locName(l):HEIAN_EN_TEXT[m.placeId]?.name||heianTr(m.place);
+ return{date:heianCalendarLabelEn(m.day)+', '+m.y,place:en,wx:(HEIAN_WX_EN[m.weather]||'')+' · '+heianHourEn(m.hour)};}
+// 共有の本文。日付・場所・ひとこと・Heiankyo（・URL）。説明は足さない
+function heianShotText(m,withUrl){const L=heianShotLabels(m),cap=(m.caption||'').trim();return[L.date,L.place,...(cap?['',cap]:[]),'','Heiankyo',...(withUrl?[m.url]:[])].join('\n');}
+// 撮影情報を右下に小さく（任意）。和紙色の小札に墨の字。字は短辺の約2%＝絵を大きく隠さない
+function heianShotStamp(src,m){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.drawImage(src,0,0);
+ const L=heianShotLabels(m),lines=[L.date,L.place,heianLang==='en'?'Iron Child · notebook':'鉄の童・聞き書き'],fs=Math.max(12,Math.round(Math.min(c.width,c.height)*.02)),pad=Math.round(fs*.7),lh=Math.round(fs*1.45),F=w=>w+' '+fs+'px "Hiragino Mincho ProN","Yu Mincho","YuMincho",serif';
+ g.font=F(500);const w=Math.ceil(Math.max(...lines.map(s=>g.measureText(s).width)))+pad*2,h=lh*lines.length+Math.round(pad*1.2),x=c.width-w-pad*2,y=c.height-h-pad*2;
+ g.fillStyle='rgba(250,246,236,.86)';g.fillRect(x,y,w,h);g.strokeStyle='rgba(96,76,52,.45)';g.lineWidth=Math.max(1,Math.round(fs/14));g.strokeRect(x+.5,y+.5,w-1,h-1);
+ g.textBaseline='top';lines.forEach((s,i)=>{g.fillStyle=i<2?'#2b241c':'#6b5a44';g.font=i<2?F(500):F(400);g.fillText(s,x+pad,y+Math.round(pad*.6)+i*lh);});return c;}
+function heianShotScale(src,long){const k=Math.min(1,long/Math.max(src.width,src.height));if(k>=1)return src;const c=document.createElement('canvas');c.width=Math.max(1,Math.round(src.width*k));c.height=Math.max(1,Math.round(src.height*k));c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c;}
+const heianCanvasBlob=(c,type,q)=>new Promise(r=>{try{c.toBlob(r,type,q);}catch(e){r(null);}});
+function heianShotFileName(m,ext){const t=new Date(m.createdAt||Date.now()),p=n=>String(n).padStart(2,'0');return'heiankyo-'+String(m.place||'').replace(/[\\/:*?"<>|\s]/g,'')+'-'+t.getFullYear()+p(t.getMonth()+1)+p(t.getDate())+'-'+p(t.getHours())+p(t.getMinutes())+p(t.getSeconds())+'.'+ext;}
+function heianShotToast(t){const hud=document.getElementById('heianGameHud');if(!hud||!t)return;const el=document.createElement('div');el.className='heian-note-toast';el.setAttribute('role','status');el.textContent=t;hud.appendChild(el);setTimeout(()=>el.remove(),2600);}
+// 日録の写真（IndexedDB）。開けない環境（権限・プライベート）では null＝「この環境では残せない」と言う。一覧は小さな絵と文字だけを覚え、大きい絵は1枚ずつ読む
+let heianShotDBP=null,heianShots=null,heianShotsLoading=null;
+function heianShotDB(){return heianShotDBP||(heianShotDBP=heianCacheTimeout(new Promise(resolve=>{try{const req=indexedDB.open('heian-photos',1);
+ req.onupgradeneeded=()=>req.result.createObjectStore('photos',{keyPath:'id'});req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);req.onblocked=()=>resolve(null);}catch(e){resolve(null);}}),4000,null));}
+function heianShotsLoad(){if(heianShots)return Promise.resolve(heianShots);if(heianShotsLoading)return heianShotsLoading;
+ heianShotsLoading=heianShotDB().then(db=>new Promise(resolve=>{const out=[],done=()=>{heianShots=out.sort((a,b)=>a.createdAt<b.createdAt?-1:1);heianShotsLoading=null;resolve(heianShots);};if(!db)return done();
+  try{const cur=db.transaction('photos').objectStore('photos').openCursor();cur.onsuccess=()=>{const c=cur.result;if(!c)return done();const{image,...row}=c.value;out.push(row);c.continue();};cur.onerror=done;}catch(e){done();}}));
+ return heianShotsLoading;}
+async function heianShotPut(rec){const db=await heianShotDB();if(!db)throw Object.assign(new Error('写真の保存先が開けない'),{name:'NoDB'});
+ await new Promise((res,rej)=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').put(rec);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error||new Error('abort'));}catch(e){rej(e);}});}
+async function heianShotGet(id){const db=await heianShotDB();if(!db)return null;return new Promise(res=>{try{const r=db.transaction('photos').objectStore('photos').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);}catch(e){res(null);}});}
+async function heianShotDelete(id){const db=await heianShotDB();if(db)await new Promise(res=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').delete(id);tx.oncomplete=tx.onerror=tx.onabort=()=>res();}catch(e){res();}});if(heianShots)heianShots=heianShots.filter(x=>x.id!==id);}
+// 窓。cur＝{canvas:元の絵（印なし）, meta, saved:日録のid|null, stamp:小札を入れるか, blob:共有用のJPEG（先に作っておく）}
+// 🚫 共有の画面（navigator.share）はボタンを押した直後でないと開かない環境がある（Safari）。押してから絵を作ると間に合わないので、窓を開いた時・小札を切り替えた時に作っておく
+const heianShot={el:null,cur:null};
+let heianShotStampOn=(()=>{try{return localStorage.getItem('heian-shot-stamp')!=='0';}catch(e){return true;}})();
+const heianShotOutput=()=>{const c=heianShot.cur;return c.stamp?heianShotStamp(c.canvas,c.meta):c.canvas;};
+function heianShotPrepare(){const c=heianShot.cur;if(!c)return;c.blob=null;const mine=c;heianCanvasBlob(heianShotScale(heianShotOutput(),HEIAN_SHOT_LONG),'image/jpeg',.9).then(b=>{if(heianShot.cur===mine)mine.blob=b;});}
+function heianShotClose(){const c=heianShot.cur;if(c?.saved&&c.caption0!==(c.meta.caption||''))heianShotGet(c.saved).then(r=>{if(!r)return;r.caption=c.meta.caption||'';heianShotPut(r).catch(()=>{});const row=heianShots?.find(x=>x.id===r.id);if(row)row.caption=r.caption;}); // 残した後にひとことを直したら書き戻す
+ heianShot.el?.remove();heianShot.el=null;heianShot.cur=null;if(heianPhotoBar)heianPhotoBar.hidden=!heianPhotoMode;if(heianNb.el)heianNb.rerender?.();}
+async function heianShotKeep(){const c=heianShot.cur;if(!c)return{ok:false,msg:''};await heianShotsLoad();
+ if(heianShots.length>=HEIAN_SHOT_MAX)return{ok:false,msg:heianShotT(`日録に残せるのは${HEIAN_SHOT_MAX}枚まで。帳面の「写真」で古いものを消してから`,`You can keep up to ${HEIAN_SHOT_MAX} photos. Remove some in the Photos tab first.`)};
+ try{const big=heianShotScale(c.canvas,HEIAN_SHOT_LONG),image=await heianCanvasBlob(big,'image/jpeg',.85);if(!image)throw new Error('JPEGを作れない');
+  const row={...c.meta,id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),createdAt:new Date().toISOString(),thumb:heianShotScale(c.canvas,320).toDataURL('image/jpeg',.72),w:big.width,h:big.height};
+  await heianShotPut({...row,image});heianShots.push(row);c.saved=row.id;c.caption0=row.caption||'';c.meta=row;heianDiaryDay(row.day);heianDiarySave();return{ok:true,id:row.id};}
+ catch(e){console.warn('写真を日録に残せなかった',e);const full=e?.name==='QuotaExceededError'||/quota/i.test(String(e?.message||e));
+  return{ok:false,msg:e?.name==='NoDB'?heianShotT('この環境では日録に残せない（画像の保存はできる）','This browser cannot keep photos. You can still save the image.'):full?heianShotT('保存する場所が足りない。古い写真を消すと残せる','Not enough storage. Remove old photos and try again.'):heianShotT('日録に残せなかった','Could not keep the photo.')};}}
+// 共有。画像を渡せる環境は画像＋本文（URL入り）、渡せない環境は本文＋URL。やめた（AbortError）は何も言わない
+async function heianShotShare(){const c=heianShot.cur;if(!c)return{ok:false};if(typeof navigator.share!=='function')return{ok:false,fallback:true};
+ let blob=c.blob;if(!blob)blob=await heianCanvasBlob(heianShotScale(heianShotOutput(),HEIAN_SHOT_LONG),'image/jpeg',.9);
+ const file=blob?new File([blob],heianShotFileName(c.meta,'jpg'),{type:'image/jpeg'}):null;let withFile=false;try{withFile=!!file&&!!navigator.canShare?.({files:[file]});}catch(e){}
+ const data=withFile?{files:[file],title:'Heiankyo',text:heianShotText(c.meta,true)}:{title:'Heiankyo',text:heianShotText(c.meta,false),url:c.meta.url};
+ try{await navigator.share(data);return{ok:true,withFile};}
+ catch(e){if(e?.name==='AbortError')return{ok:false,cancel:true};console.warn('共有の画面を開けなかった',e);return{ok:false,fallback:true};}}
+async function heianShotDownload(){const c=heianShot.cur;if(!c)return false;try{const blob=await heianCanvasBlob(heianShotOutput(),'image/png');if(!blob)throw new Error('PNGを作れない');
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=heianShotFileName(c.meta,'png');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);return true;}catch(e){console.warn('画像を保存できなかった',e);return false;}}
+async function heianCopyText(t){try{await navigator.clipboard.writeText(t);return true;}catch(e){try{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;left:-9999px;top:0';document.body.append(a);a.select();const ok=document.execCommand('copy');a.remove();return ok;}catch(e2){return false;}}}
+function heianShotOpen(canvas,meta,savedId=null){heianShotClose();const hud=document.getElementById('heianGameHud');if(!hud||!canvas)return null;
+ const cur=heianShot.cur={canvas,meta:{...meta},saved:savedId,caption0:meta.caption||'',stamp:heianShotStampOn,blob:null};if(heianPhotoBar)heianPhotoBar.hidden=true;
+ const el=document.createElement('div');el.className='heian-shot-panel';el.setAttribute('role','dialog');el.setAttribute('aria-label',heianShotT('撮った絵','Your photo'));
+ for(const ev of['pointerdown','pointerup','mousedown','mouseup','click','dblclick','wheel','touchstart','keydown'])el.addEventListener(ev,e=>{e.stopPropagation();if(ev==='keydown'&&e.key==='Escape')heianShotClose();},{passive:ev!=='keydown'&&ev!=='wheel'});
+ const img=document.createElement('img');img.className='sp-img';img.alt=heianShotT('撮った絵','Your photo');
+ const showImg=()=>{try{img.src=heianShotScale(heianShotOutput(),960).toDataURL('image/jpeg',.85);}catch(e){}heianShotPrepare();};
+ const L=heianShotLabels(cur.meta),info=document.createElement('div');info.className='sp-meta';
+ for(const[s,cls]of[[L.date,'sp-date'],[L.place,'sp-place'],[L.wx,'sp-wx']]){const p=document.createElement('p');p.className=cls;p.textContent=s;info.append(p);}
+ const capL=document.createElement('label');capL.className='sp-cap';const capT=document.createElement('span');capT.textContent=heianShotT('ひとこと（なくてもよい・'+HEIAN_SHOT_CAPTION_MAX+'字まで）','A few words (optional, up to '+HEIAN_SHOT_CAPTION_MAX+' characters)');
+ const cap=document.createElement('textarea');cap.rows=2;cap.maxLength=HEIAN_SHOT_CAPTION_MAX;cap.value=cur.meta.caption||'';cap.placeholder=heianShotT('雨上がり。悲田院の南の沼が少し霞んでいた。','After the rain, a little mist over the marsh.');
+ const cnt=document.createElement('small'),sync=()=>{cur.meta.caption=cap.value.slice(0,HEIAN_SHOT_CAPTION_MAX);cnt.textContent=[...cap.value].length+'／'+HEIAN_SHOT_CAPTION_MAX;};cap.addEventListener('input',sync);sync();capL.append(capT,cap,cnt);
+ const stL=document.createElement('label');stL.className='sp-stamp';const st=document.createElement('input');st.type='checkbox';st.checked=cur.stamp;
+ st.addEventListener('change',()=>{cur.stamp=heianShotStampOn=st.checked;try{localStorage.setItem('heian-shot-stamp',st.checked?'1':'0');}catch(e){}showImg();});
+ stL.append(st,document.createTextNode(heianShotT('撮影情報を画像に入れる（右下に小さく）','Add the date and place to the image (small, bottom right)')));
+ const msg=document.createElement('p');msg.className='sp-msg';msg.setAttribute('role','status');const say=t=>{msg.textContent=t||'';};
+ const btns=document.createElement('div');btns.className='sp-btns';const btn=(label,fn,cls='')=>{const b=document.createElement('button');b.type='button';b.textContent=label;if(cls)b.className=cls;b.addEventListener('click',()=>fn(b));btns.append(b);return b;};
+ const canShare=typeof navigator.share==='function';
+ const keep=btn(savedId?heianShotT('日録にある','In your diary'):heianShotT('日録に残す','Keep in diary'),async b=>{b.disabled=true;const r=await heianShotKeep();
+  if(r.ok){b.textContent=heianShotT('日録に残した','In your diary');say(heianShotT('日録に残した。帳面（N）の「写真」から、あとで共有できる','Kept. You can share it later from Photos in your notebook (N).'));}else{b.disabled=false;say(r.msg);}});if(savedId)keep.disabled=true;
+ let copyText,copyUrl;
+ const share=btn(heianShotT('共有する','Share'),async b=>{say('');b.disabled=true;const r=await heianShotShare();b.disabled=false;
+  if(r.ok)say(r.withFile?'':heianShotT('この環境では画像を渡せなかった。画像は「画像を保存」で','This browser could not attach the image. Use “Save image”.'));
+  else if(r.fallback){copyText.hidden=copyUrl.hidden=false;say(heianShotT('共有の画面を開けなかった。画像を保存して、本文をコピーしてください','Could not open the share sheet. Save the image and copy the text.'));}},'primary');share.hidden=!canShare;
+ btn(heianShotT('画像を保存','Save image'),async b=>{b.disabled=true;const ok=await heianShotDownload();b.disabled=false;say(ok?heianShotT('画像を保存した','Image saved.'):heianShotT('画像を作れなかった','Could not make the image.'));});
+ copyText=btn(heianShotT('本文をコピー','Copy text'),async()=>say(await heianCopyText(heianShotText(cur.meta,true))?heianShotT('本文をコピーした','Text copied.'):heianShotT('コピーできなかった','Could not copy.')));
+ copyUrl=btn(heianShotT('URLをコピー','Copy URL'),async()=>say(await heianCopyText(cur.meta.url)?heianShotT('URLをコピーした','URL copied.'):heianShotT('コピーできなかった','Could not copy.')));
+ copyText.hidden=copyUrl.hidden=canShare; // 共有の画面が使える環境では隠す（使えない・開けなかった時だけ出す）
+ btn(heianShotT('閉じる','Close'),heianShotClose);
+ el.append(img,info,capL,stL,btns,msg);hud.append(el);heianShot.el=el;showImg();
+ if(!matchMedia(HEIAN_COMPACT_MQ).matches)cap.focus({preventScroll:true});return el;}
+// 日録から開き直す（後日の共有・保存）。残した大きい絵を読んで同じ窓へ
+async function heianShotReopen(id){const rec=await heianShotGet(id);if(!rec?.image){heianShotToast(heianShotT('この写真を読めなかった','Could not open this photo.'));return false;}
+ try{const bmp=await createImageBitmap(rec.image),c=document.createElement('canvas');c.width=bmp.width;c.height=bmp.height;c.getContext('2d').drawImage(bmp,0,0);bmp.close?.();const{image,...meta}=rec;return!!heianShotOpen(c,meta,id);}
+ catch(e){console.warn('写真を開けなかった',e);heianShotToast(heianShotT('この写真を読めなかった','Could not open this photo.'));return false;}}
+// 帳面の「写真」: 小さな絵・日付・場所・ひとこと。新しい順。押すと窓で共有・保存
+function heianShotsRender(list,q,empty,rerender){if(!heianShots){empty(heianShotT('読み込み中…','Loading…'));return;}
+ const ql=q.toLowerCase(),items=heianShots.slice().reverse().filter(x=>!q||(x.caption||'').toLowerCase().includes(ql)||(x.place||'').includes(q)||heianShotLabels(x).place.toLowerCase().includes(ql));
+ const c=document.createElement('p');c.className='nb-count';c.textContent=heianShotT(`写真 ${heianShots.length}／${HEIAN_SHOT_MAX}枚`,`${heianShots.length} of ${HEIAN_SHOT_MAX} photos`);list.append(c);
+ if(!items.length)return empty(heianShots.length?heianShotT('当てはまる写真はまだない','No photos match'):heianShotT('まだ写真は無い。撮影モードで撮って「日録に残す」と、ここに並ぶ','No photos yet. Take one in photo mode and choose “Keep in diary”.'));
+ for(const x of items){const row=document.createElement('div');row.className='nb-item nb-shot';const img=document.createElement('img');img.src=x.thumb;img.loading='lazy';img.alt=heianShotLabels(x).place;img.addEventListener('click',()=>heianShotReopen(x.id));
+  const L=heianShotLabels(x),body=document.createElement('div'),meta=document.createElement('div');meta.className='nb-meta';meta.textContent=L.date+'　'+L.place+'　'+L.wx;body.append(meta);
+  if(x.caption){const t=document.createElement('p');t.className='nb-text';t.textContent=x.caption;body.append(t);}
+  const chips=document.createElement('div');chips.className='nb-chips';const b1=document.createElement('button');b1.type='button';b1.textContent=heianShotT('共有・保存','Share / save');b1.addEventListener('click',()=>heianShotReopen(x.id));
+  const b2=document.createElement('button');b2.type='button';b2.textContent=heianShotT('消す','Remove');b2.addEventListener('click',async()=>{if(b2.dataset.sure!=='1'){b2.dataset.sure='1';b2.textContent=heianShotT('本当に消す','Really remove');return;}await heianShotDelete(x.id);rerender();});
+  chips.append(b1,b2);body.append(chips);row.append(img,body);list.append(row);}}
+// 検証用
+window.__heianShot={meta:()=>heianShotMeta(),labels:m=>heianShotLabels(m||heianShotMeta()),text:(withUrl=true)=>heianShot.cur?heianShotText(heianShot.cur.meta,withUrl):null,
+ panel:()=>heianShot.el?{open:true,saved:heianShot.cur.saved,stamp:heianShot.cur.stamp,blob:!!heianShot.cur.blob,lines:[...heianShot.el.querySelectorAll('.sp-meta p')].map(p=>p.textContent),buttons:[...heianShot.el.querySelectorAll('.sp-btns button')].filter(b=>!b.hidden).map(b=>b.textContent),msg:heianShot.el.querySelector('.sp-msg')?.textContent||''}:{open:false},
+ caption:t=>{const a=heianShot.el?.querySelector('textarea');if(!a)return null;a.value=t;a.dispatchEvent(new Event('input'));return heianShot.cur.meta.caption;},
+ stamp:on=>{const s=heianShot.el?.querySelector('.sp-stamp input');if(!s)return null;s.checked=!!on;s.dispatchEvent(new Event('change'));return heianShot.cur.stamp;},
+ keep:()=>heianShotKeep(),share:()=>heianShotShare(),close:()=>heianShotClose(),reopen:id=>heianShotReopen(id),list:async()=>(await heianShotsLoad()).map(({thumb,...r})=>({...r,thumbBytes:thumb?.length||0})),
+ reset:async()=>{const db=await heianShotDB();if(db)await new Promise(res=>{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').clear();tx.oncomplete=tx.onerror=()=>res();});heianShots=[];return true;}};
 // 動画撮影（2026-08-27井内さん「オープニングやツアーを最初から最後まで動画にできたら素敵」）。
 // canvas.captureStreamはWebGLのcanvasだけを取り込むためHUDは映らない＝静止画のようにbarを隠す必要がない。
 // 実時間録画なので重い場面のフレーム落ちはそのまま入る。ツアー終了で自動保存し、上限12分で打ち切る。
@@ -26244,7 +26782,7 @@ function stopHeianGame(){
  stopHeianVideo();heianNotebookClose();heianTraceClose();
  heianDroneTour?.stop(false);heianDroneTour=null;heianTourMusic?.dispose();heianTourMusic=null;
  if(heianWalk.active)heianWalk.stop('歩行を終了した');
- disposeHeianDailyLife();disposeHeianCourtLife();disposeHeianCrowd();disposeHeianStreetLife();disposeHeianMob();disposeHeianTinRobot();disposeHeianSky();try{window.heianEnv?.dispose?.();}catch(e){}
+ disposeHeianDailyLife();disposeHeianOffice();disposeHeianCourtLife();disposeHeianCrowd();disposeHeianStreetLife();disposeHeianMob();disposeHeianTinRobot();disposeHeianSky();try{window.heianEnv?.dispose?.();}catch(e){}
  heianPhotoMode=false;heianPhotoBar=null;document.body.classList.remove('heian-photo-active');document.getElementById('heianEntryGate')?.remove();heianSpeechReset();
  heianGameMode=false;heianGameEntryMode='overview';heianNearestDisplayId=null;heianNearestSyncAt=0;heianWalkEventStartedAt=0;heianTourEventStartedAt=0;resetHeianWalkAmbient();document.body.classList.remove('heian-game','heian-walking');
  worldAxes.visible=true;gridMinor.visible=true;gridMajor.visible=true; // 編集画面では基準点・グリッドを戻す
@@ -26265,6 +26803,7 @@ function startHeianGame(entryMode='overview'){
  if(!createHeianCrowdRuntime()){disposeHeianMob();disposeHeianTinRobot();return failHeianGameStart('群衆を初期化できませんでした');}
  if(!createHeianStreetLifeRuntime()){disposeHeianCrowd();disposeHeianMob();disposeHeianTinRobot();return failHeianGameStart('街路の人々を初期化できませんでした');}
  if(!createHeianCourtLifeRuntime()){disposeHeianStreetLife();disposeHeianCrowd();disposeHeianMob();disposeHeianTinRobot();return failHeianGameStart('朝堂院・後宮の演出を初期化できませんでした');}
+ if(!createHeianOfficeRuntime())console.warn('官司の戸口の間を作れません（無しで続ける）'); // 2026-10-11 勤務者の表を持つので暮らしの営みより先
  if(!createHeianDailyLifeRuntime())console.warn('暮らしの営みの層を作れません（無しで続ける）'); // 1.77。無くても歩ける層なので起動は止めない
  try{heianBuildTownTakamikura();}catch(e){console.warn('街モードの高御座を作れません（無しで続ける）',e);} // 2026-10-08 外観の簡易版の代わりに、屋内と同じ凝った高御座を大極殿の中へ
  // 台詞は起動を待たせない（読めなければ吹き出しを出さないだけ）
@@ -26293,7 +26832,7 @@ function startHeianGame(entryMode='overview'){
  // 1.90 メニュー整理（2026-10-04決定「メニューを減らす・ハンバーガーに整理」）: 上の帯は ツアー・歩く・記録・俯瞰・撮影 だけ。
  //  音楽・夜・光と影・星座・台詞・言語・編集は ☰ の中（PC は ☰ の下に開く。スマホは今までどおり ☰ で全部を縦に）
  const settings=document.createElement('div');settings.className='heian-game-settings';
- const narrowUI=()=>matchMedia('(max-width:600px)').matches;
+ const narrowUI=()=>matchMedia(HEIAN_COMPACT_MQ).matches;
  const setMenuOpen=open=>{open=!!open;const n=narrowUI();actions.classList.toggle('open',open&&n);settings.classList.toggle('open',open&&!n);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'メニューを閉じる':'メニューを開く');};
  menuButton.addEventListener('click',()=>setMenuOpen(!(actions.classList.contains('open')||settings.classList.contains('open'))));
  addEventListener('pointerdown',e=>{if(settings.classList.contains('open')&&!settings.contains(e.target)&&e.target!==menuButton)setMenuOpen(false);},true);
@@ -26423,11 +26962,11 @@ function startHeianGame(entryMode='overview'){
   if(current)setHeianGameInfoPoint(current,current.fixed?locName(current).replace(ui('fixedPrefix'),'').replace('定位置：',''):null);
   document.documentElement.lang=heianLang;
  };
- matchMedia('(max-width:600px)').addEventListener('change',()=>{setMenuOpen(false);applyHeianLang();});
+ matchMedia(HEIAN_COMPACT_MQ).addEventListener('change',()=>{setMenuOpen(false);applyHeianLang();});
  bar.append(actions,menuButton);hud.appendChild(bar);
  const panel=document.createElement('div');panel.className='heian-game-map';
  // スマホでは地図が街を隠すため折りたたみ式にする。初期は閉・地点選択後も自動で閉じる（2026-08-18井内さん指摘）
- const smallScreen=matchMedia('(max-width:600px)');
+ const smallScreen=matchMedia(HEIAN_COMPACT_MQ);
  const mapToggle=document.createElement('button');mapToggle.type='button';mapToggle.className='heian-map-toggle';
  const setMapCollapsed=v=>{panel.classList.toggle('collapsed',v);mapToggle.textContent=v?ui('mapToggleOpen'):ui('mapToggleClose');};
  mapToggle.addEventListener('click',()=>setMapCollapsed(!panel.classList.contains('collapsed')));
@@ -26496,7 +27035,7 @@ function startHeianGame(entryMode='overview'){
  // 解説パネルと重なっていた。🚫 親が違う（panel/clockPanel は hud の子、actions は bar の子）ので
  // CSSだけでは寄せられない。DOMを移し替え、PC幅へ戻したら元の位置へ返す
  const syncHeianMobileMenu=()=>{
-  const narrow=matchMedia('(max-width:600px)').matches;
+  const narrow=matchMedia(HEIAN_COMPACT_MQ).matches;
   if(narrow){
    if(panel.parentNode!==actions)actions.insertBefore(panel,actions.firstChild);
    if(clockPanel.parentNode!==actions)actions.appendChild(clockPanel);
@@ -26508,8 +27047,8 @@ function startHeianGame(entryMode='overview'){
   return narrow;
  };
  syncHeianMobileMenu();
- matchMedia('(max-width:600px)').addEventListener('change',syncHeianMobileMenu);
- window.__heianMobileMenu=()=>({narrow:matchMedia('(max-width:600px)').matches,
+ matchMedia(HEIAN_COMPACT_MQ).addEventListener('change',syncHeianMobileMenu);
+ window.__heianMobileMenu=()=>({narrow:matchMedia(HEIAN_COMPACT_MQ).matches,
   mapInMenu:panel.parentNode===actions,clockInMenu:clockPanel.parentNode===actions,
   menuOpen:actions.classList.contains('open'),stacked:actions.classList.contains('heian-menu-stacked'),
   clockRect:(r=>({w:Math.round(r.width),h:Math.round(r.height)}))(clockPanel.getBoundingClientRect())});
@@ -26781,7 +27320,7 @@ function loadHeianDataFile(globalName,file,label,reload=null){
 let heianContentLoad=null;
 function heianContentEngine(){ // 検査に渡す、本体が持つ語彙（取れなければ検査が heian-lines.js で使われている語彙で代える）
  const at=[],who=[];
- try{for(const l of HEIAN_GAME_LOCATIONS)at.push(l.id);for(const a of Object.values(HEIAN_SPEECH_ALIAS))at.push(a);for(const g of HEIAN_SPEECH_SOSHI_GROUPS)at.push(g[0]);for(const q of HEIAN_QUIRKS)at.push('quirk_'+q.id);
+ try{for(const l of HEIAN_GAME_LOCATIONS)at.push(l.id);for(const a of Object.values(HEIAN_SPEECH_ALIAS))at.push(a);for(const g of HEIAN_SPEECH_SOSHI_GROUPS)at.push(g[0]);for(const q of HEIAN_QUIRKS)at.push('quirk_'+q.id);for(const o of HEIAN_OFFICES)at.push(o.tag);
   for(const[k,v]of Object.entries(HEIAN_SPEECH_WHO))who.push(k,...v);}catch(e){}
  let fns=[];try{fns=Object.keys(heianDialogFn);}catch(e){}
  // 2026-10-10: 作業役（life）の一覧は HEIAN_DAILY_LIFE_HOURS のキーが正本（ここだけに持ち、他は読むだけ）。validator へもここ経由で渡す
@@ -27505,11 +28044,13 @@ function heianChunkInstanced(src,{lite=null,far=null,grass=false,hideFar=0,cell=
  for(let i=0;i<n;i++){src.getMatrixAt(i,m);if(Math.abs(m.determinant())<1e-9)continue;pos.setFromMatrixPosition(m);const key=Math.floor(pos.x/cell)+':'+Math.floor(pos.z/cell);if(!cells.has(key))cells.set(key,[]);cells.get(key).push(i);}
  const parent=src.parent,out=[];if(!parent||cells.size<2)return null;
  for(const ids of cells.values()){const ch=new THREE.InstancedMesh(src.geometry,src.material,ids.length);ch.name=src.name;ch.castShadow=src.castShadow;ch.receiveShadow=src.receiveShadow;ch.renderOrder=src.renderOrder;
+  // 2026-10-12 区画は作った後に動かない＝毎フレームの行列の組み直しを止める（実測: 場面の物2.2万の行列の自動更新で1コマ9ms）。元の mesh の置き方は写す
+  ch.position.copy(src.position);ch.quaternion.copy(src.quaternion);ch.scale.copy(src.scale);ch.matrixAutoUpdate=false;ch.updateMatrix();
   ids.forEach((i,j)=>{src.getMatrixAt(i,m);ch.setMatrixAt(j,m);if(src.instanceColor){src.getColorAt(i,c);ch.setColorAt(j,c);}});ch.instanceMatrix.needsUpdate=true;if(ch.instanceColor)ch.instanceColor.needsUpdate=true;
   ch.computeBoundingSphere();ch.boundingSphere.radius*=1.2;/* 軽い形は板を広げてあるので少し余裕 */ch.frustumCulled=true;parent.add(ch);
   // 稜線（heianAddInstancedEdges の子）も区画へ。形と材質は元のものを共有し、行列は区画の instanceMatrix を読む
   for(const L of src.children)if(L.isLineSegments&&L.isInstancedMesh){const l2=new THREE.LineSegments(L.geometry,L.material);l2.isInstancedMesh=true;l2.instanceMatrix=ch.instanceMatrix;l2.instanceColor=null;Object.defineProperty(l2,'count',{get:()=>ch.count});
-   l2.frustumCulled=false;l2.name=L.name;l2.renderOrder=L.renderOrder;l2.visible=L.visible;ch.add(l2);}const bs=ch.boundingSphere;heianVegChunks.push({mesh:ch,full:src.geometry,lite,far,grass,hideFar,cx:bs.center.x,cy:bs.center.y,cz:bs.center.z,r:bs.radius,state:'full'});out.push(ch);}
+   l2.frustumCulled=false;l2.name=L.name;l2.renderOrder=L.renderOrder;l2.visible=L.visible;l2.matrixAutoUpdate=false;l2.matrix.copy(L.matrix);ch.add(l2);}const bs=ch.boundingSphere;heianVegChunks.push({mesh:ch,full:src.geometry,lite,far,grass,hideFar,cx:bs.center.x,cy:bs.center.y,cz:bs.center.z,r:bs.radius,state:'full'});out.push(ch);}
  parent.remove(src);return out;}
 function heianChunkVegetation(){
  if(!heianTerrainGroup)return null;const t0=performance.now(),flower=new Set(heianFlowerMeshes.map(q=>q.mesh)),list=[];let before=0;
@@ -27527,7 +28068,29 @@ function heianChunkVegetation(){
   // さらに遠い区画はもう一段間引く（k×3 枚に1枚・板は √3 倍）。幹と枝は遠いと葉に隠れるので描かない
   const far=card&&lite?heianCardLite2(lite,3,1.6):null,wood=/幹/.test(o.name);
   heianChunkInstanced(o,{lite,far,grass,hideFar:wood?HEIAN_VEG_FAR:0});}
- heianVegLODUpdate(true);const info={meshes:list.length,instances:before,chunks:heianVegChunks.length,ms:Math.round(performance.now()-t0)};window.__heianVegChunkInfo=()=>({...info,lite:heianVegChunks.filter(q=>q.state==='lite').length,hidden:heianVegChunks.filter(q=>q.state==='hidden').length});return info;}
+ // 2026-10-12 軽量化: 都じゅうに散らばるのに区画分けしていなかった InstancedMesh（境内・神泉苑の庭木＝1つ300株未満で上の条件の外、
+ //  郊外の茂み、車宿・門外の牛車、空地の小規模利用、住宅の遠景）は外接球が半径3〜12km＝視錐台でも影の箱（150m四方）でも落ちず、
+ //  毎フレーム全部を画面と影で2回描いていた（実測: 東市で影を落とす三角形 1530万のうち約1300万がここと草木）。
+ //  形は変えず 6000 の区画に分けて落とすだけ（作った後に株の番号で行列・色を書き換えないものに限る＝名前で指定）。
+ //  桜・梅（季節の色を株の番号で塗る）・群衆・営み（毎フレーム動く）は分けない
+ const wide=[];heianTerrainGroup.traverse(o=>{if(!o.isInstancedMesh||o.isLineSegments||o.count<8||flower.has(o)||heianVegChunks.some(q=>q.mesh===o))return;
+  if(/^(境内の植栽|神泉苑・庭木|郊外の茂み|点景・車宿の牛車|点景・宮城門外|小規模用途・|住宅遠景proxy)/.test(o.name||''))wide.push(o);});
+ let wideChunks=0;for(const o of wide){const r=heianChunkInstanced(o,{cell:6000});if(r)wideChunks+=r.length;}
+ heianVegLODUpdate(true);const info={meshes:list.length,instances:before,chunks:heianVegChunks.length,wide:wide.length,wideChunks,ms:Math.round(performance.now()-t0)};window.__heianVegChunkInfo=()=>({...info,lite:heianVegChunks.filter(q=>q.state==='lite').length,hidden:heianVegChunks.filter(q=>q.state==='hidden').length});return info;}
+// 検証用（2026-10-12 軽量化）: 名前ごとの区画数・状態・1株の三角形数・軽い形の有無・今描いている三角形（視錐台の前）
+window.__heianVegLODStats=()=>{const by={};const tri=g=>g?(g.index?g.index.count:g.getAttribute('position').count)/3:0;
+ for(const q of heianVegChunks){const n=(q.mesh.name||'?').slice(0,28),b=by[n]||(by[n]={chunks:0,inst:0,full:0,lite:0,far:0,hidden:0,triFull:Math.round(tri(q.full)),hasLite:!!q.lite,hasFar:!!q.far,hideFar:q.hideFar,grass:q.grass,drawnM:0});
+  b.chunks++;b.inst+=q.mesh.count;b[q.state]++;if(q.state!=='hidden')b.drawnM+=tri(q.mesh.geometry)*q.mesh.count/1e6;}
+ for(const b of Object.values(by))b.drawnM=Math.round(b.drawnM*10)/10;return Object.fromEntries(Object.entries(by).sort((a,b)=>b[1].drawnM-a[1].drawnM));};
+// 検証用（2026-10-12 軽量化）: 見えている mesh を名前でまとめた三角形数の上位（instanced は×count・視錐台の前・区画分けの有無）
+window.__heianTopMeshes=(n=25)=>{const by={},chunked=new Set(heianVegChunks.map(q=>q.mesh)),tri=g=>(g.index?g.index.count:g.getAttribute('position')?.count||0)/3;
+ camera.updateMatrixWorld(true);scene.updateMatrixWorld(true);const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),cp=camera.position;
+ scene.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let p=o;p;p=p.parent)if(!p.visible)return;const k=(o.name||'?').slice(0,30),b=by[k]||(by[k]={meshes:0,triM:0,drawnM:0,inst:0,chunked:0,culled:0,bigR:0});
+  const c=o.isInstancedMesh?o.count:1,t=tri(o.geometry)*c/1e6;b.meshes++;b.inst+=c;b.triM+=t;if(chunked.has(o))b.chunked++;if(o.frustumCulled)b.culled++;
+  if(o.isInstancedMesh&&!o.boundingSphere)o.computeBoundingSphere?.();const bs=o.isInstancedMesh?o.boundingSphere:(o.geometry.boundingSphere||(o.geometry.computeBoundingSphere(),o.geometry.boundingSphere));
+  const r=bs?bs.radius*o.matrixWorld.getMaxScaleOnAxis():0;b.bigR=Math.max(b.bigR,Math.round(r));
+  if(!o.frustumCulled||fr.intersectsObject(o))b.drawnM+=t;});
+ return Object.entries(by).map(([k,b])=>[k,{...b,triM:Math.round(b.triM*100)/100,drawnM:Math.round(b.drawnM*100)/100}]).sort((a,b)=>b[1].drawnM-a[1].drawnM).slice(0,n);};
 let heianVegLODAt=0;const heianVegLODCam=new THREE.Vector3(1e9,0,0);
 function heianVegLODUpdate(force=false){if(!heianVegChunks.length)return;const now=performance.now();if(!force&&(now-heianVegLODAt<200||camera.position.distanceToSquared(heianVegLODCam)<400))return;heianVegLODAt=now;heianVegLODCam.copy(camera.position);
  const cp=camera.position;for(const q of heianVegChunks){const d=Math.max(0,Math.hypot(q.cx-cp.x,q.cy-cp.y,q.cz-cp.z)-q.r);
@@ -30528,7 +31091,10 @@ function makeHeianOfficialCompound(id){
    if(z0<(D-8)/2)wall(ex,(z0+(D-8)/2)/2,8,(D-8)/2-z0);
   }else if(gateSide!=='E')wall((W-8)/2,0,8,D-8);
   const hall=(parts,x,z,w,d,eave,rise,label,board=false,y0=-1)=>k.gable(parts,x,z,w,d,y0,eave,rise,s.name+label+(board?'板葺':'瓦葺'));
-  const formalHall=(parts,x,z,w,d,eave,rise,label)=>k.colonnadeHall(parts,x,z,w,d,-1,eave,rise,s.name+label+'瓦葺');
+  const formalHall=(parts,x,z,w,d,eave,rise,label)=>{const full=s.name+label+'瓦葺',off=HEIAN_OFFICES.find(o=>o.hall&&o.hall.re.test(full+'内壁 '));
+   // 戸口を開ける正庁（HEIAN_OFFICES の hall.re。左京職）: 南面の柱間3つを壁ごと開ける。柱割りは columnFrame と同じ ceil(幅/36)（2026-10-12）
+   let dw={};if(off){const nb=Math.max(2,Math.ceil(w/36)),i0=nb%2?(nb-3)/2:nb/2-2;dw={doorway:{side:'S',i0,i1:i0+3}};}
+   return k.colonnadeHall(parts,x,z,w,d,-1,eave,rise,full,false,dw);};
   // 高床式倉庫: 倉庫部分（壁体）の高さを倍に（2026-08-17井内さん指示）
   // 寮・炊事棟などの板葺の長屋（1.56・井内さん「このタイプの屋根の建物はまだ質素なので、リアルにしたい。背も低すぎる？」）。
   // 🚫 それまでは白壁の箱＋板屋根だけ（柱も戸も無い）で、軒も2.3mと人の背丈の少し上しかなかった。
@@ -31095,16 +31661,27 @@ window.__heianWindFlagInfo=()=>heianWindFlagInfo;
 // 配置後の建築を材質・頂点属性別に結合する。個別body数は検証値として残し、draw callだけ減らす。
 function mergeHeianDisplayGroup(group,name){
  const buckets=new Map(),oldMeshes=[];
+ // 区画分け（2026-10-12 軽量化第2弾）: 大内裏のように広い施設は、材質ごとに1メッシュへ結合すると外接球が施設全体になり、
+ //   視錐台でも影の箱でも落とせない（大内裏（表示結合）約250万三角形が毎コマ）。広い施設だけ、結合を格子の区画ごとに分ける。
+ //   夜間閉鎖扉は名前で出し入れするので分けない。区画の大きさは HEIAN_MERGE_CELL（形は変えない）
+ const matByKey=new Map(),items=[];let ex0=Infinity,ex1=-Infinity,ez0=Infinity,ez1=-Infinity;
  for(const mesh of [...group.children]){
   if(!mesh.isMesh||!mesh.visible)continue;
-  mesh.updateMatrix();const src=mesh.material,g=mesh.geometry.clone();g.applyMatrix4(mesh.matrix);
+  mesh.updateMatrix();const g=mesh.geometry.clone();g.applyMatrix4(mesh.matrix);g.computeBoundingBox();
+  const bb=g.boundingBox,cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
+  if(Number.isFinite(cx)&&Number.isFinite(cz)){ex0=Math.min(ex0,cx);ex1=Math.max(ex1,cx);ez0=Math.min(ez0,cz);ez1=Math.max(ez1,cz);}
+  items.push({mesh,g,cx,cz});}
+ const cellSize=window.HEIAN_MERGE_CELL||1400,splitCells=Math.max(ex1-ex0,ez1-ez0)>cellSize*2;
+ for(const{mesh,g,cx,cz}of items){
+  const src=mesh.material;
   const attrs=Object.entries(g.attributes).map(([k,a])=>k+':'+a.itemSize+':'+a.normalized).sort().join(','),textureId=src.userData?.heianTexture||src.map?.userData?.heianTexture||'',textureRepeat=src.map?[src.map.repeat.x,src.map.repeat.y].join(','):'';
   // 夜間閉鎖扉は専用バケツへ分ける。🚫 材質で結合すると門の扉が壁・柱と同じ1メッシュになり、
   //    syncHeianGateDoors が名前で見つけられず**昼も閉じたまま**だった（2026-09-11井内さん
   //    「昼間なのに戸がしまっている門があるよ」）。実測: 都全体で名前を持つ扉は坊門の1メッシュだけだった
   const nightDoor=/夜間閉鎖扉/.test(mesh.name);
-  const key=(nightDoor?'door|':'')+src.type+'|'+src.color?.getHexString()+'|'+src.opacity+'|'+src.transparent+'|'+src.side+'|'+textureId+'|'+textureRepeat+'|'+attrs;
-  if(!buckets.has(key))buckets.set(key,{material:src.clone(),geometries:[],nightDoor});
+  const cell=splitCells&&!nightDoor&&Number.isFinite(cx)&&Number.isFinite(cz)?Math.floor(cx/cellSize)+'_'+Math.floor(cz/cellSize)+'|':'';
+  const key=(nightDoor?'door|':'')+cell+src.type+'|'+src.color?.getHexString()+'|'+src.opacity+'|'+src.transparent+'|'+src.side+'|'+textureId+'|'+textureRepeat+'|'+attrs;
+  if(!buckets.has(key)){const mk=key.slice(cell.length);if(!matByKey.has(mk))matByKey.set(mk,src.clone());buckets.set(key,{material:matByKey.get(mk),geometries:[],nightDoor});} // 区画が違っても材質は共有（材質数・シェーダを増やさない）
   buckets.get(key).geometries.push(g);oldMeshes.push(mesh);
  }
  for(const mesh of oldMeshes)group.remove(mesh);
@@ -31267,6 +31844,17 @@ function clearHeianBakedGlobals(){
  delete window.HEIAN_BAKED;delete window.HEIAN_BAKED_FRAG;
  for(let i=2;i<=Math.max(parts,32);i++)delete window['HEIAN_BAKED_PART'+i];
 }
+// 2026-10-12 散策を始めたら焼き込みの元データを手放す（実測: 文字列156MB＋復号済みの写し114MB が遊んでいる間ずっと残っていた）。
+// #heiangame だけ。焼き込み（#heianbake）は __heianPacked* を書き出しに使うので触らない。
+// IndexedDB への保存（heianCachePut）は保存処理が自分で参照を持つので、ここで手放しても途中で消えない。
+// 地形を作り直すときは IndexedDB から戻る（無ければ焼き込みを読み直す）
+function heianReleaseBakedMemory(){
+ if(location.hash!=='#heiangame')return false;
+ clearHeianBakedGlobals();heianBakedLoad=null;
+ delete window.__heianPackedLandmarks;delete window.__heianPackedNobles;delete window.__heianPackedTinRobot;
+ return true;
+}
+window.__heianBakedReleased=()=>heianBakedLoad===null&&!window.HEIAN_BAKED&&!window.__heianPackedLandmarks; // 検証用
 function heianBakedAssetValid(asset,key){
  const defs=SHINDEN_SITE_SPECS.slice(1),landmarks=heianLandmarkDefs();
  return !!key&&asset?.complete&&asset.key===key&&asset.landmarks&&landmarks.every(def=>asset.landmarks[def.id])
@@ -32962,7 +33550,7 @@ async function checkHeianSkyMusic(){try{const sr=22050,secs=122,ctx=new OfflineA
 if(location.hash==='#skymusic')void checkHeianSkyMusic();
 if(location.hash==='#heiangame')void(async()=>{try{
  // 地形初期化は既存ゲームruntimeを破棄するため、完了後にベイク済みロボを復元する。baked本体は地形側で既に読み込み済み。
- const tTerrain=performance.now();const terrainReady=await makeHeianTerrain();console.log('HEIAN_PROFILE stage makeHeianTerrain(total) '+Math.round(performance.now()-tTerrain)+'ms');if(!terrainReady)return;const tRobot=performance.now();const robotReady=await prepareHeianTinRobotRuntime();console.log('HEIAN_PROFILE stage robot '+Math.round(performance.now()-tRobot)+'ms');if(!robotReady){window.__notifyHeianError?.('ブリキロボを初期化できませんでした');console.log('CADKIT_GAME_FAIL heiangame robotを初期化できません');return;}showHeianProgress('散策の準備中… 92%');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,30)));const gameReady=startHeianGame(new URLSearchParams(location.search).get('heianMode')||'overview');hideHeianProgress();if(!gameReady)return;}catch(e){console.error('CADKIT_GAME_FAIL heiangame '+(e?.message||e));window.__notifyHeianError?.('平安京の初期化に失敗しました: '+(e?.message||e));}})();
+ const tTerrain=performance.now();const terrainReady=await makeHeianTerrain();console.log('HEIAN_PROFILE stage makeHeianTerrain(total) '+Math.round(performance.now()-tTerrain)+'ms');if(!terrainReady)return;const tRobot=performance.now();const robotReady=await prepareHeianTinRobotRuntime();console.log('HEIAN_PROFILE stage robot '+Math.round(performance.now()-tRobot)+'ms');if(!robotReady){window.__notifyHeianError?.('ブリキロボを初期化できませんでした');console.log('CADKIT_GAME_FAIL heiangame robotを初期化できません');return;}showHeianProgress('散策の準備中… 92%');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,30)));const gameReady=startHeianGame(new URLSearchParams(location.search).get('heianMode')||'overview');hideHeianProgress();if(!gameReady)return;heianReleaseBakedMemory();}catch(e){console.error('CADKIT_GAME_FAIL heiangame '+(e?.message||e));window.__notifyHeianError?.('平安京の初期化に失敗しました: '+(e?.message||e));}})();
 else if(location.hash==='#heianterrain')makeHeianTerrain();
 
 // 平安京セットの登録簿（メニューとURLハッシュを自動生成）
@@ -35664,9 +36252,10 @@ function animate(){
  if(heianGameMode)heianEnvTick(); // 環境層（heian-env.js・霞と朝モヤ）
  if(heianGameMode)heianStreetLifeRuntime?.marketActorsTick?.(heianWalk.active?heianWalk.position:null); // 2026-10-05 市の近くの人を動く人に（しぐさの返し・雨宿り）
  if(heianGameMode)heianInteriorTick(); // 屋内の出入り（2026-09-27）
- {const P=heianFrameProf,t0=P?performance.now():0;heianMobRuntime?.update();const t1=P?performance.now():0;heianCrowdRuntime?.update();const t2=P?performance.now():0;heianStreetLifeRuntime?.update();const t3=P?performance.now():0;heianCourtLifeRuntime?.update();heianDailyLifeRuntime?.update();heianBowTick();heianShrineTick();if(heianGameMode)syncHeianMapDrone();
+ {const P=heianFrameProf,t0=P?performance.now():0;heianMobRuntime?.update();const t1=P?performance.now():0;heianCrowdRuntime?.update();const t2=P?performance.now():0;heianStreetLifeRuntime?.update();const t3=P?performance.now():0;heianCourtLifeRuntime?.update();heianOfficeRuntime?.update();heianDailyLifeRuntime?.update();heianBowTick();heianShrineTick();if(heianGameMode)syncHeianMapDrone();
   if(P){const t4=performance.now(),a=(k,v)=>P[k]=(P[k]??v)*.9+v*.1;a('mob',t1-t0);a('crowd',t2-t1);a('street',t3-t2);a('court',t4-t3);}}
  heianVegLODUpdate(); // 植栽の遠近の差し替え（1.53）
+ heianCompactViewShift(); // スマホ横持ちで対話の窓が右に出ている間、街の中心を左の空き（約55%）の中央へ寄せる（2026-10-11）
  bhsFlowRuntime?.update();   // 空港BHSの荷をコンベア上で流す
  updateHeianClock(); // 時刻の流れ（空・光・灯り・影の濃さ）。停止中は何もしない（2026-08-30）
  syncHeianStarsToCamera();syncHeianDaySkyToCamera(); // 星空・昼の天体はカメラ追随の単位球。farに合わせて伸ばす（山の稜線が星を隠すため深度は有効）
@@ -39669,14 +40258,14 @@ if(location.hash==='#heiantest'){
    sharedParcelWallsOK=!bodies.some(b=>/区画塀/.test(b.name))&&['外記庁等境界塀','式部省諸司境界塀','西院・醤院境界塀','醤院・主水司境界塀','供御院・大炊寮境界塀','民部省・主計・主税境界塀','大舎人寮・侍従厨境界塀'].every(n=>!!bb(n)),
    shingonBuildings=['真言院修法堂','真言院長者坊','真言院護摩堂','真言院伴僧宿所','真言院厨所','真言院北門西雑舎','真言院北門東雑舎'],
    shingonCompoundOK=shingonBuildings.every(n=>roofCount(n)===1)&&!!bb('胎蔵界曼荼羅修法壇（西向き）')&&!!bb('金剛界曼荼羅修法壇（東向き）'),
-   productionFacilitiesOK=roofCount('造酒司蔵')===5&&roofCount('漆室漆保管蔵')===5&&roofCount('内匠寮長屋')===4&&['木工内候東西作業場','木工内候南北作業場','木工内候資材小屋'].every(n=>roofCount(n)===1),
+   productionFacilitiesOK=roofCount('造酒司蔵')===5&&roofCount('漆室漆保管蔵')===5&&roofCount('内匠寮長屋')===4&&['木工寮庁','木工内候南北作業場','木工内候資材小屋'].every(n=>roofCount(n)===1),
    /* 馬寮（2026-09-26）: 西厩・東厩（板葺・馬房の仕切り）・埒で囲う馬場・庁・秣倉2・馬具倉・馬部宿所 */
    horseFacilitiesOK=['左馬寮','右馬寮'].every(n=>!!bb(n+'厩板葺屋根')&&!!bb(n+'東厩板葺屋根')/* 馬場の白砂の板は1.56で外した */&&!!bb(n+'庁屋根')&&!!bb(n+'馬具倉屋根')&&!!bb(n+'馬部宿所板葺屋根')&&roofCount(n+'秣倉')===2&&bodies.filter(b=>b.name.startsWith(n+'厩仕切板')).length>=20&&bodies.filter(b=>b.name.startsWith(n+'埒柱')).length>=40),
    treasuryFacilitiesOK=bodies.filter(b=>/^大蔵整列倉\d+屋根/.test(b.name)).length>=28&&bodies.filter(b=>/^大蔵省整列倉\d+屋根/.test(b.name)).length===12,
    jingikanCenterWalls=bodies.filter(b=>b.name.startsWith('神祇官中央境界塀')&&!b.name.includes('笠')),jingikanCenterCaps=bodies.filter(b=>b.name.startsWith('神祇官中央境界塀')&&b.name.includes('笠')),/* 共通生成で「〜瓦笠」になったので前方一致から包含へ（2026-09-11） */
    jingikanCompoundOK=jingikanCenterWalls.length===2&&jingikanCenterCaps.length===2&&bodies.filter(b=>b.name.startsWith('神祇官中門柱')).length===2&&bodies.filter(b=>b.name.startsWith('神祇官中門屋根')).length===1&&bodies.filter(b=>b.name.startsWith('神祇官西院塀')&&!b.name.includes('笠')).length===4&&bodies.filter(b=>b.name.startsWith('神祇官東院塀')&&!b.name.includes('笠')).length===4,
    teaHedges=bodies.filter(b=>b.name.startsWith('茶園茶畝生垣')),teaHuts=bodies.filter(b=>b.name.startsWith('茶園管理小屋')&&b.name.includes('屋根')),
-   teaGardenOK=teaHedges.length===5&&teaHuts.length===2&&teaHedges.every(b=>b.mesh.material.color.getHexString()===SHINDEN_PART_PALETTE.foliage.slice(1)),
+   teaGardenOK=teaHedges.length===5&&teaHuts.length===1&&teaHedges.every(b=>b.mesh.material.color.getHexString()===SHINDEN_PART_PALETTE.foliage.slice(1)),
    dairiOuter=bodyUnion('内裏外郭塀'),southZone=bodyUnion('南院'),ranrin=bodyUnion('蘭林坊'),northRoadGap=dairiOuter&&southZone?dairiOuter.min.z-southZone.max.z:-1,
    dairiNorthFitOK=!!(dairiOuter&&southZone&&ranrin)&&northRoadGap>180&&ranrin.min.z>=dairiOuter.min.z-1,
    shingon=bodyUnion('真言院塀'),shingonNorthOK=!!shingon&&Math.abs(boxCenterZ(shingon)+610)<1&&shingon.max.z<55,
