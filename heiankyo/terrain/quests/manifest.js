@@ -14,6 +14,7 @@ window.HEIAN_CONTENT_FILES=[
  // 'quests/seasonal-autumn.js',   // 重陽・紅葉・初寒
  'quests/facilities-kamiyain.js',    // 紙屋院（paper・dry・carry）＋「乾かない一枚」（2026-10-10）
  'quests/facilities-mokumachi.js',   // 木工町（carry・saw）
+ 'quests/life-chain.js',             // 暮らしの連鎖 第1段（chop・stack・unload・ash・vend・cook・sweep）2026-10-14
  'quests/facilities-shurishiki.js',  // 修理職町（hammer・raft）
  'quests/facilities-seyakuin.js',    // 施薬院（herb・cook）
  'quests/facilities-hidenin.js',     // 悲田院（wait・sit・sweep）
