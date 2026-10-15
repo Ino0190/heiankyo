@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="6b4726cb99e41b6fb6f78263fbbbd3369d15092de71a52405b2ac271d93b5991">
+<meta name="heian-release" content="567495a4e70f0bed0683d134b180a3f9dadc48a923a2d8311e78e1fb77817b90">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -20509,7 +20509,7 @@ function setHeianReal(on){
   //    山が白く抜けて平板になり、空の地平の色とも合わなかった。霞は使わない（scene.fog は触らない）
   setHeianShadowsVisible(false);heianRealTagMeshes();heianRealLines(true);
  }else{
-  const r=heianRealRuntime;heianRealRuntime=null;const s=r.saved;
+  const r=heianRealRuntime;heianRealRuntime=null;const s=r.saved;heianGekigaOn=false;syncHeianGekigaButton(); // 劇画は光と影の上でだけ
   renderer.shadowMap.enabled=s.shadow;renderer.shadowMap.type=s.type;renderer.toneMapping=s.tone;renderer.toneMappingExposure=s.exposure;
   dir.castShadow=s.cast;dir.position.copy(s.pos);dir.color.setHex(s.color);dayHemi.color.setHex(s.hemiSky);dayHemi.groundColor.setHex(s.hemiGround);dir2.color.setHex(s.fill);dir.target.position.copy(s.targetPos);if(!s.targetParent)dir.target.parent?.remove(dir.target);
   dir.shadow.map?.dispose?.();dir.shadow.map=null;
@@ -20613,6 +20613,76 @@ function heianAORender(){
 window.__heianAO=v=>{if(v!=null){heianAOOff=!v;if(v)heianAOEnsure();}return !heianAOOff;};
 window.__heianAOInfo=()=>({off:heianAOOff,loaded:!!heianAO,fade:!!heianAO?.gtao.heianFade,frames:heianAO?.frames||0,ms:heianAO?Math.round(heianAO.ms*10)/10:null,size:heianAO?[heianAO.w,heianAO.h]:null,output:heianAO?.gtao.output??null,
  set:o=>{if(!heianAO)return false;if(o.output!=null)heianAO.gtao.output=o.output;if(o.intensity!=null)heianAO.gtao.blendIntensity=o.intensity;heianAO.gtao.updateGtaoMaterial(o);return true;}});
+// ---- 劇画モード（2026-10-15 井内さん「劇画モードは作れますかね？ モノクロ線画、モノクロパントーン貼り、陰影濃いめ」）。
+//  光と影（写実）の絵をいったん的（render target）へ描き、全画面の板1枚で白黒の劇画へ置き換えて画面へ写す。形・材質は触らない（焼き込みと無関係）。
+//  ①墨線: 深度の逆数 1/z は平面の上では画面に対して一次式＝2階差が0。2階差の大きい所（物の縁・面の折れ目）を墨線にする。
+//     深度の精度で遠いほど誤差が育つので、しきい値に誤差の見積もり（z/near に比例）を足す。2.5km〜9kmで線を消す。明るさの差でも細い線（板目・雲の縁）
+//  ②トーン: 明るさを締めて（陰影濃いめ）5段＝白／網点10%／網点28%／黒地に白点（58%）／ベタ。網点は画面に45度で貼る（スクリーントーンと同じく画面に固定）
+//  ③空: 青い所は薄い網点、雲（色の薄い所）は白
+//  AO は掛けない。撮影の写真も劇画で残す（captureHeianGameCanvas）。光と影を切ると劇画も切る（影が無いと陰影が出ない）
+// 🚫 1.124 の line 1.5（×画面の高さ/900）は太すぎ、瓦が見えず遠景が墨の塊になった（2026-10-15井内さん「もうちょい線を細く。瓦とかも見えない」）。
+//    2階差は縁の両側 line 画素ずつ拾う＝線の幅は約 2×line。0.75 に。明るさの線は1画素の隣で見て近い所だけ。墨線は 800m〜3km で消す。木の葉がベタにならないよう gamma .55
+const HEIAN_GEKIGA={line:.75,crease:.012,lumEdge:.09,fadeNear:8000,fadeFar:30000,contrast:1.5,mid:.45,gamma:.55,levels:[.72,.54,.36,.16],cover:[.10,.26,.52],skyCover:.05,period:4.6,groove:.07,detail:.06};
+let heianGekiga=null,heianGekigaOn=false,heianGameGekigaButton=null;
+function heianGekigaEnsure(){if(heianGekiga)return heianGekiga;
+ const G=HEIAN_GEKIGA,s=renderer.getDrawingBufferSize(new THREE.Vector2()),w=s.x,h=s.y;
+ const rt=new THREE.WebGLRenderTarget(w,h,{type:THREE.HalfFloatType,samples:4,depthTexture:new THREE.DepthTexture(w,h,THREE.FloatType)});rt.texture.colorSpace=THREE.SRGBColorSpace;rt.isXRRenderTarget=true;
+ const v=a=>({value:a}),U={tC:v(rt.texture),tD:v(rt.depthTexture),uRes:v(new THREE.Vector2(w,h)),uN:v(.1),uF:v(1e6),uLine:v(G.line),uCrease:v(G.crease),uLumE:v(G.lumEdge),uFadeN:v(G.fadeNear),uFadeF:v(G.fadeFar),
+  uCon:v(G.contrast),uMid:v(G.mid),uGam:v(G.gamma),uLv:v(new THREE.Vector4(...G.levels)),uCov:v(new THREE.Vector3(...G.cover)),uSky:v(G.skyCover),uP:v(G.period),uGr:v(G.groove),uDt:v(G.detail),uShow:v(0)};
+ const mat=new THREE.ShaderMaterial({uniforms:U,depthTest:false,depthWrite:false,
+  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
+  fragmentShader:`precision highp float;
+uniform sampler2D tC,tD;uniform vec2 uRes;uniform float uN,uF,uLine,uCrease,uLumE,uFadeN,uFadeF,uCon,uMid,uGam,uSky,uP,uGr,uDt,uShow;uniform vec4 uLv;uniform vec3 uCov;
+varying vec2 vUv;
+float W(vec2 uv){float d=texture2D(tD,uv).x;return (uF-d*(uF-uN))/(uN*uF);}
+float L(vec2 uv){return dot(texture2D(tC,uv).rgb,vec3(.299,.587,.114));}
+float dots(float c){if(c<=0.)return 0.;if(c>=1.)return 1.;
+ vec2 p=mat2(.7071,-.7071,.7071,.7071)*gl_FragCoord.xy/uP,f=fract(p)-.5;float dd=length(f),aa=.75/uP;
+ if(c<.5){float r=sqrt(c/3.14159);return 1.-smoothstep(r-aa,r+aa,dd);}
+ float r=sqrt((1.-c)/3.14159);return smoothstep(r-aa,r+aa,dd);}
+void main(){
+ vec2 t=uLine/uRes;vec3 col=texture2D(tC,vUv).rgb;float d0=texture2D(tD,vUv).x;bool sky=d0>=.9999999;
+ float w=W(vUv),z=1./w;
+ float sec=max(abs(W(vUv-vec2(t.x,0.))+W(vUv+vec2(t.x,0.))-2.*w),abs(W(vUv-vec2(0.,t.y))+W(vUv+vec2(0.,t.y))-2.*w));
+ sec=max(sec,.5*max(abs(W(vUv-t)+W(vUv+t)-2.*w),abs(W(vUv+vec2(-t.x,t.y))+W(vUv+vec2(t.x,-t.y))-2.*w)))/w;
+ float thr=uCrease+18e-8*z/uN,fade=1.-smoothstep(uFadeN,uFadeF,z);
+ float ink=sky?0.:smoothstep(thr,thr*2.5,sec)*fade;
+ // 細い線（瓦の列・板目・雲の縁）: 明るさの差を1画素の隣で見る。近い所ほど拾い（しきい値を下げ）、遠くは拾わない＝遠景が線で真っ黒にならない
+ vec2 t1=1./uRes;float l0=dot(col,vec3(.299,.587,.114)),gl=abs(L(vUv-vec2(t1.x,0.))-L(vUv+vec2(t1.x,0.)))+abs(L(vUv-vec2(0.,t1.y))-L(vUv+vec2(0.,t1.y)));
+ float nearF=1.-smoothstep(uFadeN*.15,uFadeN,z),le=mix(uLumE*1.8,uLumE,nearF);
+ // 瓦の列・板の継ぎ目＝周りより暗い細い溝。周り4点の平均より暗い所だけ墨にする（明るい縁は拾わない＝線が倍に太らない）
+ vec2 t2=1.5/uRes;float la=.25*(L(vUv+vec2(t2.x,0.))+L(vUv-vec2(t2.x,0.))+L(vUv+vec2(0.,t2.y))+L(vUv-vec2(0.,t2.y))),hp=(la-l0)/max(la,.05);
+ if(!sky)ink=max(ink,smoothstep(uGr,uGr*2.,hp)*.85*nearF);
+ float tx=sky?0.:smoothstep(uDt,uDt*2.5,gl+2.*abs(la-l0))*nearF;
+ // 🚫 模様の面で明るさの線（1画素隣の差）も描くと、瓦の列の縁が二重に拾われて砂嵐になった（撮影 j1）。模様の面は溝の墨だけにする
+ ink=max(ink,smoothstep(le,le*1.8,gl)*(sky?.45:.75)*mix(.25,1.,nearF)*(1.-.8*tx));
+ float lc=clamp((pow(max(l0,0.),uGam)-uMid)*uCon+uMid,0.,1.),c; // 暗い色の材（板葺き・木）が全部ベタにならないよう、締める前に持ち上げる
+ lc=mix(lc,.5+.5*lc,smoothstep(uFadeN*.2,uFadeF,z)); // 遠い所は一段明るく（遠景がベタの帯にならないように）
+ if(sky){float mx=max(col.r,max(col.g,col.b)),sat=mx>0.?(mx-min(col.r,min(col.g,col.b)))/mx:0.;c=sat>.16?uSky:0.;}
+ else c=lc>uLv.x?0.:lc>uLv.y?uCov.x:lc>uLv.z?uCov.y:lc>uLv.w?uCov.z:1.;
+ // 瓦・板目のように細かい模様のある面は、網点を薄くして模様（上の溝の墨）に任せる。🚫 網点（4.6画素）を全面に貼ると瓦の列（約4画素）と干渉して砂嵐とX字のモアレが強まった（撮影 h1）
+ ink=max(ink,dots(c)*(1.-.75*tx));
+ vec3 o=mix(vec3(.965,.955,.93),vec3(.07,.065,.06),ink);
+ if(uShow>.5)o=vec3(smoothstep(thr,thr*2.5,sec)*fade);
+ gl_FragColor=vec4(o,1.);}`});
+ const quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat);quad.frustumCulled=false;const sc=new THREE.Scene();sc.add(quad);
+ return heianGekiga={rt,U,mat,scene:sc,cam:new THREE.OrthographicCamera(-1,1,1,-1,0,1),w,h,v:new THREE.Vector2(),frames:0,ms:0};}
+// 描画ループから。描いたら true（呼び手は renderer.render を飛ばす）
+function heianGekigaRender(){
+ if(!heianGekigaOn||!heianGameMode)return false;
+ const A=heianGekigaEnsure(),s=renderer.getDrawingBufferSize(A.v),G=HEIAN_GEKIGA,t0=performance.now();
+ if(s.x!==A.w||s.y!==A.h){A.w=s.x;A.h=s.y;A.rt.setSize(s.x,s.y);A.U.uRes.value.set(s.x,s.y);}
+ const k=Math.max(1,s.y/900);A.U.uN.value=camera.near;A.U.uF.value=camera.far;A.U.uLine.value=Math.max(1,G.line*k);A.U.uP.value=G.period*k;
+ renderer.setRenderTarget(A.rt);renderer.clear();renderer.render(scene,camera);renderer.setRenderTarget(null);renderer.render(A.scene,A.cam);
+ A.frames++;A.ms=A.ms*.9+(performance.now()-t0)*.1;return true;}
+function syncHeianGekigaButton(){const b=heianGameGekigaButton;if(!b)return;b.textContent=heianLabel(ui(heianGekigaOn?'gekigaOff':'gekiga'),ui(heianGekigaOn?'gekigaOffShort':'gekigaShort'));b.classList.toggle('primary',heianGekigaOn);b.setAttribute('aria-pressed',String(heianGekigaOn));}
+// 劇画は光と影の上に掛ける。入れるときに光と影も入れる（呼び手が光と影のボタンも合わせる）
+function setHeianGekiga(on){on=!!on;if(on&&!heianRealRuntime)setHeianReal(true);heianGekigaOn=on&&!!heianRealRuntime;syncHeianGekigaButton();return heianGekigaOn;}
+window.__heianGekiga=on=>{if(on!=null)setHeianGekiga(on);return heianGekigaOn;};
+window.__heianGekigaInfo=()=>({on:heianGekigaOn,real:!!heianRealRuntime,loaded:!!heianGekiga,frames:heianGekiga?.frames||0,ms:heianGekiga?Math.round(heianGekiga.ms*10)/10:null,size:heianGekiga?[heianGekiga.w,heianGekiga.h]:null,near:camera.near,far:camera.far});
+// 検証用: 調整値を入れ替える（{crease,lumEdge,contrast,mid,levels:[4],cover:[3],line,period,show:1＝墨線だけ}）
+window.__heianGekigaSet=o=>{const G=HEIAN_GEKIGA;for(const k of['line','crease','lumEdge','fadeNear','fadeFar','contrast','mid','gamma','skyCover','period','groove','detail'])if(o[k]!=null)G[k]=o[k];if(o.levels)G.levels=o.levels;if(o.cover)G.cover=o.cover;
+ if(heianGekiga){const U=heianGekiga.U;U.uCrease.value=G.crease;U.uLumE.value=G.lumEdge;U.uFadeN.value=G.fadeNear;U.uFadeF.value=G.fadeFar;U.uCon.value=G.contrast;U.uMid.value=G.mid;U.uGam.value=G.gamma;U.uSky.value=G.skyCover;U.uGr.value=G.groove;U.uDt.value=G.detail;U.uLv.value.set(...G.levels);U.uCov.value.set(...G.cover);if(o.show!=null)U.uShow.value=o.show;}return{...G};};
 window.__heianReal=on=>setHeianReal(on);
 window.__heianRealStep=()=>{try{updateHeianRealLight();}catch(e){return{error:String(e&&e.stack||e).slice(0,400)};}return window.__heianRealInfo().light;}; // 検証用: 太陽の更新を1回だけ手で回す
 window.__heianRealSet=o=>{const ks=['minHalf','maxHalf','viewK','focusK','walkHalf'];for(const k of ks)if(Number.isFinite(o?.[k]))HEIAN_REAL[k]=o[k];if(heianRealRuntime)heianRealRuntime.half=0;return Object.fromEntries(ks.map(k=>[k,HEIAN_REAL[k]]));}; // 検証用: 影の箱の比べ撮り（1.81の値へ戻して撮る）
@@ -24922,6 +24992,7 @@ const HEIAN_UI={
   tour:'ドローンツアー',tourShort:'ツアー',tourStop:'ツアー停止',stopShort:'停止',orbitStop:'旋回停止',
   night:'夜にする',nightShort:'夜',day:'昼に戻す',dayShort:'昼',clockSet:'時間設定',clockSetShort:'時間',
   real:'光と影にする',realShort:'光と影',realOff:'線画に戻す',realOffShort:'線画',
+  gekiga:'劇画にする',gekigaShort:'劇画',gekigaOff:'劇画をやめる',gekigaOffShort:'劇画×',
   asterisms:'星座を出す',asterismsShort:'星座',asterismsOff:'星座を消す',asterismsOffShort:'星座×',
   speechOn:'台詞：ON',speechOff:'台詞：OFF',speechOnShort:'台詞 ON',speechOffShort:'台詞 OFF',
   musicOn:'音楽：ON',musicOff:'音楽：OFF',musicNo:'音楽：非対応',musicOnShort:'音 ON',musicOffShort:'音 OFF',musicNoShort:'音 ×',
@@ -24944,6 +25015,7 @@ const HEIAN_UI={
   tour:'Drone tour',tourShort:'Tour',tourStop:'Stop tour',stopShort:'Stop',orbitStop:'Stop orbit',
   night:'Switch to night',nightShort:'Night',day:'Return to daylight',dayShort:'Day',clockSet:'Time settings',clockSetShort:'Time',
   real:'Light and shadow',realShort:'Shadows',realOff:'Line drawing',realOffShort:'Lines',
+  gekiga:'Manga style (black and white)',gekigaShort:'Manga',gekigaOff:'Leave manga style',gekigaOffShort:'Manga x',
   asterisms:'Show asterisms',asterismsShort:'Stars',asterismsOff:'Hide asterisms',asterismsOffShort:'Stars x',
   speechOn:'Speech: ON',speechOff:'Speech: OFF',speechOnShort:'Talk ON',speechOffShort:'Talk OFF',
   musicOn:'Music: ON',musicOff:'Music: OFF',musicNo:'Music: n/a',musicOnShort:'Snd ON',musicOffShort:'Snd OFF',musicNoShort:'Snd x',
@@ -27087,6 +27159,8 @@ function stampHeianPhoto(canvas,record){
 function captureHeianGameCanvas(stamp=true){
  if(!heianGameMode||!heianTerrainGroup)return null;
  scene.updateMatrixWorld(true);camera.updateMatrixWorld();const scale=matchMedia(HEIAN_COMPACT_MQ).matches?3:Math.min(devicePixelRatio||1,2),w=Math.max(2,Math.round(vp.clientWidth*scale)),h=Math.max(2,Math.round(vp.clientHeight*scale)),record=heianPhotoRecord();
+ // 劇画は画面の描画器で描いて、同じ処理の中で写し取る（網点の細かさは画面と同じ）
+ if(heianGekigaOn&&heianGekigaRender()){const c=renderer.domElement,out=document.createElement('canvas');out.width=c.width;out.height=c.height;out.getContext('2d').drawImage(c,0,0);if(stamp)stampHeianPhoto(out,record);out.__heianPhotoRecord=record;return out;}
  const r2=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true,stencil:true});
  try{r2.setPixelRatio(1);r2.setSize(w,h,false);r2.outputColorSpace=renderer.outputColorSpace;r2.toneMapping=renderer.toneMapping;r2.toneMappingExposure=renderer.toneMappingExposure;r2.shadowMap.enabled=renderer.shadowMap.enabled;r2.shadowMap.type=renderer.shadowMap.type;r2.render(scene,camera);const out=document.createElement('canvas');out.width=w;out.height=h;out.getContext('2d').drawImage(r2.domElement,0,0);if(stamp)stampHeianPhoto(out,record);out.__heianPhotoRecord=record;return out;}finally{r2.dispose();}
 }
@@ -27308,7 +27382,7 @@ function stopHeianGame(){
  heianPhotoMode=false;heianPhotoBar=null;document.body.classList.remove('heian-photo-active');document.getElementById('heianEntryGate')?.remove();heianSpeechReset();
  heianGameMode=false;heianGameEntryMode='overview';heianNearestDisplayId=null;heianNearestSyncAt=0;heianWalkEventStartedAt=0;heianTourEventStartedAt=0;resetHeianWalkAmbient();document.body.classList.remove('heian-game','heian-walking');
  worldAxes.visible=true;gridMinor.visible=true;gridMajor.visible=true; // 編集画面では基準点・グリッドを戻す
- setHeianReal(false);heianGameRealButton=null; // 編集画面へ写実の影・トーンマップ・霞を持ち込まない
+ setHeianReal(false);heianGameRealButton=null;heianGameGekigaButton=null; // 編集画面へ写実の影・トーンマップ・霞を持ち込まない
  heianGameHud?.remove();heianGameHud=null;heianGameWalkButton=null;heianGameDroneButton=null;heianGameMusicButton=null;heianGameNightButton=null;heianGameAsterismButton=null;heianClockSyncUI=null;heianClock.running=false;setHeianNight(false);heianGameHelpEl=null;
  if(heianTerrainControls)heianTerrainControls.style.display='flex';
  if(heianTerrainCredit)heianTerrainCredit.style.display='block';
@@ -27400,6 +27474,9 @@ function startHeianGame(entryMode='overview'){
  const syncRealButton=()=>{if(!heianGameRealButton)return;const on=!!heianRealRuntime;heianGameRealButton.textContent=heianLabel(ui(on?'realOff':'real'),ui(on?'realOffShort':'realShort'));heianGameRealButton.classList.toggle('primary',on);heianGameRealButton.setAttribute('aria-pressed',String(on));};
  heianGameRealButton=setting('',()=>{const on=setHeianReal(!heianRealRuntime);syncRealButton();postHeianEvent('real_toggle',{enabled:on});});
  setHeianReal(heianRealWanted());syncRealButton();
+ // 劇画（2026-10-15）。光と影の上に掛ける＝入れると光と影も入る。?gekiga=1 で最初から
+ heianGameGekigaButton=setting('',()=>{const on=setHeianGekiga(!heianGekigaOn);syncRealButton();postHeianEvent('gekiga_toggle',{enabled:on});});
+ setHeianGekiga(/[?&]gekiga=1(&|$)/.test(location.search));syncRealButton();
  // 星官（中国式星座）の線と名前（2026-09-08井内さん「中国の星座の線と名前の表示をオンオフできたら素敵かも」）。
  // 押すと夜でなければ夜にする＝星が見えない状態で押しても何も起きないのを避ける
  heianGameAsterismButton=setting(heianLabel(ui('asterisms'),ui('asterismsShort')),()=>{
@@ -27469,7 +27546,7 @@ function startHeianGame(entryMode='overview'){
   traceButton.textContent=heianLabel(ui('trace'),ui('traceShort'));syncViewLabels();if(heianTrace.el){heianTraceClose();heianTraceOpen();}
   birdButton.textContent=heianLabel(ui('bird'),ui('birdShort'));photoButton.textContent=heianLabel(ui('photo'),ui('photoShort'));if(editButton)editButton.textContent=heianLabel(ui('edit'),ui('editShort'));
   photoCaptureButton.textContent=ui('shoot');photoBackButton.textContent=ui('photoBack');photoBar.setAttribute('aria-label',ui('photo'));updateHeianVideoButton();
-  heianGameNightButton.textContent=heianLabel(ui(heianNightRuntime?'day':'night'),ui(heianNightRuntime?'dayShort':'nightShort'));syncRealButton();syncClockToggle();
+  heianGameNightButton.textContent=heianLabel(ui(heianNightRuntime?'day':'night'),ui(heianNightRuntime?'dayShort':'nightShort'));syncRealButton();syncHeianGekigaButton();syncClockToggle();
   // 1.88 星座・台詞のボタンも言語に合わせる（🚫 英語でも「星座を出す」「台詞：ON」のままだった）
   heianGameAsterismButton.textContent=heianLabel(ui(heianAsterismOn?'asterismsOff':'asterisms'),ui(heianAsterismOn?'asterismsOffShort':'asterismsShort'));syncSpeechButton();
   langButton.textContent=ui('lang');label.textContent=ui('mapLabel');
@@ -37306,7 +37383,7 @@ function animate(){
   {const st=heianShadowThrottle,cast=!!dir.castShadow;
    if(heianRealRuntime&&heianWalk?.active&&renderer.shadowMap.enabled&&cast&&st.every>1){st.n=(st.n+1)%st.every;renderer.shadowMap.autoUpdate=false;if(st.n===0||!st.cast||!dir.shadow.map)renderer.shadowMap.needsUpdate=true;st.cast=true;}
    else{renderer.shadowMap.autoUpdate=true;st.cast=false;}}
-  if(!heianAORender())renderer.render(scene,camera); // 写実モードの歩行中は AO を掛けて描く（1.56）
+  if(!heianGekigaRender()&&!heianAORender())renderer.render(scene,camera); // 劇画（2026-10-15）→ 写実モードの歩行中は AO を掛けて描く（1.56）
  }
  gizmoCam.position.copy(camera.position).sub(controls.target).normalize().multiplyScalar(5);
  gizmoCam.up.copy(camera.up);
