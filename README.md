@@ -2,12 +2,9 @@
 
 [English follows the Japanese.](#english)
 
-昌泰三年（900）の平安京を、国土地理院の数値標高モデルと現況の河川データの上に推定復元し、ブラウザだけで歩けるようにしたものです。
-造営から約百年。右大臣・菅原道真が左遷される前の年の都を、ブリキのロボ「鉄の童」になって空から巡り、地上を歩き、町の人と話せます。
+昌泰三年（900）の平安京を、国土地理院の数値標高モデルと現況の河川データの上に推定復元し、ブラウザだけで歩けるようにしたものです。造営から約百年。右大臣・菅原道真が左遷される前の年の都を、ブリキのロボ「鉄の童」になって空から巡り、地上を歩き、町の人と話せます。
 
 公開ページ: https://ino0190.github.io/heiankyo/
-
-
 
 ## はじめに
 
@@ -243,7 +240,7 @@ Cloudflare側の蓄積データを公開ページから取得する機能はな�
 
 A browser-based reconstruction of Heian-kyo as it may have looked in the year 900. You play a small tin robot that the townspeople call "the Iron Child": fly over the capital, walk its streets, and talk with the people who live there.
 
-Live page: (https://ino0190.github.io/heiankyo/en/)
+Live page: https://ino0190.github.io/heiankyo/en/
 
 ## A little background
 
