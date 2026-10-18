@@ -1,1 +1,219 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./heiankyo/"><title>平安京</title><a href="./heiankyo/">平安京 3D散策へ</a></html>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平安京 3D復元｜昌泰三年（900）の都をブラウザで歩く - HakoniwaKit 平安京</title>
+<meta name="description" content="造営から約百年、昌泰三年（900）の平安京を国土地理院の標高データの上に推定復元。羅城門・朱雀大路・大内裏・東寺を空から巡り、地上を歩き、町の人と話せる無料のブラウザ箱庭です。考証の調査ノート66件も公開しています。">
+<link rel="canonical" href="https://ino0190.github.io/heiankyo/">
+<link rel="alternate" hreflang="ja" href="https://ino0190.github.io/heiankyo/">
+<link rel="alternate" hreflang="en" href="https://ino0190.github.io/heiankyo/en/">
+<link rel="alternate" hreflang="x-default" href="https://ino0190.github.io/heiankyo/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HakoniwaKit 平安京">
+<meta property="og:title" content="平安京 3D復元｜昌泰三年（900）の都をブラウザで歩く">
+<meta property="og:description" content="羅城門・朱雀大路・大内裏・東寺を空から巡り、地上を歩き、町の人と話せる無料のブラウザ箱庭。">
+<meta property="og:url" content="https://ino0190.github.io/heiankyo/">
+<meta property="og:image" content="https://ino0190.github.io/heiankyo/img/zenkei.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="857">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%235c3a1e' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%235c3a1e' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f3efe4;color:#2c2418;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:17px;line-height:1.85}
+a{color:#6b3f22}
+.hero{position:relative;min-height:min(88vh,760px);display:grid;align-items:end;color:#f4f1e9;background:#10161c center/cover no-repeat url("img/zenkei.jpg")}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,22,28,.15) 0%,rgba(16,22,28,.55) 45%,rgba(16,22,28,.9) 100%)}
+.hero .in{position:relative;width:min(820px,calc(100% - 40px));margin:0 auto;padding:0 0 64px}
+.series{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:17px;font-weight:700}
+.series svg{width:22px;height:22px;flex:none}
+h1{margin:0;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:64px;line-height:1.15;font-weight:600;letter-spacing:.08em}
+.tag{margin:10px 0 18px;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:26px;letter-spacing:.04em}
+.hero p{max-width:720px;margin:0;color:#d8dee5;font-size:18px}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin:28px 0 0}
+.btn{display:inline-block;padding:14px 32px;font-size:19px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}
+.btn:hover{background:#ddb05a}
+.cta a.sub{color:#f4f1e9;font-size:16px}
+.note{margin:14px 0 0!important;color:#aeb9c3!important;font-size:15px!important}
+main{width:min(820px,calc(100% - 40px));margin:0 auto;padding:16px 0 48px}
+section{margin:48px 0 0}
+h2{margin:0 0 16px;padding:0 0 10px;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:30px;line-height:1.4;color:#5c3a1e;border-bottom:2px solid #b79b63}
+h3{margin:0 0 6px;font-size:19px;color:#5c3a1e}
+p{margin:0 0 14px}
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 20px;margin:20px 0 0}
+.shots figure{margin:0}
+.shots figure.wide{grid-column:1/-1}
+.shots img{display:block;width:100%;height:auto;background:#d9cfb8}
+.shots figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}
+.shots figcaption b{display:block;color:#5c3a1e;font-size:17px}
+#about h3{margin:28px 0 8px}
+.hist{margin:0 0 14px;padding-left:22px}.hist li{margin:4px 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;margin:0 0 36px}.row figure{margin:0}.row img,.gal img{display:block;width:100%;height:auto;background:#d9cfb8}.row.rev figure{order:2}.row h3{font-size:20px}.row p{margin:0}
+.galh{margin:8px 0 12px;font-size:20px}.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px;margin:0 0 40px}.gal figure{margin:0}.gal figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}.gal figcaption b{display:block;color:#5c3a1e}
+@media(max-width:640px){.row{grid-template-columns:1fr;gap:12px}.row.rev figure{order:0}.gal{grid-template-columns:1fr}}
+main figure img{cursor:zoom-in}
+dialog.zoom{max-width:none;max-height:none;width:100vw;height:100vh;margin:0;padding:0;border:0;background:rgba(10,14,18,.94);color:#f4f1e9}
+dialog.zoom::backdrop{background:rgba(10,14,18,.94)}
+dialog.zoom[open]{display:grid;place-items:center;cursor:zoom-out}
+dialog.zoom figure{margin:0;padding:20px;max-width:100%}
+dialog.zoom img{display:block;max-width:calc(100vw - 40px);max-height:calc(100vh - 110px);width:auto;height:auto}
+dialog.zoom figcaption{margin:12px 0 0;font-size:16px;line-height:1.6;color:#d8dee5;max-width:900px}
+dialog.zoom button{position:fixed;top:14px;right:18px;padding:6px 14px;font-size:16px;color:#f4f1e9;background:#243040;border:0;cursor:pointer}
+.uses{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
+.uses li{padding:16px 18px;background:#fff;border:1px solid #e0d5bd;font-size:16px;line-height:1.7}
+@media(max-width:640px){.uses{grid-template-columns:1fr}}
+.feat{margin:0;padding:0;list-style:none;display:grid;gap:16px}
+.feat li{padding:0 0 0 16px;border-left:3px solid #c9973b}
+.notes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 20px;margin:20px 0 22px}
+.notes a{display:block;padding:16px 18px;background:#fff;border:1px solid #e0d5bd;color:#2c2418;text-decoration:none}
+.notes a:hover{border-color:#b79b63}
+.notes a span{display:block;font-size:16px;line-height:1.7;color:#4a3f2e}
+.btn2{display:inline-block;padding:12px 26px;font-size:17px;font-weight:600;color:#f4f1e9;background:#6b3f22;text-decoration:none}
+.btn2:hover{background:#7f4c2a}
+dl.faq dt{margin:20px 0 4px;font-weight:700;color:#5c3a1e}
+dl.faq dd{margin:0}
+.again{margin:48px 0 0;padding:32px 28px;background:#17212a;color:#f4f1e9}
+.again p{color:#d8dee5}
+footer{padding:28px 20px 40px;background:#10161c;color:#b6c2cc;font-size:15px}
+footer .in{width:min(820px,100%);margin:0 auto}
+footer dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0}
+footer dt{color:#8fa0ae;white-space:nowrap}
+footer dd{margin:0}
+footer a{color:#d8dee5}
+@media(max-width:640px){h1{font-size:46px}.tag{font-size:21px}.hero .in{padding-bottom:40px}.shots,.notes{grid-template-columns:1fr}h2{font-size:25px}footer dl{grid-template-columns:1fr;gap:2px}footer dt{margin-top:8px}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebSite","@id":"https://ino0190.github.io/heiankyo/#site","url":"https://ino0190.github.io/heiankyo/","name":"HakoniwaKit 平安京","inLanguage":"ja"},
+{"@type":"VideoGame","@id":"https://ino0190.github.io/heiankyo/#game","name":"HakoniwaKit 平安京","alternateName":["平安京 3D復元","Heian-kyo 3D"],"url":"https://ino0190.github.io/heiankyo/heiankyo/","image":"https://ino0190.github.io/heiankyo/img/zenkei.jpg","description":"昌泰三年（900）の平安京を国土地理院の標高データの上に推定復元し、空から巡り、地上を歩き、町の人と話せるブラウザ箱庭。","inLanguage":["ja","en"],"genre":["歴史","箱庭","散策"],"gamePlatform":"Webブラウザ","applicationCategory":"Game","operatingSystem":"Webブラウザ（PC・スマートフォン）","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},"author":{"@type":"Person","name":"Ikuo Inouchi"},"isPartOf":{"@type":"CreativeWorkSeries","name":"HakoniwaKit","description":"歴史上の、あるいは架空の街・城・地域をブラウザで歩ける箱庭として再現するプロジェクト"},"temporalCoverage":"0900","spatialCoverage":{"@type":"Place","name":"平安京（現在の京都市）"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"なぜ900年なのですか","acceptedAnswer":{"@type":"Answer","text":"計画された建物がそろって建っていた時期で、翌年の正月に右大臣菅原道真が都を追われる昌泰の変が起きます。暦を進めると、その昌泰の変、延喜への改元（901）、藤原時平の死（909）を迎えます。"}},
+{"@type":"Question","name":"無料で遊べますか","acceptedAnswer":{"@type":"Answer","text":"無料です。登録もいりません。ブラウザで開くと動きます。"}},
+{"@type":"Question","name":"スマートフォンでも動きますか","acceptedAnswer":{"@type":"Answer","text":"動きます。ドラッグで見回し、地面をタップして移動します。初回の読み込みが大きいので、Wi-Fiでの利用をおすすめします。"}},
+{"@type":"Question","name":"どこまで史実どおりですか","acceptedAnswer":{"@type":"Answer","text":"地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、設定資料集に確度を書いています。"}},
+{"@type":"Question","name":"撮った画像を自分の作品に使えますか","acceptedAnswer":{"@type":"Answer","text":"個人の作品（漫画・イラスト・動画など）の背景に使えます。公開するときは「HakoniwaKit 平安京」と書き添えてください。商用で使いたいときはご相談ください。"}},
+{"@type":"Question","name":"遊んだ続きはどうなりますか","acceptedAnswer":{"@type":"Answer","text":"日付と聞いた話はブラウザに残り、次に開くと続きから始まります。"}}]}
+]}
+</script>
+<script data-goatcounter="https://ino0190.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<header class="hero">
+<div class="in">
+<p class="series"><svg viewBox="414 291 285 285" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z"/><path fill="currentColor" d="M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z"/></svg>HakoniwaKit</p>
+<h1>平安京</h1>
+<p class="tag">昌泰三年（900）の都を、ブラウザで歩く</p>
+<p>造営からおよそ百年たった平安京を、国土地理院の標高データの上に推定復元した、3Dの箱庭です。ブリキのロボ「鉄の童」になって、空から都を眺め、通りを歩き、町の人の話を聞いて回ります。勝ち負けや決まった筋はなく、好きな所へ行って過ごせます。</p>
+<div class="cta"><a class="btn" href="heiankyo/">平安京を歩く（無料）</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
+<p class="note">初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
+</div>
+</header>
+<main>
+<section id="uses">
+<h2>こんな使い方ができます</h2>
+<ul class="uses">
+<li><h3>都を散歩する</h3>朱雀大路の広さや、大内裏までの遠さを、歩いて確かめられます。</li>
+<li><h3>授業や勉強会で見せる</h3>教科書の都城図を、立体の街並みとして映せます。授業や勉強会での紹介は自由です。</li>
+<li><h3>創作の資料にする</h3>建物や通りを好きな角度から見て、撮った画像を漫画やイラストの背景に使えます。</li>
+</ul>
+</section>
+<section id="about">
+<h2>昌泰三年（900）の平安京</h2>
+<p>桓武天皇は794年に都を平安京へ移しました。この再現は、それからおよそ百年後の昌泰三年（900）、醍醐天皇の代の都です。左大臣は藤原時平、右大臣は菅原道真。翌年の正月、道真は大宰権帥に落とされて都を去ります。羅城門・大極殿・朝堂院・内裏・東寺・西寺が並んで建っていた時期にあたります。</p>
+<p>条坊がすべて家で埋まることはなく、右京では農地に変わり始めた所もありました。箱庭にはその空き地や湿地もそのまま置いています。</p>
+<h3>900年の建物の来歴</h3>
+<ul class="hist">
+<li>大極殿は貞観十八年（876）に焼け、元慶三年（879）に建て直された二代目です。</li>
+<li>応天門は貞観八年（866）の応天門の変で焼け、建て直されています。変から35年たち、火を見た人がまだ都にいます。</li>
+<li>羅城門は弘仁七年（816）の大風で倒れ、建て直された二代目です。</li>
+<li>東寺の五重塔は、着工から長くかかり、9世紀の末にようやく建ちました。</li>
+<li>内裏は遷都以来の姿を保っています。</li>
+</ul>
+<p><a href="research/#doc-建物と都の来歴794-900">建物と都の来歴（794〜900年）の調査ノートを読む</a></p>
+</section>
+<section id="play">
+<h2>平安京でできること</h2>
+<div class="row"><figure><img src="img/zenkei.jpg" width="1500" height="857" alt="北山を背にした平安京の全景。碁盤目の条坊と鴨川・桂川が見える" loading="lazy" decoding="async"></figure>
+<div><h3>空から巡る</h3><p>ドローンツアーで、羅城門から朱雀大路・大内裏・東寺など19か所を飛んで巡れます。ドラッグとホイールで、地表すれすれから真上まで見回せます。南北約5.2km・東西約4.5kmの条坊を、まわりの山と川の地形ごと見渡せます。</p></div></div>
+<div class="row rev"><figure><img src="img/nijo-robo.jpg" width="1500" height="857" alt="二条大路を歩くロボと、町の人の吹き出し。左奥に朱雀門" loading="lazy" decoding="async"></figure>
+<div><h3>地上を歩く</h3><p>50の地点から歩き始め、地面をクリック（スマートフォンはタップ）して進みます。一部の建物は中に入ることもできます。すれ違う町の人のつぶやきが、吹き出しで頭の上に出ます。</p></div></div>
+<h3 class="galh">名所を訪ねる</h3>
+<div class="gal">
+<figure><img src="img/rajomon.jpg" width="1500" height="857" alt="京の南端の羅城門と、九条大路沿いの東寺の伽藍" loading="lazy" decoding="async"><figcaption><b>羅城門と京の南端</b>都の正門・羅城門の左右に、東寺と西寺が向かい合います。</figcaption></figure>
+<figure><img src="img/toji.jpg" width="1500" height="857" alt="東寺の五重塔・金堂・講堂と回廊" loading="lazy" decoding="async"><figcaption><b>東寺</b>五重塔・金堂・講堂を、回廊と築地が囲みます。</figcaption></figure>
+<figure><img src="img/shinsenen.jpg" width="1500" height="857" alt="神泉苑の池と中島、池に面した殿舎と廊" loading="lazy" decoding="async"><figcaption><b>神泉苑</b>大内裏の南東にあった禁苑。池に面して殿舎と廊が並びます。</figcaption></figure>
+<figure><img src="img/suzakumon.jpg" width="1500" height="857" alt="朱雀門を斜めから見る。朱の柱と白壁の二重の門" loading="lazy" decoding="async"><figcaption><b>朱雀門</b>大内裏の正門。朱雀大路の北の突き当たりに建ちます。</figcaption></figure>
+<figure><img src="img/daidairi-kanshi.jpg" width="1500" height="857" alt="大内裏を空から。緑の瓦屋根の朝堂院と、築地で区切られた官司。奥に内裏" loading="lazy" decoding="async"><figcaption><b>大内裏</b>緑の瓦屋根の朝堂院のまわりに、役所ごとに築地で区切られた官司が並びます。</figcaption></figure>
+<figure><img src="img/dairi.jpg" width="1500" height="857" alt="檜皮葺の殿舎が回廊の中に並ぶ内裏" loading="lazy" decoding="async"><figcaption><b>内裏</b>紫宸殿・清涼殿・後宮の殿舎を、檜皮葺の屋根で作っています。</figcaption></figure>
+</div>
+<div class="row"><figure><img src="img/ichi-robo.jpg" width="1500" height="857" alt="東市の露店の間を歩くロボと、売り子の吹き出し" loading="lazy" decoding="async"></figure>
+<div><h3>町の人と話す</h3><p>都には約3,000人の町の人が暮らし、場所・時刻・季節・天気で話が変わります。身分や仕える家、左大臣方か右大臣方かで話し方も変わります。応天門の変や宴の松原の鬼など、900年より前の出来事が噂に上ります。聞いた話は「聞き書き帳」に、その日の出来事は「日録」に残ります。</p></div></div>
+<div class="row rev"><figure><img src="img/suzaku-oji.jpg" width="1500" height="857" alt="柳並木の朱雀大路を進む牛車と騎馬の一行" loading="lazy" decoding="async"></figure>
+<div><h3>暦が進む</h3><p>昌泰三年二月二十五日から延喜二十二年（922）まで、大の月・小の月・閏月を当時の暦どおりに日が進みます。延喜元年（901）正月二十五日の昌泰の変を越えると、道真の牛車は出なくなり、町の人の話や居場所も変わります。公卿の牛車は刻限どおりに邸を出て出仕します。季節がめぐり、草木は梅・桜・若葉・紅葉・枯れ木と移り、日の出と日の入りの時刻も変わります。天気は晴れ・曇り・雨が日ごとに変わります。東市と西市は半月交替で開きます。夜は篝火と灯明だけの暗かった当時を再現しています。</p></div></div>
+<div class="row"><figure><img src="img/gekiga-otenmon.jpg" width="1500" height="857" alt="劇画調で撮った応天門。墨線と網点で描かれている" loading="lazy" decoding="async"></figure>
+<div><h3>撮影してSNSへ</h3><p>気に入った眺めを、撮影モードで画像に残せます。日付・天気・場所の入った投稿文が付き、共有ボタンからそのままSNSへ投稿できます。ロボを消して街並みだけを撮ることも、墨線と網点の劇画調で撮ることもできます。撮った画像は、ご自身の漫画やイラスト、動画の背景にも使えます（条件は「よくある質問」に書いています）。</p></div></div>
+<div class="row rev"><figure><img src="img/yozora.jpg" width="1500" height="857" alt="夜の大極殿の上の星空。北極星（ポラリス）・帝（コカブ）・北斗の名前と線が出ている" loading="lazy" decoding="async"></figure>
+<div><h3>当時の夜空</h3><p>星は、今の星表から地軸の首振り（歳差）を計算して戻した、西暦901年ごろの位置で出ます。今の北極星（ポラリス）は、当時は天の北極から約7°離れていて、真北に止まって見えません。月は満ち欠けし、惑星もその日の暦に合わせて動きます。中国式の星座（星官）の線と名前も出せて、晴れた夜は町の人が星の言い伝えを話します。</p></div></div>
+<div class="row"><figure><img src="img/kanshi-kannin.jpg" width="1500" height="857" alt="官司の戸口で、床に座って書き物をする官人たちとロボ。官人の吹き出しが出ている" loading="lazy" decoding="async"></figure>
+<div><h3>頼みごと</h3><p>迷子探し・恋文・干物盗人・羅城門の柱など、クエストのようなものが用意されています。済ませると、住民との関係が深まって新しい話が聞けたり、内裏や貴族の邸の中へ入れるようになったりします。</p></div></div>
+<ul class="feat">
+<li><h3>English</h3>英語表示では台詞もすべて英訳で出て、大内裏・牛車・陰陽師などの基礎の解説が加わります。</li>
+</ul>
+</section>
+<section id="research">
+<h2>考証について</h2>
+<p>建物・街路・暮らしは、都城図・街路の寸法・発掘資料・古記録を突き合わせて推定しました。史料で確かめられる所と推定で補った所を分けて記録し、調査ノート66件を設定資料集にまとめています。</p>
+<div class="notes">
+<a href="research/#guide-period"><h3>対象年代</h3><span>舞台は昌泰三年（900）。暦が進む延喜二十二年（922）までに並びうる建物・制度・暮らしを選び、その前後の出来事と照らし合わせています。</span></a>
+<a href="research/#guide-city"><h3>条坊・町割り・建物配置</h3><span>一辺約121mの町を単位に、大内裏・官司・東西市・寺・神泉苑の位置を決めています。</span></a>
+<a href="research/#guide-homes"><h3>皇族・公家・庶民の居宅</h3><span>内裏、寝殿造の邸、中下級官人の家、庶民の長屋を、確度の差を書き分けて置いています。</span></a>
+<a href="research/#guide-life"><h3>身分ごとに異なる一日</h3><span>出仕する公家、邸で働く女房や牛飼、市の商人や職人の一日を調べています。</span></a>
+<a href="research/#guide-food"><h3>食・衣・道具</h3><span>大饗の膳と庶民の食事、位階で変わる装束、道具を作る人までを扱います。</span></a>
+<a href="research/#guide-flow"><h3>都へ入る人と物</h3><span>塩・干魚・木材・米が、街道・淀津・鳥羽津・牛車で京へ入る流れです。</span></a>
+</div>
+<a class="btn2" href="research/">設定資料集を読む（調査ノート66件）</a>
+</section>
+<section id="hakoniwakit">
+<h2>HakoniwaKit とは</h2>
+<p>HakoniwaKit（箱庭キット）は、歴史上の、あるいは架空の街・城・地域を、ブラウザで歩ける箱庭として再現するプロジェクトです。平安京はその第一弾として用意しました。今後、バリエーションを広げていく予定です。</p>
+</section>
+<section id="faq">
+<h2>よくある質問</h2>
+<dl class="faq">
+<dt>なぜ900年なのですか</dt><dd>計画された建物がそろって建っていた時期で、翌年の正月に右大臣菅原道真が都を追われる昌泰の変が起きます。暦を進めると、その昌泰の変、延喜への改元（901）、藤原時平の死（909）を迎えます。</dd>
+<dt>無料で遊べますか</dt><dd>無料です。登録もいりません。ブラウザで開くと動きます。</dd>
+<dt>スマートフォンでも動きますか</dt><dd>動きます。ドラッグで見回し、地面をタップして移動します。初回の読み込みが大きいので、Wi-Fiでの利用をおすすめします。</dd>
+<dt>どこまで史実どおりですか</dt><dd>地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、<a href="research/">設定資料集</a>に確度を書いています。</dd>
+<dt>撮った画像を自分の作品に使えますか</dt><dd>個人の作品（漫画・イラスト・動画など）の背景に使えます。公開するときは「HakoniwaKit 平安京」と書き添えてください。商用で使いたいときはご相談ください。</dd>
+<dt>遊んだ続きはどうなりますか</dt><dd>日付と聞いた話はブラウザに残り、次に開くと続きから始まります。</dd>
+</dl>
+</section>
+<section class="again">
+<h2 style="color:#f4f1e9;border-color:#c9973b">千年前の都へ</h2>
+<p>羅城門の前から、朱雀大路を北へ歩いてみてください。</p>
+<a class="btn" href="heiankyo/">平安京を歩く（無料）</a>
+</section>
+</main>
+<footer><div class="in"><dl>
+<dt>制作</dt><dd>3Dモデル・コード © 2026 Ikuo Inouchi</dd>
+<dt>地形</dt><dd>国土地理院 地理院タイル（数値標高モデル）を加工</dd>
+<dt>河川</dt><dd>© OpenStreetMap contributors（ODbL）</dd>
+<dt>建築・区画</dt><dd>史料に基づく推定復元（<a href="research/">設定資料集</a>）</dd>
+<dt>ライブラリ</dt><dd>three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd>
+</dl></div></footer>
+<dialog class="zoom" id="zoom" aria-label="写真を大きく見る"><button type="button" id="zoomClose">閉じる</button><figure><img id="zoomImg" alt=""><figcaption id="zoomCap"></figcaption></figure></dialog>
+<script>
+(()=>{const d=document.getElementById('zoom'),im=document.getElementById('zoomImg'),cap=document.getElementById('zoomCap');
+if(!d||typeof d.showModal!=='function')return;
+for(const img of document.querySelectorAll('main figure img')){img.addEventListener('click',()=>{
+ im.src=img.currentSrc||img.src;im.alt=img.alt;
+ const fc=img.closest('figure')?.querySelector('figcaption'),h=img.closest('.row')?.querySelector('h3');
+ const b=fc?.querySelector('b');cap.textContent=fc?(b?b.textContent+'　'+fc.textContent.slice(b.textContent.length):fc.textContent):(h?h.textContent:img.alt);d.showModal();});}
+d.addEventListener('click',()=>d.close());
+d.addEventListener('close',()=>{im.removeAttribute('src');});})();
+</script>
+</body>
+</html>
