@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heian-kyo in 3D | Walk the Japanese capital of the year 900 in your browser - HakoniwaKit Heian-kyo</title>
+<meta name="description" content="A browser reconstruction of Heian-kyo, the capital that became Kyoto, as it stood in the year 900. Fly over Rajomon Gate, Suzaku Avenue, the palace and Toji Temple, walk the streets and talk with the townspeople. Free, no sign-up. 66 research notes are published alongside.">
+<link rel="canonical" href="https://ino0190.github.io/heiankyo/en/">
+<link rel="alternate" hreflang="ja" href="https://ino0190.github.io/heiankyo/">
+<link rel="alternate" hreflang="en" href="https://ino0190.github.io/heiankyo/en/">
+<link rel="alternate" hreflang="x-default" href="https://ino0190.github.io/heiankyo/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HakoniwaKit Heian-kyo">
+<meta property="og:title" content="Heian-kyo in 3D | Walk the Japanese capital of the year 900">
+<meta property="og:description" content="Fly over and walk through Heian-kyo, the capital that became Kyoto, as it stood in the year 900. Free in your browser.">
+<meta property="og:url" content="https://ino0190.github.io/heiankyo/en/">
+<meta property="og:image" content="https://ino0190.github.io/heiankyo/img/zenkei.jpg">
+<meta property="og:image:width" content="1500">
+<meta property="og:image:height" content="857">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%235c3a1e' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%235c3a1e' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f3efe4;color:#2c2418;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:17px;line-height:1.85}
+a{color:#6b3f22}
+.hero{position:relative;min-height:min(88vh,760px);display:grid;align-items:end;color:#f4f1e9;background:#10161c center/cover no-repeat url("../img/zenkei.jpg")}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,22,28,.15) 0%,rgba(16,22,28,.55) 45%,rgba(16,22,28,.9) 100%)}
+.hero .in{position:relative;width:min(820px,calc(100% - 40px));margin:0 auto;padding:0 0 64px}
+.series{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:17px;font-weight:700}
+.series svg{width:22px;height:22px;flex:none}
+h1{margin:0;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:64px;line-height:1.15;font-weight:600;letter-spacing:.08em}
+.tag{margin:10px 0 18px;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:26px;letter-spacing:.04em}
+.hero p{max-width:720px;margin:0;color:#d8dee5;font-size:18px}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin:28px 0 0}
+.btn{display:inline-block;padding:14px 32px;font-size:19px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}
+.btn:hover{background:#ddb05a}
+.cta a.sub{color:#f4f1e9;font-size:16px}
+.note{margin:14px 0 0!important;color:#aeb9c3!important;font-size:15px!important}
+main{width:min(820px,calc(100% - 40px));margin:0 auto;padding:16px 0 48px}
+section{margin:48px 0 0}
+h2{margin:0 0 16px;padding:0 0 10px;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:30px;line-height:1.4;color:#5c3a1e;border-bottom:2px solid #b79b63}
+h3{margin:0 0 6px;font-size:19px;color:#5c3a1e}
+p{margin:0 0 14px}
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 20px;margin:20px 0 0}
+.shots figure{margin:0}
+.shots figure.wide{grid-column:1/-1}
+.shots img{display:block;width:100%;height:auto;background:#d9cfb8}
+.shots figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}
+.shots figcaption b{display:block;color:#5c3a1e;font-size:17px}
+#about h3{margin:28px 0 8px}
+.hist{margin:0 0 14px;padding-left:22px}.hist li{margin:4px 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;margin:0 0 36px}.row figure{margin:0}.row img,.gal img{display:block;width:100%;height:auto;background:#d9cfb8}.row.rev figure{order:2}.row h3{font-size:20px}.row p{margin:0}
+.galh{margin:8px 0 12px;font-size:20px}.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px;margin:0 0 40px}.gal figure{margin:0}.gal figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}.gal figcaption b{display:block;color:#5c3a1e}
+@media(max-width:640px){.row{grid-template-columns:1fr;gap:12px}.row.rev figure{order:0}.gal{grid-template-columns:1fr}}
+main figure img{cursor:zoom-in}
+dialog.zoom{max-width:none;max-height:none;width:100vw;height:100vh;margin:0;padding:0;border:0;background:rgba(10,14,18,.94);color:#f4f1e9}
+dialog.zoom::backdrop{background:rgba(10,14,18,.94)}
+dialog.zoom[open]{display:grid;place-items:center;cursor:zoom-out}
+dialog.zoom figure{margin:0;padding:20px;max-width:100%}
+dialog.zoom img{display:block;max-width:calc(100vw - 40px);max-height:calc(100vh - 110px);width:auto;height:auto}
+dialog.zoom figcaption{margin:12px 0 0;font-size:16px;line-height:1.6;color:#d8dee5;max-width:900px}
+dialog.zoom button{position:fixed;top:14px;right:18px;padding:6px 14px;font-size:16px;color:#f4f1e9;background:#243040;border:0;cursor:pointer}
+.uses{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
+.uses li{padding:16px 18px;background:#fff;border:1px solid #e0d5bd;font-size:16px;line-height:1.7}
+@media(max-width:640px){.uses{grid-template-columns:1fr}}
+.feat{margin:0;padding:0;list-style:none;display:grid;gap:16px}
+.feat li{padding:0 0 0 16px;border-left:3px solid #c9973b}
+.notes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 20px;margin:20px 0 22px}
+.notes a{display:block;padding:16px 18px;background:#fff;border:1px solid #e0d5bd;color:#2c2418;text-decoration:none}
+.notes a:hover{border-color:#b79b63}
+.notes a span{display:block;font-size:16px;line-height:1.7;color:#4a3f2e}
+.btn2{display:inline-block;padding:12px 26px;font-size:17px;font-weight:600;color:#f4f1e9;background:#6b3f22;text-decoration:none}
+.btn2:hover{background:#7f4c2a}
+dl.faq dt{margin:20px 0 4px;font-weight:700;color:#5c3a1e}
+dl.faq dd{margin:0}
+.again{margin:48px 0 0;padding:32px 28px;background:#17212a;color:#f4f1e9}
+.again p{color:#d8dee5}
+footer{padding:28px 20px 40px;background:#10161c;color:#b6c2cc;font-size:15px}
+footer .in{width:min(820px,100%);margin:0 auto}
+footer dl{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0}
+footer dt{color:#8fa0ae;white-space:nowrap}
+footer dd{margin:0}
+footer a{color:#d8dee5}
+@media(max-width:640px){h1{font-size:46px}.tag{font-size:21px}.hero .in{padding-bottom:40px}.shots,.notes{grid-template-columns:1fr}h2{font-size:25px}footer dl{grid-template-columns:1fr;gap:2px}footer dt{margin-top:8px}}
+
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebSite","@id":"https://ino0190.github.io/heiankyo/en/#site","url":"https://ino0190.github.io/heiankyo/en/","name":"HakoniwaKit Heian-kyo","inLanguage":"en"},
+{"@type":"VideoGame","@id":"https://ino0190.github.io/heiankyo/#game","name":"HakoniwaKit Heian-kyo","alternateName":["Heian-kyo 3D","HakoniwaKit 平安京"],"url":"https://ino0190.github.io/heiankyo/heiankyo/?lang=en","image":"https://ino0190.github.io/heiankyo/img/zenkei.jpg","description":"A browser reconstruction of Heian-kyo in the year 900, built on Japanese national elevation data. Fly over the city, walk its streets and talk with the townspeople.","inLanguage":["en","ja"],"genre":["History","Sandbox","Exploration"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Web browser (desktop and mobile)","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Ikuo Inouchi"},"isPartOf":{"@type":"CreativeWorkSeries","name":"HakoniwaKit","description":"A project to recreate towns, castles and regions, historical or imagined, as miniature worlds you can walk in your browser"},"temporalCoverage":"0900","spatialCoverage":{"@type":"Place","name":"Heian-kyo (present-day Kyoto, Japan)"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Why the year 900?","acceptedAnswer":{"@type":"Answer","text":"The planned buildings all stood together at this time, and in the first month of the next year the Shotai Incident drove the Minister of the Right, Sugawara no Michizane, out of the capital. As the calendar moves on you reach that incident, the change of era to Engi (901) and the death of Fujiwara no Tokihira (909)."}},
+{"@type":"Question","name":"Is it free?","acceptedAnswer":{"@type":"Answer","text":"Yes. No sign-up is needed. It runs when you open it in a browser."}},
+{"@type":"Question","name":"Does it work on a phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. Drag to look around and tap the ground to move. The first download is large, so Wi-Fi is recommended."}},
+{"@type":"Question","name":"How accurate is it?","acceptedAnswer":{"@type":"Answer","text":"The terrain uses the elevation model of the Geospatial Information Authority of Japan, and the streets are laid out from dimensions recorded in historical texts. Where direct evidence is scarce, such as building details and commoners' houses, the reconstruction is an estimate, and the research notes state how certain each part is."}},
+{"@type":"Question","name":"Can I use my photos in my own work?","acceptedAnswer":{"@type":"Answer","text":"You can use them as backgrounds in personal works such as manga, illustrations and videos. When you publish, please credit \"HakoniwaKit Heian-kyo\". For commercial use, please get in touch."}},
+{"@type":"Question","name":"Is my progress saved?","acceptedAnswer":{"@type":"Answer","text":"The date and what you have heard are kept in your browser, and the next visit continues from there."}}]}
+]}
+</script>
+<script data-goatcounter="https://ino0190.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<header class="hero">
+<div class="in">
+<p class="series"><svg viewBox="414 291 285 285" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z"/><path fill="currentColor" d="M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z"/></svg>HakoniwaKit</p>
+<h1>平安京 <span lang="en" style="font-size:.5em;letter-spacing:.02em">Heian-kyo</span></h1>
+<p class="tag">Walk the capital of the year 900 in your browser</p>
+<p>Heian-kyo is the city that became today's Kyoto. This is a 3D miniature world in your browser that reconstructs the capital about a century after it was laid out, built on the national elevation data of Japan. You play the tin robot "the Iron Child": look down on the city from the sky, walk its streets and listen to the people who live there. There is no winning or losing and no fixed story. Go wherever you like.</p>
+<div class="cta"><a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo (free)</a><a class="sub" href="../" hreflang="ja" lang="ja">日本語</a><a class="sub" href="../research/" hreflang="ja">Research notes (Japanese)</a></div>
+<p class="note">The first visit downloads about 25 MB and takes one to three minutes. Runs in desktop and mobile browsers.</p>
+</div>
+</header>
+<main>
+<section id="uses">
+<h2>Ways to use it</h2>
+<ul class="uses">
+<li><h3>Take a walk</h3>See for yourself how wide Suzaku Avenue was and how far it is to the palace.</li>
+<li><h3>Show it in class</h3>Turn the textbook plan of the capital into streets you can see in 3D. You are free to show it in classes and study groups.</li>
+<li><h3>Use it for your own work</h3>View buildings and streets from any angle, and use your photos as backgrounds for manga and illustrations.</li>
+</ul>
+</section>
+<section id="about">
+<h2>Heian-kyo in the year 900</h2>
+<p>Emperor Kanmu moved the capital to Heian-kyo in 794. This reconstruction shows the city about a hundred years later, in the year 900 (the third year of the Shotai era), under Emperor Daigo. Fujiwara no Tokihira is Minister of the Left and Sugawara no Michizane is Minister of the Right. In the first month of the following year, Michizane is demoted to a post in distant Dazaifu and leaves the capital. It is a time when Rajomon Gate, the Great Hall of State, the palace and the Toji and Saiji temples all stood together.</p>
+<p>The grid of streets was never filled with houses, and parts of the western half were already turning into farmland. The reconstruction keeps those open lots and marshes as they were.</p>
+<h3>The buildings in the year 900</h3>
+<ul class="hist">
+<li>The Great Hall of State (Daigokuden) burned in 876 and was rebuilt in 879. The hall you see is the second one.</li>
+<li>Otenmon Gate burned in the Otenmon Incident of 866 and was rebuilt. Thirty-five years later, people who saw the fire still live in the city.</li>
+<li>Rajomon Gate fell in a great storm in 816. The gate you see is the second one.</li>
+<li>The five-storey pagoda of Toji Temple took decades to build and was finally completed at the end of the ninth century.</li>
+<li>The imperial palace (Dairi) keeps its form from the founding of the capital.</li>
+</ul>
+<p><a href="../research/#doc-建物と都の来歴794-900" hreflang="ja">Research note on the history of the buildings, 794–900 (Japanese)</a></p>
+</section>
+<section id="play">
+<h2>What you can do</h2>
+<div class="row"><figure><img src="../img/zenkei.jpg" width="1500" height="857" alt="The whole of Heian-kyo with the northern mountains behind it. The street grid and the Kamo and Katsura rivers are visible" loading="lazy" decoding="async"></figure>
+<div><h3>Fly over the city</h3><p>The drone tour flies through 19 places, from Rajomon Gate along Suzaku Avenue to the palace and Toji Temple. Drag and scroll to look from just above the ground to straight overhead. The grid, about 5.2 km north to south and 4.5 km east to west, sits in its real landscape of mountains and rivers.</p></div></div>
+<div class="row rev"><figure><img src="../img/nijo-robo.jpg" width="1500" height="857" alt="The robot walking along Nijo Avenue past townspeople with speech bubbles, Suzakumon Gate on the far left" loading="lazy" decoding="async"></figure>
+<div><h3>Walk the streets</h3><p>Start from any of 50 places and click the ground (tap on a phone) to walk. You can also go inside some of the buildings. The townspeople's chatter appears in speech bubbles as you pass.</p></div></div>
+<h3 class="galh">Visit the landmarks</h3>
+<div class="gal">
+<figure><img src="../img/rajomon.jpg" width="1500" height="857" alt="Rajomon Gate at the southern edge of the city and the buildings of Toji Temple" loading="lazy" decoding="async"><figcaption><b>Rajomon Gate</b>The main gate of the capital, with Toji and Saiji temples facing each other on either side.</figcaption></figure>
+<figure><img src="../img/toji.jpg" width="1500" height="857" alt="The five-storey pagoda, main hall, lecture hall and cloister of Toji Temple" loading="lazy" decoding="async"><figcaption><b>Toji Temple</b>The pagoda, main hall and lecture hall inside a cloister and an earthen wall.</figcaption></figure>
+<figure><img src="../img/shinsenen.jpg" width="1500" height="857" alt="The pond, island and pavilions of the Shinsen-en garden" loading="lazy" decoding="async"><figcaption><b>Shinsen-en</b>The imperial garden south-east of the palace, with halls and corridors along its pond.</figcaption></figure>
+<figure><img src="../img/suzakumon.jpg" width="1500" height="857" alt="Suzakumon Gate seen at an angle, a two-storey gate with vermilion pillars and white walls" loading="lazy" decoding="async"><figcaption><b>Suzakumon Gate</b>The main gate of the palace precinct, at the northern end of Suzaku Avenue.</figcaption></figure>
+<figure><img src="../img/daidairi-kanshi.jpg" width="1500" height="857" alt="The palace precinct from the air: the green-tiled Chodoin halls, walled government offices, and the imperial palace beyond" loading="lazy" decoding="async"><figcaption><b>The palace precinct</b>Around the green-tiled halls of the Chodoin, each ministry and bureau has its own walled compound.</figcaption></figure>
+<figure><img src="../img/dairi.jpg" width="1500" height="857" alt="Halls with cypress-bark roofs inside the cloister of the imperial palace" loading="lazy" decoding="async"><figcaption><b>The imperial palace</b>The Shishinden, the Seiryoden and the halls of the empresses and court ladies, roofed with cypress bark.</figcaption></figure>
+</div>
+<div class="row"><figure><img src="../img/ichi-robo.jpg" width="1500" height="857" alt="The robot among the stalls of the East Market, with a stallholder speaking in a bubble" loading="lazy" decoding="async"></figure>
+<div><h3>Talk with the townspeople</h3><p>About 3,000 people live in the city, and what they say changes with the place, the hour, the season and the weather. Rank, household and whether they side with the Minister of the Left or the Minister of the Right shape how they talk. Earlier events such as the Otenmon Incident and the demon of the Pine Grove of the Banquet come up as rumours. What you hear is kept in your notebook, and each day is written up in a diary. Every line of dialogue is available in English.</p></div></div>
+<div class="row rev"><figure><img src="../img/suzaku-oji.jpg" width="1500" height="857" alt="An ox cart and a mounted party on willow-lined Suzaku Avenue" loading="lazy" decoding="async"></figure>
+<div><h3>A calendar that moves</h3><p>Days pass from the 25th day of the second month of the year 900 to the year 922, following the lunar calendar of the time, including long and short months and leap months. Once you pass the Shotai Incident on the 25th day of the first month of 901, Michizane's ox cart no longer appears, and the townspeople change what they say and where they go. The nobles' ox carts leave their mansions for the palace on schedule. The seasons turn: plum, cherry, new leaves, autumn colour and bare branches, with sunrise and sunset moving through the year. Each day is clear, cloudy or rainy. The East and West Markets open in alternate halves of the month. At night only bonfires and oil lamps break the darkness, as they did then.</p></div></div>
+<div class="row"><figure><img src="../img/gekiga-otenmon.jpg" width="1500" height="857" alt="Otenmon Gate photographed in gekiga style, drawn with ink lines and screentone" loading="lazy" decoding="async"></figure>
+<div><h3>Take photos and share them</h3><p>Photo mode saves the view as an image. A caption with the date, weather and place is added, and the share button posts it straight to social media. You can hide the robot to capture just the streets, or shoot in a black-and-white gekiga (dramatic manga) style with ink lines and screentone. Your photos can also serve as backgrounds for your own manga, illustrations and videos (see the questions below for the conditions).</p></div></div>
+<div class="row rev"><figure><img src="../img/yozora.jpg" width="1500" height="857" alt="The night sky above the Great Hall of State, labelled with Polaris, Kochab (the Emperor star) and the Northern Dipper" loading="lazy" decoding="async"></figure>
+<div><h3>The night sky of the time</h3><p>The stars are placed where they stood around the year 901, worked back from a modern star catalogue by calculating the precession of the Earth's axis. Polaris, today's pole star, was about 7° from the celestial pole then, so it does not stay fixed in the north. The moon waxes and wanes, and the planets follow the calendar. You can show the lines and names of the Chinese constellations used at the time, and on clear nights townspeople tell stories about the stars.</p></div></div>
+<div class="row"><figure><img src="../img/kanshi-kannin.jpg" width="1500" height="857" alt="The robot at the doorway of a government office where officials sit on the floor writing, one speaking in a bubble" loading="lazy" decoding="async"></figure>
+<div><h3>Requests</h3><p>Find a lost child, deliver a love letter, catch a thief of dried fish, look into the pillars of Rajomon Gate, and more. These quest-like requests deepen your ties with the townspeople, bring new stories, and open the way into the palace and the mansions of the nobility.</p></div></div>
+<ul class="feat">
+</ul>
+</section>
+<section id="research">
+<h2>The research behind it</h2>
+<p>Buildings, streets and daily life were reconstructed by comparing city plans, recorded street dimensions, excavation reports and court diaries. The research notes separate what the sources confirm from what is estimated. All 66 notes are published, in Japanese, as a companion to the reconstruction.</p>
+<a class="btn2" href="../research/" hreflang="ja">Read the research notes (Japanese)</a>
+</section>
+<section id="hakoniwakit">
+<h2>What is HakoniwaKit?</h2>
+<p>HakoniwaKit is a project to recreate towns, castles and regions, historical or imagined, as miniature worlds (hakoniwa) you can walk in your browser. Heian-kyo is the first. More are planned.</p>
+</section>
+<section id="faq">
+<h2>Questions</h2>
+<dl class="faq">
+<dt>Why the year 900?</dt><dd>The planned buildings all stood together at this time, and in the first month of the next year the Shotai Incident drove the Minister of the Right, Sugawara no Michizane, out of the capital. As the calendar moves on you reach that incident, the change of era to Engi (901) and the death of Fujiwara no Tokihira (909).</dd>
+<dt>Is it free?</dt><dd>Yes. No sign-up is needed. It runs when you open it in a browser.</dd>
+<dt>Does it work on a phone?</dt><dd>Yes. Drag to look around and tap the ground to move. The first download is large, so Wi-Fi is recommended.</dd>
+<dt>How accurate is it?</dt><dd>The terrain uses the elevation model of the Geospatial Information Authority of Japan, and the streets are laid out from dimensions recorded in historical texts. Where direct evidence is scarce, such as building details and commoners' houses, the reconstruction is an estimate, and the <a href="../research/" hreflang="ja">research notes</a> (Japanese) state how certain each part is.</dd>
+<dt>Can I use my photos in my own work?</dt><dd>You can use them as backgrounds in personal works such as manga, illustrations and videos. When you publish, please credit "HakoniwaKit Heian-kyo". For commercial use, please get in touch.</dd>
+<dt>Is my progress saved?</dt><dd>The date and what you have heard are kept in your browser, and the next visit continues from there.</dd>
+</dl>
+</section>
+<section class="again">
+<h2 style="color:#f4f1e9;border-color:#c9973b">To the capital of a thousand years ago</h2>
+<p>Start in front of Rajomon Gate and walk north along Suzaku Avenue.</p>
+<a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo (free)</a>
+</section>
+</main>
+<footer><div class="in"><dl>
+<dt>Created by</dt><dd>3D models and code © 2026 Ikuo Inouchi</dd>
+<dt>Terrain</dt><dd>Based on GSI Tiles (digital elevation model), Geospatial Information Authority of Japan</dd>
+<dt>Rivers</dt><dd>© OpenStreetMap contributors (ODbL)</dd>
+<dt>Buildings</dt><dd>Estimated reconstruction from historical sources (<a href="../research/" hreflang="ja">research notes</a>, Japanese)</dd>
+<dt>Libraries</dt><dd>three.js (MIT), manifold-3d (Apache-2.0), opencascade.js (LGPL-2.1)</dd>
+</dl></div></footer>
+<dialog class="zoom" id="zoom" aria-label="Enlarged photo"><button type="button" id="zoomClose">Close</button><figure><img id="zoomImg" alt=""><figcaption id="zoomCap"></figcaption></figure></dialog>
+<script>
+(()=>{const d=document.getElementById('zoom'),im=document.getElementById('zoomImg'),cap=document.getElementById('zoomCap');
+if(!d||typeof d.showModal!=='function')return;
+for(const img of document.querySelectorAll('main figure img')){img.addEventListener('click',()=>{
+ im.src=img.currentSrc||img.src;im.alt=img.alt;
+ const fc=img.closest('figure')?.querySelector('figcaption'),h=img.closest('.row')?.querySelector('h3');
+ const b=fc?.querySelector('b');cap.textContent=fc?(b?b.textContent+' — '+fc.textContent.slice(b.textContent.length):fc.textContent):(h?h.textContent:img.alt);d.showModal();});}
+d.addEventListener('click',()=>d.close());
+d.addEventListener('close',()=>{im.removeAttribute('src');});})();
+</script>
+</body>
+</html>
