@@ -26,7 +26,9 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const merge=(base,add)=>{for(const k of Object.keys(add||{})){if(add[k]&&typeof add[k]==='object'&&!Array.isArray(add[k]))merge(base[k]=base[k]||{},add[k]);else base[k]=add[k];}return base;};
 const hash=(a,b)=>{const v=Math.sin(a*12.9898+b*78.233)*43758.5453;return v-Math.floor(v);};
 const Q=new URLSearchParams(location.search);
-let api=null,T=null,P=clone(DEFAULTS),fog=null,fadeNow=1,lastMs=0,lastInfo=null;
+// fadeNow は0から始める（2026-10-18 井内さん「オープニングで空から見る時モヤがかかってる。とりたい」）。
+// 🚫 旧は1から始まり、上空でも霞が全開から1.6秒の時定数でしか消えず、読み込み直後の数秒は都が白くかすんでいた。地上を歩けば fadeSec で入る
+let api=null,T=null,P=clone(DEFAULTS),fog=null,fadeNow=0,lastMs=0,lastInfo=null;
 const mist={group:null,slots:[],cand:null,assigned:new Map(),lastX:1e9,lastZ:1e9,lastAt:0,active:0,alpha:0};
 // ---- 霞 ---------------------------------------------------------------------------------------
 // three@0.160 の線形フォグの式（smoothstep で far では100%）を、「始まりから指数で寄り、最大でも半分」に差し替える。

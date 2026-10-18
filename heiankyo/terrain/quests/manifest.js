@@ -19,6 +19,7 @@ window.HEIAN_CONTENT_FILES=[
  'quests/facilities-seyakuin.js',    // 施薬院（herb・cook）
  'quests/facilities-hidenin.js',     // 悲田院（wait・sit・sweep）
  'quests/facilities-offices.js',     // 官司の戸口の間の勤務者（図書寮・木工寮・典薬寮・陰陽寮・神祇官・左京職）＋「紙が一束足りない」（2026-10-11）
+ 'quests/serial-makiwari.js',        // 日常連作「薪割りの男と隣の女」（L.serials・日付だけで4段に進む）2026-10-15
 ];
 // 試験用。ゲームを ?devpacks=1 で開いたときだけ読む（本番の人は読まない）。データだけで追加できることの確認用
 window.HEIAN_CONTENT_DEV_FILES=[

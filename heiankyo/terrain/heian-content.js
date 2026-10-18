@@ -24,7 +24,8 @@ const eraOK=e=>arr(e).length>0&&arr(e).every(s=>{const m=eraParse(s);return !!m&
 const dateOK=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isInteger)&&v[0]>=900&&v[0]<=922&&v[1]>=1&&v[1]<=12&&v[2]>=1&&v[2]<=30;
 // 条件 'a&b&c'（スペースは入れない）。使える項: q:名前(>=|<=|=|<|>)数／gate:名前／!gate:名前／done>=数／days:名前>=数／IFS の語。q: には ! を付けられない（本体が読まない）
 // 2026-10-11 carry:stone|wood|bale（ロボが抱えている荷）・carrying（何か抱えている）。本体 heianSpeechCond が読む
-const QCOND=/^(q:\w+(>=|<=|=|<|>)\d+|!?gate:\w+|done>=\d+|days:\w+>=\d+|carry:(stone|wood|bale)|carrying)$/;
+// 2026-10-15 serial:連作id(>=|<=|=|<|>)段 （日常連作 L.serials の今の段。0始まり・日付だけで進む）
+const QCOND=/^(q:\w+(>=|<=|=|<|>)\d+|!?gate:\w+|done>=\d+|days:\w+>=\d+|carry:(stone|wood|bale)|carrying|serial:\w+(>=|<=|=|<|>)\d+)$/;
 function condProblem(c){
  if(typeof c!=='string'||!c)return '条件は空でない文字列';
  for(const p of c.split('&')){
@@ -120,6 +121,26 @@ function validate(L,opt){
   if(!isObj(q)||typeof q.ja!=='string'||!q.ja)add('ng','bad-quest',q,'quests.'+k,'ja（頼みごとの名前）が無い');
   else if(typeof q.en!=='string'||!q.en)add('warn','quest-no-en',q,'quests.'+k,'en が無い（英語表示でも日本語のまま）');
   if(isObj(q)&&!setNames.has(k))add('warn','quest-never-set',q,'quests.'+k,'どの節でも set:\''+k+'=…\' されていない（入口が無い？）');}
+ // 日常連作（L.serials・2026-10-15）: 人・段・役・置き物の形。報酬や頼みごとの状態は持たない（set は使えない）
+ const SERIAL_KEYS=['id','title','spot','area','start','seeR','cast','stages','n'],STAGE_KEYS=['day','n','actors','props','seen','seenWith','talk','recent'];
+ arr(L.serials).forEach((S,i)=>{const w='serials['+i+']'+(S&&S.id?'('+S.id+')':'');if(!isObj(S)){add('ng','bad-serial',null,w,'オブジェクトでない');return;}
+  unknownKeys(S,SERIAL_KEYS,w,'連作');
+  if(!/^\w+$/.test(S.id||''))add('ng','bad-serial',S,w,'id は英数字と _ だけ');
+  if(!isObj(S.spot)||typeof S.spot.role!=='string'||!Array.isArray(S.spot.near))add('ng','bad-serial',S,w,'spot は {role,near:[x,z]}');else if(!lifeOK(S.spot.role))add('warn','unknown-life',S,w,'spot.role「'+S.spot.role+'」は本体の作業役に無い');
+  if(!(S.start==='arrive'||Number.isInteger(S.start)))add('ng','bad-serial',S,w,"start は 'arrive'（歩いて初めて着いた日）か通しの日（整数）");
+  const cast=isObj(S.cast)?S.cast:{};if(!Object.keys(cast).length)add('ng','bad-serial',S,w,'cast が無い');
+  for(const[k,c]of Object.entries(cast)){if(!isObj(c)||!people.has(c.char))add('ng','unknown-char',S,w+'.cast.'+k,'char「'+(c&&c.char)+'」が people に居ない');
+   else{const P=arr(L.people).find(p=>p&&p.id===c.char);if(!P.bind||P.bind.serial!==S.id)add('warn','serial-bind',S,w+'.cast.'+k,c.char+' の bind が {serial:\''+S.id+'\'} でない（ほかの体にも載る）');}}
+  if(!Array.isArray(S.stages)||!S.stages.length){add('ng','bad-serial',S,w,'stages が無い');return;}
+  let prev=-1;S.stages.forEach((st,j)=>{const sw=w+'.stages['+j+']';if(!isObj(st)){add('ng','bad-serial',S,sw,'オブジェクトでない');return;}unknownKeys(st,STAGE_KEYS,sw,'段');
+   if(!Number.isInteger(st.day)||st.day<=prev)add('ng','bad-serial',S,sw,'day は整数で、前の段より大きく（0から）');prev=st.day;
+   if(st.seenWith!=null&&(!Array.isArray(st.seenWith)||st.seenWith.some(k=>!(st.actors||{})[k])))add('ng','bad-serial',S,sw+'.seenWith','seenWith はその段の actors にいる人の名の配列');
+   for(const[k,a]of Object.entries(st.actors||{})){if(!cast[k])add('ng','bad-serial',S,sw+'.actors.'+k,'cast に無い人');
+    else if(a!=null&&(!isObj(a)||!lifeOK(a.role)))add('warn','unknown-life',S,sw+'.actors.'+k,'role「'+(a&&a.role)+'」は本体の作業役に無い');}
+   for(const pr of arr(st.props))if(!isObj(pr)||pr.k!=='box'||!Array.isArray(pr.p)||pr.p.length!==3||!Array.isArray(pr.s)||pr.s.length!==3)add('ng','bad-serial',S,sw,'props は {k:\'box\',p:[x,y,z],s:[w,h,d]}');
+   if(st.seen!=null&&(typeof st.seen!=='string'||len(st.seen)>60))add('warn','long-text',S,sw,'seen は60字まで');
+   for(const t of arr(st.talk)){if(!isObj(t)||arr(t.cast).length<2||!arr(t.cast).every(k=>cast[k])||!Array.isArray(t.lines)||!t.lines.length)add('ng','bad-serial',S,sw,'talk は {cast:[2人],lines:[[話し手,文]]}');
+    else for(const l of t.lines)if(!Array.isArray(l)||!(l[0]>=0&&l[0]<t.cast.length)||typeof l[1]!=='string')add('ng','bad-serial',S,sw,'talk の行は [話し手の番号,文]');else if(len(l[1])>40)add('warn','long-text',S,sw,len(l[1])+'字');}});});
  // 登録の無い状態名を、頼みごととして使っていないか。2字までの接頭辞（bk_ xx_ bn_ iy_）の途中の印と、本体で既に使われている名前は除く
  const baseUsed=new Set(uses.filter(u=>isBase(u[1])).map(u=>u[0])),said=new Set();
  for(const [name,o,w] of uses){if(isBase(o)||quests[name]||internalState(name)||baseUsed.has(name))continue;

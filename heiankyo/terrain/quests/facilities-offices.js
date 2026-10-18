@@ -25,7 +25,7 @@
     { at: 'kobo', who: '官人', life: 'timber-check', t: 'この材はまだ乾いていない' },
     { at: 'kobo', who: '官人', life: 'timber-check', t: '割れが入る前に使うか、寝かせるかだ' },
     { at: 'kobo', who: '人夫', life: 'measure', t: '寸法は三度測る。木は一度しか切れん' },
-    { at: 'kobo', who: '人夫', life: 'measure', t: '墨をまっすぐ打てば、あとは鋸が仕事をする' },
+    { at: 'kobo', who: '人夫', life: 'measure', t: '墨をまっすぐ打てば、あとは楔と手斧が仕事をする' }, // 2026-10-17 本の考証A3: 縦に挽く大鋸は900年には無い
     { at: 'kobo', who: '官人', life: 'supervise', t: '番の者が足りん。今日は急ぎの普請が重なった' },
     { at: 'kobo', who: '人夫', life: 'carry-timber', t: '足もとを空けてくれ。長い材だ' },
     { at: 'kuriya', who: '官人', life: 'ledger', t: '米の出入りは一升まで書く決まりだ' },
