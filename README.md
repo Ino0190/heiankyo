@@ -9,7 +9,7 @@
 
 ## はじめに
 
-1. 起動画面で「読み込みを開始」を押す（初回は約110MB。1〜3分）
+1. 起動画面で「読み込みを開始」を押す（初回は約120MB・通信は圧縮されて約25MB。1〜3分）
 2. オープニングの飛行のあと、上のボタンから「市内を歩く」か「ドローンツアー」を選ぶ
 3. 歩いているときは地面をクリック。近くの人に吹き出しが出たら E で話しかける
 
@@ -44,7 +44,7 @@
 - たどる（T・上の「たどる」）: 遷都（794）から延長（926）までの都の年表。いま（昌泰三年）に印があり、これより後の出来事は「これから先」として薄く出る。「くわしく」で解説を読み、場所のある出来事はそこへ移れる
 - 眺める（上の「眺める」）: ドローンツアー・俯瞰・撮影モードと、5つの定位置（南から・北から・左京上空・右京上空・真上）
 - 地図: 歩いている間は、行った所と話で聞いた所だけが出る（最初は羅城門・朱雀大路・東市・西市）。聞いただけの所は薄い印。現在地の扇が見ている向き。ツアーと俯瞰では全部
-- 発見: 歩いて着いた所で「発見」の札が出る（44か所）。数は聞き書き帳の「場所」「日録」で見られる。ドローンや一瞬の移動では発見にならない
+- 発見: 歩いて着いた所で「発見」の札が出る（51か所）。数は聞き書き帳の「場所」「日録」で見られる。ドローンや一瞬の移動では発見にならない
 - 町の人: 1人から1日に聞ける話には限りがあり、通って顔なじみになるほど多く話す。人ごとに知っている話題が違い、よその土地の言い伝えは「行って聞け」と勧め、詳しい解説は僧や学のある人が話す。散策に入ると「今日の都」で天気と市を迎える
 - 言い伝えや出来事の語（浄蔵・御霊会・応天門の変など）が出たら「〇〇とは？」で解説を読み、話の地点へ歩いて行ける。史実に寄せた話には出典を添える
 - 頼みごと: 迷子・恋文・闇市・紅の値・干物盗人・塩の買い付け・西寺の屋根・常夏の文・恋敵の足止め・夜行の知らせ・夜の女車の供・来ない魚売り・右京の夜番・羅城門の柱・鞠の会・西市の立て直し・帰るか残るか など。済ませた数に応じて、次の頼みが出てくる
@@ -71,9 +71,11 @@
 - 公卿の牛車は時刻表どおりに車宿を出て門から出仕し、夕方に帰る。都の口や市から旅の牛車・荷車・検非違使の騎馬・行商が出入りする
 - 市と小市の売り子と客、菜園の世話、洗い物・炊事・水汲み・庭掃き・厩の世話・子どもの遊び・世間話、東寺・西寺の僧、宮城門の門衛、蹴鞠、後宮の女官、竜尾壇の旗
 - 牛・馬・犬・猫、空を飛ぶ鳶・烏・燕、池の鷺、庶民の家の鶏と雀
+- 日常の移ろい: 庶民の長屋の裏で、薪割りの男と隣の女の暮らしが、初めて歩いて着いた日から数日かけて変わる（斧の音・腰を痛めて休む・隣が薪を片付ける・また割り始める）。頼みごとや知らせは出ない。見たこと・聞いたことだけが聞き書き帳と日録に残る
 
 ### そのほか
-- 撮影モード（画面の飾りを消して PNG を保存）と録画（R）
+- 撮影モード（画面の飾りを消して PNG を保存）と録画（R）。撮影モードの「ロボを消す」でロボを写さずに撮れる
+- 劇画（☰ の「劇画にする」）: 白黒の墨線・網点（スクリーントーン）・濃い陰影で劇画のように見せる。光と影の上に掛ける。撮影の写真も劇画で残る。右上の「劇画の調整」で線の太さ・トーン（網点・線・砂目）・トーンの細かさ・明暗の強さを変えられる（ブラウザに覚える）
 - 光と影 ⇔ 線画、音楽と効果音の ON/OFF（効果音は WebAudio で合成）、台詞の ON/OFF
 - 日本語 ⇔ 英語。英語では台詞もすべて英訳で出し、海外の人向けの基礎の解説（大内裏・牛車・陰陽師など）を足す。ロゴは英語でも「HakoniwaKit 平安京」
 - スマートフォンでも操作できる（ドラッグで見回し・地面をタップで移動）
@@ -111,6 +113,16 @@
 | 1.92 | 日録（一日ごとの短い記録と撮った絵） |
 | 1.93 | 上の帯を 歩く・眺める・たどる・聞き書き帳 に。眺める（ツアー・俯瞰・撮影・定位置）、たどる（都の年表・T） |
 | 1.94 | 発見（歩いて着いた所・○／44か所）と地図の見ている向き、今日の都、なじみ度、1人が話す量と知っている話を絞る |
+| 1.133 | 堀川小路・西堀川小路を8丈に（川の両脇に約8mの道）。竜尾壇を北の回廊まで広げて地面まで下ろし、大極殿から左右へ回廊。楼門と大堂の額に名前。門のすぐ内の建物を離し、曹司の門の屋根と冠木をつなぐ。貴族の邸の敷地を坂に沿わせ、門と道の段差をなくす。二条大路の人通り・牛車・荷車・行商。急ブレーキに周りが驚き、踊る人は踊りの話、牛・猫・犬も拍に乗る。是行の「わたしの世の今日」と六壬の式盤（寺・神社でも今日を占う）。門前の説明役は役所の話から。頭の形が5通りに。材を楔で割る人（大鋸の木挽きを改めた）。星「帝」の説明を直した。楼門の二階を柱・板扉・連子窓・廻縁で組み直した。入口ページ（検索から来る人向け・設定資料集）を置き、そこからゲームへ。起動画面の写真を20枚に撮り直し（季節・雨・夜空と星座・劇画・市の会話など）、画像に重ねていた暗い幕を外した。空から見るオープニングで霞をかけない |
+| 1.132 | 読み込みの間に別のタブへ移っても、「散策の準備中 92%」で止まらずに始まる。終わり近くの「まもなく、空から平安京へ降ります」は5秒だけ。自己検査が通ったときも自動でオープニングに入る |
+| 1.131 | 最初の3回の散策で、歩き方・遊び方・頼みごとのヒントを1枚ずつ出す（スキップ可・☰「あそびかた」で見返せる）。内裏の門で止められたら次の一歩を示す。庶民街の街区ごとに角の大木・牛舎と子牛・のぞく窓・芋粥売り・外壁の色の混ざり、家の前の甕や桶・夕顔の垣・丸太の腰掛けと立ち話。戸口の人はロボを見つめ、子供は寄ってくる。東市・西市の塀と門を道に合わせた |
+| 1.130 | 読み込みが終わると、そのままオープニングが始まる。ロボが座る（C）。腰の曲がった人は腰から上を曲げる。男は老人も烏帽子、髪は後頭部まで。薪炭の荷車の牛を牛車の牛と同じ形に。貴族の邸の築地塀の角と笠をつなぐ。京の外縁に林とまばらな木。鴨川の西岸に堤 |
+| 1.129 | ドローンツアーが応天門から大極殿へまっすぐ入り、そのまま左回りへ移る。オープニングの上昇で画角を1度に寄せる。右京の湿地・藪では側溝が途中で途切れる。堀川の洗い女を橋の上から岸へ。堀川などの護岸を大小の石の乱積みに |
+| 1.128 | 劇画の調整の窓を閉じられる（☰ から また出せる）、撮影モードでロボを消せる、段差の上を押すと段差の上へ歩く |
+| 1.127 | 劇画の調整（線の太さ・トーンの種類・細かさ・明暗の強さ）と白黒の画面の飾り、堀川・西堀川・大宮川の石積みの護岸、道の真ん中に出ていた側溝を直す、木工の作業場の屋根を切妻に・中を歩ける |
+| 1.126 | 日常の移ろい（薪割りの男と隣の女。日付だけで4段に進み、再訪で人の様子と薪の置き方が変わる） |
+| 1.124〜1.125 | 劇画（☰ の「劇画にする」・白黒の墨線と網点）。墨線を細くし、瓦の目が見えるように |
+| 1.118〜1.123 | 道の側溝、ついていく（V）、官司ごとの勤務者、暮らしの連鎖（炊事場・薪置場・鶏小屋など）、ホバーの急ブレーキ、庶民街区の小市と売り子、長屋の壁 |
 | 1.100〜1.101 | 市の人が両足を揃えて跳ねずに歩く（脚を振る）・雨で帰る人が見えているうちに消えない／軒下の人が瞬間移動しない、止まっているとき牛車に道を譲って勝手に歩かない、ホバーで壁にぶつかるとドシンと鳴って頭の上を星が回りくらくらする、東西の市司の前に高札（「F：品書きを見る」で専売品と両市の品を読める） |
 | 1.99 | 夜の火長の見回りが「火の用心」を言うように（朱雀大路で「宮城の門」と言う誤りを修正）・松明のまわりが明るく、ロボの頭の灯りが半径6mほど地面を照らす、ジャンプで足がビヨーンと伸びる、桜の花のかたまりが約2倍、羅城門の脇の壁が1.5倍、踊りの約1割がロボと同じ動き、陰陽寮の人に星のことを聞ける（晴れた夜は空に見えている星から・昼や雨は別の返事）、軽い頼まれごと6本（餅・夕日・田舎・古い話・約束・雨宿り） |
 | 1.98 | 眺めるに低い定位置3つ（市のにぎわい・朝堂院の庭・朱雀門の前。人の高さに近い位置から眺め、音楽ONなら曲が流れる）、「祈る」ボタンでそのまま参拝、桜はボリュームのある丸い笠に・梅は枝が四方へ伸びて花が点々と、柳の遠目が塊にならないよう修正 |
@@ -128,7 +140,7 @@
 - `heiankyo/terrain/quests/` は台詞・頼みごとのパック（人物連作・派生クエスト・季節クエスト）。`manifest.js` に並べたものを読み込む。`heiankyo/terrain/heian-content.js` が読み込みと検査をする
 - `heiankyo/terrain/heian-terrain-data.js`・`heian-water-data.js` は地形と水系
 
-動作環境: WebGL2対応のブラウザ（PC・スマートフォン）。初回は約110MBのデータを読み込みます。
+動作環境: WebGL2対応のブラウザ（PC・スマートフォン）。初回は約120MBのデータを読み込みます（通信は圧縮されて約25MB）。
 
 ## 新しい頼みごとの追加方法（作り手向け）
 
@@ -240,7 +252,7 @@ Live page: https://ino0190.github.io/heiankyo/heiankyo/?lang=en
 
 ## Getting started
 
-1. Press "Start loading" (about 110 MB on the first visit; one to three minutes).
+1. Press "Start loading" (about 120 MB on the first visit, about 25 MB over the network; one to three minutes).
 2. After the opening flight, choose "Walk the city" or "Drone tour" at the top.
 3. While walking, click the ground. When someone near you speaks, press E to talk.
 
@@ -255,8 +267,9 @@ The calendar moves on with the days you play, and you continue where you left of
 - **Notebook (N)**: who said what, when and where is noted automatically. Search a word to see different people's versions side by side — and where they disagree. Browse by person or place, and pin what matters. There is no quest list or progress counter.
 - **Timeline (T)**: the capital's history from its founding in 794 to 926. The present year (900) is marked; later events are shown faded as "yet to come", since nobody here knows them yet. Open "More" for a short explanation, or jump to the place where it happened.
 - **View**: the drone tour, the overview, photo mode and five fixed views (from the south, from the north, over the east and west halves, and straight down).
-- **Discoveries**: walk up to a place to discover it (44 in all); the count is in the notebook's Places and Diary tabs. The drone and quick travel don't count. Places you have only heard of are faded on the map, and a fan on your marker shows which way you are looking.
+- **Discoveries**: walk up to a place to discover it (51 in all); the count is in the notebook's Places and Diary tabs. The drone and quick travel don't count. Places you have only heard of are faded on the map, and a fan on your marker shows which way you are looking.
 - **Townspeople**: each person tells only so much a day, and more as you become familiar. Everyone knows different things; they send you elsewhere for tales of other places, and monks and learned people give the fuller explanations. "The city today" greets you with the weather and the market.
+- **Days that change**: behind a row house, a woodcutter and his neighbour live through a few days that start when you first walk there — he chops, hurts his back and rests, she tidies his logs, he goes back to work. No errands or notices; only what you saw or heard goes into the notebook and diary.
 - **Diary**: a tab in the notebook. Each day gets a few short sentences — the weather, where you walked, whom you met, what you heard, the moon that night — together with the pictures you took in photo mode.
 - **Map**: while walking, the map shows only places you have visited or heard about (at first: Rajomon Gate, Suzaku Avenue and the two markets). The tour and overview show everything.
 - **Errands**: a lost boy, love letters, a black market, the rising price of rouge, a dried-fish thief, a night watch, a kickball party, reviving the West Market and more. Finishing errands opens new ones and gets your name on the gate lists of the palace and the mansions.
