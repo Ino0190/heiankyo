@@ -55,6 +55,26 @@ p{margin:0 0 14px}
 .galh{margin:8px 0 12px;font-size:20px}.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px;margin:0 0 40px}.gal figure{margin:0}.gal figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}.gal figcaption b{display:block;color:#5c3a1e}
 @media(max-width:640px){.row{grid-template-columns:1fr;gap:12px}.row.rev figure{order:0}.gal{grid-template-columns:1fr}}
 main figure img{cursor:zoom-in}
+.row video{display:block;width:100%;height:auto;background:#d9cfb8}
+svg.map,svg.ui{display:block;width:100%;height:auto;background:#d9cfb8}
+svg.map circle{stroke:#fff;stroke-width:2}
+svg.map text{fill:#fff;font:700 13px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+svg.ui circle{fill:#c9973b;stroke:#10161c;stroke-width:3}
+svg.ui text{fill:#10161c;font:700 22px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+.mapkey{display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px;margin:12px 0 0;font-size:16px;line-height:1.6}
+.mapkey h3{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:17px}
+.mapkey i{display:block;width:14px;height:14px;border-radius:50%;flex:none}
+.mapkey ol{margin:0;padding-left:32px}
+table.uitab{width:100%;margin:16px 0 0;border-collapse:collapse;font-size:16px;line-height:1.7}
+table.uitab th,table.uitab td{padding:10px 10px;border-bottom:1px solid #e0d5bd;text-align:left;vertical-align:top}
+table.uitab thead th{color:#6b5a40;font-size:14px;font-weight:600;border-bottom:2px solid #b79b63}
+table.uitab tbody th{width:9.5em;color:#5c3a1e;font-weight:700}
+table.uitab td.n{width:3em;padding-right:0}
+table.uitab .no{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#c9973b;color:#10161c;font-weight:700;font-size:15px;line-height:1}
+table.keys{width:100%;margin:20px 0 0;border-collapse:collapse;font-size:16px;line-height:1.6}
+table.keys th,table.keys td{padding:8px 10px;border-bottom:1px solid #e0d5bd;text-align:left;vertical-align:top}
+table.keys th{width:9em;color:#5c3a1e;font-weight:700}
+@media(max-width:640px){.mapkey{grid-template-columns:1fr}table.uitab tbody th{width:6.5em}}
 dialog.zoom{max-width:none;max-height:none;width:100vw;height:100vh;margin:0;padding:0;border:0;background:rgba(10,14,18,.94);color:#f4f1e9}
 dialog.zoom::backdrop{background:rgba(10,14,18,.94)}
 dialog.zoom[open]{display:grid;place-items:center;cursor:zoom-out}
@@ -71,6 +91,9 @@ dialog.zoom button{position:fixed;top:14px;right:18px;padding:6px 14px;font-size
 .notes a{display:block;padding:16px 18px;background:#fff;border:1px solid #e0d5bd;color:#2c2418;text-decoration:none}
 .notes a:hover{border-color:#b79b63}
 .notes a span{display:block;font-size:16px;line-height:1.7;color:#4a3f2e}
+.notes a em{display:block;margin:10px 0 0;font-style:normal;font-size:15px;color:#6b3f22;text-decoration:underline;text-underline-offset:3px}
+.notes a:hover em{color:#8a5530}
+.morech{margin:0 0 22px;font-size:16px}
 .btn2{display:inline-block;padding:12px 26px;font-size:17px;font-weight:600;color:#f4f1e9;background:#6b3f22;text-decoration:none}
 .btn2:hover{background:#7f4c2a}
 dl.faq dt{margin:20px 0 4px;font-weight:700;color:#5c3a1e}
@@ -107,7 +130,7 @@ footer a{color:#d8dee5}
 <h1>平安京</h1>
 <p class="tag">昌泰三年（900）の都を、ブラウザで歩く</p>
 <p>造営からおよそ百年たった平安京を、国土地理院の標高データの上に推定復元した、3Dの箱庭です。ブリキのロボ「鉄の童」になって、空から都を眺め、通りを歩き、町の人の話を聞いて回ります。勝ち負けや決まった筋はなく、好きな所へ行って過ごせます。</p>
-<div class="cta"><a class="btn" href="heiankyo/">平安京を歩く（無料）</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
+<div class="cta"><a class="btn" href="heiankyo/">平安京を歩く</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
 <p class="note">初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
 </div>
 </header>
@@ -127,7 +150,7 @@ footer a{color:#d8dee5}
 <h3>900年の建物の来歴</h3>
 <ul class="hist">
 <li>大極殿は貞観十八年（876）に焼け、元慶三年（879）に建て直された二代目です。</li>
-<li>応天門は貞観八年（866）の応天門の変で焼け、建て直されています。変から35年たち、火を見た人がまだ都にいます。</li>
+<li>応天門は貞観八年（866）の応天門の変で焼け、建て直されています。変から35年経ちましたが火災を見た人がまだ都にいます。</li>
 <li>羅城門は弘仁七年（816）の大風で倒れ、建て直された二代目です。</li>
 <li>東寺の五重塔は、着工から長くかかり、9世紀の末にようやく建ちました。</li>
 <li>内裏は遷都以来の姿を保っています。</li>
@@ -149,7 +172,7 @@ footer a{color:#d8dee5}
 <figure><img src="img/daidairi-kanshi.jpg" width="1500" height="857" alt="大内裏を空から。緑の瓦屋根の朝堂院と、築地で区切られた官司。奥に内裏" loading="lazy" decoding="async"><figcaption><b>大内裏</b>緑の瓦屋根の朝堂院のまわりに、役所ごとに築地で区切られた官司が並びます。</figcaption></figure>
 <figure><img src="img/dairi.jpg" width="1500" height="857" alt="檜皮葺の殿舎が回廊の中に並ぶ内裏" loading="lazy" decoding="async"><figcaption><b>内裏</b>紫宸殿・清涼殿・後宮の殿舎を、檜皮葺の屋根で作っています。</figcaption></figure>
 </div>
-<div class="row"><figure><img src="img/ichi-robo.jpg" width="1500" height="857" alt="東市の露店の間を歩くロボと、売り子の吹き出し" loading="lazy" decoding="async"></figure>
+<div class="row"><figure><video data-src="img/suzakumon-talk.mp4" poster="img/suzakumon-talk.jpg" width="1280" height="806" muted loop playsinline preload="none" aria-label="朱雀門の前で、官人と町の人が吹き出しで話している動画"></video></figure>
 <div><h3>町の人と話す</h3><p>ゲームの中には約3,000人の町の人がいて、場所・時刻・季節・天気で話が変わります。身分や仕える家、左大臣方か右大臣方かで話し方も変わります。応天門の変や宴の松原の鬼など、900年より前の出来事が噂に上ります。聞いた話は「聞き書き帳」に、その日の出来事は「日録」に残ります。</p></div></div>
 <div class="row rev"><figure><img src="img/suzaku-oji.jpg" width="1500" height="857" alt="柳並木の朱雀大路を進む牛車と騎馬の一行" loading="lazy" decoding="async"></figure>
 <div><h3>暦が進む</h3><p>昌泰三年二月二十五日から延喜二十二年（922）まで、大の月・小の月・閏月を当時の暦どおりに日が進みます。延喜元年（901）正月二十五日の昌泰の変を越えると、道真の牛車は出なくなり、町の人の話や居場所も変わります。公卿の牛車は刻限どおりに邸を出て出仕します。季節がめぐり、草木は梅・桜・若葉・紅葉・枯れ木と移り、日の出と日の入りの時刻も変わります。天気は晴れ・曇り・雨が日ごとに変わります。東市と西市は半月交替で開きます。夜は篝火と灯明だけの暗かった当時を再現しています。</p></div></div>
@@ -163,17 +186,126 @@ footer a{color:#d8dee5}
 <li><h3>English</h3>英語表示では台詞もすべて英訳で出て、大内裏・牛車・陰陽師などの基礎の解説が加わります。</li>
 </ul>
 </section>
+<section id="map">
+<h2>平安京の地図</h2>
+<p>ゲームの中を真上から撮った地図です。南北約5.2km・東西約4.5kmの京域に、歩き始められる地点を番号で示しています。地図は北が上です。北の端の大内裏から朱雀大路が南の羅城門へ延び、朱雀大路の東（右）が左京、西（左）が右京です。右京の南西には、湿地や林のままの土地が広がっています。都の北にある船岡山の山頂からも歩き始められます。</p>
+<!--MAP-->
+<svg class="map" viewBox="0 0 832 962" role="img" aria-labelledby="mapTitle"><title id="mapTitle">真上から見た平安京の地図。歩き始められる49の地点に番号の印</title>
+<image href="img/heiankyo-map.jpg" width="832" height="962"/>
+<g transform="translate(416.1 156.4)"><title>1. 大極殿</title><circle r="10" fill="#b23b3b"/><text y="4">1</text></g>
+<g transform="translate(380.2 172.0)"><title>2. 豊楽殿</title><circle r="10" fill="#b23b3b"/><text y="4">2</text></g>
+<g transform="translate(447.3 114.3)"><title>3. 内裏</title><circle r="10" fill="#b23b3b"/><text y="4">3</text></g>
+<g transform="translate(416.1 232.0)"><title>4. 応天門</title><circle r="10" fill="#b23b3b"/><text y="4">4</text></g>
+<g transform="translate(416.0 255.7)"><title>5. 朱雀門</title><circle r="10" fill="#b23b3b"/><text y="4">5</text></g>
+<g transform="translate(460.7 176.4)"><title>6. 陰陽寮</title><circle r="10" fill="#b23b3b"/><text y="4">6</text></g>
+<g transform="translate(416.0 950)"><title>7. 羅城門</title><circle r="10" fill="#6b3f22"/><text y="4">7</text></g>
+<g transform="translate(416.0 675.4)"><title>8. 朱雀大路</title><circle r="10" fill="#6b3f22"/><text y="4">8</text></g>
+<g transform="translate(545.5 729.7)"><title>9. 東市</title><circle r="10" fill="#6b3f22"/><text y="4">9</text></g>
+<g transform="translate(286.5 729.7)"><title>10. 西市</title><circle r="10" fill="#6b3f22"/><text y="4">10</text></g>
+<g transform="translate(433.8 729.7)"><title>11. 東鴻臚館</title><circle r="10" fill="#6b3f22"/><text y="4">11</text></g>
+<g transform="translate(398.1 729.7)"><title>12. 西鴻臚館</title><circle r="10" fill="#6b3f22"/><text y="4">12</text></g>
+<g transform="translate(572.1 729.7)"><title>13. 堀川の荷舟</title><circle r="10" fill="#6b3f22"/><text y="4">13</text></g>
+<g transform="translate(572.1 12)"><title>14. 一条戻橋</title><circle r="10" fill="#6b3f22"/><text y="4">14</text></g>
+<g transform="translate(495.1 902.2)"><title>15. 東寺</title><circle r="10" fill="#2f6b4a"/><text y="4">15</text></g>
+<g transform="translate(336.9 902.2)"><title>16. 西寺</title><circle r="10" fill="#2f6b4a"/><text y="4">16</text></g>
+<g transform="translate(611.4 547.1)"><title>17. 五條天神</title><circle r="10" fill="#2f6b4a"/><text y="4">17</text></g>
+<g transform="translate(566.8 711.6)"><title>18. 市比賣社</title><circle r="10" fill="#2f6b4a"/><text y="4">18</text></g>
+<g transform="translate(296.2 12)"><title>19. 大将軍堂</title><circle r="10" fill="#2f6b4a"/><text y="4">19</text></g>
+<g transform="translate(707.2 373.0)"><title>20. 六角堂</title><circle r="10" fill="#2f6b4a"/><text y="4">20</text></g>
+<g transform="translate(707.2 534.0)"><title>21. 因幡堂</title><circle r="10" fill="#2f6b4a"/><text y="4">21</text></g>
+<g transform="translate(494.3 299.7)"><title>22. 神泉苑</title><circle r="10" fill="#6e4f8a"/><text y="4">22</text></g>
+<g transform="translate(385.2 409.2)"><title>23. 朱雀院</title><circle r="10" fill="#6e4f8a"/><text y="4">23</text></g>
+<g transform="translate(547.9 234.2)"><title>24. 冷然院</title><circle r="10" fill="#6e4f8a"/><text y="4">24</text></g>
+<g transform="translate(584.2 245.9)"><title>25. 陽成院</title><circle r="10" fill="#6e4f8a"/><text y="4">25</text></g>
+<g transform="translate(608.3 245.9)"><title>26. 町尻殿</title><circle r="10" fill="#6e4f8a"/><text y="4">26</text></g>
+<g transform="translate(584.2 183.3)"><title>27. 賀陽院</title><circle r="10" fill="#6e4f8a"/><text y="4">27</text></g>
+<g transform="translate(584.2 288.2)"><title>28. 堀河院</title><circle r="10" fill="#6e4f8a"/><text y="4">28</text></g>
+<g transform="translate(608.3 288.2)"><title>29. 閑院</title><circle r="10" fill="#6e4f8a"/><text y="4">29</text></g>
+<g transform="translate(634.7 300.0)"><title>30. 東三条殿</title><circle r="10" fill="#6e4f8a"/><text y="4">30</text></g>
+<g transform="translate(634.7 276.5)"><title>31. 二条宮</title><circle r="10" fill="#6e4f8a"/><text y="4">31</text></g>
+<g transform="translate(683.1 276.5)"><title>32. 小二条院</title><circle r="10" fill="#6e4f8a"/><text y="4">32</text></g>
+<g transform="translate(707.2 300.0)"><title>33. 山吹殿</title><circle r="10" fill="#6e4f8a"/><text y="4">33</text></g>
+<g transform="translate(683.1 195.4)"><title>34. 菅原院</title><circle r="10" fill="#6e4f8a"/><text y="4">34</text></g>
+<g transform="translate(683.1 495.8)"><title>35. 紅梅殿</title><circle r="10" fill="#6e4f8a"/><text y="4">35</text></g>
+<g transform="translate(683.1 519.9)"><title>36. 白梅殿</title><circle r="10" fill="#6e4f8a"/><text y="4">36</text></g>
+<g transform="translate(596.2 840.1)"><title>37. 亭子院</title><circle r="10" fill="#6e4f8a"/><text y="4">37</text></g>
+<g transform="translate(791.9 631.4)"><title>38. 六条河原院</title><circle r="10" fill="#6e4f8a"/><text y="4">38</text></g>
+<g transform="translate(428.7 319.0)"><title>39. 官学地区</title><circle r="10" fill="#2f5a8a"/><text y="4">39</text></g>
+<g transform="translate(570.2 403.4)"><title>40. 貴族邸街区</title><circle r="10" fill="#2f5a8a"/><text y="4">40</text></g>
+<g transform="translate(483.0 618.6)"><title>41. 庶民街区</title><circle r="10" fill="#2f5a8a"/><text y="4">41</text></g>
+<g transform="translate(272.7 207.5)"><title>42. 右京北部の官人街</title><circle r="10" fill="#2f5a8a"/><text y="4">42</text></g>
+<g transform="translate(150.1 699.4)"><title>43. 右京の緑地</title><circle r="10" fill="#2f5a8a"/><text y="4">43</text></g>
+<g transform="translate(535.8 300.0)"><title>44. 木工町</title><circle r="10" fill="#2f5a8a"/><text y="4">44</text></g>
+<g transform="translate(560.0 143.5)"><title>45. 修理職町</title><circle r="10" fill="#2f5a8a"/><text y="4">45</text></g>
+<g transform="translate(73.8 178.5)"><title>46. 内匠町</title><circle r="10" fill="#2f5a8a"/><text y="4">46</text></g>
+<g transform="translate(273.8 22.9)"><title>47. 図書町</title><circle r="10" fill="#2f5a8a"/><text y="4">47</text></g>
+<g transform="translate(253.8 119.3)"><title>48. 紙屋院</title><circle r="10" fill="#2f5a8a"/><text y="4">48</text></g>
+<g transform="translate(634.7 914.0)"><title>49. 施薬院</title><circle r="10" fill="#2f5a8a"/><text y="4">49</text></g>
+</svg>
+<div class="mapkey">
+<div><h3><i style="background:#b23b3b"></i>宮城（大内裏）</h3><ol start="1"><li>大極殿</li><li>豊楽殿</li><li>内裏</li><li>応天門</li><li>朱雀門</li><li>陰陽寮</li></ol></div>
+<div><h3><i style="background:#6b3f22"></i>門・大路・市</h3><ol start="7"><li>羅城門</li><li>朱雀大路</li><li>東市</li><li>西市</li><li>東鴻臚館</li><li>西鴻臚館</li><li>堀川の荷舟</li><li>一条戻橋</li></ol></div>
+<div><h3><i style="background:#2f6b4a"></i>寺と社</h3><ol start="15"><li>東寺</li><li>西寺</li><li>五條天神</li><li>市比賣社</li><li>大将軍堂</li><li>六角堂</li><li>因幡堂</li></ol></div>
+<div><h3><i style="background:#6e4f8a"></i>邸・院・苑</h3><ol start="22"><li>神泉苑</li><li>朱雀院</li><li>冷然院</li><li>陽成院</li><li>町尻殿</li><li>賀陽院</li><li>堀河院</li><li>閑院</li><li>東三条殿</li><li>二条宮</li><li>小二条院</li><li>山吹殿</li><li>菅原院</li><li>紅梅殿</li><li>白梅殿</li><li>亭子院</li><li>六条河原院</li></ol></div>
+<div><h3><i style="background:#2f5a8a"></i>役所の町と暮らし</h3><ol start="39"><li>官学地区</li><li>貴族邸街区</li><li>庶民街区</li><li>右京北部の官人街</li><li>右京の緑地</li><li>木工町</li><li>修理職町</li><li>内匠町</li><li>図書町</li><li>紙屋院</li><li>施薬院</li></ol></div>
+</div>
+<!--/MAP-->
+</section>
+<section id="howto">
+<h2>画面の見かた</h2>
+<p>下の画像は、地上を歩いているときの画面です。画像の中の丸い番号が、その下の表の番号と同じものを指しています。ゲームを初めて開いたときにも「あそびかた」の案内が出て、あとから右上の ☰ の中で見返せます。</p>
+<svg class="ui" viewBox="0 0 1280 806" role="img" aria-labelledby="uiTitle"><title id="uiTitle">地上を歩いているときの画面。左上に地図、右上にボタンの帯、右下に時計、下にしぐさのボタン、左下に地点の解説</title>
+<image href="img/ui-guide.jpg" width="1280" height="806"/>
+<!--UIMARKS-->
+<g transform="translate(210 94)"><circle r="17"/><text y="8">1</text></g>
+<g transform="translate(1019 52)"><circle r="17"/><text y="8">2</text></g>
+<g transform="translate(1067 52)"><circle r="17"/><text y="8">3</text></g>
+<g transform="translate(1127 52)"><circle r="17"/><text y="8">4</text></g>
+<g transform="translate(1205 52)"><circle r="17"/><text y="8">5</text></g>
+<g transform="translate(1263 52)"><circle r="17"/><text y="8">6</text></g>
+<g transform="translate(282 122)"><circle r="17"/><text y="8">7</text></g>
+<g transform="translate(328 502)"><circle r="17"/><text y="8">8</text></g>
+<g transform="translate(722 701)"><circle r="17"/><text y="8">9</text></g>
+<g transform="translate(1102 640)"><circle r="17"/><text y="8">10</text></g>
+<g transform="translate(736 766)"><circle r="17"/><text y="8">11</text></g>
+<g transform="translate(464 752)"><circle r="17"/><text y="8">12</text></g>
+<!--/UIMARKS-->
+</svg>
+<table class="uitab">
+<thead><tr><th>番号</th><th>名前</th><th>できること</th></tr></thead>
+<tbody>
+<tr><td class="n"><span class="no">1</span></td><th>地図と行き先</th><td>上の一覧か地図の印を選ぶと、その地点へ移ります。青い印が今いる所と見ている向きです。歩いている間は、行った所と話に聞いた所だけが出ます。</td></tr>
+<tr><td class="n"><span class="no">2</span></td><th>歩く</th><td>押すと地上を歩き始めます。歩いている間は「散策中」と出ます。</td></tr>
+<tr><td class="n"><span class="no">3</span></td><th>眺める</th><td>ドローンツアー・俯瞰へ戻る・撮影モードと、市のにぎわい・朝堂院の庭・朱雀門の前などの定位置を選べます。</td></tr>
+<tr><td class="n"><span class="no">4</span></td><th>たどる（T）</th><td>都の年表です。昌泰の変などの節目の日まで、時を進められます。</td></tr>
+<tr><td class="n"><span class="no">5</span></td><th>聞き書き帳（N）</th><td>聞いた話と、その日の出来事の日録を読めます。</td></tr>
+<tr><td class="n"><span class="no">6</span></td><th>☰ メニュー</th><td>音楽・時間設定・光と影・劇画・星座・台詞の切り替えと、English・あそびかたがあります。</td></tr>
+<tr><td class="n"><span class="no">7</span></td><th>名札</th><td>建物や門の名前です。</td></tr>
+<tr><td class="n"><span class="no">8</span></td><th>吹き出し</th><td>町の人のつぶやきです。</td></tr>
+<tr><td class="n"><span class="no">9</span></td><th>話しかける</th><td>近くに話せる人がいると出ます。Eキーか、この札を押して話しかけます。</td></tr>
+<tr><td class="n"><span class="no">10</span></td><th>時計</th><td>暦の日付と時刻、開いている市、月齢です。つまみで時刻を動かし、再生と倍速で時を進めます。</td></tr>
+<tr><td class="n"><span class="no">11</span></td><th>しぐさ</th><td>ジャンプ・踊る・祈る・お辞儀・手を振る・持ち上げる・座る・ついていく。ボタンの右のキーでも出せます。</td></tr>
+<tr><td class="n"><span class="no">12</span></td><th>地点の解説</th><td>今いる地点の名前と説明です。</td></tr>
+</tbody>
+</table>
+<table class="keys">
+<tr><th>PC（歩く）</th><td>地面をクリックでそこへ歩く ／ 左ドラッグで見回す ／ WASDで動く ／ Eで話しかける ／ Shiftで移動を早送り ／ Escで歩くのをやめる ／ Hで画面の案内を消す</td></tr>
+<tr><th>PC（空から）</th><td>ドラッグで向きを変える ／ ホイールで近づく・離れる</td></tr>
+<tr><th>スマートフォン</th><td>ドラッグで見回す ／ 地面をタップでそこへ歩く ／ ピンチで近づく・離れる</td></tr>
+</table>
+</section>
 <section id="research">
 <h2>考証について</h2>
 <p>建物・街路・暮らしは、都城図・街路の寸法・発掘資料・古記録を突き合わせて推定しました。史料で確かめられる所と推定で補った所を分けて記録し、調査ノート28件を設定資料集にまとめています。</p>
 <div class="notes">
-<a href="research/#guide-period"><h3>対象年代</h3><span>舞台は昌泰三年（900）。暦が進む延喜二十二年（922）までに並びうる建物・制度・暮らしを選び、その前後の出来事と照らし合わせています。</span></a>
-<a href="research/#guide-city"><h3>条坊・町割り・建物配置</h3><span>一辺約121mの町を単位に、大内裏・官司・東西市・寺・神泉苑の位置を決めています。</span></a>
-<a href="research/#guide-homes"><h3>皇族・公家・庶民の居宅</h3><span>内裏、寝殿造の邸、中下級官人の家、庶民の長屋を、確度の差を書き分けて置いています。</span></a>
-<a href="research/#guide-life"><h3>身分ごとに異なる一日</h3><span>出仕する公家、邸で働く女房や牛飼、市の商人や職人の一日を調べています。</span></a>
-<a href="research/#guide-food"><h3>食・衣・道具</h3><span>大饗の膳と庶民の食事、位階で変わる装束、道具を作る人までを扱います。</span></a>
-<a href="research/#guide-flow"><h3>都へ入る人と物</h3><span>塩・干魚・木材・米が、街道・淀津・鳥羽津・牛車で京へ入る流れです。</span></a>
+<a href="research/#cat-時代設定"><h3>対象年代</h3><span>舞台は昌泰三年（900）。暦が進む延喜二十二年（922）までに並びうる建物・制度・暮らしを選び、その前後の出来事と照らし合わせています。</span><em>章「時代設定」を読む →</em></a>
+<a href="research/#cat-都市の骨格"><h3>条坊・町割り・建物配置</h3><span>一辺約121mの町を単位に、大内裏・官司・東西市・寺・神泉苑の位置を決めています。</span><em>章「都市の骨格」を読む →</em></a>
+<a href="research/#doc-寝殿造と中下級官人住宅"><h3>皇族・公家・庶民の居宅</h3><span>内裏、寝殿造の邸、中下級官人の家、庶民の長屋を、確度の差を書き分けて置いています。</span><em>「寝殿造と中下級官人住宅」を読む →</em></a>
+<a href="research/#cat-暮らしと環境"><h3>身分ごとに異なる一日</h3><span>出仕する公家、邸で働く女房や牛飼、市の商人や職人の一日を調べています。</span><em>章「暮らしと環境」を読む →</em></a>
+<a href="research/#guide-food"><h3>食・衣・道具</h3><span>大饗の膳と庶民の食事、位階で変わる装束、道具を作る人までを扱います。</span><em>「はじめに」の食・衣・道具を読む →</em></a>
+<a href="research/#cat-周辺と交通"><h3>都へ入る人と物</h3><span>塩・干魚・木材・米が、街道・淀津・鳥羽津・牛車で京へ入る流れです。</span><em>章「周辺と交通」を読む →</em></a>
 </div>
+<p class="morech">ほかの章：<a href="research/#cat-大内裏と官庁">大内裏と官庁</a>・<a href="research/#cat-学問と教育">学問と教育</a>・<a href="research/#cat-寺社">寺社</a>・<a href="research/#cat-未分類">内裏・朝堂院・朱雀院の復元メモ</a></p>
 <a class="btn2" href="research/">設定資料集を読む（調査ノート28件）</a>
 </section>
 <section id="hakoniwakit">
@@ -194,7 +326,7 @@ footer a{color:#d8dee5}
 <section class="again">
 <h2 style="color:#f4f1e9;border-color:#c9973b">千年前の都へ</h2>
 <p>羅城門の前から、朱雀大路を北へ歩いてみてください。</p>
-<a class="btn" href="heiankyo/">平安京を歩く（無料）</a>
+<a class="btn" href="heiankyo/">平安京を歩く</a>
 </section>
 </main>
 <footer><div class="in"><dl>
@@ -204,6 +336,14 @@ footer a{color:#d8dee5}
 <dt>建築・区画</dt><dd>史料に基づく推定復元（<a href="research/">設定資料集</a>）</dd>
 <dt>ライブラリ</dt><dd>three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd>
 </dl></div></footer>
+<script>
+(()=>{const vs=[...document.querySelectorAll('video[data-src]')];if(!vs.length)return;
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const load=v=>{if(!v.src){v.src=v.dataset.src;}if(calm){v.controls=true;}else{v.play().catch(()=>{v.controls=true;});}};
+if(!('IntersectionObserver' in window)){vs.forEach(load);return;}
+const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)load(e.target);else if(!e.target.paused&&!calm)e.target.pause();}},{rootMargin:'200px'});
+vs.forEach(v=>io.observe(v));})();
+</script>
 <dialog class="zoom" id="zoom" aria-label="写真を大きく見る"><button type="button" id="zoomClose">閉じる</button><figure><img id="zoomImg" alt=""><figcaption id="zoomCap"></figcaption></figure></dialog>
 <script>
 (()=>{const d=document.getElementById('zoom'),im=document.getElementById('zoomImg'),cap=document.getElementById('zoomCap');

@@ -55,6 +55,26 @@ p{margin:0 0 14px}
 .galh{margin:8px 0 12px;font-size:20px}.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px;margin:0 0 40px}.gal figure{margin:0}.gal figcaption{padding:8px 0 0;font-size:16px;line-height:1.7}.gal figcaption b{display:block;color:#5c3a1e}
 @media(max-width:640px){.row{grid-template-columns:1fr;gap:12px}.row.rev figure{order:0}.gal{grid-template-columns:1fr}}
 main figure img{cursor:zoom-in}
+.row video{display:block;width:100%;height:auto;background:#d9cfb8}
+svg.map,svg.ui{display:block;width:100%;height:auto;background:#d9cfb8}
+svg.map circle{stroke:#fff;stroke-width:2}
+svg.map text{fill:#fff;font:700 13px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+svg.ui circle{fill:#c9973b;stroke:#10161c;stroke-width:3}
+svg.ui text{fill:#10161c;font:700 22px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+.mapkey{display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px;margin:12px 0 0;font-size:16px;line-height:1.6}
+.mapkey h3{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:17px}
+.mapkey i{display:block;width:14px;height:14px;border-radius:50%;flex:none}
+.mapkey ol{margin:0;padding-left:32px}
+table.uitab{width:100%;margin:16px 0 0;border-collapse:collapse;font-size:16px;line-height:1.7}
+table.uitab th,table.uitab td{padding:10px 10px;border-bottom:1px solid #e0d5bd;text-align:left;vertical-align:top}
+table.uitab thead th{color:#6b5a40;font-size:14px;font-weight:600;border-bottom:2px solid #b79b63}
+table.uitab tbody th{width:9.5em;color:#5c3a1e;font-weight:700}
+table.uitab td.n{width:3em;padding-right:0}
+table.uitab .no{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#c9973b;color:#10161c;font-weight:700;font-size:15px;line-height:1}
+table.keys{width:100%;margin:20px 0 0;border-collapse:collapse;font-size:16px;line-height:1.6}
+table.keys th,table.keys td{padding:8px 10px;border-bottom:1px solid #e0d5bd;text-align:left;vertical-align:top}
+table.keys th{width:9em;color:#5c3a1e;font-weight:700}
+@media(max-width:640px){.mapkey{grid-template-columns:1fr}table.uitab tbody th{width:6.5em}}
 dialog.zoom{max-width:none;max-height:none;width:100vw;height:100vh;margin:0;padding:0;border:0;background:rgba(10,14,18,.94);color:#f4f1e9}
 dialog.zoom::backdrop{background:rgba(10,14,18,.94)}
 dialog.zoom[open]{display:grid;place-items:center;cursor:zoom-out}
@@ -71,6 +91,9 @@ dialog.zoom button{position:fixed;top:14px;right:18px;padding:6px 14px;font-size
 .notes a{display:block;padding:16px 18px;background:#fff;border:1px solid #e0d5bd;color:#2c2418;text-decoration:none}
 .notes a:hover{border-color:#b79b63}
 .notes a span{display:block;font-size:16px;line-height:1.7;color:#4a3f2e}
+.notes a em{display:block;margin:10px 0 0;font-style:normal;font-size:15px;color:#6b3f22;text-decoration:underline;text-underline-offset:3px}
+.notes a:hover em{color:#8a5530}
+.morech{margin:0 0 22px;font-size:16px}
 .btn2{display:inline-block;padding:12px 26px;font-size:17px;font-weight:600;color:#f4f1e9;background:#6b3f22;text-decoration:none}
 .btn2:hover{background:#7f4c2a}
 dl.faq dt{margin:20px 0 4px;font-weight:700;color:#5c3a1e}
@@ -108,7 +131,7 @@ footer a{color:#d8dee5}
 <h1>平安京 <span lang="en" style="font-size:.5em;letter-spacing:.02em">Heian-kyo</span></h1>
 <p class="tag">Walk the capital of the year 900 in your browser</p>
 <p>Heian-kyo is the city that became today's Kyoto. This is a 3D miniature world in your browser that reconstructs the capital about a century after it was laid out, built on the national elevation data of Japan. You play the tin robot "the Iron Child": look down on the city from the sky, walk its streets and listen to the people who live there. There is no winning or losing and no fixed story. Go wherever you like.</p>
-<div class="cta"><a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo (free)</a><a class="sub" href="../" hreflang="ja" lang="ja">日本語</a><a class="sub" href="../research/" hreflang="ja">Research notes (Japanese)</a></div>
+<div class="cta"><a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo</a><a class="sub" href="../" hreflang="ja" lang="ja">日本語</a><a class="sub" href="../research/" hreflang="ja">Research notes (Japanese)</a></div>
 <p class="note">The first visit downloads about 25 MB and takes one to three minutes. Runs in desktop and mobile browsers.</p>
 </div>
 </header>
@@ -128,7 +151,7 @@ footer a{color:#d8dee5}
 <h3>The buildings in the year 900</h3>
 <ul class="hist">
 <li>The Great Hall of State (Daigokuden) burned in 876 and was rebuilt in 879. The hall you see is the second one.</li>
-<li>Otenmon Gate burned in the Otenmon Incident of 866 and was rebuilt. Thirty-five years later, people who saw the fire still live in the city.</li>
+<li>Otenmon Gate burned in the Otenmon Incident of 866 and was rebuilt. Thirty-five years have passed, but people who saw the fire still live in the city.</li>
 <li>Rajomon Gate fell in a great storm in 816. The gate you see is the second one.</li>
 <li>The five-storey pagoda of Toji Temple took decades to build and was finally completed at the end of the ninth century.</li>
 <li>The imperial palace (Dairi) keeps its form from the founding of the capital.</li>
@@ -150,7 +173,7 @@ footer a{color:#d8dee5}
 <figure><img src="../img/daidairi-kanshi.jpg" width="1500" height="857" alt="The palace precinct from the air: the green-tiled Chodoin halls, walled government offices, and the imperial palace beyond" loading="lazy" decoding="async"><figcaption><b>The palace precinct</b>Around the green-tiled halls of the Chodoin, each ministry and bureau has its own walled compound.</figcaption></figure>
 <figure><img src="../img/dairi.jpg" width="1500" height="857" alt="Halls with cypress-bark roofs inside the cloister of the imperial palace" loading="lazy" decoding="async"><figcaption><b>The imperial palace</b>The Shishinden, the Seiryoden and the halls of the empresses and court ladies, roofed with cypress bark.</figcaption></figure>
 </div>
-<div class="row"><figure><img src="../img/ichi-robo.jpg" width="1500" height="857" alt="The robot among the stalls of the East Market, with a stallholder speaking in a bubble" loading="lazy" decoding="async"></figure>
+<div class="row"><figure><video data-src="../img/suzakumon-talk.mp4" poster="../img/suzakumon-talk.jpg" width="1280" height="806" muted loop playsinline preload="none" aria-label="Video: officials and townspeople talking in speech bubbles in front of Suzakumon Gate"></video></figure>
 <div><h3>Talk with the townspeople</h3><p>The game has about 3,000 townspeople, and what they say changes with the place, the hour, the season and the weather. Rank, household and whether they side with the Minister of the Left or the Minister of the Right shape how they talk. Earlier events such as the Otenmon Incident and the demon of the Pine Grove of the Banquet come up as rumours. What you hear is kept in your notebook, and each day is written up in a diary. Every line of dialogue is available in English.</p></div></div>
 <div class="row rev"><figure><img src="../img/suzaku-oji.jpg" width="1500" height="857" alt="An ox cart and a mounted party on willow-lined Suzaku Avenue" loading="lazy" decoding="async"></figure>
 <div><h3>A calendar that moves</h3><p>Days pass from the 25th day of the second month of the year 900 to the year 922, following the lunar calendar of the time, including long and short months and leap months. Once you pass the Shotai Incident on the 25th day of the first month of 901, Michizane's ox cart no longer appears, and the townspeople change what they say and where they go. The nobles' ox carts leave their mansions for the palace on schedule. The seasons turn: plum, cherry, new leaves, autumn colour and bare branches, with sunrise and sunset moving through the year. Each day is clear, cloudy or rainy. The East and West Markets open in alternate halves of the month. At night only bonfires and oil lamps break the darkness, as they did then.</p></div></div>
@@ -162,6 +185,114 @@ footer a{color:#d8dee5}
 <div><h3>Requests</h3><p>Find a lost child, deliver a love letter, catch a thief of dried fish, look into the pillars of Rajomon Gate, and more. These quest-like requests deepen your ties with the townspeople, bring new stories, and open the way into the palace and the mansions of the nobility.</p></div></div>
 <ul class="feat">
 </ul>
+</section>
+<section id="map">
+<h2>Map of Heian-kyo</h2>
+<p>The capital seen from directly above inside the game. The numbers mark the places where you can start walking, in a city about 5.2 km north to south and 4.5 km east to west. North is up. Suzaku Avenue runs south from the palace precinct at the top to Rajomon Gate. East of it (right) is the Left Capital, and west of it (left) is the Right Capital. Much of the south-west of the Right Capital is still marsh and woodland. You can also start from the top of Mount Funaoka, north of the city.</p>
+<!--MAP-->
+<svg class="map" viewBox="0 0 832 962" role="img" aria-labelledby="mapTitle"><title id="mapTitle">Map of Heian-kyo seen from directly above, with numbered markers for the 49 places where you can start walking</title>
+<image href="../img/heiankyo-map.jpg" width="832" height="962"/>
+<g transform="translate(416.1 156.4)"><title>1. Daigokuden Hall</title><circle r="10" fill="#b23b3b"/><text y="4">1</text></g>
+<g transform="translate(380.2 172.0)"><title>2. Burakuden Hall</title><circle r="10" fill="#b23b3b"/><text y="4">2</text></g>
+<g transform="translate(447.3 114.3)"><title>3. Inner Palace (Dairi)</title><circle r="10" fill="#b23b3b"/><text y="4">3</text></g>
+<g transform="translate(416.1 232.0)"><title>4. Otenmon Gate</title><circle r="10" fill="#b23b3b"/><text y="4">4</text></g>
+<g transform="translate(416.0 255.7)"><title>5. Suzakumon Gate</title><circle r="10" fill="#b23b3b"/><text y="4">5</text></g>
+<g transform="translate(460.7 176.4)"><title>6. Bureau of Divination (Onmyo-ryo)</title><circle r="10" fill="#b23b3b"/><text y="4">6</text></g>
+<g transform="translate(416.0 950)"><title>7. Rajomon Gate</title><circle r="10" fill="#6b3f22"/><text y="4">7</text></g>
+<g transform="translate(416.0 675.4)"><title>8. Suzaku Avenue</title><circle r="10" fill="#6b3f22"/><text y="4">8</text></g>
+<g transform="translate(545.5 729.7)"><title>9. East Market</title><circle r="10" fill="#6b3f22"/><text y="4">9</text></g>
+<g transform="translate(286.5 729.7)"><title>10. West Market</title><circle r="10" fill="#6b3f22"/><text y="4">10</text></g>
+<g transform="translate(433.8 729.7)"><title>11. East Korokan</title><circle r="10" fill="#6b3f22"/><text y="4">11</text></g>
+<g transform="translate(398.1 729.7)"><title>12. West Korokan</title><circle r="10" fill="#6b3f22"/><text y="4">12</text></g>
+<g transform="translate(572.1 729.7)"><title>13. Horikawa Canal</title><circle r="10" fill="#6b3f22"/><text y="4">13</text></g>
+<g transform="translate(572.1 12)"><title>14. Ichijo Modoribashi Bridge</title><circle r="10" fill="#6b3f22"/><text y="4">14</text></g>
+<g transform="translate(495.1 902.2)"><title>15. To-ji Temple</title><circle r="10" fill="#2f6b4a"/><text y="4">15</text></g>
+<g transform="translate(336.9 902.2)"><title>16. Sai-ji Temple</title><circle r="10" fill="#2f6b4a"/><text y="4">16</text></g>
+<g transform="translate(611.4 547.1)"><title>17. Gojo Tenjin Shrine</title><circle r="10" fill="#2f6b4a"/><text y="4">17</text></g>
+<g transform="translate(566.8 711.6)"><title>18. Ichihime Shrine</title><circle r="10" fill="#2f6b4a"/><text y="4">18</text></g>
+<g transform="translate(296.2 12)"><title>19. Daishogun-do Hall</title><circle r="10" fill="#2f6b4a"/><text y="4">19</text></g>
+<g transform="translate(707.2 373.0)"><title>20. Rokkakudo Hall</title><circle r="10" fill="#2f6b4a"/><text y="4">20</text></g>
+<g transform="translate(707.2 534.0)"><title>21. Inabado Hall</title><circle r="10" fill="#2f6b4a"/><text y="4">21</text></g>
+<g transform="translate(494.3 299.7)"><title>22. Shinsen-en Garden</title><circle r="10" fill="#6e4f8a"/><text y="4">22</text></g>
+<g transform="translate(385.2 409.2)"><title>23. Suzaku-in</title><circle r="10" fill="#6e4f8a"/><text y="4">23</text></g>
+<g transform="translate(547.9 234.2)"><title>24. Reizei-in</title><circle r="10" fill="#6e4f8a"/><text y="4">24</text></g>
+<g transform="translate(584.2 245.9)"><title>25. Yozei-in</title><circle r="10" fill="#6e4f8a"/><text y="4">25</text></g>
+<g transform="translate(608.3 245.9)"><title>26. Machijiri-dono</title><circle r="10" fill="#6e4f8a"/><text y="4">26</text></g>
+<g transform="translate(584.2 183.3)"><title>27. Kaya-no-in</title><circle r="10" fill="#6e4f8a"/><text y="4">27</text></g>
+<g transform="translate(584.2 288.2)"><title>28. Horikawa-in</title><circle r="10" fill="#6e4f8a"/><text y="4">28</text></g>
+<g transform="translate(608.3 288.2)"><title>29. Kan-in</title><circle r="10" fill="#6e4f8a"/><text y="4">29</text></g>
+<g transform="translate(634.7 300.0)"><title>30. Higashi-Sanjo-dono</title><circle r="10" fill="#6e4f8a"/><text y="4">30</text></g>
+<g transform="translate(634.7 276.5)"><title>31. Nijo-no-miya</title><circle r="10" fill="#6e4f8a"/><text y="4">31</text></g>
+<g transform="translate(683.1 276.5)"><title>32. Ko-Nijo-in</title><circle r="10" fill="#6e4f8a"/><text y="4">32</text></g>
+<g transform="translate(707.2 300.0)"><title>33. Yamabuki-dono</title><circle r="10" fill="#6e4f8a"/><text y="4">33</text></g>
+<g transform="translate(683.1 195.4)"><title>34. Sugawara-in</title><circle r="10" fill="#6e4f8a"/><text y="4">34</text></g>
+<g transform="translate(683.1 495.8)"><title>35. Kobai-dono</title><circle r="10" fill="#6e4f8a"/><text y="4">35</text></g>
+<g transform="translate(683.1 519.9)"><title>36. Hakubai-dono</title><circle r="10" fill="#6e4f8a"/><text y="4">36</text></g>
+<g transform="translate(596.2 840.1)"><title>37. Teiji-no-in</title><circle r="10" fill="#6e4f8a"/><text y="4">37</text></g>
+<g transform="translate(791.9 631.4)"><title>38. Kawara-no-in</title><circle r="10" fill="#6e4f8a"/><text y="4">38</text></g>
+<g transform="translate(428.7 319.0)"><title>39. Academic quarter</title><circle r="10" fill="#2f5a8a"/><text y="4">39</text></g>
+<g transform="translate(570.2 403.4)"><title>40. Aristocratic quarter</title><circle r="10" fill="#2f5a8a"/><text y="4">40</text></g>
+<g transform="translate(483.0 618.6)"><title>41. Commoners&#x27; quarter</title><circle r="10" fill="#2f5a8a"/><text y="4">41</text></g>
+<g transform="translate(272.7 207.5)"><title>42. Officials&#x27; quarter, northern Right Capital</title><circle r="10" fill="#2f5a8a"/><text y="4">42</text></g>
+<g transform="translate(150.1 699.4)"><title>43. Green spaces of the Right Capital</title><circle r="10" fill="#2f5a8a"/><text y="4">43</text></g>
+<g transform="translate(535.8 300.0)"><title>44. Carpenters&#x27; quarter (Bureau of Carpentry)</title><circle r="10" fill="#2f5a8a"/><text y="4">44</text></g>
+<g transform="translate(560.0 143.5)"><title>45. Palace repair workers&#x27; quarter</title><circle r="10" fill="#2f5a8a"/><text y="4">45</text></g>
+<g transform="translate(73.8 178.5)"><title>46. Craftsmen&#x27;s quarter (Bureau of Crafts)</title><circle r="10" fill="#2f5a8a"/><text y="4">46</text></g>
+<g transform="translate(273.8 22.9)"><title>47. Papermakers&#x27; and copyists&#x27; quarter (Bureau of Books)</title><circle r="10" fill="#2f5a8a"/><text y="4">47</text></g>
+<g transform="translate(253.8 119.3)"><title>48. Kamiya-in Paper Mill</title><circle r="10" fill="#2f5a8a"/><text y="4">48</text></g>
+<g transform="translate(634.7 914.0)"><title>49. Seyakuin Dispensary</title><circle r="10" fill="#2f5a8a"/><text y="4">49</text></g>
+</svg>
+<div class="mapkey">
+<div><h3><i style="background:#b23b3b"></i>The palace precinct</h3><ol start="1"><li>Daigokuden Hall</li><li>Burakuden Hall</li><li>Inner Palace (Dairi)</li><li>Otenmon Gate</li><li>Suzakumon Gate</li><li>Bureau of Divination (Onmyo-ryo)</li></ol></div>
+<div><h3><i style="background:#6b3f22"></i>Gates, avenues and markets</h3><ol start="7"><li>Rajomon Gate</li><li>Suzaku Avenue</li><li>East Market</li><li>West Market</li><li>East Korokan</li><li>West Korokan</li><li>Horikawa Canal</li><li>Ichijo Modoribashi Bridge</li></ol></div>
+<div><h3><i style="background:#2f6b4a"></i>Temples and shrines</h3><ol start="15"><li>To-ji Temple</li><li>Sai-ji Temple</li><li>Gojo Tenjin Shrine</li><li>Ichihime Shrine</li><li>Daishogun-do Hall</li><li>Rokkakudo Hall</li><li>Inabado Hall</li></ol></div>
+<div><h3><i style="background:#6e4f8a"></i>Residences, villas and gardens</h3><ol start="22"><li>Shinsen-en Garden</li><li>Suzaku-in</li><li>Reizei-in</li><li>Yozei-in</li><li>Machijiri-dono</li><li>Kaya-no-in</li><li>Horikawa-in</li><li>Kan-in</li><li>Higashi-Sanjo-dono</li><li>Nijo-no-miya</li><li>Ko-Nijo-in</li><li>Yamabuki-dono</li><li>Sugawara-in</li><li>Kobai-dono</li><li>Hakubai-dono</li><li>Teiji-no-in</li><li>Kawara-no-in</li></ol></div>
+<div><h3><i style="background:#2f5a8a"></i>Workshops, offices and neighbourhoods</h3><ol start="39"><li>Academic quarter</li><li>Aristocratic quarter</li><li>Commoners&#x27; quarter</li><li>Officials&#x27; quarter, northern Right Capital</li><li>Green spaces of the Right Capital</li><li>Carpenters&#x27; quarter (Bureau of Carpentry)</li><li>Palace repair workers&#x27; quarter</li><li>Craftsmen&#x27;s quarter (Bureau of Crafts)</li><li>Papermakers&#x27; and copyists&#x27; quarter (Bureau of Books)</li><li>Kamiya-in Paper Mill</li><li>Seyakuin Dispensary</li></ol></div>
+</div>
+<!--/MAP-->
+</section>
+<section id="howto">
+<h2>Reading the screen</h2>
+<p>The image below is the screen while you walk. Each round number in the image matches the same number in the table under it. A short "How to play" guide also appears the first time you open the game, and you can open it again from the ☰ menu at the top right.</p>
+<svg class="ui" viewBox="0 0 1280 806" role="img" aria-labelledby="uiTitle"><title id="uiTitle">The screen while walking: the map at the top left, the button bar at the top right, the clock at the bottom right, gesture buttons along the bottom and the place description at the bottom left</title>
+<image href="../img/ui-guide.jpg" width="1280" height="806"/>
+<!--UIMARKS-->
+<g transform="translate(210 94)"><circle r="17"/><text y="8">1</text></g>
+<g transform="translate(1019 52)"><circle r="17"/><text y="8">2</text></g>
+<g transform="translate(1067 52)"><circle r="17"/><text y="8">3</text></g>
+<g transform="translate(1127 52)"><circle r="17"/><text y="8">4</text></g>
+<g transform="translate(1205 52)"><circle r="17"/><text y="8">5</text></g>
+<g transform="translate(1263 52)"><circle r="17"/><text y="8">6</text></g>
+<g transform="translate(282 122)"><circle r="17"/><text y="8">7</text></g>
+<g transform="translate(328 502)"><circle r="17"/><text y="8">8</text></g>
+<g transform="translate(722 701)"><circle r="17"/><text y="8">9</text></g>
+<g transform="translate(1102 640)"><circle r="17"/><text y="8">10</text></g>
+<g transform="translate(736 766)"><circle r="17"/><text y="8">11</text></g>
+<g transform="translate(464 752)"><circle r="17"/><text y="8">12</text></g>
+<!--/UIMARKS-->
+</svg>
+<table class="uitab">
+<thead><tr><th>No.</th><th>Name</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td class="n"><span class="no">1</span></td><th>Map and destinations</th><td>Choose from the list or a marker on the map to go there. The blue marker shows where you are and which way you face. While walking, only places you have visited or heard about are shown.</td></tr>
+<tr><td class="n"><span class="no">2</span></td><th>Walk</th><td>Starts walking on the ground. It reads "Walking" while you walk.</td></tr>
+<tr><td class="n"><span class="no">3</span></td><th>View</th><td>The drone tour, back to the overview, photo mode, and fixed viewpoints such as the busy market, the court of the Chodoin and the front of Suzakumon Gate.</td></tr>
+<tr><td class="n"><span class="no">4</span></td><th>Timeline (T)</th><td>A timeline of the capital. You can move time forward to turning points such as the Shotai Incident.</td></tr>
+<tr><td class="n"><span class="no">5</span></td><th>Notebook (N)</th><td>What you have heard, and a diary of each day.</td></tr>
+<tr><td class="n"><span class="no">6</span></td><th>☰ menu</th><td>Music, time settings, light and shadow, gekiga style, constellations and dialogue on or off, plus the language switch and How to play.</td></tr>
+<tr><td class="n"><span class="no">7</span></td><th>Name tag</th><td>The name of a building or gate.</td></tr>
+<tr><td class="n"><span class="no">8</span></td><th>Speech bubble</th><td>What a townsperson is saying.</td></tr>
+<tr><td class="n"><span class="no">9</span></td><th>Talk</th><td>Appears when someone nearby can be spoken to. Press E or click the tag.</td></tr>
+<tr><td class="n"><span class="no">10</span></td><th>Clock</th><td>The date and hour, which market is open and the phase of the moon. Drag the slider to change the hour, or play and speed up time.</td></tr>
+<tr><td class="n"><span class="no">11</span></td><th>Gestures</th><td>Jump, dance, pray, bow, wave, lift, sit and follow. The key is shown on each button.</td></tr>
+<tr><td class="n"><span class="no">12</span></td><th>About this place</th><td>The name and description of where you are.</td></tr>
+</tbody>
+</table>
+<table class="keys">
+<tr><th>PC (walking)</th><td>Click the ground to walk there / left-drag to look around / WASD to move / E to talk / Shift to skip ahead / Esc to stop walking / H to hide the on-screen prompts</td></tr>
+<tr><th>PC (from the air)</th><td>Drag to turn / scroll to move closer or farther</td></tr>
+<tr><th>Phone</th><td>Drag to look around / tap the ground to walk there / pinch to move closer or farther</td></tr>
+</table>
 </section>
 <section id="research">
 <h2>The research behind it</h2>
@@ -186,7 +317,7 @@ footer a{color:#d8dee5}
 <section class="again">
 <h2 style="color:#f4f1e9;border-color:#c9973b">To the capital of a thousand years ago</h2>
 <p>Start in front of Rajomon Gate and walk north along Suzaku Avenue.</p>
-<a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo (free)</a>
+<a class="btn" href="../heiankyo/?lang=en">Walk Heian-kyo</a>
 </section>
 </main>
 <footer><div class="in"><dl>
@@ -196,6 +327,14 @@ footer a{color:#d8dee5}
 <dt>Buildings</dt><dd>Estimated reconstruction from historical sources (<a href="../research/" hreflang="ja">research notes</a>, Japanese)</dd>
 <dt>Libraries</dt><dd>three.js (MIT), manifold-3d (Apache-2.0), opencascade.js (LGPL-2.1)</dd>
 </dl></div></footer>
+<script>
+(()=>{const vs=[...document.querySelectorAll('video[data-src]')];if(!vs.length)return;
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const load=v=>{if(!v.src){v.src=v.dataset.src;}if(calm){v.controls=true;}else{v.play().catch(()=>{v.controls=true;});}};
+if(!('IntersectionObserver' in window)){vs.forEach(load);return;}
+const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting)load(e.target);else if(!e.target.paused&&!calm)e.target.pause();}},{rootMargin:'200px'});
+vs.forEach(v=>io.observe(v));})();
+</script>
 <dialog class="zoom" id="zoom" aria-label="Enlarged photo"><button type="button" id="zoomClose">Close</button><figure><img id="zoomImg" alt=""><figcaption id="zoomCap"></figcaption></figure></dialog>
 <script>
 (()=>{const d=document.getElementById('zoom'),im=document.getElementById('zoomImg'),cap=document.getElementById('zoomCap');

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="c38f1c8d0ea09dd5a30219ada60d4fd3fe549f5178af4784854a5e71f28f68b7">
+<meta name="heian-release" content="be61295eab5e88ec6a2151160f357561ec79ed8b2c76eabb66d10466073d2205">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -336,6 +336,12 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-dialog-pin[aria-pressed="true"]{background:rgba(196,160,96,.25)}
 .heian-note-toast{position:absolute;z-index:4;left:50%;bottom:118px;transform:translateX(-50%);padding:4px 12px;background:rgba(43,36,28,.82);color:#f6ecd4;font-size:14px;border-radius:4px;pointer-events:none;animation:heianNoteFade 1.8s ease forwards}
 @keyframes heianNoteFade{0%{opacity:0}12%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.heian-note-toast.heian-trip-toast{animation-duration:3.6s} /* 距離と時間（2026-10-19）は読むのに長めに */
+.heian-trip-choice{/* 地点を選んだ左上の地図の右に出す。🚫 上の中央は「今日の都」の札、下の中央は初回の案内と重なった（2026-10-19 撮影） */position:absolute;z-index:7;left:clamp(16px,calc(100vw - 576px),332px);top:134px;padding:12px 16px;background:rgba(43,36,28,.94);color:#f6ecd4;font-size:16px;line-height:1.6;border-radius:4px;width:max-content;max-width:min(560px,calc(100vw - 32px))}
+.heian-trip-choice p{margin:0 0 10px}
+.heian-trip-choice .heian-trip-sub{font-size:14px;color:#d9ccb0}
+.heian-trip-choice button{font-size:14px;margin:0 8px 0 0;padding:6px 14px;background:#f6ecd4;color:#2b241c;border:0;border-radius:4px;cursor:pointer}
+.heian-trip-choice button.heian-trip-alt{background:transparent;color:#f6ecd4;border:1px solid rgba(246,236,212,.45)}
 .heian-notebook{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100vw - 32px));height:min(640px,calc(100vh - 96px));display:flex;flex-direction:column;background:rgba(250,246,236,.98);color:#2b241c;border:1px solid rgba(96,76,52,.35);border-radius:6px;pointer-events:auto;font-size:16px;line-height:1.6}
 .heian-notebook header{display:flex;align-items:center;gap:12px;height:auto;min-height:0;padding:12px 16px 8px;border-bottom:1px solid rgba(96,76,52,.2);background:none;position:static} /* 🚫 編集画面の header の決まり（高さ固定）が効いて、スマホで帯が検索欄の下に潜った */
 .heian-notebook h2{margin:0;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:24px;font-weight:600;letter-spacing:.08em;color:#3a2e22}
@@ -1501,15 +1507,18 @@ function createHeianWalkController(host){
  let boost=0,surge=0;
  // 2026-10-17 井内さん「ホバー、加速はそれぞれ1.2倍早く。最高速でもまだ遅い」: 加速の段は全部1.2倍（1段1.5→1.8・2段2.0→2.4・7段2.5→3.0）。ホバーの倍率は host 側（hoverMultiplier）
  const boostK=()=>(boost?1.2:1)*(1+.5*Math.min(boost,2)+.1*Math.max(0,boost-2))*(1+.35*surge);
- function clearAutoTarget(message){autoTarget=null;hover=false;stride=false;boost=0;surge=0;host.hideWalkTarget?.();if(message)setStatus(message);}
+ // 道なりの経路（2026-10-19）。autoTarget の後に続く曲がり角の列と、その残りの長さ。walkRoute で入れる。地面クリック・WASD・停止で消える
+ let route=[],routeRest=0;
+ function clearAutoTarget(message){autoTarget=null;route=[];routeRest=0;hover=false;stride=false;boost=0;surge=0;host.hideWalkTarget?.();if(message)setStatus(message);}
  // 追随（2026-10-13 井内さん「動作に『ついていく』をつけたい。牛車・検非違使・火長のような巡回する人に自動で追随して歩く」）。
  //  follow(fn): fn(dt) が {x,z,keep,lose} を返す間、相手から keep の距離まで寄り、相手の速さに合わせて歩く（遠いときはホバー・大股で追いつく）。
  //  相手が見えなくなって4秒・lose より遠くなったら終わる。WASD・地面クリックで解除。目的地の自動歩行を毎コマ組み直すので、到着の札は出さない
  let followFn=null,followCap=null,followLast=null,followVt=0,followLost=0,followMoving=false;
  function clearFollow(message){const was=!!followFn;followFn=null;followCap=null;followLast=null;followVt=0;followLost=0;followMoving=false;if(was){clearAutoTarget();setMotion(false);host.onFollowChange?.(false,message||'');}if(message)setStatus(message);}
  function tier(){if(!moving)return'idle';if(autoTarget&&hover)return boost?'boost'+boost:'hover';return running?'stride':'walk';}
- function setAutoTarget(point){
+ function setAutoTarget(point,opt=null){
   if(!point||![point.x,point.y,point.z].every(Number.isFinite))return false;
+  if(!opt?.route){route=[];routeRest=0;} // 地面クリックなど＝道なりの経路は終わり
   if(followFn)clearFollow(); // 地面クリックなど別の行き先を決めたら、ついていくのは終わり
   const wasHover=!!autoTarget&&hover;
   const safe=host.resolvePoint?.(point.x,point.z,radius)||point;if(!safe)return false;const safeY=terrain()?.groundY?.(safe.x,safe.z);if(!Number.isFinite(safeY))return false;
@@ -1519,8 +1528,10 @@ function createHeianWalkController(host){
   // 1.86 加速は7段まで（音はド→レ→ミ…→上のド）。3段目からは速さの伸びを小さくし、代わりにクリックのたびに一時の伸び（surge）で押し出す
   //  （2026-10-05井内さん「ホバー中に最高速でも、もう一回遠くをクリックしたら加速感を出したい」）
   // 2026-10-11 荷を持っている間（host.heavy）はホバーも大股もしない＝歩くだけ
-  const heavy=!!host.heavy?.();hover=!heavy&&Math.hypot(dx,dz)>hoverDistance;stride=!heavy&&!hover&&Math.hypot(dx,dz)>strideDistance;boost=hover&&wasHover?Math.min(7,boost+1):0;
+  const span=opt?.total??Math.hypot(dx,dz); // 道なりの経路では、ホバー・大股を経路全体の長さで決める
+  const heavy=!!host.heavy?.();hover=!heavy&&span>hoverDistance;stride=!heavy&&!hover&&span>strideDistance;boost=hover&&wasHover?Math.min(7,boost+1):0;
   if(hover){if(wasHover)surge=1;host.onBoost?.(boost,wasHover);}
+  if(hover&&!wasHover)host.onTrip?.(span); // 2026-10-19 遠くへ向かうときだけ、距離とかかる時間を一瞬出す
   host.showWalkTarget?.(autoTarget);setStatus(stride?'大股で目的地へ急いでいる':hover?(boost?'加速'+boost+'段でホバー移動中（もう一度遠くをクリックでさらに加速）':'ホバーで目的地へ移動中。移動中に遠くをもう一度クリックすると加速'):'目的地まで自動歩行中。移動中も見回し・目的地変更が可能');return true;
  }
  function direction(out=forward){
@@ -1672,17 +1683,20 @@ function createHeianWalkController(host){
   }
   if(autoTarget){
    const t=terrain();if(!t){stop('地形が解除されたため歩行を終了した');return false;}
+   // 道なりの経路: 曲がり角の手前（速さに応じて最大4m）で次の角へ切り替える。最後の角だけが本当の目的地
+   while(!followFn&&route.length&&Math.hypot(autoTarget.x-actorPosition.x,autoTarget.z-actorPosition.z)<=Math.max(radius+1,Math.min(40,moveSpeed*.15))){
+    const n=route.shift(),ny=t.groundY?.(n.x,n.z);routeRest=Math.max(0,routeRest-Math.hypot(n.x-autoTarget.x,n.z-autoTarget.z));autoTarget=new THREE.Vector3(n.x,Number.isFinite(ny)?ny:autoTarget.y,n.z);}
    const dx=autoTarget.x-actorPosition.x,dz=autoTarget.z-actorPosition.z,remaining=Math.hypot(dx,dz);
    if(remaining<=(followFn?.5:radius+1)){clearAutoTarget(followFn?null:'目的地に到着した');setMotion(false);syncActor();aimCamera();return true;}
    // ホバー中は3倍。着く手前 hoverBrake で歩きの速さまで落とす（止まる瞬間に飛び降りない）
    let ux=dx/remaining,uz=dz/remaining;const sf=slopeStep(t,actorPosition.x,actorPosition.z,ux,uz,dt,hover?.4:1);
    surge*=Math.exp(-dt*1.4);if(surge<.01)surge=0;const bk=boostK();
-   moveSpeed=(hover?Math.max(speed,speed*hoverMultiplier*bk*Math.min(1,remaining/(hoverBrake*bk))):stride?speed*runMultiplier:speed)*sf*(host.speedScale?.()??1); // 加速中は減速の距離も伸ばす・speedScale＝ジャンプの踏み切りの伸び
+   moveSpeed=(hover?Math.max(speed,speed*hoverMultiplier*bk*Math.min(1,(remaining+routeRest)/(hoverBrake*bk))):stride?speed*runMultiplier:speed)*sf*(host.speedScale?.()??1); // 加速中は減速の距離も伸ばす・speedScale＝ジャンプの踏み切りの伸び
    if(skid&&skid.target!==autoTarget)skid=null;
    if(hover&&skidTime>0&&!followFn){
     const vFull=speed*hoverMultiplier*bk*(host.speedScale?.()??1); // 坂の補正 sf は掛けない（掛けるのは moveSpeed に1回だけ）
     if(!skid){moveSpeed=vFull*sf; // 全速のまま。残りが減速に要る距離に入ったら急ブレーキ
-     if(remaining<=vFull*skidTime/2&&vFull>speed*hoverMultiplier*.6){skid={target:autoTarget,d0:remaining,v0:vFull};host.onBrake?.({speed:vFull,time:2*remaining/vFull,ux,uz,x:actorPosition.x,z:actorPosition.z});}}
+     if(!route.length&&remaining<=vFull*skidTime/2&&vFull>speed*hoverMultiplier*.6){skid={target:autoTarget,d0:remaining,v0:vFull};host.onBrake?.({speed:vFull,time:2*remaining/vFull,ux,uz,x:actorPosition.x,z:actorPosition.z});}}
     if(skid)moveSpeed=Math.max(speed*.45,skid.v0*Math.sqrt(Math.max(0,remaining)/skid.d0))*sf;}
    if(followFn&&followCap!=null&&!hover&&!stride)moveSpeed=Math.min(moveSpeed,followCap); // ついていく間は相手の歩みに合わせる
    // 1.85 牛車はロボのほうがよける（host.steer が向きを横へずらす）。ずらした先が通れなければ元の向きで進む
@@ -1751,7 +1765,14 @@ function createHeianWalkController(host){
   // 見上げ角の実測用（カメラが地面へ潜らないかを数値で確かめる・2026-09-02）
   get pitch(){return pitch;},get maxPitch(){return maxPitch;},get boost(){return boost;},get moveSpeed(){return moveSpeed;},get tier(){return tier();},get slope(){return slopeF;},get moving(){return moving;},get surge(){return surge;},
   setPitch:v=>{pitch=THREE.MathUtils.clamp(Number(v)||0,-.85,maxPitch);if(active)aimCamera();return pitch;},
-  walkTo:setAutoTarget,follow:fn=>{if(!active||typeof fn!=='function')return false;clearAutoTarget();followFn=fn;followCap=null;followLast=null;followVt=0;followLost=0;followMoving=false;host.onFollowChange?.(true,'');return true;},stopFollow:clearFollow,get following(){return !!followFn;},start,stop,relocate,toggleView,toggle:()=>active?stop():start(),setEnabled:on=>on?start():stop(),update,mount,dispose};
+  walkTo:setAutoTarget,
+   // 道なりに歩く（2026-10-19）。pts＝曲がり角の列（最後が目的地）、total＝道なりの長さ（ホバーにするか・残りの減速に使う）
+   walkRoute:(pts,total)=>{if(!active||!pts?.length)return false;const t=terrain(),Y=(x,z)=>t?.groundY?.(x,z);const P=pts.map(p=>({x:p.x,z:p.z}));
+    const y0=Y(P[0].x,P[0].z);if(!setAutoTarget(new THREE.Vector3(P[0].x,Number.isFinite(y0)?y0:actorPosition.y,P[0].z),{route:true,total}))return false;
+    route=P.slice(1);routeRest=0;for(let i=1;i<P.length;i++)routeRest+=Math.hypot(P[i].x-P[i-1].x,P[i].z-P[i-1].z);
+    const L=P[P.length-1],yl=Y(L.x,L.z);host.showWalkTarget?.(new THREE.Vector3(L.x,Number.isFinite(yl)?yl:actorPosition.y,L.z));return true;},
+   get routeLeft(){return route.length;},
+   follow:fn=>{if(!active||typeof fn!=='function')return false;clearAutoTarget();followFn=fn;followCap=null;followLast=null;followVt=0;followLost=0;followMoving=false;host.onFollowChange?.(true,'');return true;},stopFollow:clearFollow,get following(){return !!followFn;},start,stop,relocate,toggleView,toggle:()=>active?stop():start(),setEnabled:on=>on?start():stop(),update,mount,dispose};
 }
 </script>
 <script>
@@ -17847,6 +17868,81 @@ function heianNoteAdd(o){if(!o?.text)return null;const day=Math.floor(heianClock
   text:o.text,topic:o.topic||null,term:o.term||null,refer:o.refer||null,quest:o.quest||null,depth:o.depth??null,pin:!!o.pin};
  heianNotebook.items.push(it);heianNotebookSave();heianNoteToast();return it;}
 // 小さな知らせを一瞬（地図に書き入れた など・2026-10-05）
+// ---- 道なりの経路（2026-10-19 井内さん「指定した場所へ歩いていく」→「鉄の童におまかせ」の土台）。
+//  条坊の路面（heianRoadSurfaceRecords）の中心線の交点を節、同じ路面で隣り合う交点を枝にした格子で、いちばん短い道を探す。
+//  枝は 5m ごとに歩行の当たり（heianWalkBlocked・半径0.6m）を見て、塞がっていれば使わない（坊門・塀・堀川の開口など）。
+//  出発と目的地は、近い交点のうち一直線に行ける8つへつなぐ。一直線に行けて短いならそのまま。京の外（街道）はまだ無い＝一直線のまま
+let heianRouteGraphCache=null;
+function heianRouteClear(ax,az,bx,bz,r=6){const L=Math.hypot(bx-ax,bz-az),n=Math.max(1,Math.ceil(L/50));for(let i=1;i<n;i++){const k=i/n;if(heianWalkBlocked(ax+(bx-ax)*k,az+(bz-az)*k,r))return false;}return true;}
+function heianRouteGraph(){
+ const R=heianRoadSurfaceRecords;if(heianRouteGraphCache?.recs===R)return heianRouteGraphCache;const t0=performance.now();
+ const V=R.filter(r=>r.vertical&&r.w>0),H=R.filter(r=>!r.vertical&&r.w>0),inSpan=(r,a)=>r.spans.some(([u,v])=>a>=u-1&&a<=v+1);
+ const nodes=[],byKey=new Map(),onRoad=new Map(),node=(x,z)=>{const k=Math.round(x)+','+Math.round(z);let i=byKey.get(k);if(i===undefined){i=nodes.push({x,z,adj:[]})-1;byKey.set(k,i);}return i;};
+ const add=(r,i,along)=>{let L=onRoad.get(r);if(!L)onRoad.set(r,L=[]);L.push({i,along});};
+ for(const v of V)for(const h of H)if(inSpan(v,h.c)&&inSpan(h,v.c)){const i=node(v.c,h.c);add(v,i,h.c);add(h,i,v.c);}
+ let edges=0,blocked=0;const edgeList=[];
+ for(const[r,L]of onRoad){L.sort((a,b)=>a.along-b.along);
+  for(let k=1;k<L.length;k++){const a=L[k-1],b=L[k];if(a.i===b.i||!r.spans.some(([u,v])=>a.along>=u-1&&b.along<=v+1))continue;
+   const A=nodes[a.i],B=nodes[b.i];if(!heianRouteClear(A.x,A.z,B.x,B.z)){blocked++;continue;}const d=Math.hypot(B.x-A.x,B.z-A.z);A.adj.push([b.i,d]);B.adj.push([a.i,d]);edgeList.push([a.i,b.i]);edges++;}}
+ heianRouteGraphCache={recs:R,nodes,edgeList,edges,blocked,ms:Math.round(performance.now()-t0)};return heianRouteGraphCache;}
+function heianRoutePlan(fx,fz,tx,tz){
+ const G=heianRouteGraph(),N=G.nodes,direct=Math.hypot(tx-fx,tz-fz);if(!N.length)return null;
+ const near=(x,z)=>N.map((n,i)=>[i,Math.hypot(n.x-x,n.z-z)]).sort((a,b)=>a[1]-b[1]).slice(0,24).filter(([i])=>heianRouteClear(x,z,N[i].x,N[i].z)).slice(0,8);
+ // 目的地の側は「道の上のいちばん近い所」で止める（2026-10-19 井内さん「市の中を斜めに横切って通れないんじゃないの？」「門とか。門前まで行って止めるのがいい」）。
+ //  🚫 旧は目的地へ一直線に行ける交点8つへつないでいたので、市の中・敷地の中を斜めに突っ切った（売り場や塀は歩行の当たりに無いものもある）。
+ //  ⇒ 経路の枝（道の中心線）へ目的地を垂直に下ろした点を止まる所にする。そこから目的地まで 40m 以内で当たりが無いときだけ、最後に一歩入る
+ const S=near(fx,fz),E=new Map(),stopAt=new Map(),cand=[];
+ for(const[i,j]of G.edgeList){const A=N[i],B=N[j],dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz;if(!l2)continue;const k=THREE.MathUtils.clamp(((tx-A.x)*dx+(tz-A.z)*dz)/l2,0,1),qx=A.x+dx*k,qz=A.z+dz*k;cand.push([Math.hypot(tx-qx,tz-qz),i,j,qx,qz]);}
+ cand.sort((a,b)=>a[0]-b[0]);
+ for(const[off,i,j,qx,qz]of cand.slice(0,6))for(const n of[i,j]){const c=Math.hypot(N[n].x-qx,N[n].z-qz)+off;if(!E.has(n)||c<E.get(n)){E.set(n,c);stopAt.set(n,{x:qx,z:qz,off});}}
+ // 節の数は千数百＝単純な Dijkstra（未確定の中から最小を線形に探す）で足りる
+ const dist=new Float64Array(N.length).fill(Infinity),prev=new Int32Array(N.length).fill(-1),done=new Uint8Array(N.length);
+ for(const[i,d]of S)if(d<dist[i]){dist[i]=d;prev[i]=-2;}
+ let best=direct<=400&&heianRouteClear(fx,fz,tx,tz)?direct:Infinity,bestEnd=-1; // 一直線は 40m 以内のときだけ
+ for(;;){let u=-1,du=Infinity;for(let i=0;i<N.length;i++)if(!done[i]&&dist[i]<du){du=dist[i];u=i;}if(u<0||du>=best)break;done[u]=1;
+  if(E.has(u)&&du+E.get(u)<best){best=du+E.get(u);bestEnd=u;}
+  for(const[v,w]of N[u].adj)if(du+w<dist[v]){dist[v]=du+w;prev[v]=u;}}
+ if(!Number.isFinite(best))return null;
+ const pts=[];for(let i=bestEnd;i>=0;i=prev[i])pts.unshift({x:N[i].x,z:N[i].z});
+ let gate=null;if(bestEnd>=0){gate=stopAt.get(bestEnd);pts.push({x:gate.x,z:gate.z});if(gate.off<=400&&heianRouteClear(gate.x,gate.z,tx,tz))pts.push({x:tx,z:tz});else best-=gate.off;}else pts.push({x:tx,z:tz});
+ // 同じ直線上の途中の交点は省く（曲がる所だけ残す）
+ const out=[];for(let i=0;i<pts.length;i++){const a=out[out.length-1],b=pts[i],c=pts[i+1];if(a&&c&&Math.abs((b.x-a.x)*(c.z-b.z)-(b.z-a.z)*(c.x-b.x))<1e-6*(1+Math.hypot(c.x-a.x,c.z-a.z)**2))continue;out.push(b);}
+ return{points:out,length:best,direct,viaRoads:bestEnd>=0,stopsOnRoad:!!gate&&!(gate.off<=400&&heianRouteClear(gate.x,gate.z,tx,tz))};}
+window.__heianRoutePlan=(fx,fz,tx,tz)=>{const r=heianRoutePlan(fx,fz,tx,tz),G=heianRouteGraphCache;return r&&{...r,points:r.points.map(p=>[Math.round(p.x),Math.round(p.z)]),graph:G&&{nodes:G.nodes.length,edges:G.edges,blocked:G.blocked,ms:G.ms}};}; // 検証用
+window.__heianWalkState=()=>{const w=heianWalk;if(!w)return null;const p=w.position;return{active:w.active,pos:[Math.round(p.x),Math.round(p.z)],auto:w.autoWalking,hover:w.hovering,routeLeft:w.routeLeft};}; // 検証用
+// 地点へ道なりに歩く。経路が無ければ一直線（今までの自動歩行）
+function heianWalkToPlace(point){if(!heianWalk?.active||!point?.spawn)return false;const p=heianWalk.position,safe=resolveHeianWalkSpawn(point.spawn.x,point.spawn.z);
+ const plan=heianInterior?null:heianRoutePlan(p.x,p.z,safe.x,safe.z);
+ if(plan&&plan.points.length>1)return heianWalk.walkRoute(plan.points,plan.length);
+ const y=heianWalkGroundY(safe.x,safe.z);return heianWalk.walkTo(new THREE.Vector3(safe.x,y,safe.z));}
+// 歩いている間に地点を選んだら、すぐ移るか・道なりに歩いて行くかを選ぶ（2026-10-19）。距離とかかる時間を見せてから決める。
+//  返り値 true＝ここで引き受けた（選ぶまで地点は移らない）。屋内・定位置・全景・歩いていないときは false＝今までどおりすぐ移る
+function heianTripChoice(pt,prevId,select){
+ if(!pt||pt.fixed||pt.overview||!pt.spawn||!heianWalk?.active||heianInterior)return false;
+ const hud=document.getElementById('heianGameHud');if(!hud)return false;hud.querySelectorAll('.heian-trip-choice').forEach(q=>q.remove());
+ hud.querySelectorAll('.heian-blessing').forEach(q=>q.remove()); // 「今日の都」など上の札と同じ所に出すので、先に下げる（撮影で重なっていた）
+ const p=heianWalk.position,safe=resolveHeianWalkSpawn(pt.spawn.x,pt.spawn.z),plan=heianRoutePlan(p.x,p.z,safe.x,safe.z),units=plan?.length??Math.hypot(safe.x-p.x,safe.z-p.z);
+ if(units<300)return false; // 30m 以内は選ばせない（すぐ移る）
+ const e=heianTripEstimate(units),en=heianLang==='en',mins=v=>Math.max(1,Math.round(v/60)),city=h=>h<1?Math.max(1,Math.round(h*60))+(en?' min':'分'):(Math.round(h*2)/2)+(en?' h':'時間');
+ const name=locName(pt),el=document.createElement('div');el.className='heian-trip-choice';el.setAttribute('role','dialog');el.setAttribute('aria-label',en?'How to go':'行き方');
+ const q=document.createElement('p');const front=!!plan?.stopsOnRoad; // 道の上で止まる＝門前・市の前まで
+ q.textContent=en?`To ${front?'the front of ':''}${name}: about ${e.km.toFixed(1)} km${plan?.viaRoads?' along the streets':''}`:`${name}${front?'の前':''}まで 約${e.km.toFixed(1)}km${plan?.viaRoads?'（道なり）':''}`;
+ const sub=document.createElement('p');sub.className='heian-trip-sub';sub.textContent=en?`About ${mins(e.hoverSec)} min by hover, ${mins(e.walkSec)} min on foot. ${city(e.cityHours)} pass in the city.`:`ホバーで約${mins(e.hoverSec)}分、歩くと約${mins(e.walkSec)}分。都では約${city(e.cityHours)}たつ`;
+ const close=()=>{el.remove();document.removeEventListener('keydown',onKey,true);};
+ const go=document.createElement('button');go.type='button';go.textContent=en?'Walk there':'歩いて行く';
+ go.addEventListener('click',()=>{close();heianGameSelectedId=pt.id;if(!heianWalkToPlace(pt))selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'walk'});});
+ const jump=document.createElement('button');jump.type='button';jump.className='heian-trip-alt';jump.textContent=en?'Go now':'すぐ移る';
+ jump.addEventListener('click',()=>{close();selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'select'});});
+ const no=document.createElement('button');no.type='button';no.className='heian-trip-alt';no.textContent=en?'Cancel':'やめる';
+ const cancel=()=>{close();if(select)select.value=prevId;};no.addEventListener('click',cancel);
+ const onKey=ev=>{if(ev.key==='Escape'){ev.stopPropagation();cancel();}};document.addEventListener('keydown',onKey,true);
+ el.append(q,sub,go,jump,no);hud.appendChild(el);go.focus({preventScroll:true});return true;}
+window.__heianTripChoice=id=>heianTripChoice(HEIAN_GAME_LOCATIONS.find(q=>q.id===id),heianGameSelectedId,document.getElementById('heianGameLocation')); // 検証用
+// 行き先までの距離と時間（2026-10-19 井内さん「指定した場所へ歩いていく、ホバーでいくなどで、大体の時間が出て欲しい」）。道なりに行くときは道なりの長さで見積もる
+function heianTripToast(units){const e=heianTripEstimate(units),en=heianLang==='en',hud=document.getElementById('heianGameHud');if(!hud||e.km<.2)return; /* 200m 未満は出さない（近くは見ればわかる） */
+ const mins=s=>Math.max(1,Math.round(s/60)),city=h=>h<1?Math.max(1,Math.round(h*60))+(en?' min':'分'):(Math.round(h*2)/2)+(en?' h':'時間'),km=e.km<1?(en?Math.round(e.km*1000)+' m':'約'+Math.round(e.km*1000)+'m'):(en?e.km.toFixed(1)+' km':'約'+e.km.toFixed(1)+'km');
+ const t=en?`${km} · about ${mins(e.hoverSec)} min by hover, ${mins(e.walkSec)} min on foot (${city(e.cityHours)} in the city)`:`${km}・ホバーで約${mins(e.hoverSec)}分、歩くと約${mins(e.walkSec)}分（都の時計で約${city(e.cityHours)}）`;
+ hud.querySelectorAll('.heian-trip-toast').forEach(q=>q.remove());const el=document.createElement('div');el.className='heian-note-toast heian-trip-toast';el.setAttribute('role','status');el.textContent=t;hud.appendChild(el);setTimeout(()=>el.remove(),3600);}
 function heianNoteToastText(t){const hud=document.getElementById('heianGameHud');if(!hud||!t)return;const el=document.createElement('div');el.className='heian-note-toast';el.setAttribute('role','status');el.textContent=t;hud.appendChild(el);setTimeout(()=>el.remove(),2200);}
 // 「🖌 聞き書き帳に記しました」を一瞬。対話の窓の上に出し、続けて記したときは出し直さない
 let heianNoteToastAt=0;
@@ -20234,6 +20330,13 @@ function heianClockViewFactor(){
  const camDist=camera.position.distanceTo(controls.target),altitude=camera.position.y-(terrainYAt(camera.position.x,camera.position.z)||0);
  return(camDist>12000||altitude>7000)?f.wide:f.near;
 }
+const HEIAN_WALK_CLOCK={on:!/[?&]walkclock=0(&|$)/.test(location.search),unitsPerHour:40000};
+// 行き先までの所要時間の見積もり（道なりの距離 units を渡す）。歩き・大股・ホバーの実時間（秒）と、都の時計で進む時間（時間）
+//  速さは createHeianWalkController に渡す値（speed:20・runMultiplier:2.6・hoverMultiplier:5.4）と同じ。そちらを変えたらここも
+const HEIAN_TRIP_SPEED={walk:20,stride:20*2.6,hover:20*5.4};
+const heianTripEstimate=units=>{const S=HEIAN_TRIP_SPEED,walkSec=units/S.walk;return{km:units/10000,walkSec,strideSec:units/S.stride,hoverSec:units/S.hover,
+ cityHours:HEIAN_WALK_CLOCK.on?units/HEIAN_WALK_CLOCK.unitsPerHour:walkSec*24/(HEIAN_CLOCK_CONFIG.dayMinutes*60)*HEIAN_CLOCK_CONFIG.viewFactors.walk};};
+window.__heianTripEstimate=heianTripEstimate; // 検証用
 function updateHeianClock(now=performance.now()){
  // 🚫 起動直後は running=false なので一度も applyHeianTimeOfDay を通らず、時計に「15日 12:00 午の刻」と
  //    出ているのに群衆・牛車は scheduleHour=null（在席率を知らないので2200人が全員出たまま）だった。
@@ -20248,7 +20351,14 @@ function updateHeianClock(now=performance.now()){
  if(!heianClock.running)return false;
  const dt=Math.min(2000,Math.max(0,now-(heianClock.last||now)));heianClock.last=now;
  const hoursPerMs=24/(HEIAN_CLOCK_CONFIG.dayMinutes*60000);
- let h=heianClock.hour+dt*hoursPerMs*heianClock.speed*heianClockViewFactor(),day=heianClock.day;
+ // 歩いて動いている間は、進んだ距離で時計を進める（2026-10-19 井内さん「歩いている間に時間が流れるとあっと言うまに日が暮れる」→A）。
+ //  🚫 旧は歩いても止まっても実時間×30で、羅城門→朱雀門（約3.9km）を歩くと現実の32分で都の16時間（朝に出て夜に着く）だった。
+ //  ⇒ 当時の人の徒歩（時速約4km）に合わせ、HEIAN_WALK_CLOCK.unitsPerHour（4万＝4km。10で1m）進むと1時間。歩き・大股・ホバーとも同じ扱い。
+ //     立ち止まっている間は今までどおり実時間で流れる。瞬間移動（1回の更新で1000＝100m超）は数えない。?walkclock=0 で旧の方式
+ let gain=dt*hoursPerMs*heianClock.speed*heianClockViewFactor();
+ if(HEIAN_WALK_CLOCK.on&&heianWalk?.active){const p=heianWalk.position,L=heianClock.walkLast,d=L?Math.hypot(p.x-L.x,p.z-L.z):0;heianClock.walkLast={x:p.x,z:p.z};
+  if(d>.05&&d<1000)gain=d/HEIAN_WALK_CLOCK.unitsPerHour*heianClock.speed;}else heianClock.walkLast=null;
+ let h=heianClock.hour+gain,day=heianClock.day;
  while(h>=24){h-=24;day++;}
  applyHeianTimeOfDay(h,day);
  heianSaveDate(); // 5秒ごと（閉じたときは pagehide で必ず）
@@ -20683,7 +20793,7 @@ window.__heianDetailInfo=()=>({materials:heianDetailCount,byKind:{...heianDetail
 // 模様は値ノイズを順位で均した（0〜1が一様）ので、cover＝影に入る面積の割合になる
 const HEIAN_CLOUD_SHADOW=Object.freeze({tile:46000,k:.6,basic:.3,speed:40,cover:.3,soft:.1,warp:.04,flowH:4000,flowMax:12});
 const heianCloudShadowFlow={t:null,t0:null,rate:1};
-const heianCloudShadowU={heianCloudMap:{value:null},heianCloudOff:{value:new THREE.Vector2()},heianCloudK:{value:0},heianCloudB:{value:0},heianCloudTh:{value:1-HEIAN_CLOUD_SHADOW.cover}};
+const heianCloudShadowU={heianCutCam:{value:new THREE.Vector3()},heianCutTgt:{value:new THREE.Vector3()},heianCutOn:{value:0},heianCloudMap:{value:null},heianCloudOff:{value:new THREE.Vector2()},heianCloudK:{value:0},heianCloudB:{value:0},heianCloudTh:{value:1-HEIAN_CLOUD_SHADOW.cover}};
 function heianCloudShadowTexture(){
  const N=256,rnd=(()=>{let s=90101;return()=>(s=(s*16807)%2147483647)/2147483647;})(),v=new Float32Array(N*N);
  const grid=g=>{const a=Array.from({length:g*g},rnd);return(x,y)=>{const gx=x/N*g,gy=y/N*g,x0=Math.floor(gx),y0=Math.floor(gy),s=t=>t*t*(3-2*t),u=s(gx-x0),w=s(gy-y0),at=(i,j)=>a[(j%g)*g+(i%g)];
@@ -20694,21 +20804,33 @@ function heianCloudShadowTexture(){
  // 🚫 縮小にミップマップを使わず（LinearFilter）、遠くの地面で影の縁が砂嵐のようにちらついた（撮影 ac1）
  const t=new THREE.DataTexture(d,N,N);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;}
 const HEIAN_CLOUD_GLSL_F=`uniform sampler2D heianCloudMap;uniform vec2 heianCloudOff;uniform float heianCloudK;uniform float heianCloudB;uniform float heianCloudTh;varying vec2 vHeianCloudWP;
+uniform vec3 heianCutCam;uniform vec3 heianCutTgt;uniform float heianCutOn;varying vec3 vHeianWP3;
+/* 透かし（2026-10-19 井内さん「カメラの画角を覆う後ろにあるものを半透明にするとかできないか」）: 歩くときのカメラとロボの間（ロボの手前2.4mまで）の
+   円錐（カメラ側0.5m・ロボ側2.4m）に入った面を、網点のように間引いて向こうを見せる。縁はなだらかに。1割5分は残す（そこに物がある気配） */
+void heianCutaway(){if(heianCutOn<0.5)return;vec3 a=heianCutTgt-heianCutCam;float L=length(a);if(L<1.0)return;vec3 d=a/L,q=vHeianWP3-heianCutCam;float s=dot(q,d);
+ if(s<2.0||s>L-24.0||vHeianWP3.y<heianCutTgt.y-24.0)return; /* 足元（ロボの足＋0.9mより下）の地面・床・基壇は透かさない。🚫 入れないとカメラの前の床に網点の穴が出た */
+ float r=mix(5.0,24.0,s/L),e=length(q-d*s),k=(1.0-smoothstep(r*0.55,r,e))*smoothstep(2.0,8.0,s)*heianCutOn;if(k<=0.0)return;
+ float n=fract(52.9829189*fract(dot(floor(gl_FragCoord.xy),vec2(0.06711056,0.00583715))));if(n<k*0.85)discard;}
 float heianCloudShade(){if(heianCloudK<=0.0&&heianCloudB<=0.0)return 0.0;vec2 p=(vHeianCloudWP-heianCloudOff)/${HEIAN_CLOUD_SHADOW.tile.toFixed(1)};
  p+=(texture2D(heianCloudMap,p*1.9+vec2(.41,.13)).r-.5)*${HEIAN_CLOUD_SHADOW.warp};float n=texture2D(heianCloudMap,p).r;
  // 影の偏り（2026-10-02井内さん「満遍なく影があるのもなんか変」）: 同じ模様を3.4倍に引き伸ばした大きな塊で、影の出る地域と晴れた地域を分ける。
  // 晴れは約半分の地域だけに影、曇・雨（cover>.3＝th<.7）ほど地域の差を消す
  float big=texture2D(heianCloudMap,p*.29+vec2(.37,.71)).r,wet=clamp((.7-heianCloudTh)/.3,0.0,1.0);
  return smoothstep(heianCloudTh-${HEIAN_CLOUD_SHADOW.soft},heianCloudTh+${HEIAN_CLOUD_SHADOW.soft},n)*mix(smoothstep(.45,.6,big),1.0,wet);}\n`;
-const HEIAN_CLOUD_GLSL_V='{vec4 cp=vec4(transformed,1.);\n#ifdef USE_INSTANCING\ncp=instanceMatrix*cp;\n#endif\nvHeianCloudWP=(modelMatrix*cp).xz;}\n';
+const HEIAN_CLOUD_GLSL_V='{vec4 cp=vec4(transformed,1.);\n#ifdef USE_INSTANCING\ncp=instanceMatrix*cp;\n#endif\nvec4 heianWP=modelMatrix*cp;vHeianCloudWP=heianWP.xz;vHeianWP3=heianWP.xyz;}\n';
 const heianCloudSeen=new WeakSet(),heianCloudShadowOverride={};let heianCloudLast=0,heianCloudCount={lit:0,basic:0};
 /* 撮影・調整用: __heianCloudShadowSet({k,basic,cover})。{} で既定へ戻す */
 window.__heianCloudShadowSet=(o={})=>{for(const k of Object.keys(heianCloudShadowOverride))delete heianCloudShadowOverride[k];Object.assign(heianCloudShadowOverride,o);return{...heianCloudShadowOverride};};
+// 透かしの位置を毎コマ配る。三人称で歩いているときだけ（一人称・空から・ツアーでは切る）。?cutaway=0 で切る
+const HEIAN_CUTAWAY_ON=!/[?&]cutaway=0(&|$)/.test(location.search);
+function heianCutawayTick(){const U=heianCloudShadowU,on=HEIAN_CUTAWAY_ON&&!!heianWalk?.active&&heianWalk.mode!=='first-person'&&!heianPhotoMode;
+ const want=on?1:0;U.heianCutOn.value+=(want-U.heianCutOn.value)*.25;if(U.heianCutOn.value<.01)U.heianCutOn.value=0; /* 入り切りは数コマでなだらかに */
+ if(on||U.heianCutOn.value>0){U.heianCutCam.value.copy(camera.position);U.heianCutTgt.value.copy(controls.target);}}
 function heianApplyCloudShadow(m,basic){
  const prev=m.onBeforeCompile;
  m.onBeforeCompile=(sh,r)=>{prev?.call(m,sh,r);Object.assign(sh.uniforms,heianCloudShadowU);
-  sh.vertexShader='varying vec2 vHeianCloudWP;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n'+HEIAN_CLOUD_GLSL_V);
-  let f=sh.fragmentShader;
+  sh.vertexShader='varying vec2 vHeianCloudWP;\nvarying vec3 vHeianWP3;\n'+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\n'+HEIAN_CLOUD_GLSL_V);
+  let f=sh.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nheianCutaway();');
   if(basic)f=f.replace('#include <opaque_fragment>','outgoingLight*=1.-heianCloudB*heianCloudShade();\n#include <opaque_fragment>');
   else f=f.replace('#include <lights_fragment_begin>','float heianCloudLit=1.-heianCloudK*heianCloudShade();\n'+THREE.ShaderChunk.lights_fragment_begin.replace('getDirectionalLightInfo( directionalLight, directLight );',
    'getDirectionalLightInfo( directionalLight, directLight );\n\t\t#if ( UNROLLED_LOOP_INDEX == 0 )\n\t\tdirectLight.color *= heianCloudLit;\n\t\t#endif'));
@@ -21140,6 +21262,16 @@ function heianWalkMayBlockRect(x0,x1,z0,z1){if(heianInterior)return true;
  const recs=heianWalkObstacleRecords,grid=heianWalkObstacleGrid,C=HEIAN_OBSTACLE_CELL;
  for(let ix=Math.floor(x0/C);ix<=Math.floor(x1/C);ix++)for(let iz=Math.floor(z0/C);iz<=Math.floor(z1/C);iz++){const list=grid.get(heianObstacleKey(ix,iz));if(!list)continue;
   for(let k=0;k<list.length;k++){const b=recs[list[k]];if(x1>b.minX&&x0<b.maxX&&z1>b.minZ&&z0<b.maxZ)return true;}}return false;}
+// 矩形 [x0,x1]×[z0,z1] の中だけで使う当たりの判定を作る（2026-10-18）。点 (x,z) と半径 r が矩形の中に収まる限り、
+// !!heianWalkBlocked(x,z,r)（opt 無し）と同じ答えを返す: 矩形に掛かる箱を先に集め、運河・大宮川は帯に掛かるときだけ見る（帯の幅は heianWalkMayBlockRect と同じ）
+function heianWalkLocalBlocker(x0,x1,z0,z1){if(heianInterior)return(x,z,r)=>!!heianWalkBlocked(x,z,r);
+ const ch=HEIAN_CITY_CANAL_OPENING_WIDTH/2,canal=[-HEIAN_CITY_CANAL_X,HEIAN_CITY_CANAL_X].some(cx=>x1>cx-ch&&x0<cx+ch),
+  omiya=x1>HEIAN_OMIYA_RIVER_X-HEIAN_OMIYA_RIVER_HALF&&x0<HEIAN_OMIYA_RIVER_X+HEIAN_OMIYA_RIVER_HALF;
+ const recs=heianWalkObstacleRecords,grid=heianWalkObstacleGrid,C=HEIAN_OBSTACLE_CELL,seen=new Set(),bs=[];
+ for(let ix=Math.floor(x0/C);ix<=Math.floor(x1/C);ix++)for(let iz=Math.floor(z0/C);iz<=Math.floor(z1/C);iz++){const list=grid.get(heianObstacleKey(ix,iz));if(!list)continue;
+  for(let k=0;k<list.length;k++){const i=list[k];if(seen.has(i))continue;seen.add(i);const b=recs[i];if(x1>b.minX&&x0<b.maxX&&z1>b.minZ&&z0<b.maxZ)bs.push(b);}}
+ return(x,z,r)=>{if(canal&&heianCityCanalContains(x,z,r))return true;if(omiya&&heianOmiyaRiverContains(x,z,r))return true;
+  for(let k=0;k<bs.length;k++){const b=bs[k];if(x+r>b.minX&&x-r<b.maxX&&z+r>b.minZ&&z-r<b.maxZ)return true;}return false;};}
 // ---- 門籍（1.56・2026-09-29井内さん「いいね。でも最初にそこそこ入れないと歩き回れなくてつまんない」）。
 // 最初から開いている所は今と同じ。門籍で開くのは奥の3つだけ: 内裏（外郭の内）・後宮（内郭の北半分）・貴族の邸の屋内（heianInteriorEnter）。
 // 箱は buildDairiInner の局所座標を heianDairiX/Z と x×5635.8/5996 で世界へ写したもの（外郭 x689..2611・z-3878..-1100／後宮 x900..2400・z-3300..-2365）。
@@ -21153,6 +21285,15 @@ let heianQuestGatesOff=/[?&]gates=open(&|$)/.test(location.search),heianQuestTel
 // 実ユーザーは失敗してもコンソール警告だけ（下の CADKIT_GAME_FAIL）なので、待たせる意味が無い（2026-10-14）。
 // ?selftest=1 で実ブラウザでも回す、?selftest=0 でヘッドレスでも飛ばす（実ユーザーの起動時間を測る用）
 const heianSelfTest=/[?&]selftest=1(&|$)/.test(location.search)||(!!navigator.webdriver&&!/[?&]selftest=0(&|$)/.test(location.search));
+// 起動の後回し（2026-10-18 井内さん「起動を軽く」C）。遠く・上空からは見えないもの（町の人の稜線・屋根の烏）を、起動の後に描画ループの空き時間で作る。
+//  自己検査のとき（heianSelfTest）はその場で作る＝検査が見る数は今までと同じ。撮影は __heianFinishEdges が残りを全部済ませる。?later=0 で旧の一括
+const heianLaterJobs=[],heianLaterOn=!heianSelfTest&&!/[?&]later=0(&|$)/.test(location.search);
+// 🚫 町の人1人ずつの稜線（小さい形）まで後回しにすると、市の人が線だけの幽霊になった（2026-10-18 撮影で確認。動く人へ差し替える形が線を先に持つ前提）。小さい形はその場で作る＝heianRunNow
+const heianRunNow=fn=>fn();
+const heianRunLater=(fn,tag='')=>{if(heianLaterOn){fn.tag=tag;heianLaterJobs.push(fn);}else fn();};
+const heianLaterStats={done:0,ms:0,maxMs:0,maxTag:''};
+function heianProcessLaterJobs(budgetMs=6){const t0=performance.now();while(heianLaterJobs.length&&performance.now()-t0<budgetMs){const fn=heianLaterJobs.shift(),t1=performance.now();try{fn();}catch(e){console.warn('後回しの処理に失敗',e);}
+ const ms=performance.now()-t1,S=heianLaterStats;S.done++;S.ms+=ms;if(ms>S.maxMs){S.maxMs=ms;S.maxTag=fn.tag||'';}}return heianLaterJobs.length;}
 const heianQuestZoneAt=(x,z,r=0)=>{if(!heianGameMode||heianInterior||heianQuestGatesOff)return null;for(const q of HEIAN_QUEST_ZONES)if(!heianQuestHas(q.gate)&&x+r>q.minX&&x-r<q.maxX&&z+r>q.minZ&&z-r<q.maxZ)return q;return null;};
 const heianQuestInZone=(q,p)=>p.x>q.minX&&p.x<q.maxX&&p.z>q.minZ&&p.z<q.maxZ;
 function heianGuardSay(q){const now=performance.now();if(now-heianGuardLast<4000)return;heianGuardLast=now;heianGuardToast(q.who,q.t[Math.floor(Math.random()*q.t.length)],q.gate);heianTutContext('gate');
@@ -23091,14 +23232,28 @@ function createHeianStreetLifeRuntime(){
   // 稜線（牛車と同じ流儀・フェード連動）
   const marketEdgeMat=heianMpHideShader(new THREE.LineBasicMaterial({color:0x0d1117,transparent:true,opacity:1}));k.materials.add(marketEdgeMat);
   {const edgeMaterial=new THREE.LineBasicMaterial({color:0x0d1117,transparent:true,opacity:1});k.materials.add(edgeMaterial);
-   const edgeCache=new Map();
-   root.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.name==='接地影')return;let eg=edgeCache.get(o.geometry.uuid);
+   const edgeCache=new Map(),edgeTargets=[];
+   // 2026-10-18 C: 結合した市の人の稜線だけ起動の後へ（実測 EdgesGeometry 1.4秒＋人の番号付け0.25秒が起動の待ち時間に乗っていた）。ほかはその場で
+   root.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.name==='接地影')return;edgeTargets.push(o);o.userData.edgePending=true;});
+   // 🚫 東市の結合（58万三角形）は1回の EdgesGeometry に1.8秒かかり、後回しにすると飛行中に1.8秒止まった（実測）。
+   //   ⇒ 結合した市の人は、人の切れ目（aPerson が変わる所）で約8000三角形ずつに分けて線を作り、最後に1本の線へつなぐ。
+   //     人どうしは辺を共有しないので、人の切れ目で分ければ線は分けないときと同じ
+   const splitEdges=o=>{const g=o.geometry,pos=g.getAttribute('position'),per=g.getAttribute('aPerson'),tri=pos.count/3,parts=[],chunks=[];
+    for(let a=0;a<tri;){let b=Math.min(tri,a+8000);while(b<tri&&per.getX(b*3)===per.getX(b*3-1))b++;parts.push([a,b]);a=b;}
+    parts.forEach(([a,b],ci)=>heianRunLater(()=>{const sub=new THREE.BufferGeometry();sub.setAttribute('position',new THREE.BufferAttribute(pos.array.slice(a*9,b*9),3));
+     const eg=new THREE.EdgesGeometry(sub,30);sub.dispose();if(eg.getAttribute('position')?.count){heianMpTagEdges(eg,marketPeoplePositions);chunks[ci]=eg;}else eg.dispose();},'稜線(分割):'+o.name));
+    heianRunLater(()=>{delete o.userData.edgePending;const list=chunks.filter(Boolean);if(!list.length)return;
+     const n=list.reduce((s,e)=>s+e.getAttribute('position').count,0),P=new Float32Array(n*3),A=new Float32Array(n);let at=0;
+     for(const e of list){const p=e.getAttribute('position'),q=e.getAttribute('aPerson');P.set(p.array,at*3);A.set(q.array,at);at+=p.count;e.dispose();}
+     const eg=new THREE.BufferGeometry();eg.setAttribute('position',new THREE.BufferAttribute(P,3));eg.setAttribute('aPerson',new THREE.BufferAttribute(A,1));k.geometries.add(eg);
+     const line=new THREE.LineSegments(eg,marketEdgeMat);line.name=o.name+'・稜線';o.add(line);},'稜線(つなぐ):'+o.name);};
+   for(const o of edgeTargets)if(heianLaterOn&&o.material===marketMergedMat&&!o.geometry.index&&o.geometry.getAttribute('aPerson')&&o.geometry.getAttribute('position').count>60000)splitEdges(o);else heianRunNow(()=>{delete o.userData.edgePending;let eg=edgeCache.get(o.geometry.uuid);
     if(eg===undefined){eg=new THREE.EdgesGeometry(o.geometry,30);if(!eg.getAttribute('position')?.count){eg.dispose();eg=null;}else k.geometries.add(eg);edgeCache.set(o.geometry.uuid,eg);}
     if(eg&&o.material===marketMergedMat&&!eg.getAttribute('aPerson'))heianMpTagEdges(eg,marketPeoplePositions); // 2026-10-05 稜線にも人の番号（隠した人の線が宙に残らないように）
-    if(eg){const line=new THREE.LineSegments(eg,o.material===marketMergedMat?marketEdgeMat:edgeMaterial);line.name=o.name+'・稜線';o.add(line);}});
+    if(eg){const line=new THREE.LineSegments(eg,o.material===marketMergedMat?marketEdgeMat:edgeMaterial);line.name=o.name+'・稜線';o.add(line);}},'稜線:'+o.name+':'+(o.geometry.index?o.geometry.index.count:o.geometry.getAttribute('position').count)/3);
    k.edgeMaterial=edgeMaterial;}
   const nijoTroupes=troupes.filter(t=>t.nijo);for(const t of nijoTroupes){troupes.splice(troupes.indexOf(t),1);t.group.visible=false;} // 二条大路の往来は検査の数に入れない
-  const marketPeopleDrawCalls=marketPeopleRoots.reduce((count,g)=>{g.traverse(o=>{if(o.isMesh||o.isLine)count++;});return count;},0);
+  const marketPeopleDrawCalls=marketPeopleRoots.reduce((count,g)=>{g.traverse(o=>{if(o.isMesh||o.isLine)count++;if(o.isMesh&&o.userData.edgePending)count++; /* 後回し中の稜線も1本と数える（2026-10-18） */});return count;},0);
   scene.add(root);
   // 旅の組（1.83 F1-10）: 決まった道の組（羅城門・朱雀大路）と市の常設を除いた組は、牛車と同じく出没点から目的地まで道をたどる。
   //  🚫 1.82 までは前方 1200＋2200おきに置き直していた（どこから来たか分からない・犬が穀倉院の中に湧いた 2026-08-30）
@@ -23378,11 +23533,15 @@ function buildHeianFauna(k,root,material){
  // 🚫 地形全体に当てると地形メッシュの全三角形を30本ぶん調べて重い。主要施設の層だけに当てる
  const perches=[],rc=new THREE.Raycaster(),down=new THREE.Vector3(0,-1,0),lm=heianTerrainGroup?.getObjectByName('平安京主要施設'),tg=lm?[lm]:[];
  const roofAt=(x,z)=>{rc.set(new THREE.Vector3(x,4000,z),down);rc.far=8000;const h=rc.intersectObjects(tg,true).find(q=>{for(let o=q.object;o;o=o.parent)if(!o.visible)return false;return true;});return h?h.point.y:null;};
- for(const[x,z]of[[0,HEIAN_RAJOMON_Z],[0,6830],[4363,45005],[-4363,45005],[4363,44605],[4363,44155],[-4363,44155],[7,1393],[5123,44605],[7100,31810]])for(const dx of[-24,6,30]){const y=roofAt(x+dx,z);if(y!=null&&y-terrainYAt(x+dx,z)>20)perches.push({x:x+dx,y,z,ry:hsh(x,dx)*6.28});}
+ // 2026-10-18 C: 屋根への当て（30本・実測1.0秒）は起動の後で1本ずつ。地面の烏を先に置き、屋根の烏は当たったら後ろへ足す（容量は最初に取っておく）
+ const roofCands=[];for(const[x,z]of[[0,HEIAN_RAJOMON_Z],[0,6830],[4363,45005],[-4363,45005],[4363,44605],[4363,44155],[-4363,44155],[7,1393],[5123,44605],[7100,31810]])for(const dx of[-24,6,30])roofCands.push([x+dx,z,hsh(x,dx)*6.28]);
  // 地面の烏（東市・西市・河原寄り）
  for(const[cx,cz]of[[7100,33200],[-7100,33200],[20600,27400],[0,44600]])for(let i=0;i<4;i++){const x=cx+(hsh(cx,i)-.5)*260,z=cz+(hsh(cz,i)-.5)*260;if(!heianWalkBlocked(x,z,3))perches.push({x,y:gy(x,z),z,ry:hsh(x,z)*6.28,ground:true});}
- const perchMesh=inst(heianBirdPerchGeom(5.7*1.4,0x151518,0x151518,0x151518),perches.length,'鳥・烏（止まる）');
- perches.forEach((p,i)=>{d.position.set(p.x,p.y,p.z);d.rotation.set(0,p.ry,0);d.scale.setScalar(1);d.updateMatrix();perchMesh.setMatrixAt(i,d.matrix);});info.perchedCrows=perches.length;info.perchAt=perches.filter(p=>!p.ground).slice(0,4).map(p=>[Math.round(p.x),Math.round(p.y),Math.round(p.z)]);
+ const perchMesh=inst(heianBirdPerchGeom(5.7*1.4,0x151518,0x151518,0x151518),perches.length+roofCands.length,'鳥・烏（止まる）');
+ const placePerch=(p,i)=>{d.position.set(p.x,p.y,p.z);d.rotation.set(0,p.ry,0);d.scale.setScalar(1);d.updateMatrix();perchMesh.setMatrixAt(i,d.matrix);};
+ const perchInfo=()=>{perchMesh.count=perches.length;perchMesh.instanceMatrix.needsUpdate=true;info.perchedCrows=perches.length;info.perchAt=perches.filter(p=>!p.ground).slice(0,4).map(p=>[Math.round(p.x),Math.round(p.y),Math.round(p.z)]);};
+ perches.forEach(placePerch);perchInfo();
+ for(const[x,z,ry]of roofCands)heianRunLater(()=>{const y=roofAt(x,z);if(y!=null&&y-terrainYAt(x,z)>20){const p={x,y,z,ry};placePerch(p,perches.length);perches.push(p);perchInfo();}},'屋根の烏');
  // 3) 池の鷺（寝殿造の池・神泉苑）。立って動かない
  const egrets=[];heianNoblePonds.slice(0,14).forEach((p,i)=>{const a=hsh(p.x,p.z)*6.28,x=p.x+Math.cos(a)*p.rx*1.02,z=p.z+Math.sin(a)*p.rz*1.02;egrets.push({x,z,y:Math.max(terrainYAt(x,z),heianWalkPadTop(x,z)??-Infinity),ry:a});});
  {const g=HEIAN_LANDMARK_SITES.shinsenen;if(g)for(let i=0;i<3;i++){const x=g.x+(i-1)*260,z=g.z+120+i*40;egrets.push({x,z,y:terrainYAt(x,z),ry:i});}}
@@ -24941,7 +25100,7 @@ const heianWalk=createHeianWalkController({
  frameLift:.17,faceLook:false,
  // ズームの近さの下限（体全体が画角に入る距離）に使うロボの背丈と幅。最初に測れた値を使い回す（しぐさで手を上げた姿勢を測らない）
  actorSize:(()=>{let cached=null;return()=>{if(cached)return cached;const b=heianRobotBounds();if(b&&b.height>10)cached={height:b.height,width:Math.max(b.width,b.depth)};return cached;};})(),
- pickWalkGround:heianWalkClickPick,showWalkTarget:showHeianWalkTarget,hideWalkTarget:hideHeianWalkTarget,
+ pickWalkGround:heianWalkClickPick,showWalkTarget:showHeianWalkTarget,onTrip:d=>heianTripToast(d),hideWalkTarget:hideHeianWalkTarget,
  resolvePoint:heianQuestResolvePoint,isBlocked:heianQuestWalkBlocked, // 門籍の箱を先に見る（1.56）
  getTerrain:()=>heianTerrainSampler?{groundY:heianWalkGroundY,bounds:{minX:-heianTerrainSampler.halfX,maxX:heianTerrainSampler.halfX,minZ:-heianTerrainSampler.halfZ,maxZ:heianTerrainSampler.halfZ}}:null,
  // 🚫 speed 36 は歩容の歩幅8.26に対して4.4倍速く、どう周期を詰めても接地足が滑った
@@ -28171,7 +28330,9 @@ function startHeianGame(entryMode='overview'){
  label.style.cssText='position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0';
  const select=document.createElement('select');select.id='heianGameLocation';
  for(const point of HEIAN_GAME_LOCATIONS.filter(p=>p.pick!==false)){const option=document.createElement('option');option.value=point.id;option.textContent=locName(point);select.appendChild(option);}
- select.addEventListener('change',()=>{selectHeianGameLocation(select.value,true);postHeianEvent('place_select',{placeId:select.value,source:'select'});collapseAfterPick();});panel.append(label,select);
+ select.addEventListener('change',()=>{const pt=HEIAN_GAME_LOCATIONS.find(q=>q.id===select.value);
+   if(heianTripChoice(pt,heianGameSelectedId,select)){collapseAfterPick();return;} // 歩いている間は「歩いて行く／すぐ移る」を選ぶ（2026-10-19）
+   selectHeianGameLocation(select.value,true);postHeianEvent('place_select',{placeId:select.value,source:'select'});collapseAfterPick();});panel.append(label,select);
  const map=document.createElement('div');map.className='heian-mini-map';map.setAttribute('aria-label','平安京と郊外の地図。条坊街路・主要地点・ドローンの位置');
  // 広域枠の中に京域の枠（条坊・大内裏・羅城門・地点マーカー）を入れる。郊外まで見えるので俯瞰位置も示せる
  const city=document.createElement('div');city.className='heian-map-city';
@@ -28506,17 +28667,32 @@ function clearHeianTerrain(){
 }
 // heiankyo/ はGitHub Pages公開用のASCIIフォルダ名（Webアップローダが日本語名で失敗するため・2026-08-18）
 const HEIAN_DATA_PATHS=['../平安京/terrain/','../heiankyo/terrain/','../../平安京/terrain/','../../heiankyo/terrain/'];
-function loadHeianDataFile(globalName,file,label,reload=null){
- if(window[globalName]&&!reload)return Promise.resolve(window[globalName]);
- return(async()=>{
+async function heianDataQuery(reload){
  const query=new URLSearchParams(location.search),releaseKey=query.get('v'),assetAttempt=query.get('attempt')||'0';
  const versionKey=releaseKey||(location.protocol==='file:'?await heianCacheSourceKey().catch(()=>null):null),params=new URLSearchParams();
  if(versionKey)params.set('v',String(versionKey).slice(0,64));params.set('attempt',assetAttempt);if(reload)params.set('reload',String(reload).slice(0,32));
  const suffix='?'+params.toString(),strictRelease=/^[a-f0-9]{64}$/.test(releaseKey||''),paths=strictRelease?['../heiankyo/terrain/']:HEIAN_DATA_PATHS;
  const releaseInfo=window.__heianReleaseInfo||(window.__heianReleaseInfo={releaseKey:strictRelease?releaseKey:null,attempt:Number(assetAttempt),nested:[],fallbackUsed:false});
+ releaseInfo.bases=releaseInfo.bases||{};
+ return{suffix,paths,releaseInfo};
+}
+function loadHeianDataFile(globalName,file,label,reload=null){
+ if(window[globalName]&&!reload)return Promise.resolve(window[globalName]);
+ return(async()=>{
+ const{suffix,paths,releaseInfo}=await heianDataQuery(reload);
  return new Promise((resolve,reject)=>{const tryPath=i=>{if(i>=paths.length){reject(new Error(label+'データを読み込めません（'+paths.join(' / ')+'）'));return;}
   const script=document.createElement('script');script.src=paths[i]+file+suffix;releaseInfo.nested.push(script.src);
-  script.onload=()=>{script.remove();window[globalName]?resolve(window[globalName]):tryPath(i+1);};script.onerror=()=>{script.remove();tryPath(i+1);};document.head.appendChild(script);};tryPath(0);});
+  script.onload=()=>{script.remove();if(window[globalName]){releaseInfo.bases[file]=paths[i];resolve(window[globalName]);}else tryPath(i+1);};script.onerror=()=>{script.remove();tryPath(i+1);};document.head.appendChild(script);};tryPath(0);});
+ })();
+}
+// 複数のデータファイルを同時に落とし、入れた順に実行する（async=false の script は並べて取得・挿入順に実行＝HTML の仕様）。
+// baseFile を読めたフォルダから読む。そのフォルダが分からなければ null（呼び出し側が1本ずつ読む）。各要素は globalName の値（読めなければ null）
+function loadHeianDataFilesOrdered(list,baseFile,reload=null,onEach=null){
+ return(async()=>{
+ const{suffix,releaseInfo}=await heianDataQuery(reload),base=releaseInfo.bases[baseFile];if(!base)return null;
+ return Promise.all(list.map(({globalName,file})=>window[globalName]&&!reload?Promise.resolve(window[globalName]):new Promise(resolve=>{
+  const script=document.createElement('script');script.async=false;script.src=base+file+suffix;releaseInfo.nested.push(script.src);
+  script.onload=()=>{script.remove();onEach?.();resolve(window[globalName]??null);};script.onerror=()=>{script.remove();resolve(null);};document.head.appendChild(script);})));
  })();
 }
 // ---- 台詞・頼みごとのパック（2026-10-07）。terrain/quests/manifest.js に並べたファイルを heian-lines.js のあとに読み、window.HEIAN_LINES へ足させる。
@@ -29147,8 +29323,11 @@ function heianCarpetBuilder(hash){
   const lim=new Array(N).fill(1.12),jit=a=>.8+.2*Math.sin(a*3+seed)+.1*Math.sin(a*5+seed*1.7);
   // 縁の届く範囲（jit≤1.1・k≤1.12・刻みの半径1.5）に当たりが無ければ、刻んでも全部 1.12 のまま＝丸ごと飛ばす（結果は同じ。2026-10-14 起動の軽量化）
   const reach=Math.max(Math.abs(rx),Math.abs(rz))*1.1*1.12+1.5;
-  if(!fast&&heianWalkMayBlockRect(x-reach,x+reach,z-reach,z+reach)&&!heianWalkBlocked(x,z,1))for(let i=0;i<N;i++){const a=i/N*Math.PI*2,u=Math.cos(a)*rx*jit(a),v=Math.sin(a)*rz*jit(a),L=Math.hypot(u,v)*1.12,steps=Math.min(12,Math.max(3,Math.ceil(L/6)));
-   for(let s=1;s<=steps;s++){const k=1.12*s/steps,wx=x+(u*cs-v*sn)*k,wz=z+(u*sn+v*cs)*k;if(heianWalkBlocked(wx,wz,1.5)){lim[i]=Math.max(0,1.12*(s-1)/steps-.02);break;}}}
+  // 2026-10-18 起動の軽量化: 刻みの当たりは、その敷きの範囲に掛かる当たりだけを先に集めて見る（heianWalkLocalBlocker。結果は heianWalkBlocked と同じ）。
+  //  🚫 刻み1点ごとに heianWalkBlocked で格子を9マス引いていて、起動中1.1秒かかっていた
+  const local=!fast&&heianWalkMayBlockRect(x-reach,x+reach,z-reach,z+reach)&&!heianWalkBlocked(x,z,1)?heianWalkLocalBlocker(x-reach,x+reach,z-reach,z+reach):null;
+  if(local)for(let i=0;i<N;i++){const a=i/N*Math.PI*2,u=Math.cos(a)*rx*jit(a),v=Math.sin(a)*rz*jit(a),L=Math.hypot(u,v)*1.12,steps=Math.min(12,Math.max(3,Math.ceil(L/6)));
+   for(let s=1;s<=steps;s++){const k=1.12*s/steps,wx=x+(u*cs-v*sn)*k,wz=z+(u*sn+v*cs)*k;if(local(wx,wz,1.5)){lim[i]=Math.max(0,1.12*(s-1)/steps-.02);break;}}}
   put(0,0,tone*1.04,1);const ring=(k,al)=>{for(let i=0;i<N;i++){const a=i/N*Math.PI*2,j=jit(a),kk=al?Math.min(k,lim[i]*.55):Math.min(k,lim[i]);put(Math.cos(a)*rx*j*kk,Math.sin(a)*rz*j*kk,tone,al);}};
   ring(.62,1);ring(1.12,0);
   for(let i=0;i<N;i++){const i1=(i+1)%N;idx.push(base,base+1+i1,base+1+i);idx.push(base+1+i,base+1+i1,base+1+N+i);idx.push(base+1+i1,base+1+N+i1,base+1+N+i);}
@@ -31273,7 +31452,10 @@ function addHeianCityBlocks(group){
  // 除外条件（都市矩形・河川1150mm・街道250mm・傾斜45mm超）が形を決めるので、領域は緑指示の外形だけ与える。
  // 🚫 桂川のみ。以前は西高瀬川も混ぜていたが、1863年の運河なので900年前後の水田の形を決める根拠にならない。
  // 描画側でも外している（HEIAN_POST_HEIAN_WATERWAYS）ので、混ぜると見えない川沿いに空白帯ができる。
- const katsuraRivers=(window.HEIAN_WATER?.current?.rivers||[]).filter(r=>(r.name||'').replace(/\s+/g,'')==='桂川'),distanceToKatsura=([x,z])=>{let d=Infinity;for(const r of katsuraRivers)for(let i=1;i<r.points.length;i++)d=Math.min(d,heianPointSegmentDistance(x,z,...r.points[i-1],...r.points[i]));return d;};
+ // 2026-10-18 起動の軽量化: 線分を先に並べ、外接矩形までの距離が今の最小以上の線分を飛ばす（最小値は同じ。展開構文 ... を毎回使って0.34秒かかっていた）
+ const katsuraRivers=(window.HEIAN_WATER?.current?.rivers||[]).filter(r=>(r.name||'').replace(/\s+/g,'')==='桂川'),katsuraSegs=[];
+ for(const r of katsuraRivers)for(let i=1;i<r.points.length;i++){const[ax,az]=r.points[i-1],[bx,bz]=r.points[i];katsuraSegs.push([ax,az,bx,bz,Math.min(ax,bx),Math.max(ax,bx),Math.min(az,bz),Math.max(az,bz)]);}
+ const distanceToKatsura=([x,z])=>{let d=Infinity;for(const s of katsuraSegs){const ex=x<s[4]?s[4]-x:x>s[5]?x-s[5]:0,ez=z<s[6]?s[6]-z:z>s[7]?z-s[7]:0;if(ex*ex+ez*ez>=d*d)continue;d=Math.min(d,heianPointSegmentDistance(x,z,s[0],s[1],s[2],s[3]));}return d;};
  const distanceToApproach=([x,z])=>heianApproachRoadRecords.reduce((d,r)=>Math.min(d,heianPointSegmentDistance(x,z,r.ax,r.az,r.bx,r.bz)-r.width/2),Infinity);
  const inOuterPaddyRegion=heianInOuterPaddyRegion; // 外形はHEIAN_OUTER_PADDY_REGION（地形の緑ティントと共用）
  const OUTER_CHO=1212,insideCityRect=(x,z)=>x>=-22550&&x<=22550&&z>=-7000&&z<=45400;
@@ -33395,6 +33577,15 @@ function heianRyubidanWindFlags(group){
  return mesh;
 }
 window.__heianWindFlagInfo=()=>heianWindFlagInfo;
+// geometry.applyMatrix4 の速い版（2026-10-19 起動の軽量化。結合で1.0秒かかっていた）。
+//  単位行列なら何もしない／平行移動だけなら位置に足すだけ（x*1+y*0+z*0+t と x+t は浮動小数でも同じ値）。法線は回転が無いので変えない
+//  （three は法線を正規化し直すが、法線はシェーダでも正規化される）。回転・拡大があれば three の applyMatrix4 そのまま
+function heianApplyMatrixFast(g,m){const e=m.elements;
+ if(e[0]!==1||e[1]!==0||e[2]!==0||e[3]!==0||e[4]!==0||e[5]!==1||e[6]!==0||e[7]!==0||e[8]!==0||e[9]!==0||e[10]!==1||e[11]!==0||e[15]!==1){g.applyMatrix4(m);return g;}
+ const tx=e[12],ty=e[13],tz=e[14];if(tx===0&&ty===0&&tz===0)return g;
+ const p=g.getAttribute('position');if(!p||p.isInterleavedBufferAttribute||p.itemSize!==3||p.normalized){g.applyMatrix4(m);return g;}
+ const a=p.array;for(let i=0;i<a.length;i+=3){a[i]+=tx;a[i+1]+=ty;a[i+2]+=tz;}p.needsUpdate=true;
+ if(g.boundingBox!==null)g.computeBoundingBox();if(g.boundingSphere!==null)g.computeBoundingSphere();return g;}
 // 配置後の建築を材質・頂点属性別に結合する。個別body数は検証値として残し、draw callだけ減らす。
 function mergeHeianDisplayGroup(group,name){
  const buckets=new Map(),oldMeshes=[];
@@ -33404,7 +33595,7 @@ function mergeHeianDisplayGroup(group,name){
  const matByKey=new Map(),items=[];let ex0=Infinity,ex1=-Infinity,ez0=Infinity,ez1=-Infinity;
  for(const mesh of [...group.children]){
   if(!mesh.isMesh||!mesh.visible)continue;
-  mesh.updateMatrix();const g=mesh.geometry.clone();g.applyMatrix4(mesh.matrix);g.computeBoundingBox();
+  mesh.updateMatrix();const g=mesh.geometry.clone();heianApplyMatrixFast(g,mesh.matrix);g.computeBoundingBox();
   const bb=g.boundingBox,cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
   if(Number.isFinite(cx)&&Number.isFinite(cz)){ex0=Math.min(ex0,cx);ex1=Math.max(ex1,cx);ez0=Math.min(ez0,cz);ez1=Math.max(ez1,cz);}
   items.push({mesh,g,cx,cz});}
@@ -33444,15 +33635,53 @@ function mergeHeianDisplayGroup(group,name){
  return draws;
 }
 // 外形線の後回し計算。描画ループから毎フレーム呼び、budgetMs だけ進める。全部終わると空になる
+// 2026-10-19 井内さん「オープニングの飛行がカタカタする」: 実測で、準備完了から30秒以上（＝飛行の間ずっと）大内裏・東寺・西寺の外形線を
+//  描画ループの中で計算していた（7.8万個・計6.2秒。1個で35〜115ミリ秒かかる形があり、そのコマが止まる）。
+//  ⇒ 計算は Worker（別のスレッド）へ渡す。描画ループは形の写しを送り、結果を受け取ってつなぐだけ。Worker の中身は three r160 の EdgesGeometry と同じ手順
+//    （頂点の丸め1e4・角度30°・残った辺の並び順まで同じ）。Worker を作れない・落ちたときは今までどおりこのスレッドで計算する。?edgeworker=0 で旧の方式
+const HEIAN_EDGE_WORKER_SRC=`self.onmessage=e=>{const{id,items,th}=e.data;let outs;try{outs=items.map(q=>edges(q.pos,q.idx,th));}catch(err){self.postMessage({id,error:String(err)});return;}self.postMessage({id,outs},outs.map(o=>o.buffer));};
+function edges(P,I,th){const prec=1e4,thr=Math.cos(Math.PI/180*th),n=I?I.length:P.length/3,ed=new Map(),V=[],ix=[0,0,0],hs=['','',''],v=[[0,0,0],[0,0,0],[0,0,0]];
+ for(let i=0;i<n;i+=3){for(let j=0;j<3;j++){const k=I?I[i+j]:i+j;ix[j]=k;v[j][0]=P[k*3];v[j][1]=P[k*3+1];v[j][2]=P[k*3+2];}
+  const a=v[0],b=v[1],c=v[2];let nx=(c[1]-b[1])*(a[2]-b[2])-(c[2]-b[2])*(a[1]-b[1]),ny=(c[2]-b[2])*(a[0]-b[0])-(c[0]-b[0])*(a[2]-b[2]),nz=(c[0]-b[0])*(a[1]-b[1])-(c[1]-b[1])*(a[0]-b[0]);
+  const l=nx*nx+ny*ny+nz*nz;if(l>0){const s=1/Math.sqrt(l);nx*=s;ny*=s;nz*=s;}else{nx=0;ny=0;nz=0;}
+  for(let j=0;j<3;j++)hs[j]=Math.round(v[j][0]*prec)+','+Math.round(v[j][1]*prec)+','+Math.round(v[j][2]*prec);
+  if(hs[0]===hs[1]||hs[1]===hs[2]||hs[2]===hs[0])continue;
+  for(let j=0;j<3;j++){const jn=(j+1)%3,h=hs[j]+'_'+hs[jn],r=hs[jn]+'_'+hs[j],o=ed.get(r);
+   if(o){if(nx*o.nx+ny*o.ny+nz*o.nz<=thr)V.push(v[j][0],v[j][1],v[j][2],v[jn][0],v[jn][1],v[jn][2]);ed.set(r,null);}
+   else if(!ed.has(h))ed.set(h,{i0:ix[j],i1:ix[jn],nx,ny,nz});}}
+ for(const o of ed.values())if(o)V.push(P[o.i0*3],P[o.i0*3+1],P[o.i0*3+2],P[o.i1*3],P[o.i1*3+1],P[o.i1*3+2]);
+ return new Float32Array(V);}`;
+let heianEdgeWorker=null,heianEdgeWorkerState=/[?&]edgeworker=0(&|$)/.test(location.search)?'off':'new',heianEdgeSeq=0;const heianEdgeWait=new Map();
+function heianEdgeWorkerGet(){if(heianEdgeWorkerState==='ok')return heianEdgeWorker;if(heianEdgeWorkerState!=='new')return null;
+ try{heianEdgeWorker=new Worker(URL.createObjectURL(new Blob([HEIAN_EDGE_WORKER_SRC],{type:'text/javascript'})));
+  heianEdgeWorker.onmessage=e=>{const w=heianEdgeWait.get(e.data.id);if(!w)return;heianEdgeWait.delete(e.data.id);if(e.data.error){console.warn('外形線の Worker で失敗（このスレッドで計算し直す）',e.data.error);for(const i of w.is)w.job.inflight.delete(i);return;}w.done(e.data.outs);};
+  heianEdgeWorker.onerror=e=>{console.warn('外形線の Worker が使えない（このスレッドで計算する）',e?.message||e);heianEdgeWorkerState='failed';for(const w of heianEdgeWait.values())for(const i of w.is)w.job.inflight.delete(i);heianEdgeWait.clear();};
+  heianEdgeWorkerState='ok';return heianEdgeWorker;}catch(e){console.warn('外形線の Worker を作れない',e);heianEdgeWorkerState='failed';return null;}}
+// 形の位置（と頂点番号）を Float32Array（と整数の配列）へ写す。three の fromBufferAttribute と同じ値（正規化された属性は getX で戻す）
+function heianEdgeSource(g){const p=g.getAttribute('position');let pos;
+ if(p.array instanceof Float32Array&&p.itemSize===3&&!p.normalized&&!p.isInterleavedBufferAttribute)pos=p.array.slice(0,p.count*3);
+ else{pos=new Float32Array(p.count*3);for(let i=0;i<p.count;i++){pos[i*3]=p.getX(i);pos[i*3+1]=p.getY(i);pos[i*3+2]=p.getZ(i);}}
+ const I=g.getIndex();return{pos,idx:I?I.array.slice(0,I.count):null};}
 const heianEdgeJobs=[];let heianEdgeJobsDone=0,heianEdgeDroppedSegments=0;
 function heianProcessEdgeJobs(budgetMs=8){
- const t0=performance.now();
+ const t0=performance.now(),sync=budgetMs>=1e8; // 1e9＝撮影・検査の「全部その場で」。Worker の結果を待たずにこのスレッドで残りを計算する
  while(heianEdgeJobs.length&&performance.now()-t0<budgetMs){
-  const job=heianEdgeJobs[0];
+  const job=heianEdgeJobs[0];if(!job.results){job.results=new Array(job.geoms.length);job.inflight=new Set();job.filled=0;}
+  const put=(i,arr)=>{if(job.results[i]!==undefined)return;job.results[i]=arr;job.filled++;job.inflight.delete(i);};
+  const W=sync?null:heianEdgeWorkerGet();
   while(job.next<job.geoms.length&&performance.now()-t0<budgetMs){
-   const g=job.geoms[job.next++],eg=new THREE.EdgesGeometry(g,30),p=eg.getAttribute('position');
-   if(p?.count)job.positions.push(p.array);eg.dispose();g.dispose();}
-  if(job.next>=job.geoms.length){heianEdgeJobs.shift();heianEdgeJobsDone++;
+   const i=job.next,g=job.geoms[i];
+   // 1通に約3万三角形（最大400個）までまとめて送る。🚫 1通1個・返事待ち6通までだと、ヘッドレスの10コマ/秒では7.8万個に20分かかった
+   if(W){if(heianEdgeWait.size>=3)break;const items=[],is=[],buf=[];let tris=0;
+    while(job.next<job.geoms.length&&items.length<400&&tris<30000){const k=job.next++,q=heianEdgeSource(job.geoms[k]);items.push(q);is.push(k);job.inflight.add(k);buf.push(q.pos.buffer);if(q.idx)buf.push(q.idx.buffer);tris+=(q.idx?q.idx.length:q.pos.length/3)/3;}
+    const id=++heianEdgeSeq;heianEdgeWait.set(id,{job,is,done:outs=>outs.forEach((arr,n)=>put(is[n],arr.length?arr:null))});W.postMessage({id,items,th:30},buf);continue;}
+   const eg=new THREE.EdgesGeometry(g,30),p=eg.getAttribute('position');put(i,p?.count?p.array:null);eg.dispose();job.next++;}
+  // Worker が落ちた／撮影で全部その場で: 結果の無いものをこのスレッドで計算する
+  if(job.next>=job.geoms.length&&job.filled<job.geoms.length&&(sync||heianEdgeWorkerState!=='ok')){
+   for(let i=0;i<job.geoms.length&&(sync||performance.now()-t0<budgetMs);i++)if(job.results[i]===undefined&&(sync||!job.inflight.has(i))){const eg=new THREE.EdgesGeometry(job.geoms[i],30),p=eg.getAttribute('position');put(i,p?.count?p.array:null);eg.dispose();}}
+  if(job.filled<job.geoms.length)break; // Worker の返事待ち。次のコマで続ける
+  job.positions=job.results.filter(Boolean);for(const g of job.geoms)g.dispose();
+  {heianEdgeJobs.shift();heianEdgeJobsDone++;
    const total=job.positions.reduce((n,a)=>n+a.length,0);if(!total)continue;
    // 有限でない値（退化した面から出る）を含む線分は落とす。1つでも NaN が混ざると boundingSphere が NaN になり
    // 全体がフラスタムカリングで消える（2026-09-13実測: 219本の外形線が「在るのに描かれない」）
@@ -33466,7 +33695,8 @@ function heianProcessEdgeJobs(budgetMs=8){
  return heianEdgeJobs.length;
 }
 // 検証・撮影用: 残りの外形線ジョブを全部その場で片付ける（ヘッドレスは描画ループが不安定なので）
-window.__heianFinishEdges=()=>{while(heianEdgeJobs.length)heianProcessEdgeJobs(1e9);return heianEdgeJobsDone;};
+window.__heianFinishEdges=()=>{while(heianEdgeJobs.length)heianProcessEdgeJobs(1e9);heianProcessLaterJobs(1e9);return heianEdgeJobsDone;};
+window.__heianLaterJobs=()=>({on:heianLaterOn,left:heianLaterJobs.length,done:heianLaterStats.done,ms:Math.round(heianLaterStats.ms),maxMs:Math.round(heianLaterStats.maxMs),maxTag:heianLaterStats.maxTag}); // 検証用
 window.__heianEdgeJobs=(sample='羅城門')=>{let lines=0,verts=0,visible=0,sampleBox=null,meshBox=null;scene.updateMatrixWorld(true);
  scene.traverse(o=>{if(o.isLine&&(o.name||'').includes('建築外形線')){lines++;verts+=o.geometry?.getAttribute('position')?.count||0;let q=o,v=true;while(q){if(!q.visible)v=false;q=q.parent;}if(v)visible++;
    if(o.name.startsWith(sample)){sampleBox=sampleBox||new THREE.Box3();sampleBox.expandByObject(o);}}
@@ -33611,7 +33841,16 @@ async function loadHeianBakedAttempt(expectedKey,cacheBust=null,onProgress=null)
  }
  const parts=first.parts||1;
  await onProgress?.({phase:'part',done:1,total:parts});
- for(let i=2;i<=parts;i++){
+ // 分割2〜は同時に読む（2026-10-18 井内さん「起動を軽く」B）。🚫 旧は1本ずつ await で、回線の往復と立ち上がりを13回待っていた。
+ //  HEIAN_BAKED_FRAG は断片を読み込んだ順に足すので、script の async=false で「並べて落として、入れた順に実行」させる。
+ //  本体と同じフォルダから読む（本体で探した path を使う）。path が分からなければ旧の1本ずつへ
+ const rest=[];for(let i=2;i<=parts;i++)rest.push({globalName:'HEIAN_BAKED_PART'+i,file:'heian-baked-assets-'+i+'.js'});
+ let partsDone=1;const keys=rest.length?await loadHeianDataFilesOrdered(rest,'heian-baked-assets.js',cacheBust,()=>{partsDone++;onProgress?.({phase:'part',done:partsDone,total:parts});}):[];
+ if(keys){for(let k=0;k<keys.length;k++)if(keys[k]!==(expectedKey||first.key)){
+   console.warn('HEIAN_BAKED part key mismatch part='+(k+2));
+   if(strictRelease)throw new Error('公開releaseの焼き込み分割'+(k+2)+'が一致しません。自動で読み込み直します。');
+   return null;}}
+ else for(let i=2;i<=parts;i++){
   const ok=await loadHeianDataFile('HEIAN_BAKED_PART'+i,'heian-baked-assets-'+i+'.js','焼き込み建築('+i+')',cacheBust).catch(()=>null);
   if(ok!==(expectedKey||first.key)){
    console.warn('HEIAN_BAKED part key mismatch part='+i);
@@ -34538,7 +34777,12 @@ function addHeianApproachRoads(group,water){
  const layer=new THREE.Group();layer.name='周辺街道（河川の岸・谷筋・峠・巨椋池湖岸で再トレース）';const positions=[],indices=[],featureChecks=[],routeStats=[],overlapDetails=[];let outOfBounds=0,waterIntrusions=0,steepSamples=0,maxSampleGrade=0,bankAdjustedPoints=0,riverOverlapSamples=0,bridgeSamples=0;
  const rivers=water.current?.rivers||[],bankRiverNames=new Set(['若狭川','高野川','白川','山科川','桂川']),bankRivers=rivers.filter(r=>(r.widthM||0)>=30||bankRiverNames.has((r.name||'').trim())),pond=water.historical?.ponds?.find(p=>p.name.includes('巨椋池')),pondPoints=pond?.points||[],bankSideByRouteRiver=new Map(),bankDirectionByRouteRiver=new Map();
  const maxBankPasses=6;
- const nearestRiver=point=>{let best=null;for(const river of bankRivers)for(let i=1;i<river.points.length;i++){const a=river.points[i-1],b=river.points[i],dx=b[0]-a[0],dz=b[1]-a[1],d2=dx*dx+dz*dz;if(!d2)continue;const t=THREE.MathUtils.clamp(((point[0]-a[0])*dx+(point[1]-a[1])*dz)/d2,0,1),qx=a[0]+t*dx,qz=a[1]+t*dz,d=Math.hypot(point[0]-qx,point[1]-qz),half=(river.widthM||12)*6,score=d-half;if(!best||score<best.score)best={river,qx,qz,dx,dz,distance:d,half,score};}return best;};
+ // 2026-10-18 起動の軽量化: 川の線分を先に並べ、線分の外接矩形までの距離で「今の一番より近くなりえない」線分を飛ばす（同じ並び順・同じ比較＝答えは前と同じ。起動中0.57秒かかっていた）
+ const riverSegs=[];for(const river of bankRivers){const half=(river.widthM||12)*6;for(let i=1;i<river.points.length;i++){const a=river.points[i-1],b=river.points[i],dx=b[0]-a[0],dz=b[1]-a[1],d2=dx*dx+dz*dz;if(!d2)continue;
+  riverSegs.push({river,ax:a[0],az:a[1],dx,dz,d2,half,x0:Math.min(a[0],b[0]),x1:Math.max(a[0],b[0]),z0:Math.min(a[1],b[1]),z1:Math.max(a[1],b[1])});}}
+ const nearestRiver=point=>{let best=null;const px=point[0],pz=point[1];for(const s of riverSegs){
+  if(best){const ex=px<s.x0?s.x0-px:px>s.x1?px-s.x1:0,ez=pz<s.z0?s.z0-pz:pz>s.z1?pz-s.z1:0;if(Math.hypot(ex,ez)-s.half>=best.score)continue;}
+  const t=THREE.MathUtils.clamp(((px-s.ax)*s.dx+(pz-s.az)*s.dz)/s.d2,0,1),qx=s.ax+t*s.dx,qz=s.az+t*s.dz,d=Math.hypot(px-qx,pz-qz),score=d-s.half;if(!best||score<best.score)best={river:s.river,qx,qz,dx:s.dx,dz:s.dz,distance:d,half:s.half,score};}return best;};
  const moveParallelWaterPointsToBank=(points,route)=>points.map((source,i)=>{if(route.roadClass==='avenue-extension')return source.slice();
   const p0=points[Math.max(0,i-1)],p1=points[Math.min(points.length-1,i+1)],tx=p1[0]-p0[0],tz=p1[1]-p0[1],tl=Math.hypot(tx,tz)||1;let point=source.slice(),last='';
   for(let pass=0;pass<maxBankPasses;pass++){const hit=nearestRiver(point);if(!hit)break;const riverName=(hit.river.name||'').replace(/\s+/g,''),key=route.id+':'+(riverName||hit.river.wayId||'river');let rdx=hit.dx,rdz=hit.dz,reference=bankDirectionByRouteRiver.get(key);if(reference&&rdx*reference[0]+rdz*reference[1]<0){rdx=-rdx;rdz=-rdz;}else if(!reference){reference=[rdx,rdz];bankDirectionByRouteRiver.set(key,reference);}const rl=Math.hypot(rdx,rdz)||1,parallel=Math.abs((tx*rdx+tz*rdz)/(tl*rl))>=.55,clearance=hit.half+(route.width||HEIAN_APPROACH_ROAD_WIDTH)/2+300;if(hit.distance>=clearance)break;if(!parallel&&route.crossesKamo&&riverName==='鴨川'){bridgeSamples++;break;}const nx=-rdz/rl,nz=rdx/rl,signed=(point[0]-hit.qx)*nx+(point[1]-hit.qz)*nz;let side=bankSideByRouteRiver.get(key);if(!side){side=route.bankSides?.[riverName];if(!side){if(Math.abs(signed)>=1)side=Math.sign(signed);else{const ay=terrainYAt(hit.qx+nx*clearance,hit.qz+nz*clearance),by=terrainYAt(hit.qx-nx*clearance,hit.qz-nz*clearance);side=ay<=by?1:-1;}}bankSideByRouteRiver.set(key,side);}const next=[hit.qx+nx*clearance*side,hit.qz+nz*clearance*side],signature=key+':'+Math.round(next[0])+':'+Math.round(next[1]);if(signature===last)break;point=next;last=signature;bankAdjustedPoints++;}
@@ -38141,6 +38385,7 @@ function animate(){
  if(heianGameMode)heianHyakkiTick(); // 百鬼夜行（1.82・忌夜行日の丑の刻にごく稀に）
  if(heianGameMode){const t0=heianFrameProf?performance.now():0;updateHeianSpeech();if(heianFrameProf){const v=performance.now()-t0;heianFrameProf.speech=(heianFrameProf.speech??v)*.9+v*.1;heianFrameProf.speechMax=Math.max(heianFrameProf.speechMax||0,v);}} // 町の人の吹き出し（全 runtime の更新と時計の後＝そのフレームの位置で投影・2026-09-26）
  if(heianEdgeJobs.length)heianProcessEdgeJobs(8); // 主要建築の外形線を空き時間で足す（起動を先に済ませる・2026-09-13）
+ if(heianLaterJobs.length&&!heianDroneTour?.openingActive)heianProcessLaterJobs(6); // 市の人の稜線・屋根の烏（起動の後回し・2026-10-18）。オープニングの飛行中は進めない（2026-10-19「飛行がカタカタ」: 烏の当て1本30〜60ミリ秒がコマを止めていた。上空からは見えない）
  // 夜のglow（大内裏の被せ・径3600）は遠景専用。近づくと視界を覆うのでカメラ距離で出し入れする（2026-08-27）
  if(heianNightRuntime?.root?.userData?.heianGlowSprites)for(const g of heianNightRuntime.root.userData.heianGlowSprites)g.visible=camera.position.distanceTo(g.position)>=(g.userData.heianGlowFadeIn||0);
  // 篝火・灯明も近距離では縮める（径420/260は遠景用。地上では実物寄りへ・2026-08-30）
@@ -38179,6 +38424,7 @@ function animate(){
  }
  updateHeianRealLight(); // 写実モードの太陽・影のカメラ・霞（2026-09-25）
  heianCloudShadowTick(); // 地面の雲の影（2026-09-29）
+ heianCutawayTick(); // 歩くときカメラとロボの間を透かす（2026-10-19）
  heianPlantTick(); // 植物の季節（1.80）
  heianDetailTick(); // 素材の風合い（2026-09-25）
  heianPbrEnvTick(); // 1.133 空から作る環境マップ（?pbr=1）
