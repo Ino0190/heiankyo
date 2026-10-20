@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="a9e8bb7c892010f79f329b6555bfd53fecb57997b6b07059b4e065edd2eff653">
+<meta name="heian-release" content="fc7a2c6534a8fc130a1db164fac4486d99a2e83d3984a30bca31d28ff09373af">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -370,6 +370,21 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-archery .ar-msg{min-height:1.6em;margin:0 0 8px}
 .heian-archery .ar-btns button{font:inherit;font-size:16px;margin-right:8px;padding:6px 16px;background:#5a3d22;color:#f6ecd4;border:0;border-radius:4px;cursor:pointer}
 .heian-archery .ar-btns button.ar-alt{background:transparent;color:#5a3d22;border:1px solid rgba(96,76,52,.45)}
+/* スマホ（2026-10-20 監査「横持ちで下121pxが切れ、放つ・やめるを押せない」）: 弓の間はドックの操作・話しかける・地名・知らせを隠す。ボタンは指で押せる高さ44px */
+@media (max-width:600px) and (orientation:portrait),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
+ #heianGameHud:has(.heian-archery) .heian-game-help,#heianGameHud:has(.heian-archery) .heian-dialog-hint,#heianGameHud:has(.heian-archery) .heian-game-info,#heianGameHud:has(.heian-archery) .heian-blessing,#heianGameHud:has(.heian-archery) .heian-tut{display:none!important}
+ .heian-archery .ar-btns button{min-height:44px;padding:6px 18px}
+}
+@media (max-width:600px) and (orientation:portrait){.heian-archery{left:8px;right:8px;top:58px;width:auto;box-sizing:border-box;padding:10px 12px}}
+/* 横持ち: 町の側（左3/4）に横長に。左の列に的、右の列に見出し・風・引き分け・結果・ボタン（.ar-row を解いて格子に並べ直す） */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+ .heian-archery{left:8px;right:auto;top:8px;bottom:auto;width:calc(75vw - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;box-sizing:border-box;padding:8px 12px;display:grid;grid-template-columns:150px 1fr;column-gap:12px;align-content:start;font-size:15px;line-height:1.45}
+ .heian-archery .ar-row{display:contents}
+ .heian-archery .ar-tgt{grid-column:1;grid-row:1/span 5;width:150px;height:150px;align-self:start}
+ .heian-archery .ar-h,.heian-archery .ar-sub,.heian-archery .ar-side,.heian-archery .ar-msg,.heian-archery .ar-btns{grid-column:2}
+ .heian-archery .ar-h{font-size:16px}.heian-archery .ar-sub{margin:0 0 4px;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .heian-archery .ar-wind{margin:0 0 2px}.heian-archery .ar-pow{margin:0 0 4px}.heian-archery .ar-marks{margin:0 0 2px}.heian-archery .ar-msg{margin:0 0 4px;min-height:1.45em}
+}
 .heian-map-omakase{/* おまかせの行き先（2026-10-20）。朱の菱形＝現在地（青い丸）と見分ける */position:absolute;z-index:7;width:11px;height:11px;border:2px solid #fff;background:#d9542b;transform:translate(-50%,-50%) rotate(45deg);pointer-events:none;box-shadow:0 0 6px rgba(217,84,43,.85)}
 .heian-omakase-tag{/* おまかせ散歩の札（2026-10-20）。下の動作の帯の上・知らせ（heian-note-toast）より上 */position:absolute;z-index:4;left:50%;bottom:156px;transform:translateX(-50%);padding:4px 14px;background:rgba(43,36,28,.78);color:#f6ecd4;font-size:14px;border-radius:4px;pointer-events:none;white-space:nowrap}
 .heian-trip-choice .heian-trip-sub{font-size:14px;color:#d9ccb0}
@@ -542,7 +557,9 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-tut{position:absolute;left:50%;bottom:212px/* 左下の地点の案内（約190）とロボの足元の上 */;transform:translateX(-50%);width:max-content;max-width:min(600px,calc(100% - 32px));box-sizing:border-box;padding:12px 100px 12px 20px;background:rgba(24,20,12,.86);border:1px solid rgba(255,217,138,.5);color:#f6ecd4;z-index:31;opacity:0;transition:opacity .35s;pointer-events:none}
 .heian-tut.on{opacity:1}.heian-tut p{margin:0;font-size:16px;line-height:1.6}.heian-tut small{display:block;margin-top:2px;font-size:14px;color:#cdbf9f}
 .heian-tut-skip{position:absolute;right:6px;top:6px;padding:4px 8px;border:0;background:transparent;color:#cdbf9f;font:inherit;font-size:14px;cursor:pointer;pointer-events:auto}.heian-tut-skip:hover{color:#ffd98a}
-@media (max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-tut{bottom:auto;top:44%}}
+/* 2026-10-20 モバイル改善: 旧 top:44% はロボと足元（タップして歩く所）を覆っていた。縦持ちはタイトルの下、横持ちは町（左3/4）の上端 */
+@media (max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-tut{bottom:auto;top:60px;padding:8px 100px 8px 14px}.heian-tut p{font-size:15px;line-height:1.5}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-tut{left:37.5vw;max-width:calc(75vw - 24px)}}
 .heian-tut-all{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,calc(100% - 32px));max-height:82%;overflow:auto;box-sizing:border-box;padding:24px 28px;background:rgba(17,24,32,.97);color:#f1ede4;z-index:60;pointer-events:auto}
 .heian-tut-all h2{margin:0 0 8px;font-size:24px}.heian-tut-all h3{margin:20px 0 6px;font-size:18px;color:#ffd98a}.heian-tut-all ul{margin:0;padding-left:20px}.heian-tut-all li{font-size:16px;line-height:1.7}
 .heian-tut-all button{margin-top:20px;padding:8px 20px;border:1px solid #4a5561;background:#1d2833;color:#f1ede4;font:inherit;font-size:16px;cursor:pointer}
@@ -688,6 +705,63 @@ body.heian-photo-active .heian-sky-label{display:none!important}
  #heianGameHud .heian-info-more{display:block;min-width:40px;min-height:36px;padding:0 8px;font:inherit;font-size:20px;line-height:1;background:#1d2833;color:#f1ede4;border:1px solid #4a5561;cursor:pointer}
  #heianGameHud .heian-speech-box{z-index:0}
 }
+
+/* ==== スマホの操作の3つの組（2026-10-20 モバイル改善 第1弾）。heianActionGroupsBuild が .heian-act-grouped・data-grp・data-open を付ける ====
+   🚫 旧は9つのボタンが帯に並び、縦持ちでは「話しかける」・地名・「発見」の札がボタンの上に重なって押せなかった（撮影 10-20）。
+   帯には おまかせ・地図・移動・動作 の3つだけ（指で押せる高さ44px）。組を開くと中身が縦持ちは帯の上（町の上）、横持ちは組の下に出る。PC は .heian-grp-* を出さない＝今までどおり */
+.heian-grp-head,.heian-grp-extra{display:none}
+.heian-phone-map{display:none}
+@media (max-width:600px) and (orientation:portrait),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
+ #heianGameHud .heian-act-grouped>button{display:none}
+ #heianGameHud .heian-act-grouped>[data-grp="omakase"],#heianGameHud .heian-act-grouped>.heian-grp-head{display:flex;order:1;min-height:44px;font-size:15px}
+ #heianGameHud .heian-act-grouped>.heian-grp-head[data-grp="move-head"]{order:2}
+ #heianGameHud .heian-act-grouped>.heian-grp-head[data-grp="act-head"]{order:3}
+ #heianGameHud .heian-act-grouped>.heian-grp-head::after{content:'▴';margin-left:5px;font-size:14px;color:#b8c0c8}
+ #heianGameHud .heian-act-grouped>.heian-grp-head[aria-expanded="true"]{background:#34414e;border-color:#d2a64f}
+ #heianGameHud .heian-act-grouped>[data-grp="omakase"].on{background:#7a5720;border-color:#d2a64f}
+ #heianGameHud .heian-act-grouped[data-open="act"]>[data-grp="act"],#heianGameHud .heian-act-grouped[data-open="move"]>[data-grp="move"]{display:flex;order:0;min-height:44px;font-size:15px}
+ #heianGameHud .heian-act-grouped[data-open]{background:rgba(17,24,32,.94);box-shadow:0 0 0 6px rgba(17,24,32,.94)}
+ .heian-phone-map{display:block;position:absolute;z-index:40;left:8px;top:58px;width:min(78vw,330px);padding:6px;background:rgba(17,24,32,.96);border:1px solid #68737e;pointer-events:auto;box-sizing:border-box}
+ #heianGameHud .heian-phone-map .heian-mini-map{display:block!important;width:100%;height:auto;aspect-ratio:272/330}
+ .heian-phone-map .heian-map-marker::after{content:'';position:absolute;inset:-12px} /* 印は小さいまま、指で押せる範囲だけ広げる */
+ .heian-phone-map-close{position:absolute;right:8px;top:8px;z-index:6;min-width:44px;min-height:44px;padding:0;font-size:22px;line-height:1;background:#1d2833;color:#fff;border:1px solid #4a5561;cursor:pointer}
+}
+@media (max-width:600px) and (orientation:portrait){
+ /* 組の段は帯の上端に固定し、開いた中身は上（町の上）へ伸びる＝帯の中の配置は動かない。話しかける・地名はその下に詰める */
+ #heianGameHud .heian-game-help.heian-act-grouped{top:auto;bottom:calc(25dvh - 52px)} /* 🚫 .heian-act-grouped だけだと帯の既存規則（.heian-game-help.heian-game-help-actions）に負け、中身が下へ伸びた */
+ #heianGameHud .heian-act-grouped>[data-grp="omakase"]{grid-column:1} /* 組の段は必ず新しい行から（中身が7つでも段に食い込まない） */
+ #heianGameHud .heian-dialog-hint{top:calc(75dvh + 60px)}
+ #heianGameHud .heian-game-info{top:calc(75dvh + 108px)}
+ #heianGameHud .heian-blessing{top:calc(75dvh + 104px);max-height:calc(25dvh - 108px)} /* 「発見」「今日の都」は地名の所に重ねる（組の段と「話しかける」は隠さない） */
+}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+ /* 横持ちの右の列: おまかせ｜動作／地図・移動（2列目いっぱい）。開いた中身はその下。開いている間は話しかける・地名を隠す（列の高さが足りない） */
+ #heianGameHud .heian-act-grouped>.heian-grp-head[data-grp="act-head"]{order:2}
+ #heianGameHud .heian-act-grouped>.heian-grp-head[data-grp="move-head"]{order:3;grid-column:1/-1}
+ #heianGameHud .heian-act-grouped>.heian-grp-head::after{content:'▾'}
+ #heianGameHud .heian-act-grouped>[data-grp="omakase"],#heianGameHud .heian-act-grouped>.heian-grp-head,#heianGameHud .heian-act-grouped[data-open]>button{font-size:14px;min-height:42px}
+ #heianGameHud .heian-act-grouped[data-open="act"]>[data-grp="act"],#heianGameHud .heian-act-grouped[data-open="move"]>[data-grp="move"]{order:4}
+ #heianGameHud .heian-act-grouped[data-open="move"]>[data-grp="move"]{grid-column:1/-1}
+ #heianGameHud .heian-dialog-hint{top:156px}
+ #heianGameHud .heian-game-info{top:204px}
+ #heianGameHud .heian-blessing{top:202px;max-height:calc(100dvh - 208px)}
+ #heianGameHud:has(.heian-act-grouped[data-open]) .heian-dialog-hint,#heianGameHud:has(.heian-act-grouped[data-open]) .heian-game-info,#heianGameHud:has(.heian-act-grouped[data-open]) .heian-blessing{display:none}
+ #heianGameHud .heian-act-grouped[data-open]>[data-grp="act"],#heianGameHud .heian-act-grouped[data-open]>[data-grp="move"]{min-height:40px} /* 4段で縦340pxに収める */
+ .heian-phone-map{left:8px;top:8px;width:auto;height:calc(100dvh - 16px);aspect-ratio:auto}
+ #heianGameHud .heian-phone-map .heian-mini-map{width:auto;height:100%;aspect-ratio:272/330}
+}
+/* 空撮・俯瞰の間の「自分で歩く／鉄の童におまかせ」（heianStartChoiceSync）。PC は上の帯の下の右、スマホはドックの組の段と同じ所 */
+.heian-start-choice{position:absolute;z-index:4;right:16px;top:64px;display:flex;gap:8px;pointer-events:auto}
+.heian-start-choice[hidden],body:has(#heianEntryGate) .heian-start-choice,#heianGameHud.heian-photo-mode .heian-start-choice,#heianGameHud:has(.heian-game-actions.open) .heian-start-choice,#heianGameHud:has(.heian-game-settings.open) .heian-start-choice{display:none}
+.heian-start-choice button{min-height:44px;padding:8px 16px;font:inherit;font-size:16px;background:rgba(24,32,41,.94);color:#fff;border:1px solid #85909a;cursor:pointer}
+.heian-start-choice .sc-walk{background:#7a5720;border-color:#d2a64f;color:#fff4d8}
+@media (max-width:600px) and (orientation:portrait){.heian-start-choice{left:8px;right:8px;top:calc(75dvh + 8px);display:grid;grid-template-columns:1fr 1fr;gap:6px}.heian-start-choice button{padding:6px 4px;font-size:15px}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-start-choice{left:auto;right:6px;top:58px;width:calc(25vw - 12px);display:grid;grid-template-columns:1fr;gap:5px}.heian-start-choice button{padding:4px;font-size:14px}}
+/* 画質を軽量へ勧める札（heianQualityTip）と、開発用の重さの表示（?perf=1・Shift+P）のスマホでの置き場所 */
+.heian-quality-tip{position:absolute;z-index:45;left:50%;top:60px;transform:translateX(-50%);width:min(520px,calc(100% - 24px));box-sizing:border-box;padding:12px 14px;background:rgba(17,24,32,.96);border:1px solid #d2a64f;color:#f1ede4;pointer-events:auto}
+.heian-quality-tip p{margin:0 0 8px;font-size:15px;line-height:1.55}.heian-quality-tip button{min-height:44px;margin-right:8px;padding:6px 14px;font:inherit;font-size:15px;background:#1d2833;color:#f1ede4;border:1px solid #4a5561;cursor:pointer}.heian-quality-tip button:first-of-type{background:#7a5720;border-color:#d2a64f}
+@media (max-width:600px),(pointer:coarse) and (orientation:landscape) and (max-height:520px){#heianPerfBox{left:6px!important;top:52px!important;bottom:auto!important;max-width:calc(75vw - 12px)!important;padding:6px 8px!important;font-size:14px!important;line-height:1.4!important}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-quality-tip{left:37.5vw;width:min(480px,calc(75vw - 24px))}}
 
 /* ==== BHSレイアウト組み立て（#bhsbuild）。素人がプラレールのように繋ぐ画面 ====
    🔑 CADのパネル（履歴・スケッチ・フィーチャー）は隠し、押すだけのボタンに絞る。
@@ -1519,8 +1593,10 @@ function createHeianWalkController(host){
  // 1.85 坂で速さを変える。登りは遅く、下りは少し速い。急に変わらないよう slopeF を滑らかに追わせる
  let slopeF=1;const slopeAt=(t,x,z,ux,uz)=>{const a=t.groundY(x,z),b=t.groundY(x+ux*30,z+uz*30);if(!Number.isFinite(a)||!Number.isFinite(b))return 1;const g=(b-a)/30;return g>0?Math.max(.55,1-g*3):Math.min(1.25,1-g*1.5);};
  const slopeStep=(t,x,z,ux,uz,dt,k=1)=>{const w=1+(slopeAt(t,x,z,ux,uz)-1)*k;slopeF+=(w-slopeF)*Math.min(1,dt*3);return slopeF;};
- let dragPointerId=null,dragStartX=0,dragStartY=0,dragLastX=0,dragLastY=0,draggingView=false;
- const dragThreshold=5;
+ let dragPointerId=null,dragStartX=0,dragStartY=0,dragLastX=0,dragLastY=0,draggingView=false,dragTouch=false,dragT0=0;
+ // 2026-10-20 モバイル改善: 指はマウスより揺れる。5px だと見回すつもりの小さな動きが「タップ＝そこへ歩く」と取り違えられ、逆にタップが見回しになった。
+ //  指（touch・pen）は 12px 動くまで見回しにしない。指を 0.6秒より長く置いたまま離したら（迷って離した）歩かせない
+ const dragThreshold=5,dragThresholdTouch=12,tapMaxMs=600;
  const isEditable=el=>!!el?.closest?.('input,textarea,select,[contenteditable="true"]');
  const terrain=()=>host.getTerrain?.()||null;
  const setStatus=text=>host.setStatus?.(text);
@@ -1773,18 +1849,18 @@ function createHeianWalkController(host){
  function onViewPointerMove(event){
   if(!active||event.pointerId!==dragPointerId)return;
   const totalX=event.clientX-dragStartX,totalY=event.clientY-dragStartY;
-  if(!draggingView&&Math.hypot(totalX,totalY)>=dragThreshold){draggingView=true;domElement.style.cursor='grabbing';}
+  if(!draggingView&&Math.hypot(totalX,totalY)>=(dragTouch?dragThresholdTouch:dragThreshold)){draggingView=true;domElement.style.cursor='grabbing';dragLastX=event.clientX;dragLastY=event.clientY;return;} // 見回しは閾値を越えた所から（指で12px 跳ねない）
   const dx=event.clientX-dragLastX,dy=event.clientY-dragLastY;dragLastX=event.clientX;dragLastY=event.clientY;
   if(draggingView&&(dx||dy)){yaw-=dx*.002;pitch=THREE.MathUtils.clamp(pitch-dy*.0015,-.85,maxPitch);syncActor();aimCamera();}
  }
  function onCanvasPointerDown(event){
   if(!active||event.button!==0||dragPointerId!==null||isEditable(event.target))return;
-  dragPointerId=event.pointerId;dragStartX=dragLastX=event.clientX;dragStartY=dragLastY=event.clientY;draggingView=false;
+  dragPointerId=event.pointerId;dragStartX=dragLastX=event.clientX;dragStartY=dragLastY=event.clientY;draggingView=false;dragTouch=event.pointerType==='touch'||event.pointerType==='pen';dragT0=performance.now();
   domElement.setPointerCapture?.(event.pointerId);event.preventDefault();
  }
  function onCanvasPointerUp(event){
   if(!active||event.pointerId!==dragPointerId)return;
-  const click=!draggingView,point=click?host.pickWalkGround?.(event):null;clearViewDrag();event.preventDefault();
+  const click=!draggingView&&!(dragTouch&&performance.now()-dragT0>tapMaxMs),point=click?host.pickWalkGround?.(event):null;clearViewDrag();event.preventDefault();
   if(click)setAutoTarget(point);
  }
  function onCanvasPointerCancel(event){if(event.pointerId===dragPointerId)clearViewDrag();}
@@ -1983,8 +2059,19 @@ new MutationObserver(records=>{
 const vp=$('viewport');
 // スマホ（縦持ち＝幅600px以下／横持ち＝タッチ機で高さ520px以下）。UIを減らす条件の正本。CSS の @media にも同じ式を書く（2026-10-11）
 const HEIAN_COMPACT_MQ='(max-width:600px), (pointer:coarse) and (orientation:landscape) and (max-height:520px)';
+// ---- 画質の段（2026-10-20 モバイル改善 第1弾・井内さん「スマホでの描画負荷、操作負担、UIの圧迫を軽減する」）。
+//  軽量・標準・高画質。☰「画質」で切り替え、localStorage heian-quality に残す。?quality=low|mid|high で強制。既定はスマホ（タッチ・狭い画面）=標準、PC=高画質（＝これまでどおり）。
+//  prMax: 描画解像度の上限（端末の画素比に掛ける前の上限）／prFloor: 自動調整で下げる下限の倍率／crowdFar・crowdEvery: 遠い歩く人を何コマに1回動かすか（消さない）／
+//  veg: 歩く間、この距離（10=1m）より遠い植栽の区画を描かない（0=写実のときだけ従来の 5000）／scanK: 吹き出しの話し手を探す間隔の倍率
+//  farPx: 歩く間、画面でこの画素より小さく写る遠く（200m 超）の建物の部品を描かない（heianFarCullApply・0=しない）
+const HEIAN_QUALITY={low:{ja:'軽量',en:'Light',prMax:.85,prFloor:.6,crowdFar:1200,crowdEvery:8,veg:3500,scanK:2,farPx:6},
+ mid:{ja:'標準',en:'Standard',prMax:1.5,prFloor:.7,crowdFar:2000,crowdEvery:6,veg:5000,scanK:1.5,farPx:3},
+ high:{ja:'高画質',en:'High',prMax:Infinity,prFloor:.7,crowdFar:2000,crowdEvery:6,veg:0,scanK:1,farPx:0}};
+const heianIsTouch=matchMedia('(pointer:coarse)').matches||matchMedia(HEIAN_COMPACT_MQ).matches;
+let heianQualityKey=(()=>{try{const q=new URLSearchParams(location.search).get('quality');if(HEIAN_QUALITY[q])return q;const v=localStorage.getItem('heian-quality');if(HEIAN_QUALITY[v])return v;}catch(e){}return heianIsTouch?'mid':'high';})();
+let heianQ=HEIAN_QUALITY[heianQualityKey];
 const renderer=new THREE.WebGLRenderer({antialias:true,stencil:true});
-renderer.setPixelRatio(devicePixelRatio);
+renderer.setPixelRatio(Math.min(devicePixelRatio,heianQ.prMax));
 vp.appendChild(renderer.domElement);
 // ページを去る時にGPUリソースを即時解放する。リロードのたびに古いWebGLコンテキストと
 // GPU上のジオメトリ（平安京は数百MB）がGPUプロセスへ積み上がり、リロードを繰り返すほど
@@ -2295,6 +2382,8 @@ function shotCameraFromState(raw,width,height){
  return cam;
 }
 addEventListener('resize',resize);
+// 2026-10-20 モバイル改善: スマホはアドレスバーの出入り・回転で window の resize が来ない／遅れることがある。表示領域（visualViewport）の変化でも描き直す（1コマに1回まで）
+{let q=0;const again=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;resize();});};window.visualViewport?.addEventListener('resize',again);addEventListener('orientationchange',()=>setTimeout(again,250));}
 function setStatus(t){$('statusMsg').textContent=t;}
 function refreshStatInfo(){
  let tris=0;
@@ -15665,7 +15754,9 @@ const HEIAN_GUARD_OFFICES=['左近衛府','右近衛府','左兵衛府','右兵�
 function heianArcheryLayout(name,cx,cz,w,d){const s=name.startsWith('右')?1:-1,ux=cx+s*-60,zA=cz-d/2+130,zB=zA+330;return{name,s,x:ux,zA,zB,targetZ:zA+19,seatZ:zB};}
 function heianArcheryBuild(p,box,plainGable,name,A){const{x,zA,zB}=A;
  p.push(box(x,zA,90,36,-1,24,name+'射場垜基壇') /* 名前に基壇＝土・石の色（白壁の色にならない） */,box(x,zA+19,28,2,8,28,name+'射場的板'),box(x,zA+20.5,10,1.2,14,10,name+'射場的黒星'));
- for(const q of[-60,60])p.push(box(x+q,(zA+zB)/2,3,zB-zA-40,-1,8,name+'射場埒'));
+ // 埒は射る所（seatZ-70）の前後で切る＝横から射る所へ出入りできる（2026-10-20 井内さん「矢を射る場所、囲われてて入れない」「射させてもらうを選ぶと入れるけど、今度は出られない」）。
+ //  🚫 旧は垜から射席まで1本の埒で、両端の隙間は1.5mほど＝ロボ（半径0.5m＋当たりの余り）が通れず、射る所が閉じた囲いになっていた
+ {const s=A.seatZ-70,g=36,a0=zA+20,a1=zB-20;for(const q of[-60,60])for(const[u,v]of[[a0,s-g],[s+g,a1]])if(v-u>4)p.push(box(x+q,(u+v)/2,3,v-u,-1,8,name+'射場埒'));}
  plainGable(p,x,zB,90,50,-1,20,12,name+'射場射席檜皮葺');}
 // 都の座標の射場。的の中心（tx,ty,tz）と射る所（射席の前・sx,sz）
 function heianArcheryRanges(){return HEIAN_GUARD_OFFICES.map(n=>{const r=HEIAN_SOSHI.find(q=>q[0]===n);if(!r)return null;const[,cx,cz,w,d]=r,A=heianArcheryLayout(n,cx,cz,w,d),X=A.x*HEIAN_SOSHI_SX;
@@ -17629,7 +17720,7 @@ function updateHeianSpeech(){
  if(!on){if(heianDialog.open||heianDialog.hint)heianDialogClose(true);if(heianSpeech.bubbles.length||heianSpeech.talks.length)heianSpeechReset();else if(heianSpeechBox&&!hud)heianSpeechBox=null;return 0;}
  if(!heianSpeechBox||heianSpeechBox.parentElement!==hud){heianSpeechBox?.remove();heianSpeechBox=document.createElement('div');heianSpeechBox.className='heian-speech-box';heianSpeechBox.id='heianSpeech';heianSpeechBox.setAttribute('aria-live','polite');hud.appendChild(heianSpeechBox);}
  const now=performance.now()/1000,rp=heianWalk.position;camera.updateMatrixWorld();
- if(now-heianSpeech.lastScan>HEIAN_SPEECH.scanMs/1000){heianSpeech.lastScan=now;const P=heianFrameProf,a=P?performance.now():0;heianSpeech.cands=heianSpeechCollect(rp.x,rp.z);const b=P?performance.now():0;heianSpeech.tags=heianSpeechTags(rp.x,rp.z);heianFaceAssign(heianSpeech.cands,heianSpeech.tags);heianKishitsuAssign(heianSpeech.cands);const c=P?performance.now():0;heianSpeech.panels=heianSpeechPanelRects();
+ if(now-heianSpeech.lastScan>HEIAN_SPEECH.scanMs*heianQ.scanK/1000){heianSpeech.lastScan=now;const P=heianFrameProf,a=P?performance.now():0;heianSpeech.cands=heianSpeechCollect(rp.x,rp.z);const b=P?performance.now():0;heianSpeech.tags=heianSpeechTags(rp.x,rp.z);heianFaceAssign(heianSpeech.cands,heianSpeech.tags);heianKishitsuAssign(heianSpeech.cands);const c=P?performance.now():0;heianSpeech.panels=heianSpeechPanelRects();
   if(P){const d=performance.now();P.scanCollect=Math.max(P.scanCollect||0,b-a);P.scanTags=Math.max(P.scanTags||0,c-b);P.scanPanels=Math.max(P.scanPanels||0,d-c);}}
  const day=heianClock.day,ctx=heianWorldState();
  heianApplyPeopleEra(day); // 2026-10-05 住人の段ごとの書き分け（段・later・appear が変わった時だけ重ね直す）
@@ -18161,7 +18252,7 @@ function heianOmakaseTagSync(){const O=heianOmakase,hud=document.getElementById(
  if(!O.tag||!O.tag.isConnected){O.tag=document.createElement('div');O.tag.className='heian-omakase-tag';O.tag.setAttribute('role','status');hud.appendChild(O.tag);}
  const en=heianLang==='en',nm=O.to?locName(O.to):'';
  const sl=O.sight?.label||'';
- O.tag.textContent=O.phase==='watch'?(en?`Wandering · watching ${sl} (to ${nm})`:`おまかせ散歩　${sl}を眺めている（${nm}へ）`):O.phase==='stay'?(en?`Wandering · resting at ${nm}`:`おまかせ散歩　${nm}でひと休み`):(en?`Wandering · to ${nm} (any key to stop)`:`おまかせ散歩　${nm}へ（何かキーで終わる）`);}
+ O.tag.textContent=O.phase==='watch'?(en?`Wandering · watching ${sl} (to ${nm})`:`おまかせ散歩　${sl}を眺めている（${nm}へ）`):O.phase==='stay'?(en?`Wandering · resting at ${nm}`:`おまかせ散歩　${nm}でひと休み`):(heianIsTouch?(en?`Wandering · to ${nm}`:`おまかせ散歩　${nm}へ`):(en?`Wandering · to ${nm} (any key to stop)`:`おまかせ散歩　${nm}へ（何かキーで終わる）`));} /* スマホはキーが無い。やめるのは下の「おまかせをやめる」 */
 // ---- 衛府の射場で弓を射させてもらう（2026-10-20 井内さん「ロボットもやらせてもらえたら楽しいかもね」）。
 //  三本射る。窓の針が左右に揺れるので、真ん中（黒星）に来たところで Space かボタンで放つ。真ん中に近いほど中る（黒星＝中り・的＝当たり・外＝垜）。
 //  放つとロボが弓を引き分け（動作 yumi）、1.5秒で矢が飛ぶ。射手は射る手を止めてロボの方を見る。終わると射手が一言、聞き書き帳に「鉄の童が見たもの」として残す
@@ -18183,12 +18274,15 @@ function heianArcheryOpen(S){const A=heianArchery,hud=document.getElementById('h
  if(heianOmakase.on)heianOmakaseStop();if(heianWalk.following)heianWalk.stopFollow();heianWalk.halt?.();
  heianInteriorPlace([S.sx,S.sz],[S.tx,S.tz]); // 射る所に立って的を向く
  A.pitch0=heianWalk.pitch;heianWalk.setPitch(-.5); /* 🚫 いつもの見下ろし角だと、カメラが後ろの射席の屋根の下に入り、屋根しか写らなかった（撮影 ar2）。射る間だけ上から覗く */
+ {const p=heianWalk.position;heianWalk.face(Math.atan2(S.tx-p.x,S.tz-p.z)-Math.PI/2);} // 体は的に対して横（左肩が的）。カメラは的の方を向いたまま。🚫 1.146 は射る動作だけ −π/2 に直し、ここは +π/2（射る前後は右肩が的）のままだった
  Object.assign(A,{open:true,S,shots:[],phase:'aim',aimX:0,aimY:0,power:0,t0:performance.now()});S.robot=true;heianArcheryNewWind();
  const el=document.createElement('div');el.className='heian-archery';el.setAttribute('role','dialog');el.setAttribute('aria-label',en?'Archery':'弓を射る');
  for(const ev of['pointerdown','pointerup','click','wheel'])el.addEventListener(ev,e=>e.stopPropagation());
  const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
  const h=mk('div','ar-h',en?`${S.name.includes('近衛')?'Inner Palace Guards':'Palace Guards'} range — three arrows`:`${S.name}の射場　三本射る`);
- const sub=mk('p','ar-sub',en?'Aim on the target (click or arrow keys): a little above the centre, and into the wind. Then Space to draw, Space again at full draw.':'的の絵で狙いを決める（クリックか矢印キー）。矢は落ちるので黒星の少し上、風があれば風上へ。Space で引き、満ちたらもう一度で放つ');
+ // 2026-10-20 スマホはキーが無いので「タップ」「引く」の言葉で（監査「Space・クリックが残る」）
+ const sub=mk('p','ar-sub',heianIsTouch?(en?'Tap the target to aim: a little above the centre, and into the wind. Tap Draw, then tap again at full draw.':'的の絵をタップして狙う。矢は落ちるので黒星の少し上、風があれば風上へ。「引く」を押し、満ちたらもう一度押して放つ')
+  :(en?'Aim on the target (click or arrow keys): a little above the centre, and into the wind. Then Space to draw, Space again at full draw.':'的の絵で狙いを決める（クリックか矢印キー）。矢は落ちるので黒星の少し上、風があれば風上へ。Space で引き、満ちたらもう一度で放つ'));
  const row=mk('div','ar-row'),tgt=mk('div','ar-tgt');for(const c of['ar-r1','ar-r2','ar-r3'])tgt.appendChild(mk('span',c));
  const ret=mk('span','ar-ret');tgt.appendChild(ret);const dots=mk('div','ar-dots');tgt.appendChild(dots);
  tgt.addEventListener('pointerdown',e=>{if(A.phase==='fly'||A.phase==='done')return;const r=tgt.getBoundingClientRect(),V=HEIAN_ARCH.view;A.aimX=THREE.MathUtils.clamp(((e.clientX-r.left)/r.width*2-1)*V,-1.5,1.5);A.aimY=THREE.MathUtils.clamp(-((e.clientY-r.top)/r.height*2-1)*V,-1.5,1.5);heianArcheryDraw();});
@@ -18217,7 +18311,7 @@ function heianArcheryPress(){const A=heianArchery,S=A.S,en=heianLang==='en',H=HE
  if(A.phase!=='draw')return;
  const{p,shake}=heianArcheryPower(performance.now()),n=()=>(Math.random()-.5)*2;A.power=p;A.phase='fly';A.go.disabled=true;
  const dx=A.aimX+A.wind*H.wind/p+n()*(H.noise+shake*.6),dy=A.aimY-H.drop/(p*p)+n()*(H.noise+shake*.6),r=Math.hypot(dx,dy),g=r<.3?'center':r<1?'hit':'miss',me=heianWalk.position;
- heianRobotAct('yumi',{face:Math.atan2(S.tx-me.x,S.tz-me.z)});
+ heianRobotAct('yumi',{face:Math.atan2(S.tx-me.x,S.tz-me.z)-Math.PI/2}); // 体は横向き（左肩が的）。🚫 +π/2 だと右肩が的を向き左右が逆だった（2026-10-20 井内さん「左右が逆ではないか」）
  setTimeout(()=>{if(!A.open)return;heianArcheryApi?.shootAt(S,{dx,dy},()=>{if(!A.open)return;A.shots.push({g,dx,dy});heianArcheryMarks();
   const why=g!=='miss'?'':dy<-1?(p<.9?(en?' Under-drawn — it fell short.':'　引きが足りず、手前に落ちた'):(en?' Aim higher; the arrow drops.':'　矢は落ちる。もう少し上を狙え')):Math.abs(dx)>1?((A.wind<0)===(dx<0)&&Math.abs(A.wind)>.12?(en?' The wind carried it.':'　風に流された'):(en?' Off to the side.':'　横にそれた')):dy>1?(en?' Too high.':'　上へ抜けた'):'';
   A.msg.textContent=(g==='center'?(en?'A bull’s-eye!':'中った！ 黒星だ'):g==='hit'?(en?'It struck the target.':'的に当たった'):(en?'It went into the earth bank.':'外れて垜に刺さった'))+why;
@@ -18342,7 +18436,9 @@ const HEIAN_TUT_CTX={gate:['町で人の頼みを聞き、名を知られれば�
 const heianTutOff=()=>!!navigator.webdriver&&!/[?&]tutorial=1(&|$)/.test(location.search);
 const heianTutGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return null;}};
 const heianTutSet=(k,v)=>{try{localStorage.setItem(k,String(v));return true;}catch(e){return false;}};
-const heianTutText=e=>{const c=heianDiscoverCount();return(heianLang==='en'?e[1]:e[0]).replace('{n}',c.found).replace('{t}',c.total);};
+// 2026-10-20 スマホ: 「クリック」は「タップ」、キー（E・B・N）の案内はボタンの名前に言い換える（キーボードが無い）
+const HEIAN_TUT_TOUCH=[[/クリック/g,'タップ'],[/ E で話しかけてみよう/,'「話しかける」を押してみよう'],[/お辞儀（B）/,'お辞儀'],[/「聞き書き帳」（N）/,'☰ の「聞き書き帳」'],[/\bClick\b/g,'Tap'],[/click/g,'tap'],[/ and press E to talk/,' and tap “Talk to”'],[/ \(B\)/,''],[/ \(N\)/,' (☰)']];
+const heianTutText=e=>{const c=heianDiscoverCount();let s=(heianLang==='en'?e[1]:e[0]).replace('{n}',c.found).replace('{t}',c.total);if(heianIsTouch)for(const[a,b]of HEIAN_TUT_TOUCH)s=s.replace(a,b);return s;};
 let heianTut=null;
 function heianTutStop(){if(!heianTut)return;clearTimeout(heianTut.timer);heianTut.el.remove();heianTut=null;}
 function heianTutShow(list,skip=true){heianTutStop();const hud=document.getElementById('heianGameHud');if(!hud||!list?.length)return false;const en=heianLang==='en';
@@ -18365,7 +18461,12 @@ function heianTutAll(){const hud=document.getElementById('heianGameHud');if(!hud
  const h=document.createElement('h2');h.textContent=en?'How to play':'あそびかた';el.appendChild(h);
  const sec=(title,items)=>{const t=document.createElement('h3');t.textContent=title;const ul=document.createElement('ul');for(const e of items){const li=document.createElement('li');li.textContent=heianTutText(e);ul.appendChild(li);}el.append(t,ul);};
  sec(en?'Getting around':'歩き方',HEIAN_TUT[0]);sec(en?'More to do':'遊びの広がり',HEIAN_TUT[1]);sec(en?'Errands and the gate list':'頼みごとと門籍',[...HEIAN_TUT[2],HEIAN_TUT_CTX.gate,HEIAN_TUT_CTX.found]);
- sec(en?'Gestures':'しぐさ',[['Space 跳ぶ・Q 踊る・F 祈る・B お辞儀・G 手を振る・R 持ち上げる・C 座る・V ついていく','Space jump · Q dance · F pray · B bow · G wave · R lift · C sit · V follow']]);
+ // 2026-10-20 監査「あそびかたに おまかせ・弓・盤双六・蹴鞠・地点移動が無い」。盤双六と蹴鞠は今は見るだけなので「眺める」と書く
+ sec(en?'Moving around':'移動する',[['行き先の一覧か地図の印で選ぶと「歩いて行く」か「すぐ移る」を選べる','Pick a place from the list or the map, then choose “Walk there” or “Go now”.'],
+  [heianIsTouch?'「おまかせ」で、鉄の童が都のどこかへ勝手に歩いていく。途中で人や遊びを眺めて立ち止まる':'おまかせ（O）で、鉄の童が都のどこかへ勝手に歩いていく。途中で人や遊びを眺めて立ち止まる','“Wander” (O) lets the tin robot stroll anywhere in the capital, stopping to watch people and games.']]);
+ sec(en?'Join in, or watch':'参加する・眺める',[['弓: 左右の近衛府・兵衛府の射場で、朝（8〜11時半）と昼過ぎ（13〜16時半）に稽古している。射手に話しかけて「射させてもらえる？」で三本射れる','Archery: the four guard offices practise in the morning (8–11:30) and afternoon (13–16:30). Ask an archer “May I shoot?” to loose three arrows.'],
+  ['盤双六: 町のあちこちで二人が賽を振って打っている（今は眺めるだけ）','Sugoroku: pairs throw dice at boards around town (watch only for now).'],['蹴鞠: 朝堂院の西で官人が鞠を蹴っている（眺めるだけ）','Kemari: officials kick the ball west of the Chōdōin (watch only).']]);
+ sec(en?'Gestures':'しぐさ',[heianIsTouch?['下の「動作」から、跳ぶ・踊る・祈る・お辞儀・手を振る・持ち上げる・座る','From “Actions” below: jump, dance, pray, bow, wave, lift, sit.']:['Space 跳ぶ・Q 踊る・F 祈る・B お辞儀・G 手を振る・R 持ち上げる・C 座る・V ついていく','Space jump · Q dance · F pray · B bow · G wave · R lift · C sit · V follow']]);
  const c=document.createElement('button');c.type='button';c.textContent=en?'Close':'閉じる';const close=()=>{el.remove();removeEventListener('keydown',esc,true);},esc=e=>{if(e.key==='Escape'){e.stopPropagation();close();}};
  c.addEventListener('click',e=>{e.stopPropagation();close();});addEventListener('keydown',esc,true);el.addEventListener('pointerdown',e=>e.stopPropagation());el.appendChild(c);hud.appendChild(el);c.focus();}
 window.__heianTut=(o={})=>{if(o.reset)try{localStorage.removeItem(HEIAN_TUT_KEY);for(const k of Object.keys(HEIAN_TUT_CTX))localStorage.removeItem('hakoniwakit.heian.tip.'+k);}catch(e){}
@@ -18770,7 +18871,7 @@ function updateHeianDialog(now,ctx,rp,hud){
  if(target&&!heianDialog.hint){const b=document.createElement('button');b.type='button';b.className='heian-dialog-hint';b.addEventListener('pointerdown',ev=>ev.stopPropagation());
   b.title='右上の✕かHキーで消せます';b.addEventListener('click',ev=>{ev.stopPropagation();if(heianHintXHit(ev,b))return heianHintsToggle(true);heianDialogTalk();});hud.appendChild(b);heianDialog.hint=b;}
  if(heianDialog.hint){if(!target){heianDialog.hint.remove();heianDialog.hint=null;heianDialog.hintCand=null;}
-  else if(heianDialog.hintCand!==target.key){heianDialog.hintCand=target.key;heianDialog.hint.textContent=heianLang==='en'?'E: Talk to '+(target.char?heianTr(target.char.name):'the '+heianTr(target.who)):'E：'+(target.char?target.char.name:target.who)+'に話しかける';}} // 1.88
+  else if(heianDialog.hintCand!==target.key){heianDialog.hintCand=target.key;heianDialog.hint.textContent=heianLang==='en'?(heianIsTouch?'Talk to ':'E: Talk to ')+(target.char?heianTr(target.char.name):'the '+heianTr(target.who)):(heianIsTouch?'':'E：')+(target.char?target.char.name:target.who)+'に話しかける';}} // 1.88。2026-10-20 スマホはキーが無いので「E：」を付けない（押せるボタン）
 }
 function heianDialogTalk(c=heianDialogTarget()){if(!c)return false;if(c.char)heianDir().najimiTalk(c.char.id,heianClock.day); // なじみ度: 話しかけると+0.5（1日1回）
  const ctx=heianDialog.ctx||heianWorldState();return heianDialogOpen(c,heianDialogFor(c,ctx.tags),ctx);}
@@ -18783,7 +18884,8 @@ function heianDialogPickAt(ev){
  const scr=p=>{const n=p.clone().project(camera);return n.z<1&&Math.abs(n.x)<1.05&&Math.abs(n.y)<1.05?[(n.x*.5+.5)*r.width,(.5-n.y*.5)*r.height]:null;};
  let best=null,bs=Infinity;
  for(const c of heianSpeech.cands){const p=c.head();if(!p)continue;const hs=scr(p),fs=scr(p.clone().setY(p.y-15));if(!hs||!fs)continue;
-  const h=Math.max(8,fs[1]-hs[1]),half=Math.max(14,h*.35),top=hs[1]-Math.max(12,h*.25),bot=fs[1]+8;
+  // 指（touch・pen）は当たりの枠を広げる: 幅は最小44px（指先の幅）・上下も8px足す（2026-10-20 モバイル改善）
+  const fat=ev.pointerType==='touch'||ev.pointerType==='pen',h=Math.max(8,fs[1]-hs[1]),half=Math.max(fat?22:14,h*.35),top=hs[1]-Math.max(fat?20:12,h*.25),bot=fs[1]+(fat?16:8);
   if(Math.abs(x-hs[0])>half||y<top||y>bot)continue;const s=Math.abs(x-hs[0])/half+Math.abs(y-(top+bot)/2)/((bot-top)/2)+c.dist/2000;
   if(s<bs){bs=s;best=c;}}
  return best;}
@@ -20839,7 +20941,7 @@ function setHeianWalkPerformance(active){
    if(HEIAN_WALK_HIDDEN_LAYERS.has(o.name)){hidden.push([o,o.visible]);o.visible=false;}
   });
   heianWalkRenderState={pixelRatio:renderer.getPixelRatio(),hidden};
-  renderer.setPixelRatio(Math.min(1,heianWalkRenderState.pixelRatio));
+  renderer.setPixelRatio(Math.min(1,heianWalkRenderState.pixelRatio,heianQualityPixelRatio()));
   camera.far=HEIAN_WALK_CAMERA_FAR;camera.updateProjectionMatrix();resize();
  }else{
   if(!heianWalkRenderState)return;
@@ -20866,7 +20968,8 @@ let heianAdaptive={scale:1,ema:16,lastFrame:0,lastAdjust:0};
 // 「初めて見る物の準備」、cpu が大きければ更新処理、どちらでもなければ描画（GPU）が原因の見当がつく。
 // Shift+P で左下に表示（fps・回数・直近6件）。window.__heianSlowFrames() で全件。タブが裏にある間は数えない
 renderer.info.autoReset=false; // AO などの後段の描画で1コマの描画回数が上書きされないよう、animate の頭でまとめて reset する
-const heianSlow={last:0,cpu:0,programs:0,textures:0,geometries:0,log:[],count:0,frames:0,ema:0,box:null,shown:false,drawn:0,calls:0,tris:0};
+// 2026-10-20 スマホには Shift+P が無いので ?perf=1 で最初から出す（開発用）。スマホでは画面の上（タイトルの下）に小さく
+const heianSlow={last:0,cpu:0,cpuEma:0,programs:0,textures:0,geometries:0,log:[],count:0,frames:0,ema:0,box:null,shown:/[?&]perf=1(&|$)/.test(location.search),drawn:0,calls:0,tris:0};
 function heianSlowFrameTick(now){const S=heianSlow,I=renderer.info;S.calls=I.render.calls;S.tris=I.render.triangles;I.reset();
  if(!heianGameMode||document.hidden){S.last=0;return;}
  const progs=I.programs?.length||0,tex=I.memory.textures,geo=I.memory.geometries;
@@ -20874,17 +20977,19 @@ function heianSlowFrameTick(now){const S=heianSlow,I=renderer.info;S.calls=I.ren
   if(gap>120){S.count++;S.log.push({at:new Date().toTimeString().slice(0,8),gap:Math.round(gap),cpu:Math.round(S.cpu),newShaders:progs-S.programs,newTextures:tex-S.textures,newGeometries:geo-S.geometries,
    mode:heianWalk.active?'walk':'drone',place:heianNearestDisplayId||'',x:Math.round(camera.position.x),z:Math.round(camera.position.z),calls:S.calls,tris:S.tris,bubbles:heianSpeech?.bubbles?.length||0,quality:heianAdaptive.scale});
    if(S.log.length>40)S.log.shift();}}
+ S.cpuEma=S.cpuEma?S.cpuEma*.95+S.cpu*.05:S.cpu;
  S.last=now;S.programs=progs;S.textures=tex;S.geometries=geo;if(S.shown)heianSlowDraw();}
 function heianSlowDraw(){const S=heianSlow,now=performance.now();if(now-S.drawn<500)return;S.drawn=now;
  if(!S.box){S.box=document.createElement('div');S.box.id='heianPerfBox';S.box.style.cssText='position:fixed;left:12px;bottom:12px;z-index:60;max-width:640px;padding:10px 12px;background:rgba(20,26,33,.88);color:#e8edf2;font:14px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;pointer-events:none';document.body.appendChild(S.box);}
- const lines=[`fps ${S.ema?Math.round(1000/S.ema):0}　もたつき ${S.count}回／${S.frames}コマ　画質×${heianAdaptive.scale}`,`描画 ${S.calls}回・三角形 ${Math.round(S.tris/1000)}k`];
+ const lines=[`fps ${S.ema?Math.round(1000/S.ema):0}　1コマ ${Math.round(S.ema||0)}ms（更新 ${Math.round(S.cpuEma)}ms）　もたつき ${S.count}回／${S.frames}コマ`,
+  `画質 ${HEIAN_QUALITY[heianQualityKey].ja}・解像度×${Math.round(renderer.getPixelRatio()*100)/100}（自動×${heianAdaptive.scale}）　描画 ${S.calls}回・三角形 ${Math.round(S.tris/1000)}k`];
  for(const e of S.log.slice(-6).reverse())lines.push(`${e.at} ${e.gap}ms cpu${e.cpu} ${e.mode} ${e.place} 新シェーダ${e.newShaders}・新テクスチャ${e.newTextures}・新形状${e.newGeometries} 描画${e.calls}`);
  S.box.textContent=lines.join('\n');}
-window.__heianSlowFrames=()=>({count:heianSlow.count,frames:heianSlow.frames,fps:heianSlow.ema?Math.round(1000/heianSlow.ema):0,calls:heianSlow.calls,tris:heianSlow.tris,log:heianSlow.log.slice()});
+window.__heianSlowFrames=()=>({count:heianSlow.count,frames:heianSlow.frames,cpuMs:Math.round(heianSlow.cpuEma*10)/10,frameMs:Math.round((heianSlow.ema||0)*10)/10,fps:heianSlow.ema?Math.round(1000/heianSlow.ema):0,calls:heianSlow.calls,tris:heianSlow.tris,log:heianSlow.log.slice()});
 addEventListener('keydown',e=>{if(!heianGameMode||e.code!=='KeyP'||!e.shiftKey||e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;const t=e.target;if(t&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))return;
  e.preventDefault();heianSlow.shown=!heianSlow.shown;if(heianSlow.shown){heianSlow.drawn=0;heianSlowDraw();}else{heianSlow.box?.remove();heianSlow.box=null;}});
 function heianAdaptiveQuality(){
- if(!heianGameMode){if(heianAdaptive.scale!==1){heianAdaptive.scale=1;renderer.setPixelRatio(devicePixelRatio);resize();}heianAdaptive.lastFrame=0;return;}
+ if(!heianGameMode){if(heianAdaptive.scale!==1){heianAdaptive.scale=1;renderer.setPixelRatio(Math.min(devicePixelRatio,heianQ.prMax));resize();}heianAdaptive.lastFrame=0;return;}
  const now=performance.now();
  if(heianAdaptive.lastFrame){const dt=Math.min(200,now-heianAdaptive.lastFrame);heianAdaptive.ema+=(dt-heianAdaptive.ema)*.08;}
  heianAdaptive.lastFrame=now;
@@ -20893,13 +20998,39 @@ function heianAdaptiveQuality(){
  const before=heianAdaptive.scale;
  // 下限.6→.7（2026-08-19井内さん「低解像度になる」。稜線カリング・proxy屋根で負荷が下がった分、
  // 解像度は落としすぎない）
- if(heianAdaptive.ema>33)heianAdaptive.scale=Math.max(.7,heianAdaptive.scale-.1);
- else if(heianAdaptive.ema<20)heianAdaptive.scale=Math.min(1,heianAdaptive.scale+.1);
- if(before===heianAdaptive.scale)return;
- // 歩行中は既存の上限1（setHeianWalkPerformance）を尊重してその中で下げる
- const base=heianWalkRenderState?Math.min(1,devicePixelRatio):devicePixelRatio;
- renderer.setPixelRatio(Math.max(.5,base*heianAdaptive.scale));resize();
+ // 2026-10-20 下限は画質の段（heianQ.prFloor）。高画質・標準は従来の .7
+ if(heianAdaptive.ema>33)heianAdaptive.scale=Math.max(heianQ.prFloor,Math.round((heianAdaptive.scale-.1)*100)/100);
+ else if(heianAdaptive.ema<20)heianAdaptive.scale=Math.min(1,Math.round((heianAdaptive.scale+.1)*100)/100);
+ heianQualitySlowWatch();
+ // 歩行中は既存の上限1（setHeianWalkPerformance）を尊重してその中で下げる。画質の段の上限（prMax）も掛ける。
+ //  段を切り替えた・歩行を出入りした後も、ここで目標の画素比へ合わせ直す（旧: 倍率が変わった時だけ）
+ const want=heianQualityPixelRatio();
+ if(before===heianAdaptive.scale&&Math.abs(renderer.getPixelRatio()-want)<.01)return;
+ renderer.setPixelRatio(want);resize();
 }
+function heianQualityPixelRatio(){const base=Math.min(heianWalkRenderState?Math.min(1,devicePixelRatio):devicePixelRatio,heianQ.prMax);return Math.max(.5,base*heianAdaptive.scale);}
+// 標準のスマホで重い（解像度を下限まで下げても1コマ50ms超が約7秒続く）とき、1回だけ「軽量」を勧める。断ったら（heian-quality-tip=0）もう出さない
+let heianQualitySlow=0,heianQualityTipShown=false;
+function heianQualitySlowWatch(){
+ if(heianQualityKey!=='mid'||!heianIsTouch||heianQualityTipShown||document.hidden)return;
+ if(heianAdaptive.scale<=heianQ.prFloor+.001&&heianAdaptive.ema>50)heianQualitySlow++;else heianQualitySlow=Math.max(0,heianQualitySlow-1);
+ if(heianQualitySlow<8)return;heianQualityTipShown=true;
+ try{if(localStorage.getItem('heian-quality-tip')==='0'||localStorage.getItem('heian-quality'))return;}catch(e){return;}
+ heianQualityTip();}
+function heianQualityTip(){const hud=document.getElementById('heianGameHud');if(!hud)return null;hud.querySelector('.heian-quality-tip')?.remove();const en=heianLang==='en';
+ const el=document.createElement('div');el.className='heian-quality-tip';el.setAttribute('role','status');
+ const p=document.createElement('p');p.textContent=en?'It seems slow on this device. "Light" quality may run smoother.':'動きが重いようです。画質を「軽量」にすると軽くなります（☰ の「画質」でいつでも戻せます）';
+ const yes=document.createElement('button');yes.type='button';yes.textContent=en?'Use Light':'軽量にする';yes.addEventListener('click',e=>{e.stopPropagation();heianQualitySet('low');el.remove();});
+ const no=document.createElement('button');no.type='button';no.textContent=en?'Keep':'このまま';no.addEventListener('click',e=>{e.stopPropagation();try{localStorage.setItem('heian-quality-tip','0');}catch(_){}el.remove();});
+ el.addEventListener('pointerdown',e=>e.stopPropagation());el.append(p,yes,no);hud.appendChild(el);return el;}
+// 段を切り替える（☰ の「画質」・勧めの「軽量にする」）。解像度は次の自動調整（0.9秒以内）で合わせる。群衆の間引き・植栽はその場で
+function heianQualitySet(key,save=true){if(!HEIAN_QUALITY[key])return heianQualityKey;heianQualityKey=key;heianQ=HEIAN_QUALITY[key];
+ if(save)try{localStorage.setItem('heian-quality',key);}catch(e){}
+ HEIAN_CROWD_LOD.far=heianQ.crowdFar;HEIAN_CROWD_LOD.every=heianQ.crowdEvery;heianAdaptive.scale=Math.max(heianAdaptive.scale,heianQ.prFloor);heianAdaptive.lastAdjust=0;
+ heianQualitySync?.();return key;}
+let heianQualitySync=null; // ☰ のボタンの文字を合わせる（メニューを作る時に入る）
+window.__heianQuality=k=>{if(k)heianQualitySet(k,false);return{key:heianQualityKey,...heianQ,touch:heianIsTouch,pixelRatio:renderer.getPixelRatio(),want:heianQualityPixelRatio(),scale:heianAdaptive.scale,crowd:{...HEIAN_CROWD_LOD},slow:heianQualitySlow};}; // 検証用（保存しない）
+window.__heianQualityTip=()=>!!heianQualityTip(); // 検証用
 window.__heianAdaptiveInfo=()=>({scale:heianAdaptive.scale,emaMs:Math.round(heianAdaptive.ema*10)/10,pixelRatio:renderer.getPixelRatio()}); // 検証用
 // 検証用: 直近レンダーの描画統計（draw call・三角形数）。カクつきの原因切り分けに使う（2026-08-18）
 // ---- 写実モード（2026-09-25井内さん「光と影」）。太陽の本物の影（shadowMap）・トーンマップ・遠景の霞・外形線を消す。
@@ -21461,6 +21592,15 @@ window.__heianRenderTime=(k=8,hide=null)=>{const gl=renderer.getContext(),px=new
  const ms=(performance.now()-t0)/k,calls=renderer.info.render.calls,tris=renderer.info.render.triangles;for(const o of hidden)o.visible=true;return{ms:Math.round(ms*10)/10,calls,tris,hidden:hidden.length};};
 // 検証用（2026-10-12 軽量化）: 1コマの内訳。行列の更新（scene.updateMatrixWorld）・描画の命令を出す時間（CPU・GPUを待たない）・GPUを待った合計、
 //  場面の物の数（全部・見えている mesh・matrixAutoUpdate の物）。描画の解像度を pr 倍にした時間も（塗りの重さの見当）
+// 検証用（2026-10-20 モバイル改善）: 今の視界で描かれる物（見えていて視錐台に入る mesh・line）を、場面の直下の組ごとと、カメラからの距離（〜50m・〜150m・〜400m・それより遠い）で数える
+//  inside: その名前の組の中を、1段下の組ごとに数える（距離の段は 〜100m・〜400m・〜1km・〜2km・それより遠い）
+window.__heianDrawBreakdown=(top=14,inside=null)=>{camera.updateMatrixWorld();const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),cp=camera.position,sph=new THREE.Sphere(),groups={},bins=[0,0,0,0,0],lim=[1000,4000,10000,20000];
+ const walk=(o,root)=>{if(!o.visible)return;if((o.isMesh||o.isLine||o.isPoints)&&o.geometry){const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(g.boundingSphere){sph.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);
+   if(o.frustumCulled===false||fr.intersectsSphere(sph)){const d=Math.max(0,sph.center.distanceTo(cp)-sph.radius);let b=0;while(b<4&&d>=lim[b])b++;bins[b]++;const k=(root?.name||'?').slice(0,24);const G=groups[k]||(groups[k]={n:0,d:[0,0,0,0,0]});G.n++;G.d[b]++;}}}
+  for(const c of o.children)walk(c,root||c);};
+ const base=inside?(()=>{let f=null;scene.traverse(o=>{if(!f&&o.name===inside)f=o;});return f;})():scene;if(!base)return null;
+ for(const c of base.children)walk(c,c);
+ return{bins:{'<100m':bins[0],'<400m':bins[1],'<1km':bins[2],'<2km':bins[3],'far':bins[4]},groups:Object.entries(groups).sort((a,b)=>b[1].n-a[1].n).slice(0,top)};};
 window.__heianFrameSplit=(k=5,pr=null)=>{const gl=renderer.getContext(),px=new Uint8Array(4),sync=()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);
  let objs=0,meshes=0,auto=0;scene.traverse(o=>{objs++;if(o.matrixAutoUpdate)auto++;if(o.isMesh&&o.visible)meshes++;});
  const prev=renderer.getPixelRatio();if(pr)renderer.setPixelRatio(prev*pr);
@@ -21493,6 +21633,33 @@ function heianVegCullApply(range){const st=heianVegCull,p=camera.position;
   if(far){if(o.visible){o.visible=false;o.userData.vegCulled=true;}hid++;}else if(o.userData.vegCulled){o.visible=true;o.userData.vegCulled=false;}}
  st.range=range;st.hidden=hid;return hid;}
 window.__heianVegCull=(range)=>({hidden:heianVegCullApply(range),of:heianVegCull.list.length}); // 検証用: range=0 で全部戻す
+// ---- 遠くて小さく写る建物の部品を描かない（2026-10-20 モバイル改善）。スマホの東市で描画 3684 回のうち 2738 回が 2km より遠い物
+//  （主要施設の部品 1046・住宅 1198・貴族邸 422・__heianDrawBreakdown）。画面で px 画素より小さく写る部品だけ（大極殿の屋根のような大きな物は遠くても残る）。
+//  歩く間だけ・6コマに1回。位置と大きさは一覧を作る時に世界座標で覚える（建物は動かない）。消したのは自分が消した物だけ戻す（userData.farCulled）。
+//  扉・灯り・火・影・水面のように他の所が出し入れする物は対象にしない。画質の段の farPx（軽量6・標準3・高画質0＝しない）。
+//  🚫 3・1.5 では住宅（1/8町の組を並べた InstancedMesh・1個の半径約15m）が 3km 先でも 3画素を超え、ほとんど減らなかった（描画 3682→3662）
+const heianFarCull={list:null,builds:0,tick:0,active:false,hidden:0,px:0};
+const HEIAN_FAR_CULL_GROUPS=/^(平安京主要施設|平安京住宅|平安京貴族邸|朱雀大路の坊城|平安京水田)/,HEIAN_FAR_CULL_SKIP=/扉|戸|簾|灯|篝|火|夜|glow|星|月|影|水面|煙/;
+function heianFarCullApply(px){const st=heianFarCull;
+ // 一覧は1回だけ作る（建物は起動で出来上がって動かない）。🚫 60回ごとに作り直すと、スマホ相当（CPU 1/4）で約1秒止まるコマが定期的に出た
+ //  🚫 1回きりにしたら、歩き始めの時点（建物・住宅・外形線がまだ足されている途中）の3件だけで固まった。場面の直下・地形の組の子の数と、後回しの仕事が残っているかが変わった時だけ作り直す
+ const sig=scene.children.length+':'+(heianTerrainGroup?.children.length||0)+':'+(heianEdgeJobs.length>0)+':'+(heianLaterJobs.length>0)+':'+(heianSettlementRuntime?.chunks?.length||0);
+ if(!st.list||st.sig!==sig){st.sig=sig;if(st.list)for(const e of st.list)if(e.o.userData.farCulled){e.o.visible=true;e.o.userData.farCulled=false;}st.list=[];
+  // 🚫 初版は heianTerrainGroup の子だけを見ていて、住宅（町の組み立てが別に足す）が一覧に入らなかった。名前の組を場面全体から集める（入れ子の中は見ない）
+  const tops=[];scene.traverse(o=>{if(HEIAN_FAR_CULL_GROUPS.test(o.name||'')&&!tops.some(t=>{for(let p=o.parent;p;p=p.parent)if(p===t)return true;return false;}))tops.push(o);});
+  for(const top of tops){if(!HEIAN_FAR_CULL_GROUPS.test(top.name||''))continue;top.updateMatrixWorld(true);
+   // 🚫 初版は InstancedMesh も形（1個分・原点のまわり）の球で測り、東市の売り台・小屋（並べた InstancedMesh）が目の前でも「遠くて小さい」と消えた。InstancedMesh は全部の個体を包む球（o.boundingSphere）で測る
+   top.traverse(o=>{if(!(o.isMesh||o.isLine)||!o.geometry||o.isBatchedMesh||HEIAN_FAR_CULL_SKIP.test(o.name||''))return;let b;
+    //  距離は全部を包む球のいちばん近い所まで、大きさは1個分（形の球の半径）で測る＝いちばん近い1個でも px より小さい時だけ消す
+    const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(o.isInstancedMesh){if(typeof o.computeBoundingSphere!=='function')return;if(!o.boundingSphere)o.computeBoundingSphere();b=o.boundingSphere;}else b=g.boundingSphere;if(!b||!Number.isFinite(b.radius)||b.radius<0||!g.boundingSphere)return; /* 🚫 isInstancedMesh の印だけ付いた線（computeBoundingSphere が無い）で例外になり、一覧が3件で止まった */
+    const s=b.clone().applyMatrix4(o.matrixWorld),one=o.isInstancedMesh?g.boundingSphere.radius*o.matrixWorld.getMaxScaleOnAxis():s.radius;st.list.push({o,x:s.center.x,y:s.center.y,z:s.center.z,r:s.radius,one});});}}
+ const p=camera.position,K=(vp.clientHeight/2)/Math.tan(THREE.MathUtils.degToRad(camera.fov||50)/2);let hid=0;
+ for(const e of st.list){const o=e.o;let cull=false;if(px>0){const dx=e.x-p.x,dy=e.y-p.y,dz=e.z-p.z,d=Math.sqrt(dx*dx+dy*dy+dz*dz)-e.r;cull=d>2000&&e.one*K<px*d;}
+  if(cull){if(o.visible){o.visible=false;o.userData.farCulled=true;}if(o.userData.farCulled)hid++;}else if(o.userData.farCulled){o.visible=true;o.userData.farCulled=false;}}
+ st.px=px;st.hidden=hid;return hid;}
+window.__heianFarCullTops=()=>{const out=[];scene.traverse(o=>{if(HEIAN_FAR_CULL_GROUPS.test(o.name||'')){let m=0,sk=0;o.traverse(q=>{if(q.isMesh||q.isLine){m++;if(HEIAN_FAR_CULL_SKIP.test(q.name||''))sk++;}});out.push({name:o.name.slice(0,20),type:o.type,parent:(o.parent?.name||'').slice(0,16),meshes:m,skip:sk});}});return out.slice(0,20);}; // 検証用
+window.__heianFarCullList=()=>(heianFarCull.list||[]).map(e=>{let p=e.o,path=[];while(p&&p!==scene&&path.length<4){path.unshift((p.name||p.type).slice(0,16));p=p.parent;}return{path:path.join('/'),inst:!!e.o.isInstancedMesh,count:e.o.count,r:Math.round(e.r),one:Math.round(e.one),d:Math.round(Math.hypot(e.x-camera.position.x,e.z-camera.position.z)),vis:e.o.visible,culled:!!e.o.userData.farCulled};}); // 検証用
+window.__heianFarCull=(px,rebuild)=>(rebuild&&(heianFarCull.sig=null),{hidden:heianFarCullApply(px??heianQ.farPx),of:heianFarCull.list.length}); // 検証用: 0 で全部戻す
 window.__heianSetCast=(re,v)=>{const R=new RegExp(re);let n=0;scene.traverse(o=>{if(o.isMesh&&R.test(o.name||'')&&o.castShadow!==!!v){o.castShadow=!!v;n++;}});return n;}; // 検証用: 名前に当たる mesh の影落としを切り替え
 window.__heianShadowAuto=on=>{renderer.shadowMap.autoUpdate=!!on;if(!on)renderer.shadowMap.needsUpdate=false;return renderer.shadowMap.autoUpdate;}; // 検証用: 影の地図を毎コマ描くか（切ると今ある影のまま固定）
 window.__heianSetVisible=(re,v)=>{const R=new RegExp(re),hit=[];scene.traverse(o=>{if(R.test(o.name||'')&&!hit.some(q=>{for(let p=o.parent;p;p=p.parent)if(p===q)return true;return false;}))hit.push(o);});hit.forEach(o=>o.visible=!!v);return hit.map(o=>o.name);}; // 検証用（2026-10-12）: 名前に当たる最上位の物を表示/非表示（重さの切り分け）
@@ -21842,6 +22009,7 @@ const HEIAN_LEG_CLOSE={右股開き:-18,左股開き:-18};
 window.__heianLegClose=v=>{if(Number.isFinite(v))HEIAN_LEG_CLOSE.右股開き=HEIAN_LEG_CLOSE.左股開き=v;return{...HEIAN_LEG_CLOSE};};
 const HEIAN_WAVE_A={右肩振り:-150,右肩開き:25,右肘曲げ:-40,右手開閉:-15,首左右:-4,目笑い:5};
 const HEIAN_WAVE_B={右肩振り:-150,右肩開き:55,右肘曲げ:-12,右手開閉:-15,首左右:4,目笑い:5};
+const HEIAN_YUMI_LOOK=40; // 弓の物見: 引き分けで顔を的（左）へ回す角度（首回転・度）。体は横向きのまま顔だけ少し的へ（2026-10-20 井内さん「顔も少し的の方に」）
 // ---- 持ち上げる・運ぶ（2026-10-11井内さん「ロボットに持ち上げるという動作を追加したい。将来クエストなどで石、木材、食料などを持ち上げたり運ぶ」）。
 //  R（または「持ち上げる」）: 近く（reach）の荷へ向き、しゃがんで（腰を折り膝を曲げる）両手を伸ばし、つかんで胸の前へ抱えて立つ。
 //  抱えている間は腕だけ HEIAN_CARRY_POSE に固め、脚はふだんどおり歩く。ホバー・大股はしない（host.heavy）・歩みは speed 倍。ほかのしぐさはしない。
@@ -21878,14 +22046,35 @@ function heianCarryUpdate(rt){const C=rt.carry;if(!C)return;const name=rt.action
 // ロボの弓（2026-10-20）。射場で射る間（heianArchery.open）だけ、前へ出ている方の手に弓（弧の板と弦）を持たせる。弓は heianLiftRoot と同じく撮影で消えないよう組を残す一覧へ
 let heianRobotBow=null;
 function heianRobotBowTick(rt){const on=!!heianArchery.open;if(!on){if(heianRobotBow)heianRobotBow.visible=false;return;}
- if(!heianRobotBow){heianLiftablesEnsure();const g=new THREE.Group();g.name='ロボの弓（推定）';const R=11,arc=Math.PI*.78,m=new THREE.MeshLambertMaterial({color:0x5a3a22});
+ if(!heianRobotBow){heianLiftablesEnsure();const g=new THREE.Group();g.name='ロボの弓（推定）';const R=16/* 11→16: 和弓は射手の背より長い（約2.2m）。11 では引き分けた右手が弓の長さほど後ろへ出た */,arc=Math.PI*.78,m=new THREE.MeshLambertMaterial({color:0x5a3a22});
   const bow=new THREE.Mesh(new THREE.TorusGeometry(R,.45,6,28,arc),m);bow.rotation.z=-arc/2;g.add(bow);
-  const top=[R*Math.cos(arc/2),R*Math.sin(arc/2)],str=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,top[1]*2,4),new THREE.MeshBasicMaterial({color:0xe8e0c8}));str.position.set(top[0],0,0);g.add(str);
-  g.userData.R=R;heianLiftRoot.add(g);heianRobotBow=g;}
- const hb=rt.handBodies||(rt.handBodies=rt.robotBodies.filter(b=>/^手首ブロック/.test(b.name||'')));const fx=Math.sin(rt.heading),fz=Math.cos(rt.heading);let best=null,bf=-1e9;
- for(const b of hb){const g=b.mesh.geometry;if(!g.boundingBox)g.computeBoundingBox();const c=g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(b.mesh.matrix),f=(c.x-rt.position.x)*fx+(c.z-rt.position.z)*fz;if(f>bf){bf=f;best=c;}}
+  // 弦は上下2本（弓の先→引く点）。引き分けの間は引く点を右手（的から遠い方の手）へ寄せて V 字に張る。矢は引く点から弓の握りの先へ（2026-10-20 井内さん「弦もちゃんと引いて欲しい」）
+  const sm=new THREE.MeshBasicMaterial({color:0xe8e0c8}),sg=new THREE.CylinderGeometry(.09,.09,1,4),s1=new THREE.Mesh(sg,sm),s2=new THREE.Mesh(sg,sm);g.add(s1,s2);
+  const ar=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,1,5),new THREE.MeshLambertMaterial({color:0xc9b48a}));ar.visible=false;g.add(ar);
+  g.userData={R,tip:[R*Math.cos(arc/2),R*Math.sin(arc/2)],s1,s2,ar};heianLiftRoot.add(g);heianRobotBow=g;}
+ // 弓は的に近い方の手（左手・的の方へ伸ばした手）。弧のふくらみは的の方へ（体が横向きなので、体の向きでなく的の向きで決める）
+ const S=heianArchery.S,a=S?Math.atan2(S.tx-rt.position.x,S.tz-rt.position.z):rt.heading,fx=Math.sin(a),fz=Math.cos(a);
+ const hb=rt.handBodies||(rt.handBodies=rt.robotBodies.filter(b=>/^手首ブロック/.test(b.name||'')));let best=null,bf=-1e9;
+ let pull=null,pf=1e9;
+ for(const b of hb){const g=b.mesh.geometry;if(!g.boundingBox)g.computeBoundingBox();const c=g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(b.mesh.matrix),f=(c.x-rt.position.x)*fx+(c.z-rt.position.z)*fz;if(f>bf){bf=f;best=c;}if(f<pf){pf=f;pull=c;}}
  if(!best)best=new THREE.Vector3(rt.position.x+fx*8,rt.position.y+14,rt.position.z+fz*8);
- const B=heianRobotBow,R=B.userData.R;B.visible=true;B.rotation.set(0,rt.heading-Math.PI/2,0);B.position.set(best.x-fx*R,best.y,best.z-fz*R);}
+ const B=heianRobotBow,U=B.userData,R=U.R,GY=4/* 握りは弓の中央より下（和弓は下から約1/3） */;B.visible=true;B.rotation.set(0,a-Math.PI/2,0);B.position.set(best.x-fx*R,best.y+GY,best.z-fz*R);
+ // 引く点（弓の組の座標・弦の中央が原点側 x=tip[0]）。yumi の .6〜.8秒で右手へ寄せ、1.55秒（離れ）で戻して少し震わせる
+ const A=rt.action,t=A?.name==='yumi'?(Number.isFinite(rt.posePin?.t)?rt.posePin.t:(performance.now()/1000-A.t0)/(A.k||1)):-1,[tx0,ty0]=U.tip;
+ const n=new THREE.Vector3(tx0,-GY,0),w=t>=.6&&t<1.55&&pull?THREE.MathUtils.smoothstep(t,.6,.8):0;
+ if(w){B.updateMatrixWorld(true);const h=B.worldToLocal(pull.clone());if(h.x>tx0)h.x=tx0;n.lerp(h,w);}
+ else if(t>=1.55&&t<1.85)n.z=Math.sin((t-1.55)*90)*(1.85-t)*2.4; // 離れの後の弦の震え
+ const seg=(m,p,q)=>{const d=q.clone().sub(p),L=d.length()||1e-3;m.position.copy(p).add(q).multiplyScalar(.5);m.scale.set(1,L,1);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.multiplyScalar(1/L));};
+ seg(U.s1,new THREE.Vector3(tx0,ty0,0),n);seg(U.s2,n,new THREE.Vector3(tx0,-ty0,0));
+ // 番えた矢: 打起しから離れまで。引く点から握り（x=R）の少し先まで
+ U.ar.visible=t>=.3&&t<1.55;if(U.ar.visible){const q=t<.6?new THREE.Vector3(tx0,-GY,0):n.clone();seg(U.ar,q,new THREE.Vector3(Math.max(R+3,q.x+10),-GY,0));}}
+// 検証用（2026-10-20）: 弓の構えの左右。left＝体の左の向きと的の向きの内積（1＝左肩が的）、hands＝各手首の的の方への出（f）と高さ、eye＝顔の向きと的の向きの内積
+window.__heianYumiDebug=()=>{const rt=heianTinRobotRuntime,S=heianArchery.S;if(!rt||!S)return null;const P=rt.position,a=Math.atan2(S.tx-P.x,S.tz-P.z),fx=Math.sin(a),fz=Math.cos(a),h=rt.heading;
+ const ctr=re=>{const v=new THREE.Vector3();let n=0;for(const b of rt.robotBodies)if(re.test(b.name||'')&&b.mesh.visible){const g=b.mesh.geometry;if(!g.boundingBox)g.computeBoundingBox();v.add(g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(b.mesh.matrix));n++;}return n?v.divideScalar(n):null;};
+ const hd=ctr(/^頭/),ey=ctr(/^目/),e=hd&&ey?new THREE.Vector2(ey.x-hd.x,ey.z-hd.z).normalize():null,B=heianRobotBow?.userData;
+ return{p:[P.x,P.y,P.z],t:[fx,fz],heading:+h.toFixed(2),left:+(Math.cos(h)*fx-Math.sin(h)*fz).toFixed(2),eye:e?+(e.x*fx+e.y*fz).toFixed(2):null,eyeFwd:e?+(e.x*Math.sin(h)+e.y*Math.cos(h)).toFixed(2):null,
+  hands:(rt.handBodies||[]).map(b=>{const g=b.mesh.geometry,c=g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(b.mesh.matrix);return{name:b.name,f:+((c.x-P.x)*fx+(c.z-P.z)*fz).toFixed(1),y:+(c.y-P.y).toFixed(1)};}),
+  nock:B?[B.s1.position,B.s2.position].map(v=>[v.x,v.y,v.z].map(q=>+q.toFixed(1))):null,arrow:B?.ar.visible};};
 window.__heianCarryDebug=()=>{const rt=heianTinRobotRuntime;if(!rt)return null;const r=v=>[v.x,v.y,v.z].map(q=>Math.round(q*10)/10);
  const hands=(rt.handBodies||[]).map(b=>{const g=b.mesh.geometry;if(!g.boundingBox)g.computeBoundingBox();const c=g.boundingBox.getCenter(new THREE.Vector3());const p=c.clone().applyMatrix4(b.mesh.matrix);b.mesh.updateWorldMatrix(true,false);const pw=c.clone().applyMatrix4(b.mesh.matrixWorld);return{name:b.name,local:r(p),world:r(pw),parent:b.mesh.parent?.type};});
  const m=rt.carry?.mesh;return{pos:r(rt.position),heading:+rt.heading.toFixed(2),hands,item:m?{pos:r(m.position),visible:m.visible,parent:m.parent?.type,inScene:m.parent===scene}:null};};
@@ -21932,7 +22121,12 @@ const HEIAN_ROBOT_ACTIONS=Object.freeze({
   [2.05,{体ロール:-4,首左右:-6,胴ひねり:-3,腰前屈:3,首前後:3,右肩振り:-8,左肩振り:-8},0],[2.6,{},0]]},
   // 座る: 1.1秒で座り、hold（1.1）で止まる。立つときは hold から先（1.1〜2.3）を流す
   // 弓を射る（2026-10-20・射場で「射させてもらう」）。ボタンは出さない。的の方を向き、左腕を前へ伸ばして弓を押し、右腕を前から肘を曲げて耳元へ引き分け、1.5秒で放つ。弓は heianRobotBowTick が左手に持たせる
-  yumi:{label:'弓',key:'',hidden:true,dur:2.6,stand:true,keys:[[0,{},0],[.45,{左肩振り:-80,右肩振り:-80,右肘曲げ:-15,首前後:2},0],[1.35,{左肩振り:-86,左肘曲げ:0,右肩振り:-84,右肩開き:-18,右肘曲げ:-125,首左右:-6},0],[1.5,{左肩振り:-86,右肩振り:-60,右肩開き:10,右肘曲げ:-35,首左右:-6},0],[2.1,{左肩振り:-84,右肩振り:-50,右肘曲げ:-30},0],[2.6,{},0]]},
+  // 2026-10-20 井内さん「体を横向きにして、ちゃんと左手で弓を構えて、右手で矢を引いて放って」: 体は的に対して横（左肩が的・heianArcheryOpen が向きを決める）。
+  //  ①打起し（両腕を上へ） ②引き分け: 左腕は横（的の方）へ伸ばして弓を押し、右腕は横へ開いて肘を曲げ、手を右の耳もとへ ③離れ: 右手が後ろへ抜ける ④残心
+  //  肩開き＋＝腕を外（横）へ上げる・肩振り−＝前へ上げる（memory heian-robot-play-feel）
+  //  🚫 2026-10-20 井内さん「左右が逆ではないか」: このロボの「右〜」の関節は体の +x＝体の左側の腕（前が +z）。弓手（的の側・体の左）は「右〜」、引く手は「左〜」で書く
+  yumi:{label:'弓',key:'',hidden:true,dur:2.8,stand:true,keys:[[0,{},0],[.45,{右肩振り:-150,左肩振り:-150,右肘曲げ:-20,左肘曲げ:-25},0],[.75,{右肩振り:-60,右肩開き:70,左肩振り:-110,左肩開き:-30,左肘曲げ:-40,首回転:HEIAN_YUMI_LOOK*.6},0],
+   [1.4,{右肩開き:88,右肩振り:-5,左肩開き:85,左肩振り:-15,左肘曲げ:-135,首回転:HEIAN_YUMI_LOOK,首左右:-5},0],[1.55,{右肩開き:88,右肩振り:-5,左肩開き:100,左肩振り:-5,左肘曲げ:-50,首回転:HEIAN_YUMI_LOOK,首左右:-5},0],[2.2,{右肩開き:86,左肩開き:96,左肘曲げ:-45,首回転:HEIAN_YUMI_LOOK,首左右:-5},0],[2.8,{},0]]},
   sit:{label:'座る',key:'KeyC',dur:2.3,stand:true,hold:1.1,keys:[[0,{},0],[.55,HEIAN_SIT_MID,0],[1.1,HEIAN_SIT,0],[1.7,HEIAN_SIT_MID,0],[2.3,{},0]]},
   // 急ブレーキ（heianBrake が始める）。時間は 0〜0.8 が滑っている間（歩行側の skidTime に合わせて k で伸縮）、0.8〜1.5 は止まって起き上がる。
   //  ホバー姿勢（しゃがみ）は動作中に消える。yaw＝体を進行方向から横へ向ける角（度）。前の足（右）を出し、後ろの足（左）は曲げて重心を落とし、上体は後ろへ、腕は広げて釣り合いをとる
@@ -22172,7 +22366,9 @@ function createHeianTinRobotRuntime(options={}){
    runtime.actionT=ac?.t??null;
    const carryOn=!!runtime.carry&&!(runtime.action&&/^(lift|putdown)$/.test(runtime.action.name)),cjs=carryOn?Object.entries(HEIAN_CARRY_POSE).map(([n,v])=>{const j=joints.find(q=>q.name===n);return j?[j,j.angle||0,v]:null;}).filter(Boolean):[];
    for(const[j,a,v]of cjs)j.angle=a+v;
-   if(tj)tj.angle=ta+torso;if(nj)nj.angle=na+neck;applyPose();if(tj)tj.angle=ta;if(nj)nj.angle=na;
+   // 首回転は動作の値（ajs・弓の物見など）に見回りの首を足す。🚫 旧は na（動作を足す前の値）＋neck で上書きし、動作の首回転が消えていた（2026-10-20）
+   //  胴ひねりも同じ（2026-10-20 井内さん「直して」）。🚫 旧 ta+torso は踊る（±18）・ぶつかる（±9）の胴ひねりを消していた
+   if(tj)tj.angle+=torso;if(nj)nj.angle+=neck;applyPose();if(tj)tj.angle-=torso;if(nj)nj.angle-=neck;
    // 掛けた順（hjs→ajs→standLegs→cjs）の逆に戻す。🚫 standLegs を最後に戻すと、動作の脚の値が歩きの値に残り、毎フレーム積み重なる
    for(const[j,a]of cjs)j.angle=a;
    for(const[j,a]of standLegs)j.angle=a;
@@ -23147,9 +23343,11 @@ function heianTripPoints(){
   add('estate',k,x,s.gate.z,s.inner,carts);}
  // ②東西市: 全周板塀の門（addHeianMarketOfficeCompounds と同じ式＝板塀は敷地の内18）。外60・内80。牛車は北と南の門だけ
  //  1.131 塀と門を道に合わせた（addHeianMarketOfficeCompounds と同じ値＝中心は小路の交点 ±7272.3・32975.4、塀は道の縁から20内側）。🚫 旧の式では西・東の門の外60が大宮・堀川の路面に届いていなかった
- for(const id of['eastMarket','westMarket']){const s=HEIAN_LANDMARK_SITES[id];if(!s)continue;const mx=Math.sign(s.x)*7272.3,mz=32975.4,hw=((8545.2-5999.4)-40)/2,hd=((34245.2-31705.6)-40)/2;
-  for(const[side,dx,dz]of[['北',0,-1],['南',0,1],['西',-1,0],['東',1,0]])
-   add('market',s.name+side+'門',mx+dx*(hw+60),mz+dz*(hd+60),{x:mx+dx*(hw-80),z:mz+dz*(hd-80)},dz!==0);}
+ //  2026-10-20 堀川側の塀の線は堀川の道幅から（addHeianMarketOfficeCompounds と同じ式）。西・東の門は塀の線 x0/x1 の上
+ for(const id of['eastMarket','westMarket']){const s=HEIAN_LANDMARK_SITES[id];if(!s)continue;const sx=Math.sign(s.x),mx=sx*7272.3,mz=32975.4,hd=((34245.2-31705.6)-40)/2,
+   xa=sx*(5999.4+20),xb=sx*(HEIAN_CITY_CANAL_X-HEIAN_CITY_CANAL_ROAD_WIDTH/2-20),x0=Math.min(xa,xb),x1=Math.max(xa,xb);
+  for(const[side,gx,gz,dx,dz]of[['北',mx,mz-hd,0,-1],['南',mx,mz+hd,0,1],['西',x0,mz,-1,0],['東',x1,mz,1,0]])
+   add('market',s.name+side+'門',gx+dx*60,gz+dz*60,{x:gx-dx*80,z:gz-dz*80},dz!==0);}
  // ③京の口: 羅城門（北120＝九条大路の上、南の京外60mで隠す）と、街道が京域の矩形を横切る点（外へ街道を600たどって隠す）。
  //  牛車は羅城門と東・北の口だけ（西・南の口は人と荷車）
  add('kyonokuchi','羅城門',0,HEIAN_RAJOMON_Z-120,{x:0,z:HEIAN_RAJOMON_Z+600},true);
@@ -24315,7 +24513,7 @@ window.__heianCourtExtraInfo=()=>{const r=heianCourtLifeRuntime;if(!r)return nul
  return{guardNamed:named(r.guards),miyaGuardNamed:named(r.miyaGuards),shiseiNamed:named(r.shisei),shiseiBlocked:(r.shisei||[]).filter(q=>heianWalkBlocked(q.x,q.z,3)).map(q=>q.name),stableHorses:r.stableHorses,umabe:r.umabe?.length,students:r.students?.length,monks:(r.monks||[]).map(q=>q.name),monkAt:at(r.monks),miyaGuards:r.miyaGuards?.length,studentAt:at(r.students),umabeAt:at(r.umabe),parcelFolk:(r.parcelFolk||[]).map(q=>q.name),parcelNamed:named(r.parcelFolk),
   blocked:[...(r.umabe||[]),...(r.students||[]),...(r.parcelFolk||[]),...(r.monks||[])].filter(q=>heianWalkBlocked(q.group.position.x,q.group.position.z,2)).map(q=>q.name)};};
 function disposeHeianStreetLife(){heianStreetLifeRuntime?.dispose();}
-const HEIAN_CROWD_LOD=Object.freeze({far:2000,every:6}); // 群衆の更新の間引き（1.56）: 200m より遠い歩く人は6フレームに1回
+const HEIAN_CROWD_LOD={far:heianQ.crowdFar,every:heianQ.crowdEvery}; // 群衆の更新の間引き（1.56）: 200m より遠い歩く人は6フレームに1回。2026-10-20 画質の段で変わる（軽量は120mより遠い人を8コマに1回・消しはしない）
 // ---- 避け合い（2026-10-11井内さん「牛車同士、人同士がぶつからないように、速度が異なる場合は先行者に合わせて減速するとか、行き当たった場合は位が下のものが事前に少し進路を変える」）。
 //  人（群衆）: 同じ筋（中心・向きが同じ動線）を歩く人を0.3秒ごとに調べる（heianCrowdAvoidPrep）。カメラから far 以内の人だけ。
 //   ・前後に詰めて同じ向きに歩く人（along の差 groupGap 以内・筋の差 groupLane 以内）を1つの組として扱い、よけるときは組ごと同じだけ筋をずらす
@@ -25170,7 +25368,7 @@ function createHeianDailyLifeRuntime(){
   // 衛府の射場の射手（2026-10-20）。射る所（射席の前）に2人が並び、体は横向き（左肩を的へ向ける）。番は交代。ロボが射る間（S.robot）は弓を下ろして見ている
   const archSites=[];
   for(const R of heianArcheryRanges()){const a=Math.atan2(R.tx-R.sx,R.tz-R.sz),S={...R,idx:archSites.length,people:[],ph:h(R.tx,R.tz,90)*20,turn:-1,shot:null,on:false,robot:false,stuck:[],aim:a};
-   for(const[j,off]of[[0,-18],[1,18]]){const x=R.sx+off,z=R.sz;if(heianWalkBlocked(x,z,2))continue;add('archer',x,z,a+Math.PI/2,{archery:S,seat:j,who:R.name.includes('近衛')?'近衛舎人':'兵衛',female:false,shift:0,y:heianWalkGroundY(x,z),color:0x6b5a3a});S.people.push(people.length-1);}
+   for(const[j,off]of[[0,-18],[1,18]]){const x=R.sx+off,z=R.sz;if(heianWalkBlocked(x,z,2))continue;add('archer',x,z,a-Math.PI/2/* 的は体の +x＝左。🚫 +π/2 だと右だった */,{archery:S,seat:j,who:R.name.includes('近衛')?'近衛舎人':'兵衛',female:false,shift:0,y:heianWalkGroundY(x,z),color:0x6b5a3a});S.people.push(people.length-1);}
    if(S.people.length)archSites.push(S);}
   // 働く人（2026-10-07 井内さん「最近追加した地点では、そこで働いている人がいるはず」）: 街区の組み立てが積んだ置き場（木工町・修理職町の作業場・材木置場・河岸）と、紙屋院・施薬院の持ち場
   for(const q of heianTradeSpots){if(q.bx!==undefined)walker(q.role,q.x,q.z,q.bx,q.bz,{who:'人夫',servant:true,spd:q.spd||3.2,ph:h(q.x,q.z,54)*6.283});
@@ -25386,11 +25584,19 @@ function createHeianDailyLifeRuntime(){
    else if(p.role==='sugoW'){hL=[1.3,shY-2.4,2.4];hR=[-1.3,shY-2.6,2.2];} // 双六の見物: 腕を組んで盤を見る
    else if(p.role==='archer'){ // 射手（2026-10-20）: 体は横向き＝的は体の左（-x）。左手に弓（縦の棒）、右手で弦を引き分けて放つ。番でない間は弓を立てて待つ
     const S=p.archery,{f,who}=archPhase(S,t),me=who===p.seat&&!S.robot;let bow;
-    if(me&&f<1)bow=[-3.4,shY-1,2],hL=bow,hR=[-1.6,shY-.6,2];
-    else if(me&&f<2.4){const u=Math.min(1,(f-1)/.8);bow=[-3.4-3.4*u,shY+.6*u,2-2*u];hL=bow;hR=[-1.6+3.6*u,shY+.6+1.2*u,2-1.6*u];}
-    else if(me&&f<3.2){bow=[-6.8,shY+.6,0];hL=bow;hR=[3.4,shY+.8,-.6];} // 放った後の残心
-    else{bow=[-2.9,shY-3.6,1.4];hL=bow;}
-    rod(P.stick,i,[bow[0],bow[1]-10,bow[2]],[bow[0],bow[1]+11,bow[2]],.32);}
+    // 2026-10-20 井内さん「人も同じく」: 打起し（両手を頭の上へ）→引き分け（左手は的の方へ伸ばし、右手は右の耳もとへ）→離れ→残心
+    // 下の座標は「的が -x」の向きで書き、最後に x を反転して的を +x（体の左）へ移す。弓は +x 側の腕（hR の腕）、弦を引くのは -x 側の腕（hL の腕）
+    //  🚫 2026-10-20 井内さん「左右が逆ではないか」: 旧は的が -x＝体の右で、弓を右手に持っていた（この群衆の体は +x が左）
+    let pull=null,draw=hR;
+    if(me&&f<.5){bow=[-3.2,shY-1.2,2.2];draw=pull=[-1.4,shY-.8,2.2];}
+    else if(me&&f<1){const u=(f-.5)/.5;bow=[-2.2,shY-1+u*6,2.2];draw=pull=[-.6,shY-.6+u*6.2,2];}
+    else if(me&&f<2.4){const u=THREE.MathUtils.smoothstep(f,1,1.9);bow=[-2.2-4.8*u,shY+5-4.4*u,2.2-2.2*u];draw=pull=[-.6+2.6*u,shY+5.6-3.8*u,2-2*u];}
+    else if(me&&f<3.2){bow=[-6.8,shY+.6,0];draw=[3.4,shY+.8,-.6];} // 放った後の残心
+    else{bow=[-2.9,shY-3.6,1.4];draw=[2.9,shY-3.9,-sw*1.6];} // 待つ間は弓を立て、下の弭を地面に
+    const M=q=>[-q[0],q[1],q[2]],lo=Math.max(.4,bow[1]-10),top=M([bow[0],lo+21,bow[2]]),bot=M([bow[0],lo,bow[2]]);
+    hR=M(bow);hL=M(draw);rod(P.stick,i,bot,top,.32);
+    // 弦（2026-10-20 井内さん「弦もちゃんと引いて」）: 弓の上下の先から引く手へ V 字に張る。引いていない間は弓に沿って真っ直ぐ。紙の部品を細い棒に使う（射手は巻物・紙を使わない）
+    const nk=pull?M(pull):[(top[0]+bot[0])/2-.35,(top[1]+bot[1])/2,(top[2]+bot[2])/2];rod(P.scroll,i,[top[0]-.35,top[1],top[2]],nk,.09);rod(P.sheet,i,nk,[bot[0]-.35,bot[1],bot[2]],.14);}
    else if(p.role==='play'&&p.oni){hL=[-.8,hy,hz+2.1];hR=[.8,hy,hz+2.1];}
    else if(p.kind){const K=p.kind,s1=Math.sin(T*1.7),s2=Math.sin(T*1.1),c1=Math.cos(T*1.3); // 官司の勤務（2026-10-11）。案は前方9.5・天面は高さ4（置き物側が持つ）
     if(K==='sugo'){const S=p.sugo,{f,who}=sugoPhase(S,t),me=who===p.seat,cup=(q,rx=0)=>set(P.bucket,i,q,[.5,.62,.5],rx); // 盤双六: 筒を振る→賽を盤へ→駒を動かす（番は7秒ごとに交代）
@@ -25976,6 +26182,36 @@ function heianInteriorTick(){
 // ---- 動作のボタン（ジャンプ・踊る・祈る・お辞儀）。キーは Space・Q・F・B
 // 🚫 1.58 は画面右に別の帯を出し、右下の黒い帯（操作の説明）と2つ並んだ（2026-09-30井内さん「画面下の元からある黒い帯の操作の説明不要なんで、そっちに置かない？」）。
 //    ⇒ 歩いている間は右下の帯（heianGameHelpEl）の中身を説明の文からボタンへ差し替える。歩きをやめたら説明の文へ戻す
+// ---- スマホの操作を3つの組に（2026-10-20 モバイル改善 第1弾「主要操作を『おまかせ』『地図・移動』『動作』に整理」）。
+//  ボタンは今のまま（PC は今までどおり全部が並ぶ）。スマホ（HEIAN_COMPACT_MQ・CSS の .heian-act-grouped）だけ、帯には おまかせ・地図・移動・動作 の3つを出し、
+//  組を押すと中身（動作7つ／地図を見る・行き先を選ぶ・ついていく）が帯の上（縦持ち）・下（横持ち）に開く。中のボタンを押したら閉じる。町をタップしても閉じる
+//  dataset.grp: 各ボタンの組（omakase は組の見出しを兼ねる）。help.dataset.open: 開いている組
+let heianActionGroupsLabel=null;
+function heianActionGroupsBuild(help){
+ for(const b of help.children){const a=b.dataset.act;b.dataset.grp=a==='omakase'?'omakase':a==='follow'?'move':'act';}
+ const close=()=>{delete help.dataset.open;for(const h of help.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');};
+ const mk=(cls,grp,fn)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.dataset.grp=grp;b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();b.blur();fn();});help.appendChild(b);return b;};
+ const heads=[['move','地図・移動','Map & go'],['act','動作','Actions']].map(([g,ja,en])=>{const b=mk('heian-grp-head',g+'-head',()=>{const o=help.dataset.open!==g;close();if(o){help.dataset.open=g;b.setAttribute('aria-expanded','true');}});b.dataset.ja=ja;b.dataset.en=en;b.setAttribute('aria-expanded','false');return b;});
+ const extra=[['地図を見る','See the map',()=>heianPhoneMap(true)],['行き先を選ぶ','Choose a place',()=>heianPhonePickPlace()]].map(([ja,en,fn])=>{const b=mk('heian-grp-extra','move',fn);b.dataset.ja=ja;b.dataset.en=en;return b;});
+ // 中のボタン（動作・ついていく・地図）を押したら組を閉じる。capture＝ボタン自身の click（stopPropagation）より先に受ける
+ if(!help._grpBound){help._grpBound=true;help.addEventListener('click',e=>{const b=e.target.closest?.('button');if(b&&b.dataset.grp&&!/-head$/.test(b.dataset.grp)&&b.dataset.grp!=='omakase')setTimeout(()=>{delete help.dataset.open;for(const h of help.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');},0);},true);}
+ if(!heianActionGroupsBuild.bound){heianActionGroupsBuild.bound=true;renderer.domElement.addEventListener('pointerdown',()=>{if(heianGameHelpEl?.dataset.open){delete heianGameHelpEl.dataset.open;for(const h of heianGameHelpEl.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');}});}
+ heianActionGroupsLabel=()=>{const en=heianLang==='en';for(const b of[...heads,...extra])b.textContent=en?b.dataset.en:b.dataset.ja;};heianActionGroupsLabel();
+ help.classList.add('heian-act-grouped');}
+// 地図を見る（スマホ）: 左上の地図（.heian-mini-map・スマホでは隠してある）を町の上へ一時的に出す。印を押して移ったら・×で閉じたら元の場所へ戻す
+function heianPhoneMap(on){const hud=document.getElementById('heianGameHud'),map=document.querySelector('.heian-mini-map');if(!hud||!map)return false;
+ let box=hud.querySelector('.heian-phone-map');
+ if(!on){if(box){const h=box._home;if(h?.parent)h.parent.insertBefore(map,h.next&&h.next.parentNode===h.parent?h.next:null);box.remove();}return false;}
+ if(box)return true;box=document.createElement('div');box.className='heian-phone-map';box.setAttribute('role','dialog');box.setAttribute('aria-label',heianLang==='en'?'Map':'地図');
+ box._home={parent:map.parentNode,next:map.nextSibling};
+ const x=document.createElement('button');x.type='button';x.className='heian-phone-map-close';x.textContent='×';x.setAttribute('aria-label',heianLang==='en'?'Close the map':'地図を閉じる');x.addEventListener('click',e=>{e.stopPropagation();heianPhoneMap(false);});
+ box.addEventListener('pointerdown',e=>e.stopPropagation());
+ box.addEventListener('click',e=>{const m=e.target.closest?.('.heian-map-marker:not(.heian-map-group),.heian-map-pop button');if(m)setTimeout(()=>heianPhoneMap(false),0);});
+ box.append(x,map);hud.appendChild(box);return true;}
+// 行き先を選ぶ（スマホ）: ☰ を開いて、中の行き先の一覧（#heianGameLocation）を見せる
+function heianPhonePickPlace(){const mb=document.querySelector('.heian-menu-toggle');if(!mb)return false;if(mb.getAttribute('aria-expanded')!=='true')mb.click();
+ const s=document.getElementById('heianGameLocation');s?.scrollIntoView?.({block:'center'});s?.focus?.();return !!s;}
+window.__heianPhoneMap=on=>heianPhoneMap(on!==false); // 検証用
 function heianActionBarSync(){
  const help=heianGameHelpEl;if(!help)return;const want=heianWalk.active&&heianGameMode,has=help.dataset.mode==='actions';
  if(want&&!has){help.textContent='';help.dataset.mode='actions';help.classList.add('heian-game-help-actions');help.setAttribute('role','toolbar');help.setAttribute('aria-label','ロボの動作');
@@ -25988,8 +26224,9 @@ function heianActionBarSync(){
    b.addEventListener('click',e=>{e.stopPropagation();b.blur();heianFollowToggle();});help.appendChild(b);}
   {const b=document.createElement('button');b.type='button';b.dataset.act='omakase'; // 2026-10-20 鉄の童におまかせ（O）
    const k=document.createElement('kbd');k.textContent='O';b.append(heianOmakase.on?'おまかせをやめる':'おまかせ',k);b.classList.toggle('on',heianOmakase.on);
-   b.addEventListener('click',e=>{e.stopPropagation();b.blur();heianOmakaseToggle();});help.appendChild(b);}}
- else if(!want&&has){delete help.dataset.mode;help.classList.remove('heian-game-help-actions');help.removeAttribute('role');help.removeAttribute('aria-label');help.textContent='';syncHeianGameHelp();}
+   b.addEventListener('click',e=>{e.stopPropagation();b.blur();heianOmakaseToggle();});help.appendChild(b);}
+  heianActionGroupsBuild(help);}
+ else if(!want&&has){delete help.dataset.mode;delete help.dataset.open;heianPhoneMap(false);help.classList.remove('heian-game-help-actions','heian-act-grouped');help.removeAttribute('role');help.removeAttribute('aria-label');help.textContent='';syncHeianGameHelp();}
  if(want){const off=heianDialog.open||heianPhotoMode;for(const b of help.children)if(b.disabled!==off)b.disabled=off;
   heianLiftablesEnsure(); // 持ち上げられる荷を置く（歩き始めに1回）
   const lb=help.querySelector('[data-act="lift"]'),txt=heianTinRobotRuntime?.carry?'下ろす':'持ち上げる';if(lb?.firstChild&&lb.firstChild.nodeValue!==txt)lb.firstChild.nodeValue=txt;}}
@@ -28246,7 +28483,22 @@ function syncHeianGameWalkUI(active){
  if(!active){const info=document.querySelector('.heian-game-info');if(info?.hidden)info.hidden=false;} // 歩行をやめたら左下の説明を戻す
  if(heianGameWalkButton){heianGameWalkButton.textContent=active?(heianWalk.running?heianLabel(ui('skip'),ui('skipShort')):ui('walking')):heianLabel(ui('walk'),ui('walkShort'));heianGameWalkButton.classList.toggle('primary',!!active);heianGameWalkButton.setAttribute('aria-pressed',String(!!active));}syncHeianMapPlayer();syncHeianGameHelp();heianSyncKnownMap(); // 1.90 歩くと知った所だけ
  try{heianChoreBadge();}catch(e){} // 1.97 預かり物の札（前の日から持ち越したもの）
+ heianStartChoiceSync();
 }
+// ---- 空撮・俯瞰の間の「自分で歩く／鉄の童におまかせ」（2026-10-20 UI/UX監査「起動直後は次の行動が ☰ を開くまで分からない」）。
+//  歩いていない間だけ出す（PC は右上の帯の下、スマホはドックの上端）。押せばそのまま散策に入る。おまかせは歩き出してから始める（歩行のロボが出てから）
+function heianStartChoiceSync(){const hud=document.getElementById('heianGameHud');if(!hud)return;let el=hud.querySelector('.heian-start-choice');
+ const want=heianGameMode&&!heianWalk?.active;if(!want){if(el)el.hidden=true;return;}
+ const en=heianLang==='en';
+ if(!el){el=document.createElement('div');el.className='heian-start-choice';el.setAttribute('role','group');
+  const mk=(cls,fn)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();b.blur();fn();});el.appendChild(b);return b;};
+  const go=()=>{if(heianDroneTour?.running||heianDroneTour?.locationView)heianDroneTour.stop('市内散策へ切替');if(!heianWalk.active)heianWalk.start();};
+  mk('sc-walk',go); // 利用計測のイベントは足さない（受け側の許可一覧 HEIAN_EVENT_NAMES に無い名前は送らない）
+  mk('sc-omakase',()=>{go();let n=0;const t=setInterval(()=>{if(++n>40){clearInterval(t);return;}if(heianWalk.active&&heianTinRobotRuntime?.visible&&!heianWalk.autoWalking){clearInterval(t);if(!heianOmakase.on)heianOmakaseToggle();}},250);});
+  hud.appendChild(el);}
+ const [w,o]=el.children;w.textContent=en?'Walk on your own':'自分で歩く';o.textContent=en?'Let the tin robot wander':'鉄の童におまかせ';
+ el.setAttribute('aria-label',en?'How to start':'散策の始め方');el.hidden=heianEntryGateActive();}
+window.__heianStartChoice=()=>{const el=document.querySelector('.heian-start-choice');return el?{hidden:el.hidden,shown:!!el.offsetParent,buttons:[...el.children].map(b=>b.textContent)}:null;}; // 検証用
 function syncHeianGameViewUI(){return 'overhead';}
 function heianGameViewState(point,overview=false){
  const y=Number.isFinite(terrainYAt(point.x,point.z))?terrainYAt(point.x,point.z):0;
@@ -28692,6 +28944,10 @@ function startHeianGame(entryMode='overview'){
  // 調整の窓を閉じた後に また出す（劇画の間で、窓を閉じている時だけ出る）
  heianGameGekigaPanelButton=setting(heianLang==='en'?'Manga settings':'劇画の調整',()=>{setHeianGekigaPanelShown(true);setMenuOpen(false);});heianGameGekigaPanelButton.hidden=true;
  setting(heianLang==='en'?'How to play':'あそびかた',()=>{heianTutAll();setMenuOpen(false);}); // 1.131 初回チュートリアルの見返し先
+ // 2026-10-20 画質（軽量・標準・高画質）。押すたびに 標準→軽量→高画質→標準… と替わり、メニューは開いたまま（続けて押せる）
+ {const order=['mid','low','high'],qb=document.createElement('button');qb.type='button';qb.id='heianQualityButton';settings.appendChild(qb);
+  heianQualitySync=()=>{const en=heianLang==='en',Q=HEIAN_QUALITY[heianQualityKey];qb.textContent=(en?'Quality: ':'画質：')+(en?Q.en:Q.ja);qb.title=en?'Light / Standard / High':'軽量（動きを優先）・標準・高画質';};
+  qb.addEventListener('click',e=>{e.stopPropagation();heianQualitySet(order[(order.indexOf(heianQualityKey)+1)%order.length]);});heianQualitySync();}
  setHeianGekiga(/[?&]gekiga=1(&|$)/.test(location.search));syncRealButton();
  // 星官（中国式星座）の線と名前（2026-09-08井内さん「中国の星座の線と名前の表示をオンオフできたら素敵かも」）。
  // 押すと夜でなければ夜にする＝星が見えない状態で押しても何も起きないのを避ける
@@ -28755,7 +29011,7 @@ function startHeianGame(entryMode='overview'){
  actions.appendChild(settings); // ☰ の中身（PC は ☰ の下に開く。スマホは縦に並んだメニューの後半）
  // 幅が変わったらラベルも切り替える（回転・ウィンドウリサイズ）
  applyHeianLang=()=>{
-  heianEnsureLinesEn();if(heianDialog)heianDialog.hintCand=null;syncClockUI(); // 1.88 台詞の英訳・話しかけの案内・時計を言語に合わせる
+  heianEnsureLinesEn();if(heianDialog)heianDialog.hintCand=null;syncClockUI();heianQualitySync?.();heianActionGroupsLabel?.();heianStartChoiceSync(); // 1.88 台詞の英訳・話しかけの案内・時計を言語に合わせる・画質と動作の組の名前
   heading.textContent=gameTitle();
   syncSubtitle();
   notebookButton.textContent=heianLabel(ui('notebook'),ui('notebookShort'));if(heianNb.el){heianNotebookClose();heianNotebookOpen();}
@@ -28815,7 +29071,8 @@ function startHeianGame(entryMode='overview'){
  // 組の印を押すと地点の一覧（.heian-map-pop）が開き、そこで選ぶ。1つだけの組は従来どおり押せばすぐ移る
  const mapGroups=[];for(const point of HEIAN_GAME_LOCATIONS.filter(point=>point.mapMarker!==false)){const g=mapGroups.find(g=>Math.hypot(g[0].x-point.x,g[0].z-point.z)<=HEIAN_MAP_GROUP_R);if(g)g.push(point);else mapGroups.push([point]);}
  const mapPop=document.createElement('div');mapPop.className='heian-map-pop';mapPop.hidden=true;mapPop.setAttribute('role','menu');
- const pickFromMap=id=>{mapPop.hidden=true;selectHeianGameLocation(id,true);postHeianEvent('place_select',{placeId:id,source:'map'});collapseAfterPick();};
+ // 2026-10-20 監査「地図の印は確認なしですぐ移る・一覧は歩いて行く／すぐ移るを出す＝同じ選び方で結果が違う」: 印も同じ選ぶ札（heianTripChoice）を通す
+ const pickFromMap=id=>{mapPop.hidden=true;const pt=HEIAN_GAME_LOCATIONS.find(q=>q.id===id);if(heianTripChoice(pt,heianGameSelectedId,select)){heianPhoneMap(false);collapseAfterPick();return;}selectHeianGameLocation(id,true);postHeianEvent('place_select',{placeId:id,source:'map'});collapseAfterPick();};
  const groupTitle=g=>g.map(p=>locName(p)).join('・');
  for(const g of mapGroups){const point=g[0],marker=document.createElement('button');marker.type='button';marker.className='heian-map-marker'+(g.length>1?' heian-map-group':'');marker.dataset.location=point.id;
   const cx=g.reduce((s,p)=>s+p.x,0)/g.length,cz=g.reduce((s,p)=>s+p.z,0)/g.length;marker.style.left=mapPctX(cx)+'%';marker.style.top=mapPctZ(cz)+'%';
@@ -28873,7 +29130,7 @@ function startHeianGame(entryMode='overview'){
   mapInMenu:panel.parentNode===actions,clockInMenu:clockPanel.parentNode===actions,
   menuOpen:actions.classList.contains('open'),stacked:actions.classList.contains('heian-menu-stacked'),
   clockRect:(r=>({w:Math.round(r.width),h:Math.round(r.height)}))(clockPanel.getBoundingClientRect())});
- const help=document.createElement('div');help.className='heian-game-help';heianGameHelpEl=help;hud.appendChild(help);syncHeianGameHelp();
+ const help=document.createElement('div');help.className='heian-game-help';heianGameHelpEl=help;hud.appendChild(help);syncHeianGameHelp();setTimeout(heianStartChoiceSync,0);
  const photoBar=document.createElement('div');photoBar.className='heian-photo-bar';photoBar.hidden=true;photoBar.setAttribute('aria-label','撮影モード');
  const photoCaptureButton=document.createElement('button');photoCaptureButton.type='button';photoCaptureButton.textContent=ui('shoot');photoCaptureButton.addEventListener('click',saveHeianGamePhoto);
  const photoBackButton=document.createElement('button');photoBackButton.type='button';photoBackButton.textContent=ui('photoBack');photoBackButton.addEventListener('click',()=>setHeianPhotoMode(false));
@@ -34856,6 +35113,7 @@ function addHeianMicroStalls(parent,list){
  window.__heianMicroStalls=list.slice(0,60).map(s=>({x:Math.round(s.x),z:Math.round(s.z)})); // 検証用: 小市の露店の位置（撮影の狙い先）
  return{stalls:n,drawCalls:8};
 }
+const heianMarketWallInfo={};window.__heianMarketWalls=()=>JSON.parse(JSON.stringify(heianMarketWallInfo)); // 検証用（市の塀の東西の線と堀川の道の縁）
 function addHeianMarketOfficeCompounds(parent,marketLayouts){
  HEIAN_MARKET_BOARDS.length=0;const root=new THREE.Group();root.name='東西市・全周板塀と市司';parent.add(root);const compounds=[];let offices=0,warehouses=0,walkObstacles=0,perimeterWalls=0,officeEnclosureWalls=0,gates=0;const officeWallHeight=34,officePostHeight=42,officeEaveHeight=38,officeRidgeHeight=officeEaveHeight+18;
  const mats={wall:new THREE.MeshLambertMaterial({color:0xd8c8ab}),wood:new THREE.MeshLambertMaterial({color:0x6b4b35}),roof:new THREE.MeshLambertMaterial({color:0x55483d}),store:new THREE.MeshLambertMaterial({color:0xa88a63}),fence:new THREE.MeshLambertMaterial({color:0x765d3f})};
@@ -34869,15 +35127,20 @@ function addHeianMarketOfficeCompounds(parent,marketLayouts){
   // 1.131 塀と門を道に合わせる（2026-10-17 井内さん「西市、東市の壁、門が道とずれています」）。🚫 旧は敷地（中心 ±7284.6, 32994・2400四方）の内側18に塀を立て、
   //  門は敷地の中心に置いた。実際の4町の区画は 大宮大路〜堀川小路・七条坊門小路〜七条大路で、中を通る小路は 猪隈／西靫負小路（x ±7272.3）と北小路（z 32975.4）。
   //  門が小路から1.2〜1.9m ずれ、塀は道の縁から8〜10m 内側に浮いていた。⇒ 塀の中心＝小路の交点、塀は道の縁から20内側（側溝の外）。露店・市司の配置は敷地のまま
-  const mx=Math.sign(s.x)*7272.3,mz=32975.4,innerW=(8545.2-5999.4)-40,innerD=(34245.2-31705.6)-40,segX=(innerW-gap)/2,segZ=(innerD-gap)/2;
+  // 2026-10-20 井内さん「西市の塀が、西堀川の方にはみ出て、道路が狭くなっている」: 🚫 堀川側の塀を 8545.2（堀川小路が4丈＝121.2 だった頃の道の縁）から測っていた。
+  //  10-17 に堀川小路を8丈（HEIAN_CITY_CANAL_ROAD_WIDTH 242.4）へ広げたので、道の縁は 8484.0 へ下がり、塀が道の中へ約4m 出ていた（東市も同じ）。
+  //  ⇒ 堀川側の縁は堀川の道幅から求める。門は小路の交点（mx）のまま、塀は門の左右で長さが違ってよい（道の縁に合わせる）
+  const sx=Math.sign(s.x),mx=sx*7272.3,mz=32975.4,canalEdge=HEIAN_CITY_CANAL_X-HEIAN_CITY_CANAL_ROAD_WIDTH/2,xa=sx*(5999.4+20),xb=sx*(canalEdge-20),x0=Math.min(xa,xb),x1=Math.max(xa,xb);
+  const innerW=x1-x0,innerD=(34245.2-31705.6)-40,segZ=(innerD-gap)/2;
   const wall=(x,z,w,d,name)=>{putBox(g,x,z,w,d,h,base,mats.fence,label+'低い板塀・'+name);addObstacle(x,z,w,d,label+name);perimeterWalls++;};
-  for(const z of[mz-innerD/2,mz+innerD/2]){wall(mx-gap/2-segX/2,z,segX,t,z<mz?'北西塀':'南西塀');wall(mx+gap/2+segX/2,z,segX,t,z<mz?'北東塀':'南東塀');}
-  for(const x of[mx-innerW/2,mx+innerW/2]){wall(x,mz-gap/2-segZ/2,t,segZ,x<mx?'西北塀':'東北塀');wall(x,mz+gap/2+segZ/2,t,segZ,x<mx?'西南塀':'東南塀');}
+  for(const z of[mz-innerD/2,mz+innerD/2]){const wl=mx-gap/2-x0,wr=x1-(mx+gap/2);wall(x0+wl/2,z,wl,t,z<mz?'北西塀':'南西塀');wall(x1-wr/2,z,wr,t,z<mz?'北東塀':'南東塀');}
+  for(const x of[x0,x1]){wall(x,mz-gap/2-segZ/2,t,segZ,x<mx?'西北塀':'東北塀');wall(x,mz+gap/2+segZ/2,t,segZ,x<mx?'西南塀':'東南塀');}
+  heianMarketWallInfo[id]={x0:Math.round(x0*10)/10,x1:Math.round(x1*10)/10,canalEdge:Math.round(sx*canalEdge*10)/10,gateX:mx}; // 検証用
   const gate=(x,z,axis,name)=>{const horiz=axis==='x';for(const sign of[-1,1])putBox(g,x+(horiz?sign*55:0),z+(horiz?0:sign*55),horiz?9:15,horiz?15:9,36,base,mats.wood,label+name+'門柱');putBox(g,x,z,horiz?120:15,horiz?15:120,7,base+34,mats.wood,label+name+'門梁');putGable(g,x,z,150,48,41,mats.roof,label+name+'簡素門',horiz?0:Math.PI/2);gates++;
    // 夜間閉鎖の扉（2026-09-12井内さん「夜も市場の門が空いてるけど閉まってるのでは？」）。市は日没前に閉市し門を閉じる。
    // 柱間101を2枚で塞ぐ。昼は syncHeianGateDoors が隠す（名前に「夜間閉鎖扉」）。歩行障害物には入れない
    for(const sign of[-1,1]){const leaf=putBox(g,x+(horiz?sign*25:0),z+(horiz?0:sign*25),horiz?48:4,horiz?4:48,33,base,mats.wood,label+name+'門夜間閉鎖扉');leaf.visible=false;}};
-  gate(mx,mz-innerD/2,'x','北');gate(mx,mz+innerD/2,'x','南');gate(mx-innerW/2,mz,'z','西');gate(mx+innerW/2,mz,'z','東');
+  gate(mx,mz-innerD/2,'x','北');gate(mx,mz+innerD/2,'x','南');gate(x0,mz,'z','西');gate(x1,mz,'z','東');
   // 市司は市場の北辺・朱雀大路寄り。正庁背面を板塀から17mmに寄せ、塀へ付属して見える配置にする。
   const cx=s.x+side*620,cz=mz-innerD/2+79,w=700,d=300,officeLabel=label+'市司'; /* 1.131 正庁の背面（cz−75）を塀の内面へ */
   putBox(g,cx,cz,300,150,officeWallHeight,base,mats.wall,officeLabel+'正庁壁');
@@ -38943,7 +39206,9 @@ function animate(){
   // 影の地図は歩行中の写実では 3コマに1回だけ描く（2026-10-13 井内さん「省庁のあたりはPCで重い」。影の地図の描画が1コマの約17％＝6〜7ms。
   //  影の行列も地図と一緒に止まるので、建物の影は地面に張り付いたまま。動く人の影が最大2コマ遅れるだけ）。?shadowevery=1 で毎コマに戻せる
   // 歩行中の写実だけ、500m より遠い植物の区画を描かない（6コマに1回判定。歩行を抜けたら戻す）。?vegcull=0 で無効、?vegcull=3000 で距離変更
-  {const vs=heianVegCull;if(heianRealRuntime&&heianWalk?.active&&HEIAN_VEG_RANGE>0){if(vs.tick++%6===0){heianVegCullApply(HEIAN_VEG_RANGE);vs.active=true;}}else if(vs.active){heianVegCullApply(0);vs.active=false;}}
+  //  2026-10-20 画質の段が軽量・標準なら写実でなくても歩く間は切る（スマホは写実が既定で切れているため、これまで一度も効いていなかった）。?vegcull=0 は全部の段で無効
+  {const vs=heianVegCull,vr=HEIAN_VEG_RANGE<=0?0:heianRealRuntime?(heianQ.veg?Math.min(heianQ.veg,HEIAN_VEG_RANGE):HEIAN_VEG_RANGE):heianQ.veg;if(heianWalk?.active&&vr>0){if(vs.tick++%6===0){heianVegCullApply(vr);vs.active=true;}}else if(vs.active){heianVegCullApply(0);vs.active=false;}}
+  {const fc=heianFarCull,px=heianQ.farPx||0;if(heianWalk?.active&&px>0){if(fc.tick++%6===3){heianFarCullApply(px);fc.active=true;}}else if(fc.active){heianFarCullApply(0);fc.active=false;}} // 遠くて小さく写る部品（2026-10-20）
   {const st=heianShadowThrottle,cast=!!dir.castShadow;
    if(heianRealRuntime&&heianWalk?.active&&renderer.shadowMap.enabled&&cast&&st.every>1){st.n=(st.n+1)%st.every;renderer.shadowMap.autoUpdate=false;if(st.n===0||!st.cast||!dir.shadow.map)renderer.shadowMap.needsUpdate=true;st.cast=true;}
    else{renderer.shadowMap.autoUpdate=true;st.cast=false;}}
