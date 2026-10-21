@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="fc7a2c6534a8fc130a1db164fac4486d99a2e83d3984a30bca31d28ff09373af">
+<meta name="heian-release" content="81ae2b7bbf40194aba28385e824fc365955a3c13362a89585d3a3d3ea35521b2">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -696,6 +696,7 @@ body.heian-photo-active .heian-sky-label{display:none!important}
 }
 @media (max-width:600px) and (orientation:portrait),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
  #heianGameHud.heian-dialog-open .heian-game-help-actions,#heianGameHud.heian-dialog-open .heian-dialog-hint{display:none}
+ #heianGameHud.heian-dialog-open .heian-blessing{display:none} /* 2026-10-20 横持ちで「今日の都」が会話の選択肢の上に重なった（撮影 tdl） */
  #heianGameHud:has(.heian-game-info.expanded) .heian-game-help-actions,#heianGameHud:has(.heian-game-info.expanded) .heian-dialog-hint{display:none}
  #heianGameHud .heian-game-info{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px}
  #heianGameHud .heian-game-info[hidden]{display:none}
@@ -709,7 +710,8 @@ body.heian-photo-active .heian-sky-label{display:none!important}
 /* ==== スマホの操作の3つの組（2026-10-20 モバイル改善 第1弾）。heianActionGroupsBuild が .heian-act-grouped・data-grp・data-open を付ける ====
    🚫 旧は9つのボタンが帯に並び、縦持ちでは「話しかける」・地名・「発見」の札がボタンの上に重なって押せなかった（撮影 10-20）。
    帯には おまかせ・地図・移動・動作 の3つだけ（指で押せる高さ44px）。組を開くと中身が縦持ちは帯の上（町の上）、横持ちは組の下に出る。PC は .heian-grp-* を出さない＝今までどおり */
-.heian-grp-head,.heian-grp-extra{display:none}
+/* 🚫 1.147 は .heian-grp-head{display:none} だけで、PC では .heian-game-help-actions button{display:flex} に負けて「地図・移動」「動作」「地図を見る」「行き先を選ぶ」が下の帯に並んでいた */
+#heianGameHud .heian-game-help-actions>.heian-grp-head,#heianGameHud .heian-game-help-actions>.heian-grp-extra{display:none}
 .heian-phone-map{display:none}
 @media (max-width:600px) and (orientation:portrait),(pointer:coarse) and (orientation:landscape) and (max-height:520px){
  #heianGameHud .heian-act-grouped>button{display:none}
@@ -757,6 +759,14 @@ body.heian-photo-active .heian-sky-label{display:none!important}
 .heian-start-choice .sc-walk{background:#7a5720;border-color:#d2a64f;color:#fff4d8}
 @media (max-width:600px) and (orientation:portrait){.heian-start-choice{left:8px;right:8px;top:calc(75dvh + 8px);display:grid;grid-template-columns:1fr 1fr;gap:6px}.heian-start-choice button{padding:6px 4px;font-size:15px}}
 @media (pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-start-choice{left:auto;right:6px;top:58px;width:calc(25vw - 12px);display:grid;grid-template-columns:1fr;gap:5px}.heian-start-choice button{padding:4px;font-size:14px}}
+/* 今日できること（heianTodayOpen）。和紙の色＝今できる操作の面（監査「文脈操作は紙色」）。PC は上の帯の下の右 */
+.heian-today{position:absolute;z-index:8;right:16px;top:64px;width:min(440px,calc(100vw - 32px));box-sizing:border-box;padding:14px 16px 12px;background:rgba(250,246,236,.98);color:#2b241c;border:1px solid rgba(96,76,52,.3);border-radius:6px;pointer-events:auto}
+.heian-today h2{margin:0;font-size:18px;color:#5a3d22;font-family:'Hiragino Mincho ProN','Yu Mincho',serif}.heian-today .td-sub{margin:2px 0 8px;font-size:14px;color:#6b5a44}
+.heian-today .td-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(96,76,52,.18)}.heian-today .td-row p{flex:1;margin:0;font-size:16px;line-height:1.5;color:#6b5a44}.heian-today .td-row.on p{color:#2b241c}
+.heian-today button{min-height:44px;padding:6px 14px;font:inherit;font-size:15px;background:#5a3d22;color:#f6ecd4;border:0;border-radius:4px;cursor:pointer;white-space:nowrap}.heian-today button:disabled{background:#cbbfa8;cursor:default}
+.heian-today .td-close{margin-top:6px;background:transparent;color:#5a3d22;border:1px solid rgba(96,76,52,.45)}
+@media (max-width:600px) and (orientation:portrait){.heian-today{left:8px;right:8px;top:58px;width:auto}}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){.heian-today{left:8px;right:auto;top:8px;width:calc(75vw - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;padding:8px 12px}.heian-today .td-row{padding:4px 0}.heian-today .td-row p{font-size:15px}}
 /* 画質を軽量へ勧める札（heianQualityTip）と、開発用の重さの表示（?perf=1・Shift+P）のスマホでの置き場所 */
 .heian-quality-tip{position:absolute;z-index:45;left:50%;top:60px;transform:translateX(-50%);width:min(520px,calc(100% - 24px));box-sizing:border-box;padding:12px 14px;background:rgba(17,24,32,.96);border:1px solid #d2a64f;color:#f1ede4;pointer-events:auto}
 .heian-quality-tip p{margin:0 0 8px;font-size:15px;line-height:1.55}.heian-quality-tip button{min-height:44px;margin-right:8px;padding:6px 14px;font:inherit;font-size:15px;background:#1d2833;color:#f1ede4;border:1px solid #4a5561;cursor:pointer}.heian-quality-tip button:first-of-type{background:#7a5720;border-color:#d2a64f}
@@ -2064,8 +2074,11 @@ const HEIAN_COMPACT_MQ='(max-width:600px), (pointer:coarse) and (orientation:lan
 //  prMax: 描画解像度の上限（端末の画素比に掛ける前の上限）／prFloor: 自動調整で下げる下限の倍率／crowdFar・crowdEvery: 遠い歩く人を何コマに1回動かすか（消さない）／
 //  veg: 歩く間、この距離（10=1m）より遠い植栽の区画を描かない（0=写実のときだけ従来の 5000）／scanK: 吹き出しの話し手を探す間隔の倍率
 //  farPx: 歩く間、画面でこの画素より小さく写る遠く（200m 超）の建物の部品を描かない（heianFarCullApply・0=しない）
-const HEIAN_QUALITY={low:{ja:'軽量',en:'Light',prMax:.85,prFloor:.6,crowdFar:1200,crowdEvery:8,veg:3500,scanK:2,farPx:6},
- mid:{ja:'標準',en:'Standard',prMax:1.5,prFloor:.7,crowdFar:2000,crowdEvery:6,veg:5000,scanK:1.5,farPx:3},
+// 🚫 1.147 の軽量は prMax .85・prFloor .6 で、スマホの描画が 198×430 画素（画面の約半分）まで落ち、井内さん「画質を落とすとボケて何だかよくわからなくなる」（2026-10-20）。
+//    実測ではスマホ相当の重さは更新処理（CPU）が大半で、解像度を下げても fps はほとんど上がらなかった（標準 8fps・軽量 7fps）。
+//    ⇒ 解像度はほぼ落とさない（軽量 prMax 1・下限 .85、標準の下限 .9）。軽量は人の動かし方・植栽・遠い部品で軽くする
+const HEIAN_QUALITY={low:{ja:'軽量',en:'Light',prMax:1,prFloor:.85,crowdFar:1200,crowdEvery:8,veg:3500,scanK:2,farPx:6},
+ mid:{ja:'標準',en:'Standard',prMax:1.5,prFloor:.9,crowdFar:2000,crowdEvery:6,veg:5000,scanK:1.5,farPx:3},
  high:{ja:'高画質',en:'High',prMax:Infinity,prFloor:.7,crowdFar:2000,crowdEvery:6,veg:0,scanK:1,farPx:0}};
 const heianIsTouch=matchMedia('(pointer:coarse)').matches||matchMedia(HEIAN_COMPACT_MQ).matches;
 let heianQualityKey=(()=>{try{const q=new URLSearchParams(location.search).get('quality');if(HEIAN_QUALITY[q])return q;const v=localStorage.getItem('heian-quality');if(HEIAN_QUALITY[v])return v;}catch(e){}return heianIsTouch?'mid':'high';})();
@@ -17439,12 +17452,17 @@ const HEIAN_DIRECTOR_NULL=Object.freeze({version:0,init(){return this;},onScan()
  talkLeft(){return Infinity;},talkUse(){},talkCap(){return Infinity;}, // 読めないときは話の数を絞らない（今までどおり）
  inspect(){return{version:0,ready:false};}});
 const heianDir=()=>{const d=window.heianDirector;return d&&d.ready?d:HEIAN_DIRECTOR_NULL;}; // init(api) を済ませるまでは使わない（済む前に今日の都の日付だけ進むのを防ぐ）
+// 画面に読む物が出ているか（2026-10-20 知らせの待ち行列）。toasts=true は札（今日の都・発見・頼みごと）も数える。吹き出しは札とは並べてよい（札が出ている間も町の人は話す）
+function heianNoticeBusy(toasts){const hud=document.getElementById('heianGameHud');if(!hud)return false;
+ if(toasts&&(heianDialog?.open||hud.querySelector('.heian-quest-toast,.heian-first-guide')))return true; // 会話の間は札だけ待つ（吹き出しは今までどおり）
+ return !!(heianTut||heianArchery?.open||hud.querySelector('.heian-today,.heian-trip-choice,.heian-tut-all,.heian-quality-tip'));}
 // Director に渡すエンジンの部品。DOM（札の見た目）はエンジンが持つ
 const heianDirectorApi={
  introStep:id=>heianSpeech.intro[id]||0,
  // 🚫 「今日の都」と「発見」が同じ所に重なって読めなかった（撮影 rain1）。札が出ている間は待って、消えてから出す（最大12秒待つ）
  toast(o={},waited=0){const{cls='',title='',text='',ms=5200}=o;const hud=document.getElementById('heianGameHud');if(!hud||!text)return;
-  if(hud.querySelector('.heian-quest-toast')&&waited<12000){setTimeout(()=>heianDirectorApi.toast(o,waited+400),400);return;}const el=document.createElement('div');el.className='heian-blessing heian-quest-toast'+(cls?' '+cls:'');el.setAttribute('role','status');
+  // 2026-10-20 知らせは1度に1枚（監査）: 他の札・案内・弓・会話・今日できること・行き方の札が出ている間も待つ（最大45秒＝初回の案内4枚が終わるまで）。待ち切れたら出す
+  if(heianNoticeBusy(true)&&waited<45000){setTimeout(()=>heianDirectorApi.toast(o,waited+400),400);return;}const el=document.createElement('div');el.className='heian-blessing heian-quest-toast'+(cls?' '+cls:'');el.setAttribute('role','status');
   const h=document.createElement('strong');h.textContent=title;const p=document.createElement('p');p.textContent=text;el.append(h,p);hud.appendChild(el);
   const t0=performance.now(),step=()=>{const t=(performance.now()-t0)/ms;el.style.opacity=String(Math.min(1,t*6)*Math.min(1,(1-t)*4));if(t<1)requestAnimationFrame(step);else el.remove();};requestAnimationFrame(step);}};
 let heianDirectorLoad=null;
@@ -17734,7 +17752,8 @@ function updateHeianSpeech(){
   const[who,text]=t.lines[t.idx++],c=t.cands[who],p=c.head();if(!p)return false;
   const b=heianSpeechShow(c,text,now,{scr:heianSpeechProject(p),talk:true});t.next=b?b.t1-.2+HEIAN_SPEECH.talkGap:now+1;return true;});
  try{heianBrakeSayTick(now);}catch(e){heianBrakeReactState=null;} // 2026-10-17 急ブレーキへの驚きの一言
- if(heianSpeech.bubbles.length<HEIAN_SPEECH.max&&now-heianSpeech.lastSpawn>HEIAN_SPEECH.spawnMs/1000){heianSpeech.lastSpawn=now;heianSpeechSpawn(now,ctx);}
+ // 2026-10-20 監査「初回チュートリアル中に吹き出し・今日の都・発見が同時に出て、どれを読むか決めにくい」: 案内の札・弓・今日できること・行き方の札が出ている間は新しい吹き出しを出さない（出ている吹き出しは寿命まで）
+ if(heianSpeech.bubbles.length<HEIAN_SPEECH.max&&now-heianSpeech.lastSpawn>HEIAN_SPEECH.spawnMs/1000&&!heianNoticeBusy(false)){heianSpeech.lastSpawn=now;heianSpeechSpawn(now,ctx);}
  // 置き直し・寿命・距離で薄める
  heianSpeech.bubbles=heianSpeech.bubbles.filter(b=>{
   const p=b.cand.head(),scr=heianSpeechProject(p);
@@ -18165,14 +18184,57 @@ function heianTripChoice(pt,prevId,select){
  const sub=document.createElement('p');sub.className='heian-trip-sub';sub.textContent=en?`About ${mins(e.hoverSec)} min by hover, ${mins(e.walkSec)} min on foot. ${city(e.cityHours)} pass in the city.`:`ホバーで約${mins(e.hoverSec)}分、歩くと約${mins(e.walkSec)}分。都では約${city(e.cityHours)}たつ`;
  const close=()=>{el.remove();document.removeEventListener('keydown',onKey,true);};
  const go=document.createElement('button');go.type='button';go.textContent=en?'Walk there':'歩いて行く';
- go.addEventListener('click',()=>{close();heianGameSelectedId=pt.id;if(!heianWalkToPlace(pt))selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'walk'});});
+ // pt.jump: 地点の一覧に無い行き先（「今日できること」の射場・双六の辻など・2026-10-20）。すぐ移るはこれで置く
+ go.addEventListener('click',()=>{close();if(pt.jump){if(!heianWalkToPlace(pt))pt.jump();return;}heianGameSelectedId=pt.id;if(!heianWalkToPlace(pt))selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'walk'});});
  const jump=document.createElement('button');jump.type='button';jump.className='heian-trip-alt';jump.textContent=en?'Go now':'すぐ移る';
- jump.addEventListener('click',()=>{close();selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'select'});});
+ jump.addEventListener('click',()=>{close();if(pt.jump){pt.jump();return;}selectHeianGameLocation(pt.id,true);postHeianEvent('place_select',{placeId:pt.id,source:'select'});});
  const no=document.createElement('button');no.type='button';no.className='heian-trip-alt';no.textContent=en?'Cancel':'やめる';
  const cancel=()=>{close();if(select)select.value=prevId;};no.addEventListener('click',cancel);
  const onKey=ev=>{if(ev.key==='Escape'){ev.stopPropagation();cancel();}};document.addEventListener('keydown',onKey,true);
  if(!plan){go.disabled=true;go.style.opacity='.45';go.style.cursor='default';sub.textContent=en?'No walkable way found from here. You can go there at once.':'ここから歩いて行ける道が見つからない。すぐ移ることはできる';}
  el.append(q,sub,go,jump,no);hud.appendChild(el);(plan?go:jump).focus({preventScroll:true});return true;}
+// ---- 今日できること（2026-10-20 UI/UX監査「実装済みの遊びを名前から探せない」「弓の場所を知るまで2操作以内」）。
+//  今の刻に開いている営みを最大3件: 市（今日開く方）・弓の稽古（いちばん近い射場）・蹴鞠（朝堂院）・盤双六（いちばん近い辻）。開いていなければ次に始まる刻を添える。
+//  盤双六と蹴鞠は今は眺めるだけなので「見に行く」と書く（参加はまだ無い）。押すと地点を選んだ時と同じ「歩いて行く／すぐ移る」（近ければそのまま歩く）。報酬や数は付けない
+const heianHourText=(h,en)=>{const H=Math.floor(h),half=h-H>=.25;return en?`${H%12||12}${half?':30':''} ${H<12?'am':'pm'}`:`${H<12?'午前':'午後'}${H<=12?H:H-12}時${half?'半':''}`;};
+function heianTodayItems(){const h=heianClock.hour,en=heianLang==='en',rain=heianWeather==='rain',p=heianWalk?.active?heianWalk.position:(controls?.target||{x:0,z:30000}),out=[];
+ const next=(spans)=>{for(const[a]of spans)if(h<a)return a;return null;},inS=spans=>spans.some(([a,b])=>h>=a&&h<b);
+ const later=(spans)=>{const n=next(spans);return n==null?(en?'from tomorrow morning':'明日の朝から'):(en?'from '+heianHourText(n,en):heianHourText(n,en)+'から');};
+ const near=(list,xz)=>list.slice().sort((a,b)=>Math.hypot(xz(a)[0]-p.x,xz(a)[1]-p.z)-Math.hypot(xz(b)[0]-p.x,xz(b)[1]-p.z))[0];
+ const place=(key,name,x,z,lx,lz)=>({id:'today-'+key,name,x,z,spawn:{x,z},jump:()=>{if(!heianWalk.active)return;heianInteriorPlace([x,z],[lx??x,lz??z-400]);heianWalkAmbientAnchor=null;syncHeianWalkAmbient(true);}});
+ // 市: 午の刻に開いて日の入る前に閉まる（heianScheduleAt の表）
+ {const id=heianOpenMarket(heianClock.day),loc=HEIAN_GAME_LOCATIONS.find(q=>q.id===id),nm=en?(id==='eastMarket'?'East Market':'West Market'):(id==='eastMarket'?'東市':'西市'),open=heianScheduleAt(id,h)>.1;
+  if(loc)out.push({key:'market',open,text:open?(en?`The ${nm} is open`:`${nm}が立っている`):(en?`The ${nm} opens today (${h<12?'from noon':'closed for the day'})`:`今日は${nm}が開く（${h<12?'正午から':'今日はもう閉まった'}）`),verb:en?'Go':'向かう',pt:loc,done:!open&&h>=12});}
+ // 弓: 衛府の射場（雨の日は休み）
+ if(heianArcherySites.length){const S=near(heianArcherySites,s=>[s.sx,s.sz]),sp=HEIAN_DAILY_LIFE_HOURS.archer,open=!rain&&inS(sp),nm=en?(S.name.includes('近衛')?'the Inner Palace Guards':'the Palace Guards'):S.name;
+  out.push({key:'archery',open,text:open?(en?`Archery practice at ${nm}. Ask an archer to let you shoot`:`${S.name}の射場で弓の稽古をしている。射手に頼むと射させてもらえる`):rain?(en?`No archery at ${nm} in the rain`:`${S.name}の射場は雨で稽古が休み`):(en?`Archery at ${nm} ${later(sp)}`:`${S.name}の射場で弓の稽古（${later(sp)}）`),verb:en?'Go':'向かう',pt:(()=>{const L=Math.hypot(S.tx-S.sx,S.tz-S.sz)||1,k=60/L; /* 射る所から的の方へ6m: 射席の屋根の下にカメラが入らない（撮影 td）。射る所から8m以内なので「弓を射させてもらう」が出る */
+   return place('archery',(en?'the range of ':'')+(en?nm:S.name+'の射場'),S.sx+(S.tx-S.sx)*k,S.sz+(S.tz-S.sz)*k,S.tx,S.tz);})(),done:rain});}
+ // 蹴鞠: 朝堂院の西（9〜16時半・眺めるだけ）
+ {const sp=[[9,16.5]],open=inS(sp)&&heianCourtLifeRuntime?.kemariOn!==false;
+  out.push({key:'kemari',open,text:open?(en?'Officials are playing kemari in the Chōdōin (watch)':'朝堂院で官人が蹴鞠をしている（眺めるだけ）'):(en?`Kemari in the Chōdōin ${later(sp)}`:`朝堂院の蹴鞠（${later(sp)}）`),verb:en?'Watch':'眺めに行く',pt:place('kemari',en?'the kemari in the Chōdōin':'朝堂院の蹴鞠',-390,5390,-390,5260)});}
+ // 盤双六: いちばん近い辻（9〜17時半・雨は休み・眺めるだけ）
+ if(heianSugoSites.length){const S=near(heianSugoSites,s=>[s.x,s.z]),sp=HEIAN_DAILY_LIFE_HOURS.sugo,open=!rain&&inS(sp),at=heianPlaceNameAt(S.x,S.z)||'';
+  out.push({key:'sugoroku',open,text:open?(en?'People are playing sugoroku nearby (watch)':`${at?at+'の':'近くの'}辻で盤双六を打っている（見るだけ）`):(en?`Sugoroku in town ${rain?'is off in the rain':later(sp)}`:`辻の盤双六（${rain?'雨で休み':later(sp)}）`),verb:en?'Watch':'見に行く',pt:place('sugoroku',en?'a sugoroku board':`${at||'辻'}の盤双六`,S.x+14,S.z+14,S.x,S.z),done:rain});}
+ // 開いているものを先に。最大3件
+ return out.sort((a,b)=>(b.open?1:0)-(a.open?1:0)).slice(0,3);}
+function heianTodayGo(it){if(!it?.pt)return false;heianTodayClose();
+ const doIt=()=>{if(heianTripChoice(it.pt,heianGameSelectedId,null))return;if(it.pt.jump){if(!heianWalkToPlace(it.pt))it.pt.jump();}else if(!heianWalkToPlace(it.pt))selectHeianGameLocation(it.pt.id,true);};
+ if(heianWalk.active){doIt();return true;}
+ // 空から見ている間: 散策に入ってから、その場所へ移る（空からは歩いて行けないので、すぐ移る）
+ if(heianDroneTour?.running||heianDroneTour?.locationView)heianDroneTour.stop('市内散策へ切替');heianWalk.start();let n=0;
+ const t=setInterval(()=>{if(++n>40){clearInterval(t);return;}if(!heianWalk.active||heianWalk.autoWalking)return;clearInterval(t);if(it.pt.jump)it.pt.jump();else selectHeianGameLocation(it.pt.id,true);},250);return true;}
+function heianTodayClose(){document.querySelectorAll('.heian-today').forEach(e=>e.remove());}
+function heianTodayOpen(){const hud=document.getElementById('heianGameHud');if(!hud)return false;heianTodayClose();const en=heianLang==='en',items=heianTodayItems();
+ const el=document.createElement('div');el.className='heian-today';el.setAttribute('role','dialog');el.setAttribute('aria-label',en?'What you can do today':'今日できること');
+ for(const ev of['pointerdown','click','wheel'])el.addEventListener(ev,e=>e.stopPropagation());
+ const h=document.createElement('h2');h.textContent=en?'What you can do today':'今日できること';
+ const sub=document.createElement('p');sub.className='td-sub';sub.textContent=heianClockLabel(heianClock.day,heianClock.hour);el.append(h,sub);
+ for(const it of items){const row=document.createElement('div');row.className='td-row'+(it.open?' on':'');const t=document.createElement('p');t.textContent=it.text;
+  const b=document.createElement('button');b.type='button';b.textContent=it.verb;b.disabled=!!it.done;b.addEventListener('click',()=>heianTodayGo(it));row.append(t,b);el.appendChild(row);}
+ const c=document.createElement('button');c.type='button';c.className='td-close';c.textContent=en?'Close':'閉じる';c.addEventListener('click',heianTodayClose);el.appendChild(c);
+ const esc=e=>{if(e.key==='Escape'&&document.contains(el)){e.stopPropagation();heianTodayClose();removeEventListener('keydown',esc,true);}};addEventListener('keydown',esc,true);
+ hud.appendChild(el);return true;}
+window.__heianToday=(open)=>{if(open)heianTodayOpen();return heianTodayItems().map(i=>({key:i.key,open:i.open,text:i.text,verb:i.verb,to:i.pt?.name,at:i.pt?[Math.round(i.pt.spawn.x),Math.round(i.pt.spawn.z)]:null}));}; // 検証用
 // ---- 鉄の童におまかせ（2026-10-20 おまかせ散歩）。O かボタンで始める・やめる。
 //  近く（120〜600m）の地点から、まだ行っていない所・最近行っていない所を重く選び、道なり（heianRoutePlan）に歩いて行く（ホバーも大股もしない）。
 //  着いたら 8〜16 秒たたずむ（人がいればお辞儀か手を振る＝返してくれる）。立ち寄った所とそこで聞こえた一言を、聞き書き帳に「鉄の童が見たもの」として残す。
@@ -18415,7 +18477,8 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
  head.append(h,tabs,close);el.append(head,tools,filt,list);hud.append(el);heianNb.el=el;heianNb.rerender=render;render();search.focus({preventScroll:true});
  if(!heianShots)heianShotsLoad().then(()=>{if(heianNb.el===el)render();});} // 2026-10-12 写真は帳面を開いた時に読む（起動では読まない）
 // 1.90 最初の5分: 初めて歩き出したときに一度だけ、歩き方・話し方・帳面・最初に訪ねる人を短く出す（10秒で消える）。localStorage heian-first-guide
-function heianFirstGuide(){try{if(localStorage.getItem('heian-first-guide'))return;localStorage.setItem('heian-first-guide','1');}catch(e){return;}
+function heianFirstGuide(tries=0){if(heianNoticeBusy(true)&&tries<60){setTimeout(()=>heianFirstGuide(tries+1),750);return;} // 2026-10-20 案内の札・他の知らせが出ている間は待つ（1度に1枚）
+ try{if(localStorage.getItem('heian-first-guide'))return;localStorage.setItem('heian-first-guide','1');}catch(e){return;}
  const hud=document.getElementById('heianGameHud');if(!hud||!heianWalk.active)return;const en=heianLang==='en';
  const el=document.createElement('div');el.className='heian-blessing heian-first-guide';el.setAttribute('role','status');
  const h=document.createElement('strong');h.textContent=en?'Welcome to Heian-kyo':'平安京へようこそ';
@@ -26192,7 +26255,7 @@ function heianActionGroupsBuild(help){
  const close=()=>{delete help.dataset.open;for(const h of help.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');};
  const mk=(cls,grp,fn)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.dataset.grp=grp;b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('click',e=>{e.stopPropagation();b.blur();fn();});help.appendChild(b);return b;};
  const heads=[['move','地図・移動','Map & go'],['act','動作','Actions']].map(([g,ja,en])=>{const b=mk('heian-grp-head',g+'-head',()=>{const o=help.dataset.open!==g;close();if(o){help.dataset.open=g;b.setAttribute('aria-expanded','true');}});b.dataset.ja=ja;b.dataset.en=en;b.setAttribute('aria-expanded','false');return b;});
- const extra=[['地図を見る','See the map',()=>heianPhoneMap(true)],['行き先を選ぶ','Choose a place',()=>heianPhonePickPlace()]].map(([ja,en,fn])=>{const b=mk('heian-grp-extra','move',fn);b.dataset.ja=ja;b.dataset.en=en;return b;});
+ const extra=[['今日できること','Today',()=>heianTodayOpen()],['地図を見る','See the map',()=>heianPhoneMap(true)],['行き先を選ぶ','Choose a place',()=>heianPhonePickPlace()]].map(([ja,en,fn])=>{const b=mk('heian-grp-extra','move',fn);b.dataset.ja=ja;b.dataset.en=en;return b;});
  // 中のボタン（動作・ついていく・地図）を押したら組を閉じる。capture＝ボタン自身の click（stopPropagation）より先に受ける
  if(!help._grpBound){help._grpBound=true;help.addEventListener('click',e=>{const b=e.target.closest?.('button');if(b&&b.dataset.grp&&!/-head$/.test(b.dataset.grp)&&b.dataset.grp!=='omakase')setTimeout(()=>{delete help.dataset.open;for(const h of help.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');},0);},true);}
  if(!heianActionGroupsBuild.bound){heianActionGroupsBuild.bound=true;renderer.domElement.addEventListener('pointerdown',()=>{if(heianGameHelpEl?.dataset.open){delete heianGameHelpEl.dataset.open;for(const h of heianGameHelpEl.querySelectorAll('.heian-grp-head'))h.setAttribute('aria-expanded','false');}});}
@@ -28919,6 +28982,8 @@ function startHeianGame(entryMode='overview'){
  const fixedButtons=HEIAN_GAME_LOCATIONS.filter(p=>p.fixed).map(p=>{const b=viewAction(fixedName(p),()=>selectHeianGameLocation(p.id));b.dataset.location=p.id;return b;});
  const syncViewLabels=()=>{viewToggle.textContent=heianLabel(ui('view'),ui('viewShort'));fixedHead.textContent=ui('fixedViews');for(const b of fixedButtons){const p=HEIAN_GAME_LOCATIONS.find(q=>q.id===b.dataset.location);if(p)b.textContent=fixedName(p);}};
  syncViewLabels();
+ // 今日できること（2026-10-20 監査）。スマホは ☰ の中の上の方に並ぶ
+ const todayButton=action(heianLang==='en'?'Today':'今日できること',()=>heianTodayOpen());todayButton.id='heianTodayButton';
  // たどる（都の年表・T）
  const traceButton=action(heianLabel(ui('trace'),ui('traceShort')),()=>heianTraceOpen());traceButton.id='heianTraceButton';
  // 1.90 聞き書き帳（記録）
@@ -29011,7 +29076,7 @@ function startHeianGame(entryMode='overview'){
  actions.appendChild(settings); // ☰ の中身（PC は ☰ の下に開く。スマホは縦に並んだメニューの後半）
  // 幅が変わったらラベルも切り替える（回転・ウィンドウリサイズ）
  applyHeianLang=()=>{
-  heianEnsureLinesEn();if(heianDialog)heianDialog.hintCand=null;syncClockUI();heianQualitySync?.();heianActionGroupsLabel?.();heianStartChoiceSync(); // 1.88 台詞の英訳・話しかけの案内・時計を言語に合わせる・画質と動作の組の名前
+  heianEnsureLinesEn();if(heianDialog)heianDialog.hintCand=null;syncClockUI();heianQualitySync?.();heianActionGroupsLabel?.();heianStartChoiceSync();todayButton.textContent=heianLang==='en'?'Today':'今日できること'; // 1.88 台詞の英訳・話しかけの案内・時計を言語に合わせる・画質と動作の組の名前
   heading.textContent=gameTitle();
   syncSubtitle();
   notebookButton.textContent=heianLabel(ui('notebook'),ui('notebookShort'));if(heianNb.el){heianNotebookClose();heianNotebookOpen();}
