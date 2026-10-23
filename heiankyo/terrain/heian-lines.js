@@ -887,7 +887,15 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'kemari',who:'官人',t:'落とすな…落とすなよ…'},
 {at:'kemari',who:'官人',t:'今日は風がある。鞠が流れる'},
 {at:'kemari',who:'官人',when:'noon',t:'退出したら、うちの庭でも蹴るか'},
-{at:'kemari',who:'官人',if:'robot',t:'鉄の童も蹴ってみるか？ …冗談だ'},
+// 2026-10-23 井内さん「もう蹴鞠の中に入れてもらったのに『入れてやるぞ』とか出る」: 誘いは輪の外だけ（kemariOut）。輪の中（kemariIn）では蹴り方の助言とほめ言葉（大内裏で鞠を出した輪も）
+{at:'kemari',who:'官人',if:'kemariOut',t:'鉄の童も蹴ってみるか？ 声をかければ輪に入れてやるぞ'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'なかなかうまいではないか'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'鞠が落ちてきたところで蹴るのじゃ'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'鞠から目を離すでないぞ'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'膝をやわらかく。足の甲で受けるのじゃ'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'高く上げすぎるな。次の者が受けにくい'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'鉄の足は重かろう。軽く当てるだけでよい'},
+{at:['kemari','daidairi'],who:'官人',if:'kemariIn',t:'ほう、初めてにしては筋がよい'},
 {at:'kemari',who:'官人',if:'hover',t:'砂ぼこりを立てるな！ 鞠が見えん！'},
 // ---- 会話のきっかけ（どこでも・時刻）
 {at:['street','commoners'],who:'庶民',when:'morning',t:'今朝の粥は、少し濃かった。ええ日になる'},
