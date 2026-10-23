@@ -81,7 +81,7 @@ const finish=()=>{if(settled)return;if(mainTitle.textContent!==LP[lang].title||!
 const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
 const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所20枚（空撮・東寺・朱雀大路・大内裏・東市とロボ・劇画の応天門・蹴鞠・省庁・牛車とお供・春・秋・冬・雨・星座の夜空など）をクロスフェードで順に見せる。撮り直し＝CadKit/heian-launch.py
-const HEIAN_BUILD='9045a61e7e61d2549c4802445959a27fe134be62b4a9b71c7364e04547d5483a',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='1df41f57bb17dd16582760f6193c7ef31cb6553863e01ec75b52f9c854fe092d',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 const slides=['launch-bg.jpg',...Array.from({length:19},(_,i)=>`launch-${String(i+1).padStart(2,'0')}.jpg`)].map(src=>src+'?v='+assetVersion);
 // 写真は「今の1枚」と「次の1枚」だけ読む（2026-10-18 井内さん「起動を軽く」A）。
 // 🚫 旧は最初に全部（20枚・5.4MB）を読み、ゲームの建築データ（約25MB）と回線を取り合っていた。
