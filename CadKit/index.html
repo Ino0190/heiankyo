@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="9045a61e7e61d2549c4802445959a27fe134be62b4a9b71c7364e04547d5483a">
+<meta name="heian-release" content="1df41f57bb17dd16582760f6193c7ef31cb6553863e01ec75b52f9c854fe092d">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -23135,7 +23135,7 @@ function createHeianTinRobotRuntime(options={}){
    const stride=kind==='skip'?null:HEIAN_GAIT_STRIDE.walk*HEIAN_GAIT_STRIDE.legGain;
    const cycle=kind==='skip'?HEIAN_GAIT_STRIDE.skipCycle
     :(v?THREE.MathUtils.clamp(stride/v,0.24,HEIAN_GAIT_STRIDE.slowCycle):null);
-   const per=cycle?cycle/steps.length:null;
+   const per=cycle?cycle/steps.length:null,skipSum=kind==='skip'?steps.reduce((a,q)=>a+(q.dur||0),0):0; // スキップは段の dur の比で1周を割る（2026-10-23）
    // 段ごとの時間は前進量に比例させる（等分だと前進0の段で体だけが進んで滑る）。歩きだけプロファイルを持つ。
    // 🚫 前進0の段が2つ続くと、durを極小にしてもフレーム時間（約16ms）が下限になって2フレーム分まるごと
    //    滑る。「◯足前」は直前の「踵接地」と足の位置がほぼ同じなので、連続する前進0の後段を畳む
@@ -23150,7 +23150,7 @@ function createHeianTinRobotRuntime(options={}){
    // 歩きは股の振りを legGain 倍して歩幅を稼ぐ（脚を大きく振る＝速度を落とさずに滑りを消せる）
    const g=HEIAN_GAIT_STRIDE.legGain;
    posePlaybackQuiet=true;
-   poseCustomLoopSteps=steps.map((s,i)=>{const o={...s};const d=durs?durs[i]:per;if(d)o.dur=d;
+   poseCustomLoopSteps=steps.map((s,i)=>{const o={...s};const d=durs?durs[i]:kind==='skip'&&skipSum>0&&cycle?cycle*(s.dur||0)/skipSum:per;if(d)o.dur=d;
     if(durs)o.linearGait=true; // 等速補間（easeだと段の端で足が止まって滑る）
     if(kind!=='skip'&&g!==1&&s.angles){const a={...s.angles};
      for(const k of['右股','左股'])if(Number.isFinite(a[k]))a[k]=a[k]*g;o.angles=a;}
@@ -23321,7 +23321,7 @@ function heianGaitStepDurations(advance,cycle,minShare=.008){
 // skipCycle: スキップは接地中に足が体に対して動かない（前進は滞空中）ので周期は見た目のテンポで固定
 // subdivide: 段の刻みを何倍に細かくするか（10段×2＝20段。1フレーム1段なので周期0.41秒では24段が上限）
 // slowCycle: 歩きの周期の上限（秒）。ついていくで相手がゆっくりのとき、足も同じ速さまで遅く運ぶ（2026-10-14: 旧は3秒＝秒速2.75より遅いと足が滑り、0.5以下は周期なしで10秒）
-const HEIAN_GAIT_STRIDE={walk:4.59,legGain:1.8,skipCycle:.5,subdivide:2,slowCycle:5};
+const HEIAN_GAIT_STRIDE={walk:4.59,legGain:1.8,skipCycle:.84,subdivide:2,slowCycle:5};
 window.__heianGaitState=()=>{const r=heianTinRobotRuntime;return r?{kind:r.gaitKind,cycle:r.gaitCycle==null?null:+r.gaitCycle.toFixed(2),speed:r.gaitSpeed==null?null:+r.gaitSpeed.toFixed(1),retimed:r.retimed||0,rebuilt:r.rebuilt||0}:null;}; // 検証用: 歩容の周期・速さ・組み直し／速さ変更の回数
 window.__heianGaitStride=HEIAN_GAIT_STRIDE; // 実測で係数を振るための口
 async function prepareHeianTinRobotRuntime(){
@@ -23662,6 +23662,7 @@ function heianOxAnimate(ox,step,amp=.3){if(!ox)return;for(const l of ox.legs){co
 // 止まっている牛（2026-10-17 井内さん「庶民街の荷車のウシが真四角なので、貴族の牛車の牛を使ったらどうか」）。
 //  牛車の牛（buildHeianMobOx）を立ち姿で1つの形（頂点色）に固め、毛色ごとに InstancedMesh 1本で置く＝何頭でも draw call は毛色の数だけ。
 //  局所 −z が前・原点は足元。list の要素 {x,z,rot,coat(HEIAN_OX_COATS の番号),s(倍率・子牛は .6 前後)}。rot は前（−z）が (−sin rot, −cos rot) を向く角
+const HEIAN_LAUNDRY_LZ=26; // 物干しの竿の、家の前の縁からの距離（2.6m・戸口を出入りできる）
 const heianOxStaticGeos=new Map();
 function heianOxStaticGeometry(coat){if(heianOxStaticGeos.has(coat))return heianOxStaticGeos.get(coat);
  const k=createHeianMobKit();k.oxCoat=heianOxCoat(k,coat);const ox=buildHeianMobOx(k);heianOxAnimate(ox,0,0);ox.group.position.y=0;k.root.updateMatrixWorld(true);
@@ -24589,13 +24590,14 @@ function createHeianStreetLifeRuntime(){
   // 描画発行の削減（牛車と同じ結合・実測で街路の人々=357call→武官隊236が主因・2026-08-18）
   for(const t of troupes){
    if(t.animate===false){heianMergeMobStatics(k,t.group);continue;} // 琵琶弾き等の静止troupeは丸ごと1メッシュ
-   const excl=new Set([...(t.people||[]).map(p=>p.group),...(t.horse?[t.horse.group]:[])]);
+   const excl=new Set([...(t.people||[]).map(p=>p.group),...(t.horse?[t.horse.group]:[]),...(t.ox?[t.ox.group]:[])]); // 🚫 牛（t.ox）を除いていなかったので、荷車の牛は脚ごと1枚に畳まれて歩かなかった（2026-10-23 井内さん「荷車の牛が歩く動作をしてない」）
    heianMergeMobStatics(k,t.group,t.dogLegs?new Set(t.dogLegs.map(l=>l.pivot)):excl); // 騎乗武官などtroupe直下の静的部品も畳む
    for(const p of t.people||[]){heianMergeMobStatics(k,p.group,new Set(p.legs));for(const leg of p.legs)heianMergeMobStatics(k,leg);}
    // 脚は pivot（肩・股）と knee（腕節・飛節）を別々に畳む（1.51 の2関節の脚）
    const mergeLegs=ls=>{for(const l of ls){heianMergeMobStatics(k,l.pivot,l.knee?new Set([l.knee]):new Set());if(l.knee)heianMergeMobStatics(k,l.knee);}};
    if(t.horse){heianMergeMobStatics(k,t.horse.group,new Set(t.horse.legs.map(l=>l.pivot)));mergeLegs(t.horse.legs);}
    if(t.dogLegs)mergeLegs(t.dogLegs);
+   if(t.ox){heianMergeMobStatics(k,t.ox.group,new Set(t.ox.legs.map(l=>l.pivot)));mergeLegs(t.ox.legs);} // 牛も馬と同じく脚の関節ごとに畳む
   }
   // 荷車と牛の接地影（2026-08-30井内さん「荷車には影がなくて何もないところに荷車の影がある」）。
   // 🚫 影を付けていたのは people / horse / dogLegs だけで、cargoCart と ox が抜けていた＝
@@ -25261,10 +25263,19 @@ function heianBoatBuild(){if(heianBoat)return heianBoat;if(!heianRoadSurfaceReco
   const g=new THREE.Group();g.name='船着場（'+B.line.name+'・'+B.home.name+'・推定）';root.add(g);
   const at=(o,a)=>({x:B.x+nx*o+A.dx*a,z:B.z+nz*o+A.dz*a}),bx=(o,a,w,h,d,y,m)=>{const q=at(o,a),mm=k.add(g,k.geometry.box,m,[q.x,y,q.z],[w,h,d]);mm.rotation.y=rot;return mm;};
   const bankO=city?HEIAN_CITY_CANAL_OPENING_WIDTH/2-B.lat:110,deckY=wy+4.6,o0=9,o1=bankO-(city?4:0),L=o1-o0;
-  bx((o0+o1)/2,0,L,1.4,28,deckY,deckM); // 桟橋の板
-  for(const o of[o0+1,o1-1])for(const a of[-12,12])bx(o,a,1.6,10,1.6,deckY-5,postM); // 杭
   const top=heianWalkGroundY(at(bankO+10,0).x,at(bankO+10,0).z),Y=Number.isFinite(top)?top:deckY+12;
-  if(city&&Y>deckY+2){const n=4,hS=(Y-deckY)/n;for(let i=0;i<n;i++)bx(o1-1+i*2.6,24,3,hS*(i+1),14,deckY+hS*(i+1)/2,stoneM);} // 雁木（岸から桟橋へ下りる石段）
+  if(!city){bx((o0+o1)/2,0,L,1.4,28,deckY,deckM); // 川（鴨川・南の川）は板の桟橋
+   for(const o of[o0+1,o1-1])for(const a of[-12,12])bx(o,a,1.6,10,1.6,deckY-5,postM);} // 杭
+  // 堀割の荷揚げ場（2026-10-23 井内さん「荷物の積み下ろしをするんだから、水面に近い所まで少し掘ったプラットフォームがあるのでは」）。
+  //  岸の石垣の前に、水面の少し上（0.3m）の石敷きの段を張り出し（奥行1m・長さ6m）、縁に角材と舫い杭、片側に岸の上の道へ上がる雁木（石段）。舟からは渡し板。荷を2つ置く。
+  //  🚫 道そのものを掘り下げる形は、道の面（heianRoadSurfaceRecords の1枚）と歩く地面を作り直すことになるので採らず、石垣の前へ張り出した（見た目は「掘り下げた荷揚げ場」と同じ高さ・広さ）
+  else{const bed=terrainYAt(B.x,B.z)+HEIAN_CITY_CANAL_BED_OFFSET,py=wy+3,oIn=bankO-10,oc=(oIn+bankO)/2,dep=bankO-oIn,n=Math.max(2,Math.ceil((Y-py)/3)),hS=(Y-py)/n;
+   bx(oc,0,dep,py-bed,60,(py+bed)/2,stoneM); // 荷揚げ場の石の段
+   bx(oIn+.6,0,1.2,1,60,py+.5,deckM); // 縁の角材
+   for(const a of[-22,22])bx(oIn-.3,a,1.2,8,1.2,py+3,postM); // 舫い杭
+   for(let i=1;i<=n;i++)bx(oc,30+i*5-2.5,dep,py+i*hS-bed,5,(bed+py+i*hS)/2,stoneM); // 雁木（荷揚げ場から岸の上の道へ）
+   bx((8+oIn)/2+.5,-6,oIn-8+1,.6,8,py+.7,deckM); // 舟から渡す板
+   bx(oc+1,-16,6,6,11,py+3,straw);bx(oc,-4,5,4,5,py+2,mats.pack);} // 下ろした荷
   {const q=at(bankO+14,-20),yb=heianWalkGroundY(q.x,q.z);if(Number.isFinite(yb)){bx(bankO+14,-20,1,18,1,yb+9,postM);bx(bankO+14,-20,.6,4,9,yb+15,boardM);}}} // 立て札
  return heianBoat;}
 function heianBoatSay(B,text){if(!B||!heianSpeechBox||!text)return;const g=B.man.group,key='bt'+B.i,head=()=>g.visible?g.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,HEIAN_SPEECH.head*B.man.group.scale.y,0)):null,h=head();if(!h)return;
@@ -25379,7 +25390,7 @@ Object.assign(HEIAN_UI_LINES_EN,{'（独楽を回させてもらう）':'(Ask to
 //  初めて歩いたときに作る（焼き込みに入れない）。東市の側は焼き込みの荷舟3艘（addHeianCanalBoats の −694・0・+686）があるので、その間の2艘だけ足す
 const HEIAN_KASHI=Object.freeze({sites:[{id:'eastMarket',name:'東市の河岸',side:1},{id:'westMarket',name:'西市の河岸',side:-1}],z:32994,stations:[-694,-347,0,346,686],baked:[-694,0,686],
  workers:8,near:2500,cycle:13,kinds:['fish','veg','rice','cloth'],
- color:{basket:0x8a7a52,fish:0xb9c4c8,veg:0x5f8a3a,veg2:0xa8643a,rice:0xb79a5a,cloth:0x3b5a8a,cloth2:0xa8413a,cloth3:0xe8dfc8,wood:0x8a6f4d,stone:0x8d8a80,robe:0x7a6a52,skin:0xd9b48f,dark:0x3a3229}});
+ color:{pave:0x9c978b,basket:0x8a7a52,fish:0xb9c4c8,veg:0x5f8a3a,veg2:0xa8643a,rice:0xb79a5a,cloth:0x3b5a8a,cloth2:0xa8413a,cloth3:0xe8dfc8,wood:0x8a6f4d,stone:0x8d8a80,robe:0x7a6a52,skin:0xd9b48f,dark:0x3a3229}});
 let heianKashi=null,heianKashiErr=0;
 // 荷1つを束ねる geometry の列へ足す（kind ごとの形。y＝荷の底）
 function heianKashiGoods(push,kind,x,y,z,ry=0,i=0){const C=HEIAN_KASHI.color;
@@ -25395,15 +25406,17 @@ function heianKashiBuild(){if(heianKashi)return heianKashi;if(!heianRoadSurfaceR
  const sites=[];
  for(const D of K.sites){const geos=[],cx=D.side*HEIAN_CITY_CANAL_X,inw=-D.side,X=d=>cx+inw*d;
   const push=(t,c,x,y,z,ry=0,rx=0,rz=0,sx=1,sy=1,sz=1)=>{E.set(rx,ry,rz);Q.setFromEuler(E);P.set(x,y,z);S.set(sx,sy,sz);M.compose(P,Q,S);const g0=U[t].clone(),g=g0.toNonIndexed();g0.dispose();g.deleteAttribute('uv');g.applyMatrix4(M);col.set(c);
+   const n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=col.r;a[i*3+1]=col.g;a[i*3+2]=col.b;}g.setAttribute('color',new THREE.BufferAttribute(a,3));geos.push(g);};
   /* 2026-10-23 和船の川舟（heianWasenHull）を頂点色のまま束ねる。舳先は局所 −z。ry＝向き */
   const pushHull=(x,y,z,ry=0)=>{E.set(0,ry,0);Q.setFromEuler(E);P.set(x,y,z);S.set(1,1,1);M.compose(P,Q,S);const g=heianWasenHull().clone();g.applyMatrix4(M);geos.push(g);};
-   const n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=col.r;a[i*3+1]=col.g;a[i*3+2]=col.b;}g.setAttribute('color',new THREE.BufferAttribute(a,3));geos.push(g);};
   const cross=heianWaterCrossings(cx,half),stations=[],group=new THREE.Group();group.name=D.name+'（推定）';group.visible=false;scene.add(group);
   K.stations.forEach((off,si)=>{const z=K.z+off;if(cross.some(([a,b])=>z>a-120&&z<b+120))return;
    const kind=K.kinds[si%4],kind2=K.kinds[(si+1)%4],top=gy(X(half+4),z),wy=terrainYAt(cx,z)+HEIAN_CITY_CANAL_WATER_OFFSET;
-   // 雁木（岸から水際へ3段）と舟へ渡す板
-   for(let t=0;t<3;t++)push('box',C.stone,X(half-1-t*3),top-1.2-t*((top-wy-2)/3),z,0,0,0,4,2.4,40);
-   push('box',C.wood,X(29),wy+3.4,z,0,0,0,6,.8,8);
+   // 荷揚げ場（2026-10-23 井内さん「水面に近い所まで少し掘ったプラットフォーム」）: 石垣の前の水面0.3m上に石敷きの段（奥行0.9m・長さ6m）、縁の角材・舫い杭、舳先の側に岸の上へ上がる雁木。舟から渡し板。段の上にも下ろした荷
+   const bed=terrainYAt(cx,z)+HEIAN_CITY_CANAL_BED_OFFSET,py=wy+3,dIn=half-9,dc=(dIn+half)/2,dep=half-dIn,n=Math.max(2,Math.ceil((top-py)/3)),hS=(top-py)/n;
+   push('box',C.pave,X(dc),(py+bed)/2,z,0,0,0,dep,py-bed,60);push('box',C.wood,X(dIn+.6),py+.5,z,0,0,0,1.2,1,60);for(const a of[-22,22])push('cyl',C.wood,X(dIn-.3),py+3,z+a,0,0,0,.7,8,.7);
+   for(let i=1;i<=n;i++)push('box',C.stone,X(dc),(bed+py+i*hS)/2,z+30+i*5-2.5,0,0,0,dep,py+i*hS-bed,5);
+   push('box',C.wood,X((28+dIn)/2),py+.7,z-6,0,0,0,dIn-28+1,.6,8);heianKashiGoods(push,kind,X(dc),py,z-18,.2,0);heianKashiGoods(push,kind2,X(dc+1),py,z+14,.5,1);
    // 舟（和船の川舟・heianWasenHull）。荷4つは敷板の上、船頭は艫板の上。棹は上が舳先の側（2026-10-23 井内さん「櫂は向きが逆」）
    if(D.side<0||!K.baked.includes(off)){const bx=X(20),by=wy,fl=by+HEIAN_WASEN_FLOOR,stn=by+HEIAN_WASEN_STERN;pushHull(bx,by,z,0);
     for(let i=0;i<4;i++)heianKashiGoods(push,i%2?kind2:kind,bx,fl,z-16+i*10,0,i);
@@ -25413,7 +25426,8 @@ function heianKashiBuild(){if(heianKashi)return heianKashi;if(!heianRoadSurfaceR
     const h=pk==='rice'?9:pk==='cloth'?6:5;heianKashiGoods(push,pk,px,y0+h,pz,.3,i);}
    if(si%2===0){const qx=X(74),qz=z+44,y0=gy(qx,qz);push('box',C.wood,qx,y0+9,qz,0,0,0,14,2,30);for(const s of[-1,1])push('cyl',C.dark,qx+s*8,y0+8,qz+4,0,0,Math.PI/2,8,2,8);
     for(const s of[-1,1])push('box',C.wood,qx+s*5,y0+9,qz-24,0,0,0,1.6,1.6,22);for(let i=0;i<3;i++)heianKashiGoods(push,kind2,qx,y0+10,qz-9+i*9,0,i);}
-   stations.push({off,z,kind,kind2,A:[X(half+3),z],B:[X(52),z+(si%2?16:-14)],top});});
+   // 人足の道: 舟の脇（荷揚げ場）→ 段の上を雁木の下へ → 雁木を上る → 岸の上 → 荷の山。y＝null は地面
+   const zt=z+30+n*5;stations.push({off,z,kind,kind2,top,path:[[X(dIn+2.5),z-4,py],[X(dc),z+28,py],[X(dc),zt,top],[X(half+6),zt+4,null],[X(52),z+(si%2?16:-14),null]]});});
   const geo=geos.length?mergeGeometries(geos,false):null;for(const g of geos)g.dispose();
   if(geo){const mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));mesh.name=D.name+'・雁木と荷と舟';mesh.castShadow=false;mesh.receiveShadow=true;group.add(mesh);}
   sites.push({D,group,stations,workers:heianKashiWorkers(group,stations,D),open:false});}
@@ -25439,16 +25453,21 @@ function heianKashiWorkers(group,stations,D){if(!stations.length)return[];const 
   const body=new THREE.Mesh(W.geo,W.mat);body.name='人足の体';g.add(body);const load=new THREE.Mesh(W.load,W.loadMat[kind]);load.name='人足の荷';load.position.set(0,17,0);g.add(load);
   group.add(g);out.push({g,load,st,off:(i*K.cycle/K.workers*1.7)%K.cycle,jz:((i*7)%5-2)*4});}
  return out;}
+// 人足の道の f（0〜1）の所。長さで按分。jz＝人ごとのずれ（舟の脇と荷の山だけ流れの向きへずらす）。y＝段の高さ（null＝地面）
+function heianKashiPathAt(P,f,jz=0){const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1],(P[i][2]??P[i-1][2]??0)-(P[i-1][2]??0)));
+ const d=Math.max(0,Math.min(1,f))*L[L.length-1];let i=1;while(i<P.length-1&&L[i]<d)i++;const a=P[i-1],b=P[i],k=(d-L[i-1])/((L[i]-L[i-1])||1),dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1;
+ const end=i===1?(1-k):i===P.length-1?k*.5:0,y=a[2]!=null&&b[2]!=null?a[2]+(b[2]-a[2])*k:a[2]!=null&&k<.15?a[2]:null;
+ return{x:a[0]+dx*k,z:a[1]+dz*k+jz*end,y,dx:dx/l,dz:dz/l};}
 function heianKashiTick(){
  if(!heianGameMode||!heianWalk?.active||heianInterior){if(heianKashi)for(const s of heianKashi.sites)s.group.visible=false;return;}
  const KS=heianKashi||heianKashiBuild();if(!KS)return;const K=HEIAN_KASHI,day=heianOpenMarket(heianClock.day),h=heianClock.hour,p=heianWalk.position,t=performance.now()/1000;
  for(const s of KS.sites){s.open=day===s.D.id&&heianScheduleAt(s.D.id,h)>.1;s.group.visible=s.open;if(!s.open)continue;
   const near=Math.hypot(p.x-s.D.side*HEIAN_CITY_CANAL_X,p.z-K.z)<K.near+1000;
-  for(const w of s.workers){w.g.visible=near;if(!near)continue;const u=((t+w.off)%K.cycle)/K.cycle,[ax,az]=w.st.A,[bx,bz]=w.st.B,a=[ax,az+w.jz],b=[bx,bz+w.jz*.5];
+  for(const w of s.workers){w.g.visible=near;if(!near)continue;const u=((t+w.off)%K.cycle)/K.cycle;
    let f,carry,bend=0;if(u<.12){f=0;carry=u>.07;bend=Math.sin(u/.12*Math.PI);}else if(u<.5){f=(u-.12)/.38;carry=true;}else if(u<.6){f=1;carry=u<.55;bend=Math.sin((u-.5)/.1*Math.PI);}else{f=1-(u-.6)/.4;carry=false;}
-   const x=a[0]+(b[0]-a[0])*f,z=a[1]+(b[1]-a[1])*f,walking=(u>=.12&&u<.5)||u>=.6,dir=u<.5?1:-1,y=heianWalkGroundY(x,z);
-   w.g.position.set(x,(Number.isFinite(y)?y:w.st.top)+(walking?Math.abs(Math.sin(t*7+w.off))*.6:0)-bend*2.2,z);
-   w.g.rotation.y=Math.atan2((b[0]-a[0])*dir,(b[1]-a[1])*dir);w.g.rotation.x=bend*.35;w.load.visible=carry;}}}
+   const q=heianKashiPathAt(w.st.path,f,w.jz),walking=(u>=.12&&u<.5)||u>=.6,dir=u<.5?1:-1,gy0=q.y??heianWalkGroundY(q.x,q.z);
+   w.g.position.set(q.x,(Number.isFinite(gy0)?gy0:w.st.top)+(walking?Math.abs(Math.sin(t*7+w.off))*.6:0)-bend*2.2,q.z);
+   if(walking)w.g.rotation.y=Math.atan2(q.dx*dir,q.dz*dir);w.g.rotation.x=bend*.35;w.load.visible=carry;}}}
 // 検証用: 宙に浮いている物を探す（2026-10-23 井内さん「空中にいる人がいる」）。今見えている Mesh・InstancedMesh の各個の位置（Instanced は行列、ほかは形の中心）で、地面より th 上にある物を名前ごとに数える。屋根・木・鳥・雲など高くて当然の物は名前で外す
 window.__heianFloatLife=(th=60)=>{const dl=heianDailyLifeRuntime;if(!dl)return null;const out=[];dl.people.forEach((p,i)=>{const y=p.wy??p.y,g=terrainYAt(p.wx??p.x,p.wz??p.z);if(Number.isFinite(y)&&y-g>th&&out.length<40)out.push({i,role:p.role,kind:p.kind||null,who:p.who||null,office:p.office||null,spot:p.spot?.name||p.site||null,x:Math.round(p.x),z:Math.round(p.z),dy:Math.round(y-g),walk:Math.round(heianWalkGroundY(p.x,p.z)-g),y0:Math.round((p.y??0)-g)});});return{n:out.length,list:out};}; // 検証用
 window.__heianFloatProbe=(R=3000,th=60)=>{const p=heianWalk?.active?heianWalk.position:controls.target,M=new THREE.Matrix4(),v=new THREE.Vector3(),S=new THREE.Vector3(),Q=new THREE.Quaternion(),out=new Map();
@@ -25459,7 +25478,8 @@ window.__heianFloatProbe=(R=3000,th=60)=>{const p=heianWalk?.active?heianWalk.po
   else{const g=o.geometry;if(!g)return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingSphere||g.boundingSphere.radius>400)return;v.copy(g.boundingSphere.center).applyMatrix4(o.matrixWorld);add(v.x,v.y,v.z);}});
  return[...out.entries()].sort((a,b)=>b[1].n-a[1].n).slice(0,25).map(([k,e])=>({name:k.slice(0,90),n:e.n,at:e.at}));};
 window.__heianKashi=()=>{const KS=heianKashi;if(!KS)return{err:heianKashiErr||null,roads:heianRoadSurfaceRecords?.length||0,sampler:!!heianTerrainSampler};return KS?KS.sites.map(s=>({id:s.D.id,open:s.open,visible:s.group.visible,stations:s.stations.map(q=>q.off),workers:s.workers.length,shown:s.workers.filter(w=>w.g.visible).length,
- at:s.stations[0]?[Math.round(s.stations[0].A[0]),Math.round(s.stations[0].z)]:null})):null;}; // 検証用
+ at:s.stations[0]?[Math.round(s.stations[0].path[0][0]),Math.round(s.stations[0].z)]:null})):null;}; // 検証用
+let heianLifeFloatSkipped=0; // 宙に浮く所へ置かなかった暮らしの営みの人の数（検証用）
 let heianKoma=null,heianKomaErr=0; // 🚫 2026-10-23 河岸の挿入でこの行が消え、独楽の catch が ReferenceError を投げて歩きの毎フレーム処理（河岸・町の物音・牛・話し相手の目印）が全部止まっていた
 function heianKomaTop(woodMat,bandMat){const g=new THREE.Group(),X=HEIAN_KOMA,pts=[[0,0],[.3,.25],[1,.95],[1,1.35],[.72,1.75],[.26,1.95],[.26,2.4],[0,2.4]].map(([r,y])=>new THREE.Vector2(r*X.r,y*X.h/2.4));
  const body=new THREE.Mesh(new THREE.LatheGeometry(pts,14),woodMat),band=new THREE.Mesh(new THREE.CylinderGeometry(X.r*1.01,X.r*1.01,X.h*.12,14,1,true),bandMat);band.position.y=X.h*.48;
@@ -26911,7 +26931,9 @@ function createHeianDailyLifeRuntime(){
   const mat=c=>{const m=new THREE.MeshLambertMaterial({color:c});k.materials.add(m);return m;},geo=g=>(k.geometries.add(g),g);
   const robeMat=mat(0xffffff),M={tub:mat(0x8a6a44),clay:mat(0x9b7f62),pot:mat(0x2b2724),broom:mat(0xa88f5c),rope:mat(0x6b5a3e),timber:mat(0x9a7a4e),paper:mat(0xf1ebdc)};
   const people=[],h=heianLifeHash,commonColors=[0x8c7a5c,0x6f6a5e,0x5d6a70,0x7a5a45,0xa39478,0x5f6650,0x7b6a58],kidColors=[0xc9b48a,0x9a6b4a,0x7f8f6a,0xb08860,0x8a9aa0,0xa5795f];
-  const add=(role,x,z,face,o={})=>{people.push({role,x,z,face,cx:x,cz:z,wx:x,wz:z,child:role==='play',female:role==='wash'||role==='cook'||role==='well',
+  // 🚫 2026-10-23 井内さん「空中にいる人がいる」: 輪になって走る童（role play）が地面から17m上にいた＝置く時の heianWalkGroundY が屋根や木の上を返した所。
+  //    高さを自分で決めない役（o.y なし・盤双六の組以外）で、歩く地面が地形より6m以上高い所には置かない（数は lifeFloatSkipped）
+  const add=(role,x,z,face,o={})=>{if(o.y==null&&role!=='sugo'&&role!=='sugoW'){const g=heianWalkGroundY(x,z),t0=terrainYAt(x,z);if(Number.isFinite(g)&&Number.isFinite(t0)&&g-t0>60){heianLifeFloatSkipped++;return;}}people.push({role,x,z,face,cx:x,cz:z,wx:x,wz:z,child:role==='play',female:role==='wash'||role==='cook'||role==='well',
    color:commonColors[Math.floor(h(x,z,21)*commonColors.length)],ph:h(x,z,22)*6.283,shift:h(x,z,23)-.5,ht:.9+h(x,z,24)*.13,y:heianWalkGroundY(x,z),on:false,...heianBodyTraits(Math.floor(h(x,z,29)*1e9)),...o});};
   // 盤双六（2026-10-20 井内さん「双六とかそういう遊びはどうしたっけ」→C の第1段＝町で打っている人を置く）。
   //  1組＝盤（中心 x,z・向き a）と、盤を挟んで座る2人（人0は a の逆側に座って a を向く）、盤の両端に立つ見物0〜2人。盤の長辺は a に直交する向き
@@ -32569,9 +32591,9 @@ const HEIAN_GATE_OXEN=[[-1422,3],[1431,2],[4297,1]]; // [門のz, 頭数]（陽�
 function heianBuildLifePropMeshes(props,name){
  const group=new THREE.Group(),cells=new Map(),dummy=new THREE.Object3D(),col=new THREE.Color();group.name=name;let meshes=0;
  for(const q of props){const key=q.shape+'|'+Math.floor(q.x/HEIAN_LIFE.cell)+':'+Math.floor(q.z/HEIAN_LIFE.cell);let l=cells.get(key);if(!l)cells.set(key,l=[]);l.push(q);}
- const geoms={box:new THREE.BoxGeometry(1,1,1),sphere:new THREE.SphereGeometry(1,7,5)},mats={box:new THREE.MeshLambertMaterial({color:0xffffff}),sphere:new THREE.MeshLambertMaterial({color:0xffffff,flatShading:true})};
+ const geoms={box:new THREE.BoxGeometry(1,1,1),sphere:new THREE.SphereGeometry(1,7,5),cyl:new THREE.CylinderGeometry(1,1,1,9),basket:new THREE.CylinderGeometry(1,.72,1,9)},mats={box:new THREE.MeshLambertMaterial({color:0xffffff}),sphere:new THREE.MeshLambertMaterial({color:0xffffff,flatShading:true})};mats.cyl=mats.box;mats.basket=mats.box; /* 2026-10-23 cyl＝桶・手桶・甕の胴、basket＝上が広い背負い籠 */
  for(const[key,items]of cells){const shape=key.split('|')[0],mesh=new THREE.InstancedMesh(geoms[shape],mats[shape],items.length);mesh.name='暮らしの小道具・'+shape;
-  items.forEach((q,i)=>{dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(q.rx||0,q.rot,q.rz||0,'YXZ');/* rx・rz＝自分の向きのまま前後・左右へ傾ける（立てかけた板・材木・2026-10-23） */dummy.scale.set(shape==='box'?q.w:q.w/2,shape==='box'?q.h:q.h/2,shape==='box'?q.d:q.d/2);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,col.setHex(q.color));});
+  items.forEach((q,i)=>{dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(q.rx||0,q.rot,q.rz||0,'YXZ');/* rx・rz＝自分の向きのまま前後・左右へ傾ける（立てかけた板・材木・2026-10-23） */dummy.scale.set(shape==='box'?q.w:q.w/2,shape==='box'||shape==='cyl'||shape==='basket'?q.h:q.h/2,shape==='box'?q.d:q.d/2);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,col.setHex(q.color));});
   mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;mesh.matrixAutoUpdate=false;mesh.computeBoundingSphere();mesh.boundingSphere.radius+=6;mesh.frustumCulled=true;group.add(mesh);meshes++;}
  return{group,meshes,props:props.length};}
 // ---- 街路の暮らしの連鎖（2026-10-14 井内さん「東西の山から薪や炭を牛や人に引かせた荷車で市内へ運び、あちこちで売る商人」「門前を箒で掃く人」「炭売り商人と立ち話」）。
@@ -33484,7 +33506,7 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
   const free=r=>r[0]>=bx0&&r[1]<=bx1&&r[2]>=bz0&&r[3]<=bz1&&!taken.some(q=>r[1]>q[0]&&r[0]<q[1]&&r[3]>q[2]&&r[2]<q[3]);
   const take=r=>taken.push([r[0]-1.5,r[1]+1.5,r[2]-1.5,r[3]+1.5]);
   for(const p of rows){const f=footprintOf(p.w,p.d,p.rot);taken.push([p.x-f.w/2-2,p.x+f.w/2+2,p.z-f.d/2-2,p.z+f.d/2+2]);
-   if(hash(p.x,p.z,951)<=(type==='庶民長屋'?.26:.15)){const half=Math.min(30,p.w*.4);take(box(p,0,p.d/2+12,half*2+6,8));}} // 物干し（2026-10-23 家の前へ移した）
+   if(hash(p.x,p.z,951)<=(type==='庶民長屋'?.26:.15)){const half=Math.min(30,p.w*.4);take(box(p,0,p.d/2+HEIAN_LAUNDRY_LZ,half*2+6,8));}} // 物干し（2026-10-23 家の前へ移した・戸口から2.6m離す）
   if(wellAt)taken.push([wellAt.x-20,wellAt.x+20,wellAt.z-20,wellAt.z+20]);
   if(cartAt)taken.push([cartAt.x-48,cartAt.x+48,cartAt.z-34,cartAt.z+34]);
   // 壁のない炊事場: 柱4本＋屋根だけ。局所(x,z)＝屋根の中心、−z が奥。竈と鍋は炊く人が前に出すもの(6.4×.95 先)と同じ所へ置く
@@ -33582,25 +33604,11 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
       else if(kind===2){lifeProp('box',q.x,q.z,6,5,4,0x6b5238,p.rot,0);lifeProp('sphere',q.x,q.z,7,1.4,7,0xb59a62,p.rot,5);} // 台に笊
       else lifeProp('box',q.x,q.z,5,6,5,0x7a6a58,p.rot,0); // 臼
       lifeCount.goods=(lifeCount.goods||0)+1;}}
-    // 2026-10-23 井内さん「全然ものが雑然とある感じじゃない」「木材が積んであったり、カゴがおいてあったり、ゴミみたいなものとか」: 家の前の雑多な物（約6割の家に1〜3つ）。
-    //  材木の山・壁に立てかけた板・背負い籠・重ねた笊・藁束・薪束・塵の山・欠けた甕。当たりは付けない（小さい・踏み越える）。形・色・数は推定（区分D）
-    {const nC=hash(p.x,p.z,5300)<.75?1+Math.floor(hash(p.x,p.z,5301)*3):0; /* 2026-10-23 寄せ集めの間・前にも散らす（3割→75%・1〜3つ） */
-     for(let j=0;j<nC;j++){const kind=Math.floor(hash(p.x,p.z,5310+j)*8),big=kind===0?[26,9]:kind===1?[13,3]:[9,9],lx=(hash(p.x,p.z,5320+j)-.5)*Math.max(0,p.w-big[0]-4),lz=kind===1?p.d/2+3.5:p.d/2+5.5+hash(p.x,p.z,5330+j)*7,R=box(p,lx,lz,big[0],big[1]);if(!free(R))continue;take(R);
-      const q=loc(p,lx,lz),r0=p.rot+(hash(p.x,p.z,5340+j)-.5)*.5,L=(dx,dz)=>loc(p,lx+dx,lz+dz);
-      if(kind===0){for(let k=0;k<4;k++){const a=L(k%2?1.5:-1,(k%2-.5)*2.2);lifeProp('box',a.x,a.z,22-k*1.5,1.7,1.8,k%2?0x9a7a4e:0xa88a5c,r0,k>1?1.7:0);}} // 材木の山（角材を2段）
-      else if(kind===1){for(let k=0;k<3;k++){const a=L(-4+k*3.8,0);lifeProp('box',a.x,a.z,3.2,11+k*1.5,.7,0x8a6a44,p.rot,0);}} // 壁に立てかけた板
-      else if(kind===2){lifeProp('sphere',q.x,q.z,6.4,7,6.4,0xa58552,r0,0);lifeProp('sphere',q.x,q.z,5.6,1.2,5.6,0x6b5238,r0,6.6);} // 背負い籠
-      else if(kind===3){for(let k=0;k<3;k++)lifeProp('sphere',q.x,q.z,8-k*.6,1.3,8-k*.6,k%2?0xb59a62:0xa88d58,r0,k*1.1);} // 重ねた笊
-      else if(kind===4){lifeProp('box',q.x,q.z,9,3,3.4,0xc0a468,r0,0);lifeProp('box',q.x,q.z,1,3.4,3.8,0x7a6a40,r0,0);} // 藁束
-      else if(kind===5){for(let k=0;k<2;k++){const a=L(0,k*3.6-1.8);lifeProp('box',a.x,a.z,7,3,3,0x7a5a38,r0,0);lifeProp('box',a.x,a.z,1,3.3,3.3,0x4f3c28,r0,0);}} // 薪束（縄で縛る）
-      else if(kind===6){for(let k=0;k<6;k++){const a=L((hash(p.x+k,p.z,5350+j)-.5)*7,(hash(p.x,p.z+k,5360+j)-.5)*7),s=1.2+hash(p.x+k,p.z+k,5370+j)*2.2;lifeProp(k%2?'sphere':'box',a.x,a.z,s*1.6,.5+s*.4,s,[0x5a5040,0x7a6a50,0x8a7a5a,0x6a5a3c][k%4],r0+k,0);}} // 塵の山（藁くず・欠けた土器・灰）
-      else{lifeProp('sphere',q.x,q.z,6,5,6,0x7a5a40,r0,-1.8);const a=L(3,2);lifeProp('box',a.x,a.z,2.4,.6,1.6,0x7a5a40,r0+.8,0);} // 欠けた甕と破片
-      lifeCount.clutter=(lifeCount.clutter||0)+1;}}
     // ---- 2026-10-23 井内さん「いくつかのものの組み合わせで積んでような塊とか、植え込みとか立てかけた材木とかをグチャッと」「今はぽつん、ぽつん」「生きてる街っぽく」。
     //  寄せ集め（約6割の家の前・壁際に1〜2塊）: 奥に壁へ立てかけた板・材木・巻いた筵、前に桶・甕・箱・藁束・薪束を並べ、その上に笊・籠・小桶を積み、足もとに屑を散らす。
     //  植え込み（約3割）・壁に立てかけた材木の束（約1割）・家の角の箱に腰掛ける人（約8%）・家の前で盥の洗濯（約7%）。形・数・色は推定（区分D）
-    {const hh=k=>hash(p.x,p.z,k),wood=[0x9a7a4e,0xa88a5c,0x8a6a44,0x7a5a38],nK=type==='庶民長屋'?(hh(5400)<.92?1+(hh(5401)<.6?1:0)+(hh(5399)<.18?1:0):0):(hh(5400)<.5?1:0); /* 2026-10-23 井内さん「まだまだ荷物少ない」「庶民はいるのかいらないのかわかんないものをたくさん持ってる」: 庶民長屋はほぼ全部の家に1〜3塊（従者長屋は半分に1塊）。数は小道具の総数（メモリ）と相談 */
-     for(let j=0;j<nK;j++){const side=(hh(5402)<.5?-1:1)*(j%2?-1:1),cw=18+hh(5404+j)*10,lx=j===2?(hh(5406+j)-.5)*Math.max(0,p.w-cw-30):side*Math.max(0,p.w/2-cw/2-2-hh(5406+j)*4),lz=p.d/2+5+(j===2?3:0),R=box(p,lx,lz,cw,10);if(!free(R))continue;take(R);
+    {const hh=k=>hash(p.x,p.z,k),wood=[0x9a7a4e,0xa88a5c,0x8a6a44,0x7a5a38],nK=type==='庶民長屋'?2+(hh(5401)<.45?1:0):(hh(5400)<.6?1:0); /* 2026-10-23 井内さん「まだまだ荷物少ない」「庶民はいるのかいらないのかわかんないものをたくさん持ってる」: 庶民長屋はほぼ全部の家に1〜3塊（従者長屋は半分に1塊）。数は小道具の総数（メモリ）と相談 */
+     for(let j=0;j<nK;j++){const side=(hh(5402)<.5?-1:1)*(j%2?-1:1),cw=18+hh(5404+j)*10,lx=j===2?(hh(5406+j)-.5)*Math.max(0,p.w-cw-30):side*Math.max(0,p.w/2-cw/2-2-hh(5406+j)*4),lz=p.d/2+7.5+(j===2?3:0),R=box(p,lx,lz,cw,10); /* 🚫 旧 d/2+5（奥行10）は家の当たり（縁+2）に必ず重なり、寄せ集めがほとんど置けていなかった（2026-10-23 井内さん「全然増えてないよ」） */if(!free(R))continue;take(R);
       const L=(dx,dz)=>loc(p,lx+dx,lz+dz),r=k=>hh(5410+j*40+k),put=(s,dx,dz,w,h,d,c,lift=0,rx=0,rz=0,dr=0)=>{const a=L(dx,dz);lifeProp(s,a.x,a.z,w,h,d,c,p.rot+dr,lift,rx,rz);};
       // 奥（壁際）: 立てかけた物 2〜3
       const nb=3+(r(0)<.5?1:0);for(let k=0;k<nb;k++){const dx=-cw/2+3+k*(cw-6)/Math.max(1,nb-1),t=r(1+k);
@@ -33609,17 +33617,43 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
        else put('box',dx,-3,3.6,10+r(20+k)*4,3.6,0xb59a62,0,-.08);} // 巻いた筵を立てる
       // 前: 土台になる物 3〜4
       const nf=4+Math.floor(r(23)*3),tops=[];for(let k=0;k<nf;k++){const dx=-cw/2+3+k*(cw-6)/Math.max(1,nf-1)+(r(24+k)-.5)*2,dz=(r(28+k)-.5)*2.4,t=r(32+k);
-       if(t<.22){put('box',dx,dz,5,4.2,5,0x8a6a44,0,0,0,r(33+k));tops.push([dx,dz,4.2]);} // 桶
+       if(t<.22){put('cyl',dx,dz,5.4,4.4,5.4,0x8a6a44,0,0,0,r(33+k));put('cyl',dx,dz,5.7,.5,5.7,0x4f3c28,1.2);put('cyl',dx,dz,5.7,.5,5.7,0x4f3c28,3.2);tops.push([dx,dz,4.4,'oke']);} // 桶（箍2本）
        else if(t<.4){put('sphere',dx,dz,6,7,6,[0x6a4a34,0x7a5a40,0x5a4030][k%3]);tops.push([dx,dz,6.4]);} // 甕
+       else if(t<.48){put('basket',dx,dz,7,9,6,0xa58552,0,0,0,r(39+k));put('cyl',dx,dz,7.2,.6,6.2,0x7a5a38,8.4);if(r(41+k)<.6)put('box',dx,dz,1,9,1,0x9a7a4e,9,-.3);} // 背負い籠（口に縁・挿した薪）
        else if(t<.58){put('box',dx,dz,7,5.2,6,0x7a5c3e,0,0,0,r(34+k)*.6);tops.push([dx,dz,5.2]);} // 木箱
        else if(t<.76)put('box',dx,dz,9,3,3.4,0xc0a468,0,0,0,r(35+k)*.8); // 藁束
        else if(t<.9){put('box',dx,dz,7,3,3,0x7a5a38,0,0,0,r(36+k)*.8);put('box',dx,dz,7,3,3,0x6a4a30,3,0,0,r(37+k)*.8+.2);} // 薪束を2段
        else put('sphere',dx,dz,5,2,4,0x5a5040,0,0,0,r(38+k));} // 灰の山
       // 上に積む: 笊・籠・小桶・畳んだ布
-      for(const[dx,dz,top]of tops){const t=r(Math.round(dx*7)+60);if(t<.35)put('sphere',dx,dz,7,1.3,7,0xb59a62,top);else if(t<.6)put('sphere',dx,dz,5,5,5,0xa58552,top);else if(t<.78)put('box',dx,dz,3.4,2.6,3.4,0x9a7a4e,top);else if(t<.9)put('box',dx,dz,5,1.4,4,[0xefe9da,0x4c5d7a,0x9a5d48][Math.floor(r(70)*3)],top);}
+      for(const[dx,dz,top,what]of tops){const t=r(Math.round(dx*7)+60);
+       if(what==='oke'&&t<.55){put('cyl',dx+.8,dz,2.4,1.4,2.4,0x9a7a4e,top);put('box',dx-2.2,dz,.6,.6,8,0x8a6a44,top+2,0,0,.3);continue;} // 桶に杓（柄を縁に掛ける）
+       if(t<.35)put('sphere',dx,dz,7,1.3,7,0xb59a62,top);else if(t<.6)put('sphere',dx,dz,5,5,5,0xa58552,top);else if(t<.78)put('box',dx,dz,3.4,2.6,3.4,0x9a7a4e,top);else if(t<.9)put('box',dx,dz,5,1.4,4,[0xefe9da,0x4c5d7a,0x9a5d48][Math.floor(r(70)*3)],top);}
       // 足もとの屑（藁くず・木っ端・欠けた土器）
       for(let k=0;k<3;k++){const s=.9+r(80+k)*1.6;put(k%2?'sphere':'box',(r(84+k)-.5)*(cw+4),3+r(88+k)*3,s*1.6,.4+s*.3,s,[0x8a7a5a,0x9a7a4e,0x7a5a40,0x6a5a3c][k],0,0,0,r(92+k)*3);}
-      lifeCount.heap=(lifeCount.heap||0)+1;}
+      lifeCount.heap=(lifeCount.heap||0)+1;if(type==='庶民長屋'&&(window.__heianHeaps??=[]).length<200){const c0=L(0,0),f0=L(0,40);window.__heianHeaps.push([Math.round(c0.x),Math.round(c0.z),Math.round(f0.x),Math.round(f0.z)]);}}
+ /* 寄せ集め（下）の後に置く＝寄せ集めが先に場所を取る（2026-10-23: 先に置いた小物が前を埋め、寄せ集めが3千しか置けなかった） */
+     // 2026-10-23 井内さん「全然ものが雑然とある感じじゃない」「木材が積んであったり、カゴがおいてあったり、ゴミみたいなものとか」: 家の前の雑多な物（約6割の家に1〜3つ）。
+     //  材木の山・壁に立てかけた板・背負い籠・重ねた笊・藁束・薪束・塵の山・欠けた甕。当たりは付けない（小さい・踏み越える）。形・色・数は推定（区分D）
+     {const nC=type==='庶民長屋'?1+Math.floor(hash(p.x,p.z,5301)*2):(hash(p.x,p.z,5300)<.75?1+Math.floor(hash(p.x,p.z,5301)*2):0); /* 2026-10-23 寄せ集めの間・前にも散らす（3割→75%・1〜3つ） */
+      for(let j=0;j<nC;j++){const kind=Math.floor(hash(p.x,p.z,5310+j)*8),big=kind===0?[26,9]:kind===1?[13,3]:[9,9],lx=(hash(p.x,p.z,5320+j)-.5)*Math.max(0,p.w-big[0]-4),lz=kind===1?p.d/2+4:p.d/2+2.6+big[1]/2+hash(p.x,p.z,5330+j)*6,R=box(p,lx,lz,big[0],big[1]); /* 🚫 旧は d/2+5.5（奥行9）＝家の当たりに重なり、立てかけた板しか置けていなかった */if(!free(R))continue;take(R);
+       const q=loc(p,lx,lz),r0=p.rot+(hash(p.x,p.z,5340+j)-.5)*.5,L=(dx,dz)=>loc(p,lx+dx,lz+dz),sub=hash(p.x,p.z,5345+j); /* sub＝同じ種類の中の替え（背負い籠・桶と杓・手桶） */
+       if(kind===0){for(let k=0;k<4;k++){const a=L(k%2?1.5:-1,(k%2-.5)*2.2);lifeProp('box',a.x,a.z,22-k*1.5,1.7,1.8,k%2?0x9a7a4e:0xa88a5c,r0,k>1?1.7:0);}} // 材木の山（角材を2段）
+       else if(kind===1){for(let k=0;k<3;k++){const a=L(-4+k*3.8,0);lifeProp('box',a.x,a.z,3.2,11+k*1.5,.7,0x8a6a44,p.rot,0);}} // 壁に立てかけた板
+       else if(kind===2){lifeProp('basket',q.x,q.z,7,9,6,0xa58552,r0,0);lifeProp('cyl',q.x,q.z,7.2,.6,6.2,0x7a5a38,r0,8.4);if(sub<.5){const a=L(5,1);lifeProp('cyl',a.x,a.z,5,4.4,5,0x8a6a44,r0,0);lifeProp('cyl',a.x,a.z,2.4,1.4,2.4,0x9a7a4e,r0,4.4);const h=L(3,1);lifeProp('box',h.x,h.z,.6,.6,8,0x8a6a44,r0+.3,6.2);}} // 背負い籠（口に縁）と、半分は脇に桶と杓
+       else if(kind===3){if(sub<.45){for(let k=0;k<2;k++){const a=L(k*6-3,0);lifeProp('cyl',a.x,a.z,4.4,4,4.4,0x8a6a44,r0,0);lifeProp('box',a.x,a.z,.5,4,.5,0x6b5238,r0,5,0,0);lifeProp('box',a.x,a.z,4.6,.5,.5,0x6b5238,r0,7);}} /* 手桶2つ（取っ手） */else for(let k=0;k<3;k++)lifeProp('sphere',q.x,q.z,8-k*.6,1.3,8-k*.6,k%2?0xb59a62:0xa88d58,r0,k*1.1);} // 重ねた笊
+       else if(kind===4){lifeProp('box',q.x,q.z,9,3,3.4,0xc0a468,r0,0);lifeProp('box',q.x,q.z,1,3.4,3.8,0x7a6a40,r0,0);} // 藁束
+       else if(kind===5){for(let k=0;k<2;k++){const a=L(0,k*3.6-1.8);lifeProp('box',a.x,a.z,7,3,3,0x7a5a38,r0,0);lifeProp('box',a.x,a.z,1,3.3,3.3,0x4f3c28,r0,0);}} // 薪束（縄で縛る）
+       else if(kind===6){for(let k=0;k<6;k++){const a=L((hash(p.x+k,p.z,5350+j)-.5)*7,(hash(p.x,p.z+k,5360+j)-.5)*7),s=1.2+hash(p.x+k,p.z+k,5370+j)*2.2;lifeProp(k%2?'sphere':'box',a.x,a.z,s*1.6,.5+s*.4,s,[0x5a5040,0x7a6a50,0x8a7a5a,0x6a5a3c][k%4],r0+k,0);}} // 塵の山（藁くず・欠けた土器・灰）
+       else{lifeProp('sphere',q.x,q.z,6,5,6,0x7a5a40,r0,-1.8);const a=L(3,2);lifeProp('box',a.x,a.z,2.4,.6,1.6,0x7a5a40,r0+.8,0);} // 欠けた甕と破片
+       lifeCount.clutter=(lifeCount.clutter||0)+1;}}
+     // 家と家の間（妻側の脇・前寄り）にも物を押し込む（2026-10-23 井内さん「こういう密度感で、あちこちにある方がいい。背負うようなかごとか、桶とか、杓とか」）。庶民長屋は両脇を試し、空いていれば置く
+     if(type==='庶民長屋')for(const side of[-1,1]){if(hh(5470+side)>.8)continue;const lx=side*(p.w/2+6),lz=p.d/2-5,R=box(p,lx,lz,7,10); /* 家の当たり（縁+2）の外 */if(!free(R))continue;take(R);
+      const t=hh(5480+side),put=(s2,dx,dz,w,h,d,c,lift=0,rx=0,rz=0,dr=0)=>{const a=loc(p,lx+dx,lz+dz);lifeProp(s2,a.x,a.z,w,h,d,c,p.rot+dr,lift,rx,rz);};
+      if(t<.3){put('basket',0,-2,6.4,8.4,5.6,0xa58552,0,-.08);put('cyl',0,-2,6.6,.6,5.8,0x7a5a38,7.9);put('cyl',0,3,4.8,4.2,4.8,0x8a6a44);put('cyl',.8,3,2.2,1.3,2.2,0x9a7a4e,4.2);put('box',-1.6,3,.6,.6,7.6,0x8a6a44,5.8,0,0,.4);} // 背負い籠と桶に杓
+      else if(t<.55){for(let k=0;k<3;k++)put('box',(k-1)*1.8,-3,1.4,16+k*3,1.4,wood[k%4],0,-.12,(k-1)*.08);put('box',0,2,7,3,3,0x7a5a38,0,0,0,.4);put('box',0,2,7,3,3,0x6a4a30,3,0,0,.6);} // 立てかけた材木と薪束
+      else if(t<.8){put('cyl',0,-2,5,4.4,5,0x8a6a44);put('cyl',0,-2,5.3,.5,5.3,0x4f3c28,1.4);put('cyl',0,3,4.4,4,4.4,0x7a5c3e);put('box',0,3,.5,4,.5,0x6b5238,4.4);put('box',0,3,4.6,.5,.5,0x6b5238,6.4);put('box',2.4,-2,.6,.6,8,0x8a6a44,5.6,0,0,-.3);} // 桶・手桶・杓
+      else{put('sphere',0,-1,6,6.6,6,0x6a4a34);put('sphere',0,-1,5.6,1,5.6,0xb59a62,6.2);put('box',0,4,8,1,5,0xc0a468,0,0,0,.2);} // 甕に笊の蓋・箕
+      lifeCount.gap=(lifeCount.gap||0)+1;}
      // 植え込み: 家の前の角に低い木2〜4株と草の株
      if(hh(5500)<.3){const side=hh(5501)<.5?-1:1,lx=side*(p.w/2-7),lz=p.d/2+4.5,R=box(p,lx,lz,12,8);
       if(free(R)){take(R);const n=2+Math.floor(hh(5502)*3);for(let k=0;k<n;k++){const a=loc(p,lx+(hh(5503+k)-.5)*9,lz+(hh(5507+k)-.5)*4),d=5+hh(5511+k)*5;lifeProp('sphere',a.x,a.z,d,4+hh(5515+k)*4,d,[0x4f7a3a,0x5d8a42,0x47703a,0x6a9248][k%4],p.rot,0);}
@@ -33717,7 +33751,9 @@ function buildHeianSettlementLayer(cityCells,noblePlots,allSites,overlapsZone,ha
     const cloth=[0xefe9da,0xefe9da,0xefe9da,0x4c5d7a,0xc2a664,0x9a5d48,0x8f9a6c];
     for(let k=rowStart;k<placements.length;k++){const p=placements[k];if(p.kind!=='row'||hash(p.x,p.z,951)>(type==='庶民長屋'?.26:.15))continue;
      // 2026-10-23 井内さん「洗濯物を裏に干してるけど、これも表に持ってこよう」: 家を背中合わせにしてから裏は2mしか無い。戸口の側（+lz）の家の前へ
-     const co=Math.cos(p.rot),si=Math.sin(p.rot),at=(lx,lz)=>({x:p.x+co*lx+si*lz,z:p.z-si*lx+co*lz}),lz=p.d/2+12,mid=at(0,lz);
+     // 2026-10-23 井内さん「洗濯物は家から少し離した方がいい。出入りできない」: 旧は戸口の前1.2m（竿の下を通れない）。2.6m前へ出す。区画の縁（道）に出るなら少し戻し、それでも出るなら干さない
+     const co=Math.cos(p.rot),si=Math.sin(p.rot),at=(lx,lz)=>({x:p.x+co*lx+si*lz,z:p.z-si*lx+co*lz}),half0=Math.min(30,p.w*.4),inYard=lz=>[-1,1].every(sx=>{const q=at(sx*half0,lz);return Math.abs(q.x-m.x)<m.w/2-10&&Math.abs(q.z-m.z)<m.d/2-10;});
+     const lz=[HEIAN_LAUNDRY_LZ,HEIAN_LAUNDRY_LZ-6].map(v=>p.d/2+v).find(inYard);if(lz==null)continue;const mid=at(0,lz);
      if(wellAt&&Math.hypot(mid.x-wellAt.x,mid.z-wellAt.z)<48||cartAt&&Math.hypot(mid.x-cartAt.x,mid.z-cartAt.z)<70)continue;
      // 🚫 初版（布 幅0.9〜1.3m・丈0.9〜1.4m・生成り2/6）は俯瞰で地面に紛れて見えなかった（row-a）。着物を広げて干す大きさ・生成りを多めに
      const half=Math.min(30,p.w*.4);for(const sx of[-1,1]){const q=at(sx*half,lz);addMicroProp('box',q.x,q.z,1.8,23,1.8,0x5e4833,p.rot);}
@@ -37867,7 +37903,7 @@ function heianCityCanals(data){
 //  局所座標: 長さは z（舳先＝−z・艫＝+z）、幅 x、y＝0 が水面。全長 70（6.4m＋舳先の伸び）・幅 16。
 //  断面は 敷（平らな底）＋左右の棚板（少し外へ開く）。舳先へ向かって底が反り上がり幅が細る（水押）、艫は平らな戸立て。舷の上に縁板（こべり）、船梁3本、艫に船頭が立つ艫板、底に敷板。
 //  色は頂点色（棚板は上下2段で濃淡・縁板と船梁は明るい木）。1つの BufferGeometry（描画1回）。返す geometry は使い回すので dispose しない
-const HEIAN_WASEN=Object.freeze({len:70,z0:32,beam:16,flare:1.4,bottom:-1,floor:-.3,gunwale:4,bowRise:4.2,bowLift:5.2,sternRise:1,N:22,
+const HEIAN_WASEN=Object.freeze({len:70,z0:32,beam:16,flare:1.4,bottom:-1,floor:.9/* 🚫 −.3 は水面（0）より下で、舟の中に川の水が溜まって見えた（2026-10-23 井内さん「船、水が溜まってて変」）＝敷板は水面の上 */,gunwale:4,bowRise:4.2,bowLift:5.2,sternRise:1,N:22,
  col:{side:0x6a5236,side2:0x7d6343,bottom:0x4e3d29,inner:0x8a6f4d,rail:0xa98a5e,beam:0x9a7c52,floor:0x9c8360,deck:0x8f744c}});
 function heianWasenHull(){if(heianWasenHull.geo)return heianWasenHull.geo;const H=HEIAN_WASEN,C=H.col,pos=[],col=[],c=new THREE.Color(),N=H.N;
  const st=u=>{const b=Math.max(0,(u-.6)/.4),s=Math.max(0,(.14-u)/.14),wb=(H.beam/2-H.flare)*(1-Math.pow(b,1.5)*.94),wt=H.beam/2*(1-Math.pow(b,1.8)*.88);
@@ -37879,7 +37915,8 @@ function heianWasenHull(){if(heianWasenHull.geo)return heianWasenHull.geo;const 
    quad([sd*A.wb,A.yb,A.z],[sd*B.wb,B.yb,B.z],[sd*wmB,mB,B.z],[sd*wmA,mA,A.z],C.side);quad([sd*wmA,mA,A.z],[sd*wmB,mB,B.z],[sd*B.wt,B.yt,B.z],[sd*A.wt,A.yt,A.z],C.side2);
    quad([sd*A.wt,A.yt,A.z],[sd*B.wt,B.yt,B.z],[sd*(B.wt-1.1),B.yt+.25,B.z],[sd*(A.wt-1.1),A.yt+.25,A.z],C.rail);} // 縁板（こべり）
   quad([-A.wb,A.yb,A.z],[A.wb,A.yb,A.z],[B.wb,B.yb,B.z],[-B.wb,B.yb,B.z],C.bottom);
-  if(i<N*.72)quad([-A.wb+.6,H.floor,A.z],[A.wb-.6,H.floor,A.z],[B.wb-.6,H.floor,B.z],[-B.wb+.6,H.floor,B.z],C.floor);} // 敷板
+  {const fy=q=>Math.max(H.floor,q.yb+.3),fw=(q,y)=>q.wb+(q.wt-q.wb)*Math.min(1,Math.max(0,(y-q.yb)/((q.yt-q.yb)||1))),ya=fy(A),yb2=fy(B),wa=fw(A,ya)+.05,wb2=fw(B,yb2)+.05; /* 敷板は舳先まで張り、幅は棚板の内側いっぱい（隙間から水が見えない） */
+   quad([-wa,ya,A.z],[wa,ya,A.z],[wb2,yb2,B.z],[-wb2,yb2,B.z],C.floor);}} // 敷板
  {const A=S[0];quad([-A.wt,A.yt,A.z],[-A.wb,A.yb,A.z],[A.wb,A.yb,A.z],[A.wt,A.yt,A.z],C.side);} // 艫の戸立て
  {const E=S[N],P=st(1-1/N);quad([-E.wt,E.yt,E.z],[E.wt,E.yt,E.z],[E.wb,E.yb,E.z],[-E.wb,E.yb,E.z],C.side);tri([-E.wt,E.yt,E.z],[0,E.yt+1.2,E.z-2.2],[E.wt,E.yt,E.z],C.rail);void P;} // 舳先の水押の頭
  const g0=new THREE.BufferGeometry();g0.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g0.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g0.computeVertexNormals();
@@ -37891,7 +37928,7 @@ function heianWasenHull(){if(heianWasenHull.geo)return heianWasenHull.geo;const 
 // 船体の Mesh（geometry と material は使い回し）
 function heianWasenMesh(name='荷舟船体'){const g=heianWasenHull(),m=new THREE.Mesh(g,heianWasenHull.mat);m.name=name;return m;}
 // 舟の上の床（敷板）と艫板の高さ。乗る・立つ・荷を置く所
-const HEIAN_WASEN_FLOOR=-.1,HEIAN_WASEN_STERN=2.6;
+const HEIAN_WASEN_FLOOR=.9,HEIAN_WASEN_STERN=2.6;
 // 堀川の荷舟（2026-08-18井内さん指示: 東市に荷物を積んだ舟を置く）。
 // 東市の東縁は堀川に接する（canalMarketGap 0〜60m）ので、市の搬入舟を東市の横の水面に係留する。
 // 造形は津（淀津・鳥羽津）の川舟と同じ寸法感（船体1.6×6.4m）。舟底は掘り下げた水面へ追随する。
@@ -40435,25 +40472,19 @@ function makeTinRobot(options={}){
    右股:10,右膝曲げ:12,右足首:-22,右脚伸縮:-.2,左股:-16,左膝曲げ:24,左足首:-8,左脚伸縮:-.2,
    首回転:-4,胴ひねり:-6,右肩振り:-30,右肘曲げ:-28,右手首前後:-8,左肩振り:18,左肘曲げ:12,右手開閉:8,左手開閉:8}},
   // 片足を持上げ、両足が床を離れる短い跳躍と滞空を挟み、反対足へ一度だけ着地する。
-  {name:'スキップ（左右ループ）',dur:.14,groundFeet:true,groundFoot:'left',stages:[
-   {name:'スキップ・右足・持上げ',dur:.16,groundFeet:true,groundFoot:'left',angles:{ルート上下:-.8,重心左右:-4,体ロール:6,腰前屈:3,胴ひねり:5,
-    右股:-40,右膝曲げ:76,右足首:-36,左股:-6,左膝曲げ:18,左足首:-12,右肩振り:28,右肘曲げ:16,左肩振り:-45,左肘曲げ:-34}},
-   {name:'スキップ・右足・跳躍',dur:.14,angles:{ルート上下:7.5,重心左右:3,体ロール:-5,腰前屈:1,胴伸縮:1.2,胴ひねり:-5,
-    右股:2,右膝曲げ:10,右足首:-12,左股:-38,左膝曲げ:72,左足首:-34,右肩振り:-45,右肘曲げ:-34,左肩振り:28,左肘曲げ:16}},
-   {name:'スキップ・右足・滞空',dur:.12,angles:{ルート上下:7.5,重心左右:3,体ロール:-5,腰前屈:1,胴伸縮:1.2,胴ひねり:-5,
-    右股:2,右膝曲げ:10,右足首:-12,左股:-38,左膝曲げ:72,左足首:-34,右肩振り:-45,右肘曲げ:-34,左肩振り:28,左肘曲げ:16}},
-   {name:'スキップ・右足・着地',dur:.16,groundFeet:true,groundFoot:'right',angles:{ルート上下:-1.8,重心左右:4,体ロール:-6,腰前屈:5,胴伸縮:-.6,胴ひねり:-5,
-    右股:4,右膝曲げ:30,右足首:-34,左股:-34,左膝曲げ:68,左足首:-34,右肩振り:-38,右肘曲げ:-30,左肩振り:24,左肘曲げ:14}},
-   {name:'スキップ・左足・持上げ',dur:.16,groundFeet:true,groundFoot:'right',angles:{ルート上下:-.8,重心左右:4,体ロール:-6,腰前屈:3,胴ひねり:-5,
-    右股:-6,右膝曲げ:18,右足首:-12,左股:-40,左膝曲げ:76,左足首:-36,右肩振り:-45,右肘曲げ:-34,左肩振り:28,左肘曲げ:16}},
-   {name:'スキップ・左足・跳躍',dur:.14,angles:{ルート上下:7.5,重心左右:-3,体ロール:5,腰前屈:1,胴伸縮:1.2,胴ひねり:5,
-    右股:-38,右膝曲げ:72,右足首:-34,左股:2,左膝曲げ:10,左足首:-12,右肩振り:28,右肘曲げ:16,左肩振り:-45,左肘曲げ:-34}},
-   {name:'スキップ・左足・滞空',dur:.12,angles:{ルート上下:7.5,重心左右:-3,体ロール:5,腰前屈:1,胴伸縮:1.2,胴ひねり:5,
-    右股:-38,右膝曲げ:72,右足首:-34,左股:2,左膝曲げ:10,左足首:-12,右肩振り:28,右肘曲げ:16,左肩振り:-45,左肘曲げ:-34}},
-   {name:'スキップ・左足・着地',dur:.16,groundFeet:true,groundFoot:'left',angles:{ルート上下:-1.8,重心左右:-4,体ロール:6,腰前屈:5,胴伸縮:-.6,胴ひねり:5,
-    右股:-34,右膝曲げ:68,右足首:-34,左股:4,左膝曲げ:30,左足首:-34,右肩振り:24,右肘曲げ:14,左肩振り:-38,左肘曲げ:-30}}
-  ],angles:{ルート上下:-.8,重心左右:-4,体ロール:6,腰前屈:3,胴ひねり:5,
-   右股:-40,右膝曲げ:76,右足首:-36,左股:-6,左膝曲げ:18,左足首:-12,右肩振り:28,右肘曲げ:16,左肩振り:-45,左肘曲げ:-34}},
+  // 2026-10-23 井内さん「スキップは歩くの早回しではなく、足を大きく振って、地面についた足のキックで蹴って少しジャンプ気味に進むのを繰り返す」:
+  //  片足ずつ 踏み切り（膝をためる）→蹴る（後ろ足を伸ばしきり、前の膝を高く上げる）→跳躍（腰が1.1m上がる・いちばん長い）→反対の足で着地（膝で受ける）。腕は脚と逆に大きく振る。
+  //  🚫 旧は8段を等分した0.5秒で回し、脚が速く動くだけの「歩きの早回し」に見えた。段の長さは dur の比（startGait）・1周 0.84秒（HEIAN_GAIT_STRIDE.skipCycle）
+  {name:'スキップ（左右ループ）',dur:.16,groundFeet:true,groundFoot:'left',stages:[
+   {name:'スキップ・左足で踏み切り',dur:0.16,groundFeet:true,groundFoot:'left',angles:{ルート上下:-1.6,重心左右:-4,体ロール:5,腰前屈:6,胴ひねり:5,右股:-46,右膝曲げ:84,右足首:-30,左股:-6,左膝曲げ:30,左足首:-16,右肩振り:-50,右肘曲げ:-36,左肩振り:40,左肘曲げ:20}},
+   {name:'スキップ・左足で蹴る',dur:0.1,groundFeet:true,groundFoot:'left',angles:{ルート上下:4,重心左右:-2,体ロール:3,腰前屈:8,胴伸縮:1.6,胴ひねり:6,右股:-66,右膝曲げ:96,右足首:-28,左股:22,左膝曲げ:6,左足首:-44,右肩振り:-62,右肘曲げ:-40,左肩振り:48,左肘曲げ:22}},
+   {name:'スキップ・左足の跳躍',dur:0.22,angles:{ルート上下:11,重心左右:0,体ロール:2,腰前屈:4,胴伸縮:1.2,胴ひねり:4,右股:-58,右膝曲げ:80,右足首:-26,左股:16,左膝曲げ:34,左足首:-36,右肩振り:-48,右肘曲げ:-34,左肩振り:36,左肘曲げ:18}},
+   {name:'スキップ・右足で着地',dur:0.12,groundFeet:true,groundFoot:'right',angles:{ルート上下:-2.2,重心左右:4,体ロール:-5,腰前屈:7,胴伸縮:-0.8,胴ひねり:-2,右股:-10,右膝曲げ:32,右足首:-20,左股:-14,左膝曲げ:54,左足首:-30,右肩振り:-20,右肘曲げ:-24,左肩振り:18,左肘曲げ:14}},
+   {name:'スキップ・右足で踏み切り',dur:0.16,groundFeet:true,groundFoot:'right',angles:{ルート上下:-1.6,重心左右:4,体ロール:-5,腰前屈:6,胴ひねり:-5,左股:-46,左膝曲げ:84,左足首:-30,右股:-6,右膝曲げ:30,右足首:-16,左肩振り:-50,左肘曲げ:-36,右肩振り:40,右肘曲げ:20}},
+   {name:'スキップ・右足で蹴る',dur:0.1,groundFeet:true,groundFoot:'right',angles:{ルート上下:4,重心左右:2,体ロール:-3,腰前屈:8,胴伸縮:1.6,胴ひねり:-6,左股:-66,左膝曲げ:96,左足首:-28,右股:22,右膝曲げ:6,右足首:-44,左肩振り:-62,左肘曲げ:-40,右肩振り:48,右肘曲げ:22}},
+   {name:'スキップ・右足の跳躍',dur:0.22,angles:{ルート上下:11,重心左右:0,体ロール:-2,腰前屈:4,胴伸縮:1.2,胴ひねり:-4,左股:-58,左膝曲げ:80,左足首:-26,右股:16,右膝曲げ:34,右足首:-36,左肩振り:-48,左肘曲げ:-34,右肩振り:36,右肘曲げ:18}},
+   {name:'スキップ・左足で着地',dur:0.12,groundFeet:true,groundFoot:'left',angles:{ルート上下:-2.2,重心左右:-4,体ロール:5,腰前屈:7,胴伸縮:-0.8,胴ひねり:2,左股:-10,左膝曲げ:32,左足首:-20,右股:-14,右膝曲げ:54,右足首:-30,左肩振り:-20,左肘曲げ:-24,右肩振り:18,右肘曲げ:14}}
+  ],angles:{ルート上下:-1.6,重心左右:-4,体ロール:5,腰前屈:6,胴ひねり:5,右股:-46,右膝曲げ:84,右足首:-30,左股:-6,左膝曲げ:30,左足首:-16,右肩振り:-50,右肘曲げ:-36,左肩振り:40,左肘曲げ:20}},
   // 前屈みで腕を後ろへ落とす→前へ振る→体を起こしながら外向きY字へ抜く。
   {name:'ばんざい',dur:.55,stages:[
    {name:'ばんざい・ため',dur:.35,angles:{腰前屈:14,右手開閉:-4,左手開閉:-4}},
