@@ -8590,6 +8590,14 @@ L.say.push(
  {at:'daidairi',who:['近衛舎人','兵衛'],life:'drill',t:'……もう腕が上がらん'},
  {at:'daidairi',who:['近衛舎人','兵衛'],life:'drill',t:'行幸の供の日までに、形を覚えねば'},
  {at:'daidairi',who:['近衛舎人','兵衛'],life:'drill',if:'robot',t:'（教官に見つかる…前を向いておこう）'},
+ // 2026-10-25 稽古の刻の外は、その場で武具を立てて休む（life:drillRest・drillLeadRest）。言葉は創作。木の人形を相手にする稽古も創作
+ {at:'daidairi',who:['近衛舎人','兵衛'],life:'drillRest',t:'やっと休みじゃ。人形の藁がもうぼろぼろよ'},
+ {at:'daidairi',who:['近衛舎人','兵衛'],life:'drillRest',t:'腕が棒のようじゃ。飯の後にまた稽古とは'},
+ {at:'daidairi',who:['近衛舎人','兵衛'],life:'drillRest',t:'あの人形、今日もびくともせんかった'},
+ {at:'daidairi',who:['近衛舎人','兵衛'],life:'drillRest',if:'robot',t:'鉄の童か。そなたなら人形に打ち込んでも疲れんのじゃろうな'},
+ {at:'daidairi',who:'教官',life:'drillLeadRest',t:'休め。水を飲んでおけ'},
+ {at:'daidairi',who:'教官',life:'drillLeadRest',t:'休みの間も、太刀を地に放り出すなよ'},
+ {at:'daidairi',who:'教官',life:'drillLeadRest',t:'次は構えから見る。さぼった者はすぐ分かるぞ'},
  // 宮中の物流 A「米の出庫と受渡し」（2026-10-24・index.html の HEIAN_RICE_CHAIN）。大炊寮の米倉→大膳職の厨。
  //  【史実・高】大炊寮は米穀を収めて諸司へ分け与えた。【創作】この便・刻・道・人と言葉。『延喜式』の名は出さない
  {at:'daidairi',who:'人夫',life:'riceCarryLoaded',t:'重いぞ、道をあけてくれ',n:'創作'},

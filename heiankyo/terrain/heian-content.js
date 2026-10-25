@@ -32,7 +32,7 @@ function condProblem(c){
   if(!p)return '空の条件（& の前後）';
   if(/^!q:/.test(p))return '「'+p+'」: q: に ! は付けられない（q:名前<1 のように書く。! は !gate: だけ）';
   if(/\s/.test(p))return '「'+p+'」: 条件にスペースは入れない';
-  if(QCOND.test(p)||IFS.has(p))continue;
+  if(QCOND.test(p)||IFS.has(p)||/^chance:\d{1,2}$/.test(p))continue; // chance:N＝その日・その人で N%（2026-10-25・本体 heianSpeechCond）
   return '「'+p+'」は使えない条件';}
  return null;}
 // 本体 heianSpeechTags が出す場所タグ（固定のもの）。地点 id・曹司の類・estate_／interior_／quirk_ は本体から受け取るか接頭辞で判定する
