@@ -1385,7 +1385,7 @@ dialogs:[
 {id:'child-play',who:['童','牛飼童'],auto:{if:'robot',chance:.25},title:'童',start:'s',nodes:{
  s:{t:['ねえ、鉄の子！ 遊ぼう！','その頭の棒、何？'],c:[['何して遊ぶ？','play'],['頭の棒はアンテナだよ','ant'],['また今度','bye']]},
  play:{t:['竹馬で競争だ！ …鉄の子、竹馬に乗れる？','鬼ごっこ！ 鬼は鉄の子ね！'],c:[['乗れないよ','no'],['いいよ','yes']]},
- no:{t:'じゃあ浮いてやって！ あれ、すごいんだ',end:true},yes:{t:'やった！ …あ、牛の世話があった。また今度な！',end:true},
+ no:{t:'じゃあ浮いてやって！ あれ、すごいんだ',end:true},yes:{t:'やった！ …あ、呼ばれとる。また今度な！',end:true}, /* 2026-10-13 井内さん「貴族の子なのに『牛の世話がある』」: 町の童・邸の子・牛飼童のだれが言ってもおかしくない言い方に */
  ant:{t:'あんてな？ 唐の言葉？ …かっこいい！',end:true},bye:{t:'きっとだよ！',end:true}}},
 {id:'seller-call',who:['売り子'],auto:{if:'open',chance:.3},title:'売り子',start:'s',nodes:{
  s:{t:['そこの鉄の旦那、見ていきな','いらっしゃい！ 何をお探しで'],c:[['何が売れている？','hot'],['値はどう決まる？','price'],['百鬼夜行の噂は？','hyakki'],['見ているだけです','bye']]},
@@ -8728,7 +8728,7 @@ L.dialogs.push(
  follow:{t:'@riceFollow',end:true},bye:{t:'布に泥をはねるなよ',end:true}},
  n:'織部司が織り縫殿寮が縫った（史実・高）。織り手の町・便・道は推定と創作'},
 // 凧揚げ（2026-10-25 井内さん「凧を上げてる子に話しかけても凧の話をしないのはおかしい」）。life kite＝揚げている童・kiteSee＝見上げている近所の人
-{id:'kite-child',who:['童'],at:['any'],life:['kite'],title:'凧を揚げる童',start:'s',nodes:{
+{id:'kite-child',who:['童'],at:['any'],life:['kite'],auto:{if:'robot',chance:.25},title:'凧を揚げる童',start:'s',nodes:{ /* 2026-10-13 寄ってくる時も凧の話（一般の child-play を出さない） */
  s:{t:['見て見て、鳶が飛んでおるじゃろう','しっ、いま風をつかまえたところじゃ'],c:[['それは何？','what'],['どうやって揚げるの？','how'],['だれが作ったの？','who'],['じゃましたね','bye']]},
  what:{t:'紙鳶（しえん）というのじゃ。紙を張って鳶の形にした。唐の国から伝わった遊びじゃと、父上が言うておった',c:[['どうやって揚げるの？','how'],['だれが作ったの？','who'],['ありがとう','bye']]},
  how:{t:'風上に立って、糸を少しずつ出す。落ちそうになったら、ぐっと引くと上がる。風の止む日は揚がらん',c:[['だれが作ったの？','who'],['持たせてくれる？','hold'],['ありがとう','bye']]},
@@ -8744,3 +8744,68 @@ L.dialogs.push(
  n:'創作（紙鳶の語は和名類聚抄・史実・高）'}
 );
 })();
+// ---- 町の人の身の上（2026-10-13 井内さん「それぞれの人に仕事、家、家族を」「出身とか、両親も一緒に住んでるとか国元にいるとか、昔から農民だった、郡司だった、
+//  すごく昔は飛鳥で豪族だったらしいとか、国元では口分田を兄が継いでるとか、防人で新羅の賊と戦ったが怖かったとか」「隣の子がうちの子をいじめる、主人の出世が遅れていてお先真っ暗、奥さんが怖い」）。
+//  名前の無い町の人（暮らしの営み・群衆・市の人）に、本体（heianProfile）が人ごとに決まった乱数で部品を組み合わせて身の上を作る。話しかけて「身の上を聞く」「家の者のことを聞く」。
+//  部品の項目: t＝文（{kuni} 国・{ani} 兄の名・{ko} 子の名・{tsuma} 連れ合いの名・{tonari} 隣の子の名）、w＝重み、c＝身分（min 町の者・ge 下人と従者・kan 下級の官人とその家・hei 衛士と舎人・so 僧・ko 童。無ければ誰でも）、
+//  s＝m 男だけ／f 女だけ、age＝old 年寄りだけ／adult 大人だけ／young 若い者だけ、r＝出身の地方（kyo 京・kinai 畿内と近国・east 東国・west 西国・kyushu 筑紫）、need＝要る家族（ko 子・tsuma 連れ合い・tonari 隣の子）、n＝出典・推定の注。組み合わせは創作
+window.HEIAN_LINES.mibun={
+ kuni:[['京',30,'kyo'],['山城',8,'kinai'],['大和',6,'kinai'],['河内',5,'kinai'],['摂津',5,'kinai'],['和泉',2,'kinai'],['近江',6,'kinai'],['丹波',5,'kinai'],['伊賀',2,'kinai'],['伊勢',3,'kinai'],
+  ['播磨',4,'west'],['紀伊',3,'kinai'],['若狭',2,'kinai'],['越前',3,'kinai'],['美濃',3,'east'],['尾張',3,'east'],['但馬',1,'west'],['備前',2,'west'],['備中',2,'west'],['出雲',1,'west'],['阿波',2,'west'],['讃岐',2,'west'],['伊予',2,'west'],
+  ['筑前',2,'kyushu'],['豊前',1,'kyushu'],['肥前',1,'kyushu'],['武蔵',1,'east'],['上総',1,'east'],['常陸',1,'east'],['陸奥',1,'east']],
+ otoko:['広足','黒麻呂','犬丸','福丸','乙麻呂','安成','清人','真足','石麻呂','鷹丸','豊成','秋足','浜成','宅守','弟人','国足'],
+ onna:['乙女','刀自','若女','福女','稲女','宮女','真刀自','小刀自','千代女','秋女','浜女','玉女'],
+ warawa:['犬丸','次郎','三郎','小黒','鶴丸','亀丸','千手丸','虎丸','小女','あこ','つる','若女'],
+ n:'名は8〜10世紀の戸籍・計帳に見える型（〜麻呂・〜足・〜女・刀自）に寄せた創作。庶民の姓は名乗らせない'};
+window.HEIAN_LINES.mibun.ie=[ // 家の昔
+ {t:'代々、田を作る百姓の家じゃ',en:"My family has farmed the land for generations.",w:6,c:['min','ge','hei']},
+ {t:'祖父の代までは{kuni}の郡司の家じゃった。今は見る影もない',en:"Until my grandfather’s day we were district officials in {kuni}. Nothing is left of that now.",w:2,c:['min','kan','hei'],n:'郡司は郡の役人で、土地の古い豪族が多く任じられた（史実・高）'},
+ {t:'ずっと昔は飛鳥で豪族だったらしい。祖母の話じゃから、当てにはならんが',en:"Long, long ago we were a powerful clan in Asuka, they say. That’s Grandmother’s story, so don’t count on it.",w:1},
+ {t:'秦の一族で、先祖は海の向こうから来たそうな',en:"We’re of the Hata clan. Our ancestors came from across the sea, they say.",w:1,c:['min','kan'],n:'秦氏は渡来系の氏族（史実・高）'},
+ {t:'父も祖父も木工の工じゃ。鉋の音を聞いて育った',en:"My father and grandfather were both carpenters. I grew up to the sound of the plane.",w:1,c:['min']},
+ {t:'国の戸籍を抜けて都へ流れてきた。…大きな声では言えん',en:"I slipped off the provincial register and drifted to the capital. …Keep your voice down.",w:1,c:['min','ge'],n:'本籍を離れた浮浪・逃亡は奈良・平安時代に多かった（史実・高）'},
+ {t:'父は下級の官人で、わしもそのまま役所勤めよ',en:"My father was a minor official, and I went straight into office work too.",w:4,c:['kan'],s:'m'},
+ {t:'実家は下級の官人の家。嫁いだ先も同じようなものよ',en:"I grew up in a minor official’s family, and married into one just like it.",w:3,c:['kan'],s:'f'},
+ {t:'家は代々、主家にお仕えしておる',en:"My family has served this house for generations.",w:4,c:['ge']},
+ {t:'寺に入ったのは七つの時じゃ。家は{kuni}の百姓よ',en:"I entered the temple at seven. My family are farmers in {kuni}.",w:3,c:['so']},
+ {t:'家は{kuni}の百姓じゃ。兵に取られて都へ来た',en:"My family are farmers in {kuni}. I was called up as a soldier and sent to the capital.",w:3,c:['hei'],s:'m'}];
+window.HEIAN_LINES.mibun.kunimoto=[ // 国元とのつながり（京の生まれには使わない）
+ {t:'{kuni}の口分田は、兄の{ani}が継いでおる',en:"Back in {kuni}, my elder brother {ani} took over our allotted rice fields.",w:3,s:'m',n:'口分田（史実・高）。班田は900年ごろには滞りがちで、延喜2年（902）の班田が最後とされる（史実・要留保）'},
+ {t:'親は{kuni}で田を作っておる。もう何年も会うておらん',en:"My parents farm in {kuni}. I haven’t seen them in years.",w:3},
+ {t:'調を担いで{kuni}から上って、そのまま都に居ついてしもうた',en:"I carried our tax goods up from {kuni} and ended up staying in the capital.",w:2,s:'m',c:['min','ge'],n:'調・庸を都へ運ぶ運脚（史実・高）'},
+ {t:'{kuni}には、もう誰もおらん。帰る家も無い',en:"There’s no one left in {kuni}. No home to go back to.",w:1},
+ {t:'年に一度、{kuni}へ帰るのが楽しみでな',en:"Going back to {kuni} once a year is what I look forward to.",w:1},
+ {t:'衛士として{kuni}から上番して、そのまま都に残った',en:"I came up from {kuni} to serve as a palace guard and stayed on.",w:1,s:'m',c:['min','hei'],n:'諸国の衛士の上番（史実・高）'},
+ {t:'母は{kuni}におる。わしが仕送りせんと食えん',en:"My mother is in {kuni}. If I don’t send her something, she can’t eat.",w:2,c:['min','ge','hei']}];
+window.HEIAN_LINES.mibun.mukashi=[ // 昔のこと
+ {t:'若いころ防人で筑紫におった時、新羅の賊が来た。戦うたが…怖かった。今でも夢に見る',en:"When I was young I guarded the coast in Tsukushi, and the Silla raiders came. I fought… but I was scared. I still dream of it.",w:3,s:'m',age:'old',r:['kyushu','west'],n:'寛平5〜6年（893〜894）新羅の賊が肥前・対馬を襲う（史実・高）。このころの筑紫の守りを防人と呼んだかは要留保'},
+ {t:'応天門が焼けた夜を覚えとる。空が真っ赤じゃった',en:"I remember the night Otenmon Gate burned. The sky was bright red.",w:2,age:'old',n:'貞観8年（866）応天門の変（史実・高）'},
+ {t:'若いころの大地震で、都の築地がずいぶん崩れたそうな',en:"In the great earthquake when I was young, they say many of the capital’s earthen walls came down.",w:1,age:'old',n:'貞観10年（868）播磨・山城の地震で京も被害（史実・高）'},
+ {t:'疫病の年に、弟を亡くした',en:"I lost my younger brother in a year of plague.",w:2,age:'adult'},
+ {t:'鴨川があふれて、家を流されたことがある',en:"The Kamo River flooded once and washed our house away.",w:2,c:['min']},
+ {t:'飢えた年に、子を一人亡くしての',en:"In a famine year I lost one of my children.",w:1,s:'f',age:'adult'},
+ {t:'衛士として三年、宮の門を守った。寒い門じゃった',en:"I guarded a palace gate for three years. A cold gate it was.",w:2,s:'m',age:'adult',c:['min','hei']},
+ {t:'{kuni}から都まで、二十日も歩いて来た',en:"I walked from {kuni} to the capital. It took twenty days.",w:2,age:'adult',r:['east','west','kyushu']},
+ {t:'若いころ、いっぺんだけ宮の中の宴を遠くから見た',en:"When I was young, I once saw a palace banquet from far off.",w:1}];
+window.HEIAN_LINES.mibun.nayami=[ // 悩み・こぼし話
+ {t:'隣の{tonari}が、うちの{ko}をいじめるのよ。親は知らん顔で',en:"{tonari} next door bullies our {ko}. The parents just look the other way.",w:4,s:'f',need:['ko','tonari']},
+ {t:'主人の出世が遅れてねえ。このままじゃ、お先真っ暗だよ',en:"My husband keeps getting passed over for promotion. At this rate, there’s nothing ahead but darkness.",w:4,s:'f',c:['kan']},
+ {t:'うちは女房が怖うてな。…ここだけの話じゃぞ',en:"My wife scares me. …That stays between us.",w:4,s:'m',need:['tsuma']},
+ {t:'姑と折り合いが悪うて、毎日気が休まらん',en:"My mother-in-law and I don’t get along. I never get a moment’s peace.",w:2,s:'f',need:['tsuma']},
+ {t:'亭主がまた双六で負けてきた。笑うしかないよ',en:"My husband lost at sugoroku again. All I can do is laugh.",w:2,s:'f',c:['min'],need:['tsuma']},
+ {t:'息子が博打に手を出しておる。どうしたものか',en:"My son has taken up gambling. What am I to do?",w:2,age:'old'},
+ {t:'出挙の稲が返せそうにない。秋が来るのが怖い',en:"I can’t pay back the rice loan. I dread the autumn.",w:2,c:['min'],n:'出挙＝春に稲を貸し秋に利をつけて返させる（史実・高）'},
+ {t:'娘の嫁ぎ先が、なかなか決まらん',en:"We still can’t find a match for our daughter.",w:2,age:'adult'},
+ {t:'屋根の雨漏りが、何べん直しても止まらん',en:"However often I patch the roof, it still leaks.",w:2,c:['min','ge']},
+ {t:'腰が痛うて、水汲みがつらい',en:"My back hurts. Fetching water is hard.",w:2,age:'old'},
+ {t:'上役に名を覚えてもらえん。何年たっても同じ席じゃ',en:"My superiors never remember my name. Year after year, the same seat.",w:4,s:'m',c:['kan']},
+ {t:'主家の若君がわがままでな。手を焼いておる',en:"The young master of the house is spoiled. He’s a handful.",w:3,c:['ge']},
+ {t:'米が高うて、粥ばかりじゃ',en:"Rice is so dear, it’s nothing but gruel.",w:2,c:['min','ge']},
+ {t:'早う一人前になりたい',en:"I want to grow up soon.",w:2,age:'young'},
+ {t:'経がなかなか覚えられん。師に叱られてばかりじゃ',en:"I can’t remember the sutras. My teacher is always scolding me.",w:3,c:['so']},
+ {t:'国へ帰る日を数えておる',en:"I’m counting the days until I go home.",w:3,c:['hei']},
+ {t:'{tonari}がわしの独楽を取った。返せと言うても返さん',en:"{tonari} took my top. I told him to give it back, but he won’t.",w:4,c:['ko'],need:['tonari']},
+ {t:'手伝いばかりで、ちっとも遊べん',en:"It’s all chores. I never get to play.",w:3,c:['ko']}];
+
+// 身の上の英語表示（2026-10-13）: 国・名前のローマ字。部品の文は各項目の en（{kuni} などの差し込みは同じ）
+window.HEIAN_LINES.mibun.en={"京": "the capital", "山城": "Yamashiro", "大和": "Yamato", "河内": "Kawachi", "摂津": "Settsu", "和泉": "Izumi", "近江": "Omi", "丹波": "Tanba", "伊賀": "Iga", "伊勢": "Ise", "播磨": "Harima", "紀伊": "Kii", "若狭": "Wakasa", "越前": "Echizen", "美濃": "Mino", "尾張": "Owari", "但馬": "Tajima", "備前": "Bizen", "備中": "Bitchu", "出雲": "Izumo", "阿波": "Awa", "讃岐": "Sanuki", "伊予": "Iyo", "筑前": "Chikuzen", "豊前": "Buzen", "肥前": "Hizen", "武蔵": "Musashi", "上総": "Kazusa", "常陸": "Hitachi", "陸奥": "Mutsu", "広足": "Hirotari", "黒麻呂": "Kuromaro", "犬丸": "Inumaru", "福丸": "Fukumaru", "乙麻呂": "Otomaro", "安成": "Yasunari", "清人": "Kiyohito", "真足": "Matari", "石麻呂": "Iwamaro", "鷹丸": "Takamaru", "豊成": "Toyonari", "秋足": "Akitari", "浜成": "Hamanari", "宅守": "Yakamori", "弟人": "Otohito", "国足": "Kunitari", "乙女": "Otome", "刀自": "Toji", "若女": "Wakame", "福女": "Fukume", "稲女": "Iname", "宮女": "Miyame", "真刀自": "Matoji", "小刀自": "Kotoji", "千代女": "Chiyome", "秋女": "Akime", "浜女": "Hamame", "玉女": "Tamame", "次郎": "Jiro", "三郎": "Saburo", "小黒": "Koguro", "鶴丸": "Tsurumaru", "亀丸": "Kamemaru", "千手丸": "Senjumaru", "虎丸": "Toramaru", "小女": "Kome", "あこ": "Ako", "つる": "Tsuru"};
