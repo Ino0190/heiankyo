@@ -16,7 +16,7 @@ const len=s=>[...String(s)].length;
 const isObj=v=>v!=null&&typeof v==='object'&&!Array.isArray(v);
 // ---- 条件言語（DSL）の語彙。index.html の heianSpeechCond・heianQuestCond と同じ。増やすときは本体側も直す
 const WHEN=new Set(['dawn','morning','noon','afternoon','dusk','night']);
-const IFS=new Set(['dawn','dusk','marketDay','offDay','open','closing','spring','summer','autumn','winter','ume','sakura','kouyou','wakaba','karegi','fullMoon','newMoon','michiae','hyakki','robot','hover','waiting','night','day','kugyo','kugyoWait','rain','cloudy','clear','dry','odori','odoriSelf','odoriMiru','fue','fueSelf','kemariIn','kemariOut','hideri','ohideri','yudachi','nagaame','ameagari']);
+const IFS=new Set(['dawn','dusk','marketDay','offDay','open','closing','spring','summer','autumn','winter','koyomiSpring','koyomiSummer','koyomiAutumn','koyomiWinter','ume','sakura','kouyou','wakaba','karegi','fullMoon','newMoon','michiae','hyakki','robot','hover','waiting','night','day','kugyo','kugyoWait','rain','cloudy','clear','dry','odori','odoriSelf','odoriMiru','fue','fueSelf','kemariIn','kemariOut','hideri','ohideri','yudachi','nagaame','ameagari']);
 // 時代の段（index.html HEIAN_PHASES）。era は段 id（'>=' '<=' '<' '>' 付きも可・配列も可）。from/until は [年,月,日]（900〜922年・陰暦）
 const ERA=new Map([['shotai',[900,1,1]],['yocho',[900,10,1]],['zenya',[901,1,1]],['tojitsu',[901,1,25]],['chokugo',[901,1,26]],['yoha',[901,3,1]],['engi',[901,7,15]],['koki',[909,4,4]]]);
 const eraParse=s=>/^(>=|<=|<|>)?(\w+)$/.exec(String(s));

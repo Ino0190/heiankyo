@@ -136,7 +136,7 @@ window.HEIAN_LINES={version:2,terms:{
 // ---- 西市（右京七条・月の後半に開く）
 {at:'westMarket',who:'売り子',if:'open',t:'今日から西市の番だ。半月ぶりに店を開けたよ'},
 {at:'westMarket',who:'売り子',if:'open',t:'東市に負けん品ぞろえさ。遠いなんて言わずに'},
-{at:'westMarket',who:'売り子',if:'open',ware:'塩',t:'丹波の栗に播磨の塩、西からの品は西市だ',n:'若狭の荷は近江・逢坂越えで東から入る（推定）＝西の品には入れない'},
+{at:'westMarket',who:'売り子',if:'open',ware:'塩',t:'丹波の栗に播磨の塩、西からの品は西市だ',n:'季節を問わない（干し栗・昔話）。若狭の荷は近江・逢坂越えで東から入る（推定）＝西の品には入れない'},
 {at:'westMarket',who:'売り子',if:'open',ware:'鞍',t:'馬具ならここだ。鞍も鐙もそろってる'},
 {at:'westMarket',who:'売り子',if:'closing',t:'鼓が鳴る前に買っとくれ。右京の夜道は暗いよ'},
 {at:'westMarket',who:'売り子',if:'offDay',t:'前半は東市の番でな。こっちは閑古鳥さ'},
@@ -183,7 +183,7 @@ window.HEIAN_LINES={version:2,terms:{
 // 境内を歩く僧（1.50・2026-09-28 東寺・西寺に僧を置いた）
 {at:'toji',who:'僧',t:'講堂の仏さま方の前では、声を落としなされ',n:'講堂の諸尊は839年開眼（通説）'},
 {at:'toji',who:'僧',t:'食堂の鐘が鳴れば斎の刻。遅れると叱られます'},
-{at:'toji',who:'僧',t:'僧坊は冬が寒うて、経を読む声まで震えます'},
+{at:'toji',who:'僧',if:'winter',t:'僧坊は冬が寒うて、経を読む声まで震えます'},
 {at:'toji',who:'僧',t:'あの五重塔は、元慶の頃にようやく建ったそうな',n:'東寺の初代の塔は883年頃の完成とされる（通説）'},
 {at:'toji',who:'僧',when:'dawn',t:'暁の勤行を終えて、これから堂の掃除です'},
 {at:'toji',who:'僧',when:'night',t:'夜の境内は灯明だけ。足もとにお気をつけて'},
@@ -208,7 +208,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'daidairi',who:'官人',t:'左大臣さまはお若いが、父君ゆずりの手腕だ',n:'時平30歳'},
 {at:'daidairi',who:'衛士',t:'許しなき者は通さぬ。用向きを申されよ'},
 {at:'daidairi',who:'衛士',t:'国許から衛士に召されて三年。帰りたいのう',n:'衛士は諸国から上番'},
-{at:'daidairi',who:'衛士',when:'night',t:'夜番は寒い。篝火の番だけが楽しみだ'},
+{at:'daidairi',who:'衛士',when:'night',if:'winter',t:'夜番は寒い。篝火の番だけが楽しみだ'},
 {at:'daidairi',who:'女房',t:'局に戻らねば。女御さまがお待ちです'},
 {at:'daidairi',who:'女房',t:'今宵は月の宴があるとか。何を着ましょう',if:'fullMoon'},
 {at:'suzakumon',who:'衛士',t:'朱雀門より先は大内裏。身なりを正されよ'},
@@ -283,7 +283,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'commoners',who:'庶民',t:'今日の水汲みはもう三度目だ'},
 {at:'commoners',who:'庶民',t:'隣の婆さまが猫を拾ってきた。唐猫だと言い張る'},
 {at:'commoners',who:'庶民',when:'dusk',t:'飯の支度だ。煙が目にしみる'},
-{at:'commoners',who:'童',t:'竹馬で競争だ！ 負けたら栗を一つ'},
+{at:'commoners',who:'童',if:'autumn',t:'竹馬で競争だ！ 負けたら栗を一つ'},
 {at:'commoners',who:'童',t:'鬼ごっこしよう。鬼はあの鉄の子だ',if:'robot'},
 {at:'commoners',who:'庶民',t:'糸を紡いで布にして、市で米に替える'},
 {at:'ukyoPaddies',who:'庶民',t:'都の中でも、こっちは畑のほうが多い'},
@@ -914,7 +914,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:['street','commoners'],who:'庶民',when:['dawn','morning'],t:'鶏に起こされた。隣のやつだ'},
 {at:['street','commoners'],who:'庶民',when:['dawn','morning'],t:'朝の粥をすすったら、仕事に出る'},
 {at:['street','commoners'],who:'庶民',when:['noon','afternoon'],t:'日が高うなった。腹が鳴る'},
-{at:['street','commoners'],who:'庶民',when:['noon','afternoon'],t:'この暑さでは、牛も歩かん'},
+{at:['street','commoners'],who:'庶民',when:['noon','afternoon'],if:'summer',t:'この暑さでは、牛も歩かん'},
 {at:['street','commoners'],who:'庶民',when:['noon','afternoon'],t:'昼の一休みだ。木陰を譲ってくれ'},
 {at:['street','commoners'],who:'庶民',when:'dusk',t:'今日の稼ぎは米一升。まあ、ええか'},
 {at:['street','commoners'],who:'庶民',when:'dusk',t:'門の閉まる前に、七条まで帰らねば'},
@@ -964,7 +964,7 @@ window.HEIAN_LINES={version:2,terms:{
 {at:'street',who:'女',t:'娘が宮仕えに上がったの。文が来るのが楽しみで'},
 {at:'street',who:'女',t:'夫は国司の供で下ったきり。もう二年'},
 {at:'street',who:'女',t:'針仕事で食べております。邸の衣を縫うの'},
-{at:'street',who:'人夫',t:'国の田は妻と子に任せてきた。稲刈りに間に合うか'},
+{at:'street',who:'人夫',if:'summer',t:'国の田は妻と子に任せてきた。稲刈りに間に合うか'},
 {at:'street',who:'僧',t:'わしは比叡の山から下りてきた。都の騒がしさには慣れん'},
 {at:'street',who:'官人',t:'わしは木工寮の官人。建物の修理の帳簿ばかりだ'},
 // ---- 陰陽寮への相談の噂
@@ -4022,7 +4022,7 @@ L.say.push(
  // 市井の生活雑談（値の因果・品と鮮度・客の噂・ご近所）。庶民の口に制度名・政治を乗せない
  {at:'eastMarket',who:'客',t:'塩が高うてな。瀬戸の舟が、海賊を避けて遠回りしとるんだ',n:'架空（価格と流通。既存 kaizoku と整合）'},
  {at:'eastMarket',who:'客',t:'今月は筑紫の荷が遅い。干し鮑の値が上がっとるよ',n:'架空'},
- {at:'westMarket',who:'客',t:'丹波の栗は、山が不作でな。去年の倍の値だ',n:'架空'},
+ {at:'westMarket',who:'客',if:'autumn',t:'丹波の栗は、山が不作でな。去年の倍の値だ',n:'架空'},
  {at:'eastMarket',who:'客',if:'q:beni<9',t:'紅がまた上がった。染め屋がこぞって買うからね',n:'架空（既存 beni 事件と接続。事件が済んだら出さない）'},
  {at:'eastMarket',who:'客',if:'summer',t:'雨続きで干物が乾かん。数が少ないから、今日は高いよ',n:'架空'},
  {at:'eastMarket',who:'客',t:'この干物、ちょっと古いね。昨日のじゃないのかい',n:'架空'},
@@ -4386,7 +4386,7 @@ L.say.push(
  {at:['eastMarket','westMarket'],who:'客',if:'cloudy',t:'降らんうちに、買うて帰ろう',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',when:'morning',if:'clear',t:'よう晴れた。洗い物日和じゃ',kind:'zatsu'},
  {at:['street','commoners'],who:'女',when:'morning',if:'clear',t:'お天道さまが気持ちええね',kind:'zatsu'},
- {at:['street','horikawa','rajomon'],who:'人夫',when:'noon',if:'clear',t:'日が高うなった。汗が止まらん',kind:'zatsu'},
+ {at:['street','horikawa','rajomon'],who:'人夫',when:'noon',if:'clear&summer',t:'日が高うなった。汗が止まらん',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',when:'dusk',if:'clear',t:'夕焼けがきれいだ。明日も晴れるぞ',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',if:'summer',t:'暑うて、何もする気が起きん',kind:'zatsu'},
  {at:['street','commoners'],who:'女',if:'summer',t:'打ち水でもせんと、やっとられんね',kind:'zatsu'},
@@ -4439,13 +4439,13 @@ L.say.push(
  {at:['daidairi'],who:'官人',when:'noon',t:'今日の昼は、また干した鰹か',kind:'zatsu',n:'堅魚（干した鰹）は調の品（通説）'},
  {at:['street','commoners'],who:'童',t:'餅が食べたいなあ。正月まで遠いや',kind:'zatsu'},
  {at:['street','commoners'],who:'女',t:'醤をちょっと付けるだけで、飯が進むんだよ',kind:'zatsu'},
- {at:['street','commoners'],who:'庶民',when:'morning',t:'ゆうべは蚊に食われて、眠れなんだ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'morning',if:'summer',t:'ゆうべは蚊に食われて、眠れなんだ',kind:'zatsu'}, /* 蚊も夏だけ（2026-10-13） */
  {at:['street','commoners'],who:'庶民',t:'近ごろ、腰が重うてかなわん',kind:'zatsu'},
  {at:['street','commoners'],who:'女',t:'隣の猫が、また軒で寝とる',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',when:'dawn',t:'鶏が鳴く前に目が覚めてしもうた',kind:'zatsu'},
  {at:['street','commoners'],who:'女',t:'針に糸が通らん。歳かね',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',when:'afternoon',t:'昼寝がしたい。…せんがの',kind:'zatsu'},
- {at:['street','commoners'],who:'童',t:'蝉の抜け殻、十も見つけた',kind:'zatsu'}
+ {at:['street','commoners'],who:'童',if:'summer',t:'蝉の抜け殻、十も見つけた',kind:'zatsu'} /* 2026-10-13 井内さん「2月なのに蝉の抜け殻」: 季節の条件が無かった */
 );
 // 掛け合い（2人）。本体の掛け合いは at が1つの文字列（ctx.tags.has(t.at)）・who の並びが話し手の順（同じ種類なら2回書く）
 L.talk.push(
@@ -6105,7 +6105,7 @@ L.say.push(
  {at:['eastMarket','westMarket'],who:'売り子',if:'ohideri',t:'米の値が上がり出した。わしらには堪える',kind:'zatsu'},
  {at:['daidairi'],who:'官人',if:'ohideri',t:'奉幣の使いが、諸社へ発つそうだ',kind:'zatsu',n:'祈雨の奉幣（898年五月・902年六月の記録）'},
  {at:['street','commoners'],who:'庶民',when:'night',if:'ohideri',t:'夜も地面が熱い。寝られたもんじゃない',kind:'zatsu'},
- {at:['street','commoners'],who:'庶民',when:'afternoon',if:'yudachi',t:'ほれ、夕立じゃ！ 軒へ入れ',kind:'zatsu'},
+ {at:['street','commoners'],who:'庶民',when:'afternoon',if:'yudachi&summer',t:'ほれ、夕立じゃ！ 軒へ入れ',kind:'zatsu'},
  {at:['street','commoners'],who:'童',when:'afternoon',if:'yudachi',t:'鳴る神さまじゃ！ 早う家へ入れ',kind:'zatsu',n:'鳴る神＝雷（『万葉集』の語）。「雷にへそを取られる」は江戸の終わりから明治の初めに広まったとされる＝使わない（2026-10-04 確かめた）'},
  {at:['eastMarket','westMarket'],who:'売り子',when:'afternoon',if:'yudachi',t:'品を濡らすな！ 菰をかけろ',kind:'zatsu'},
  {at:['street','commoners'],who:'庶民',if:'nagaame',t:'三日も降り続きじゃ。屋根が腐る',kind:'zatsu'},
@@ -6310,7 +6310,7 @@ if(!K)return;Object.assign(K.TOPICS,{
 L.say.push(
  {at:['rajomon','suzaku'],who:'行商',ware:'炭',kind:'知',t:'炭は叩いて音を聞く。澄んだ音のが、よう焼けた炭だ'},
  {at:['rajomon','suzaku'],who:'行商',ware:'炭',kind:'産',t:'山の名は言わん。どこの炭焼きも、自分の山を隠すもんだ'},
- {at:['rajomon','suzaku'],who:'行商',ware:'薪',kind:'売',t:'寒い日が続くと、薪は朝のうちに売り切れる'},
+ {at:['rajomon','suzaku'],who:'行商',ware:'薪',kind:'売',if:'winter',t:'寒い日が続くと、薪は朝のうちに売り切れる'},
  {at:['street','commoners'],who:'行商',ware:'薪',kind:'得',t:'坊長さんの家は、毎朝ひと束。夜回りの火に使うそうな'},
  {at:['horikawa'],who:'行商',ware:'鮎',kind:'知',t:'鮎は川の苔を食う。だから香りがいいのさ'},
  {at:['horikawa'],who:'行商',ware:'鮎',kind:'競',t:'市の魚屋に卸すより、ここで売るほうが早く捌ける'},
@@ -6320,7 +6320,7 @@ L.say.push(
  {at:['toji','saiji'],who:'行商',ware:'油',kind:'得',t:'寺の灯明は絶やせん。油はいくらあっても足りんのさ'},
  {at:['toji','saiji','rokakudo'],who:'行商',ware:'海藻',kind:'売',t:'精進の日の前は、寺の門前で海藻がよく売れる'},
  {at:['street','commoners'],who:'行商',ware:'塩辛',kind:'知',t:'塩辛は魚のわたを塩で寝かせたもの。酒の肴によい'},
- {at:['street','commoners'],who:'行商',ware:'栗',kind:'産',t:'丹波の山の栗だよ。拾ってきた村の名は内緒'},
+ {at:['street','commoners'],who:'行商',ware:'栗',kind:'産',if:'autumn',t:'丹波の山の栗だよ。拾ってきた村の名は内緒'},
  {at:['nobles'],who:'行商',ware:'干魚',kind:'得',t:'中納言家の厨に寄って、それから東三条のほうへ回るのさ'},
  {at:['nobles'],who:'行商',ware:'干魚',kind:'売',t:'お邸の厨は、朝のうちに寄らんと、もう膳の支度が済んでる'},
  {at:['nobles'],who:'行商',ware:'海藻',kind:'競',t:'同じ道を回る海藻売りがもう一人おってな。先に着いたほうが勝ち'},
@@ -7554,8 +7554,8 @@ L.say.push(
  {at:'ukyo',who:'人夫',if:'q:utsushi>=9',t:'字の上には糊を置くな、と紙屋院に頼む者が増えた',n:'架空'},
  {at:'suzakumon',who:'衛士',when:'night',if:'q:fue_nushi>=9',t:'今夜の笛は、少しうまくなった',n:'架空'},
  {at:'daidairi',who:'官人',if:'q:fue_nushi>=9',t:'雅楽寮の笛麻呂は、近ごろ昼間に眠そうだ',n:'架空'},
- {at:'rajomon',who:'旅人',if:'q:kuni_kotoba>=9',t:'陸奥の馬曳きが、馬を雪の朝と呼んどった',n:'架空'},
- {at:'commoners',who:'庶民',if:'q:kuni_kotoba>=9',t:'宿で雪の色を言い合うて、夜更けまで騒いどった',n:'架空'},
+ {at:'rajomon',who:'旅人',if:'q:kuni_kotoba>=9',t:'陸奥の馬曳きが、馬を雪の朝と呼んどった',n:'季節を問わない（干し栗・昔話）。架空'},
+ {at:'commoners',who:'庶民',if:'q:kuni_kotoba>=9',t:'宿で雪の色を言い合うて、夜更けまで騒いどった',n:'季節を問わない（干し栗・昔話）。架空'},
  {at:['street','commoners'],who:'庶民',if:'q:tonari_bo>=9',t:'坊長の家に、見慣れん竹の籠があった',n:'架空'},
  {at:'westMarket',who:'庶民',if:'q:tonari_bo>=9',t:'右京の坊長が、竹の籠を自慢しとった',n:'架空'}
 );
@@ -8726,6 +8726,21 @@ L.dialogs.push(
  what:{t:'織部町の機屋で織り上がった布よ。織部司の織り手が織る。わしは運ぶだけじゃ',c:[['どこへ届けるの？','where'],['ついていっていい？','follow'],['ありがとう','bye']]},
  where:{t:'大内裏の縫殿寮。あちらで衣に縫う。布は織る所と縫う所が別なのじゃ',c:[['ついていっていい？','follow'],['ありがとう','bye']]},
  follow:{t:'@riceFollow',end:true},bye:{t:'布に泥をはねるなよ',end:true}},
- n:'織部司が織り縫殿寮が縫った（史実・高）。織り手の町・便・道は推定と創作'}
+ n:'織部司が織り縫殿寮が縫った（史実・高）。織り手の町・便・道は推定と創作'},
+// 凧揚げ（2026-10-25 井内さん「凧を上げてる子に話しかけても凧の話をしないのはおかしい」）。life kite＝揚げている童・kiteSee＝見上げている近所の人
+{id:'kite-child',who:['童'],at:['any'],life:['kite'],title:'凧を揚げる童',start:'s',nodes:{
+ s:{t:['見て見て、鳶が飛んでおるじゃろう','しっ、いま風をつかまえたところじゃ'],c:[['それは何？','what'],['どうやって揚げるの？','how'],['だれが作ったの？','who'],['じゃましたね','bye']]},
+ what:{t:'紙鳶（しえん）というのじゃ。紙を張って鳶の形にした。唐の国から伝わった遊びじゃと、父上が言うておった',c:[['どうやって揚げるの？','how'],['だれが作ったの？','who'],['ありがとう','bye']]},
+ how:{t:'風上に立って、糸を少しずつ出す。落ちそうになったら、ぐっと引くと上がる。風の止む日は揚がらん',c:[['だれが作ったの？','who'],['持たせてくれる？','hold'],['ありがとう','bye']]},
+ who:{t:'家の者が竹を削って骨にして、紙を張ってくれた。目と羽の筋は、わしが墨で描いたのじゃ',c:[['持たせてくれる？','hold'],['ありがとう','bye']]},
+ hold:{t:['だめじゃ、鉄の手では糸が切れてしまう','見ておるだけにしてくれ。落ちたら泣くぞ'],c:[['わかった','bye']]},
+ bye:{t:'糸に引っかかるなよ',end:true}},
+ n:'紙鳶・紙老鴟は『和名類聚抄』（934年ごろ）に載る＝中国から伝わっていた（史実・高）。900年ごろの京で揚げたか（要留保）。作り方・言葉は創作'},
+{id:'kite-watcher',who:['庶民','女','童'],at:['any'],life:['kiteSee'],title:'凧を見上げる人',start:'s',nodes:{
+ s:{t:['ほれ、あの空の鳶。あれは紙じゃ','お屋敷の若君が揚げておられるのよ'],c:[['あれは何？','what'],['よく揚げるの？','often'],['じゃましたね','bye']]},
+ what:{t:'紙鳶よ。紙で鳶をこしらえて、糸で風に乗せる。ほんものの鳶と見分けがつかんわい',c:[['よく揚げるの？','often'],['ありがとう','bye']]},
+ often:{t:'風のよい日に、ときどきな。揚がると子らが集まってきて、みな空ばかり見ておる',c:[['ありがとう','bye']]},
+ bye:{t:'首が痛うなるまで見てしもうた',end:true}},
+ n:'創作（紙鳶の語は和名類聚抄・史実・高）'}
 );
 })();

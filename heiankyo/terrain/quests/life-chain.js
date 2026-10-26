@@ -8,7 +8,7 @@
   if (!L) return;
   L.say.push(
     // L01 寺の裏で薪割り
-    { at: ['toji', 'saiji', 'commoners'], who: '庶民', life: 'chop', when: ['dawn', 'morning'], t: '朝のうちに割っておく。昼は暑うて斧が重い', n: 'D 創作' },
+    { at: ['toji', 'saiji', 'commoners'], who: '庶民', life: 'chop', when: ['dawn', 'morning'], if: 'summer', t: '朝のうちに割っておく。昼は暑うて斧が重い', n: 'D 創作' },
     { at: ['toji', 'saiji', 'commoners'], who: '庶民', life: 'chop', t: '木目を見て割れ。節に当てると斧が跳ねる', n: 'D 創作' },
     { at: ['toji', 'saiji'], who: '庶民', life: 'chop', t: '寺の台所は薪をよう食う。割っても割っても足りん', n: 'C 推定（寺は炊事と湯の薪を多く使った）' },
     // L02 門前で薪の荷降ろし
