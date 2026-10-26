@@ -26,6 +26,7 @@
 - 坂では登りが遅く下りが速い。町の人はよけ、牛車はロボのほうがよける
 - 足音は砂・草・板・石・水で変わる。人の多い所はざわめき、大内裏は静かで、内裏に近いほど静か
 - 屋内: 中納言家（寝殿・北の対・西の対）と大極殿の中を歩ける。入口で F
+- 居候: 羅城門の二階・市の人夫小屋・貴族の邸の下働きの長屋に寝泊まりできる（話しかけた人が貸してくれる）。人夫小屋に住むと河岸の荷揚げ、長屋に住むと若君の凧揚げ・なぞなぞの相手を手伝える。夜は部屋で Z（朝まで休む）: 座って止まったロボのゼンマイを同居の人が巻き、朝6時に起きる
 
 ### しぐさと町の人の返し
 - Space ジャンプ（速いほど遠く高く）・Q 踊る・B お辞儀・F 祈る（社殿・堂の前では参拝）・G 手を振る
@@ -36,7 +37,8 @@
 ### 都の人と話す
 - 近くの人の吹き出しに台詞が出る（一言約1,300・掛け合い約160）。場所・刻・季節・市の日・天気・月齢で出る話が変わる
 - E で話しかけると、身の上・近ごろ見たもの・望み・知り合いのこと・土地の言い伝えを聞ける。選択肢は一度に4つまで
-- 名前のある住人は100人あまり。それぞれに一日の居場所と仕事があり、身分・仕える家・右大臣方/左大臣方の立場で話し方が変わる
+- 身の上を聞く: 名前の無い町の人も、生まれた国・国元の家族・昔の暮らし・いまの悩みを話す。近所に住む人どうしは同じ家の者として話がつながる
+- 名前のある住人は約140人。それぞれに一日の居場所と仕事があり、身分・仕える家・右大臣方/左大臣方の立場で話し方が変わる
 - 聞き込み: 「〇〇のこと、知ってる？」と話題を振ると、人によって知っている深さ（噂・事情・真相）が違い、知らない人は知っていそうな人を教える。紹介された人へはそのまま歩いて会いに行ける。聞いた深さは手元に記録される
 - 聞き書き帳（N・上の「聞き書き帳」）: 誰が・いつ・どこで・何と言ったかが自動で残る。語で探すと同じ話題の別の人の話が並び、食い違いが見える。人物・場所ごとにも見られ、📌で留められる。頼みごとの一覧や進み具合は出さない
 - 日録（聞き書き帳の「日録」）: 一日ごとに、天気・歩いた所・会った人・聞いた話・夜の月を短い文で書く。撮影モードで撮った絵もその日に並ぶ
@@ -112,6 +114,7 @@
 | 1.92 | 日録（一日ごとの短い記録と撮った絵） |
 | 1.93 | 上の帯を 歩く・眺める・たどる・聞き書き帳 に。眺める（ツアー・俯瞰・撮影・定位置）、たどる（都の年表・T） |
 | 1.94 | 発見（歩いて着いた所・○／44か所）と地図の見ている向き、今日の都、なじみ度、1人が話す量と知っている話を絞る |
+| 1.164 | 居候: 住む所のないロボに寝床を貸す人が3か所に（羅城門の流れ者＝門の二階・市司／西市の刀禰＝市の人夫小屋・凧揚げを手伝った邸の家司＝下働きの長屋）。部屋はロボに合わせて大きめの箱庭仕立てで、外の景色が見える（羅城門の二階は崩れた壁の向こうに都の街並み）。入口で F。人夫小屋に住むと河岸の荷揚げを手伝える（俵を岸の荷置き場まで運ぶ・1日3俵で米2つ）。長屋に住むと若君の相手ができる（凧を一緒に揚げる・なぞなぞ。1日1回、家司から唐菓子）。朝まで休む（Z）: ロボは背中のゼンマイで横になれないので、夜に居候の部屋で座って止まり、同居の人（旅人・人夫・朝に来る若君）がゼンマイを巻いてくれて卯の刻に起きる。身の上: 町の人に「身の上を聞く」と、生まれた国・国元の家族・昔の暮らし（郡司・防人・飛鳥の豪族の末など）・いまの悩みを話し、近所の人は同じ家の者として話がつながる。凧を揚げる童と話せる。季節の台詞を暦と体感の季節で選ぶ（蝉・蚊は夏だけ）。貴族の庭に山桜。右京北の築地と門の崩れ。宜秋門・陰明門をまっすぐ通れるように。衛府の稽古の手直し。「今日できること」を開け閉めできる。起動画面の写真を23枚に（PCは幅1920・スマートフォンは写真を読まない） |
 | 1.163 | 鳥羽津を行き先・発見の地点に。津に荷車溜まり（荷車8台と牛・蔵から俵を運ぶ人・荷台に積む人・出番を待つ荷車引き・水路の板橋）。鳥羽作道などの街道を田より少し高い盛り土に（両脇に草の法面・ところどころ松並木。川を渡る所は盛らずに浅瀬を歩いて渡る）。道の縁の雑草を倍に、雑草に季節の野の花（春の野・初夏・夏・秋の七草・晩秋）。並木の高さをまちまちに（ときどき若木）。川・水路・池の水面に流れる筋と空の映り込み・きらめき。豊楽院の6堂に朝堂院と同じ扉と階段。表に無い牛車は出仕（朝）と退出（昼）の刻に多く、その間は少なく。検非違使は貴族の邸に入らない。牛車と検非違使の隊が同じ筋で重ならない（後ろが待つ）。屋敷の庭で鳥の形の凧（紙鳶）を揚げる童と見上げる近所の人（3軒）。官人に袴（束帯は白の表袴・衣冠は指貫）。扁額の文字を毛筆に（旧字体）。竜尾壇の旗竿を細く・旗が竿を突き抜けない。基壇・船着場の石をざらざらに。人が蹴鞠を蹴る音も聞こえるように。PC の動作の帯のしぐさを「動作」にまとめた。サイトのトップに「平安京を歩く（音が出ます）」と「はじめての操作」 |
 | 1.162 | 起動画面に「平安京を歩く（音が出ます）」のボタンと操作の手引き。押すとオープニングから音楽が鳴る（読み込みが先に終わったら押すまで待つ）。官人の通い: 名前のある官人20人が朝は京の家から宮城門をくぐって役所へ、昼過ぎ（史生は夕方）に家へ歩いて帰る（歩いている間も話せる・家の前に家族）。名前の無い官人30人も朝は門へ、昼過ぎは京へ。寮13か所に宿直所・厨・井戸・雑舎（人手の多い寮は食堂と仕丁の長屋も）と、炊く人・水を汲む人・昼に食べる人。衛府の太刀・矛の稽古を8人の列にし、一人ずつ木の人形を相手に（稽古の刻の外は武具を立てて休む）。大内裏の曹司の木を倍、曹司の塀沿いに道の木。楓（秋に紅く・冬に散る）を都じゅうに。神泉苑の門を押小路・三条坊門小路の突き当たりへ、切り欠きだった所に小門。朱雀院の北・南・西にも門。堀川・西堀川の船着場8か所を、岸の道を掘り下げた石敷きの荷揚げ場に（石段・石垣・舟2艘・荷を揚げる人夫）。「歩いて行く」は歩くだけに。小さな本音（町の人がときどき本音をこぼす・数日後に余韻）。宙に浮いていた童を地面へ。動きを軽く（遠くの牛を描かない・楓と庭木を遠くで間引く） |
 | 1.161 | 時が最初から流れる（1時間＝現実の20分・話している間は止まる）。町に銭（寛平大宝）・蛤の貝・桜貝・子安貝が落ちていて、ときどきピカッと光る（拾って市で使える・人にあげられる）。おまかせで塀や坊城を通り抜けないように。大内裏の暮らし: 大炊寮から大膳職へ米を運ぶ人、郁芳門の外から米を運び入れる荷車、造酒司の甑と甕、織部町から縫殿寮へ布を届ける使い、内匠寮の器作り。衛府の稽古と食堂・厨・井戸・雑蔵、2つ目の小門。朱雀門の前に衛士の詰所。上東門は元の幅に戻し、檳榔毛の車はそこを通って中で待つ。弓の的の絵。小安殿を低く。曹司の分かれた区画に小門。大木と、ときどき倍の高さの木。大宮大路などの並木と繋いだ牛。鳥羽津。北の諸司厨町21町。お辞儀の音を大きく。竜尾壇で笛を吹くと一緒に吹く人が壇上に並ぶ |
@@ -291,8 +294,9 @@ The calendar moves on with the days you play, and you continue where you left of
 
 - **Fly**: a continuous drone tour of 19 sites, and an overview you can tilt from street level to straight above, with cloud shadows drifting over the ground.
 - **Walk**: start from any of 50 places. Four speeds: walk, long strides, hover, and boosts when you keep clicking far away — each with its own sound. Slopes slow you down, people step aside, and you step aside for ox carts. Footsteps change with sand, grass, wood, stone and water; crowds murmur, and the palace grows quieter toward the Emperor's residence. Walk inside a noble's mansion and the Great Hall of State (press F at the entrance).
+- **A place to stay**: people lend the homeless robot a bed: the upper floor of Rajomon Gate, the porters' hut at the market, or a servants' row house in a noble mansion. Living at the hut, you can help unload bales at the riverbank; living at the row house, you can fly kites and trade riddles with the young lord. The robot's wind-up key keeps it from lying down, so at night press Z in your room: it sits still, a roommate winds it up, and it wakes at six.
 - **Gestures**: Space jump, Q dance, B bow, F pray, G wave. People bow and wave back; on the great terrace, the whole line of officials bows in return. Keep dancing and people join in, a flute and a sho mouth organ start up, and the crowd keeps dancing for a while after you stop.
-- **Talk**: about 1,300 one-liners and 160 short exchanges that change with place, hour, season, market day, weather and moon. More than 100 named residents, each with a daily routine, a rank, a household and a side in court politics. Ask "Do you know about …?" — some know only the rumor, some the truth, and some will send you to someone else. Read "What is …?" notes on people, events and basic Heian life, with sources where lines are based on history.
+- **Talk**: about 1,300 one-liners and 160 short exchanges that change with place, hour, season, market day, weather and moon. Ask anyone about their life: their home province, the family back there, how they used to live and what worries them now; neighbours speak as one household. About 140 named residents, each with a daily routine, a rank, a household and a side in court politics. Ask "Do you know about …?" — some know only the rumor, some the truth, and some will send you to someone else. Read "What is …?" notes on people, events and basic Heian life, with sources where lines are based on history.
 - **Notebook (N)**: who said what, when and where is noted automatically. Search a word to see different people's versions side by side — and where they disagree. Browse by person or place, and pin what matters. There is no quest list or progress counter.
 - **Timeline (T)**: the capital's history from its founding in 794 to 926. The present year (900) is marked; later events are shown faded as "yet to come", since nobody here knows them yet. Open "More" for a short explanation, or jump to the place where it happened.
 - **View**: the drone tour, the overview, photo mode and five fixed views (from the south, from the north, over the east and west halves, and straight down).

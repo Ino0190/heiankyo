@@ -59,6 +59,8 @@ main figure img{cursor:zoom-in}
 svg.map,svg.ui{display:block;width:100%;height:auto;background:#d9cfb8}
 svg.map circle{stroke:#fff;stroke-width:2}
 svg.map text{fill:#fff;font:700 13px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+svg.map text.far{fill:#2c2418;font-size:14px;font-weight:600;text-anchor:start}
+svg.map line.far{stroke:#5a5f66;stroke-width:2;stroke-dasharray:4 3}
 svg.ui circle{fill:#c9973b;stroke:#10161c;stroke-width:3}
 svg.ui text{fill:#10161c;font:700 22px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
 .mapkey{display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px;margin:12px 0 0;font-size:16px;line-height:1.6}
@@ -178,7 +180,7 @@ footer a{color:#d8dee5}
 <div class="row"><figure><img src="../img/zenkei.jpg" width="1500" height="857" alt="The whole of Heian-kyo with the northern mountains behind it. The street grid and the Kamo and Katsura rivers are visible" loading="lazy" decoding="async"></figure>
 <div><h3>Fly over the city</h3><p>The drone tour flies through 19 places, from Rajomon Gate along Suzaku Avenue to the palace and Toji Temple. Drag and scroll to look from just above the ground to straight overhead. The grid, about 5.2 km north to south and 4.5 km east to west, sits in its real landscape of mountains and rivers.</p></div></div>
 <div class="row rev"><figure><img src="../img/nijo-robo.jpg" width="1500" height="857" alt="The robot walking along Nijo Avenue past townspeople with speech bubbles, Suzakumon Gate on the far left" loading="lazy" decoding="async"></figure>
-<div><h3>Walk the streets</h3><p>Start from any of 50 places and click the ground (tap on a phone) to walk. You can also go inside some of the buildings. The townspeople's chatter appears in speech bubbles as you pass.</p></div></div>
+<div><h3>Walk the streets</h3><p>Start from any of 51 places and click the ground (tap on a phone) to walk. You can also go inside some of the buildings. The townspeople's chatter appears in speech bubbles as you pass.</p></div></div>
 <h3 class="galh">Visit the landmarks</h3>
 <div class="gal">
 <figure><img src="../img/rajomon.jpg" width="1500" height="857" alt="Rajomon Gate at the southern edge of the city and the buildings of Toji Temple" loading="lazy" decoding="async"><figcaption><b>Rajomon Gate</b>The main gate of the capital, with Toji and Saiji temples facing each other on either side.</figcaption></figure>
@@ -189,7 +191,7 @@ footer a{color:#d8dee5}
 <figure><img src="../img/dairi.jpg" width="1500" height="857" alt="Halls with cypress-bark roofs inside the cloister of the imperial palace" loading="lazy" decoding="async"><figcaption><b>The imperial palace</b>The Shishinden, the Seiryoden and the halls of the empresses and court ladies, roofed with cypress bark.</figcaption></figure>
 </div>
 <div class="row"><figure><video data-src="../img/suzakumon-talk.mp4" poster="../img/suzakumon-talk.jpg" width="1280" height="806" muted loop playsinline preload="none" aria-label="Video: officials and townspeople talking in speech bubbles in front of Suzakumon Gate"></video></figure>
-<div><h3>Talk with the townspeople</h3><p>The game has about 3,000 townspeople, and what they say changes with the place, the hour, the season and the weather. Rank, household and whether they side with the Minister of the Left or the Minister of the Right shape how they talk. Earlier events such as the Otenmon Incident and the demon of the Pine Grove of the Banquet come up as rumours. What you hear is kept in your notebook, and each day is written up in a diary. Every line of dialogue is available in English.</p></div></div>
+<div><h3>Talk with the townspeople</h3><p>The game has about 4,900 townspeople, and what they say changes with the place, the hour, the season and the weather. Rank, household and whether they side with the Minister of the Left or the Minister of the Right shape how they talk. Ask about their life and they tell you which province they came from, the family back home, how they used to live and what worries them now. Neighbours who live together speak as one household. Earlier events such as the Otenmon Incident and the demon of the Pine Grove of the Banquet come up as rumours. What you hear is kept in your notebook, and each day is written up in a diary. Every line of dialogue is available in English.</p></div></div>
 <div class="row rev"><figure><img src="../img/suzaku-oji.jpg" width="1500" height="857" alt="An ox cart and a mounted party on willow-lined Suzaku Avenue" loading="lazy" decoding="async"></figure>
 <div><h3>A calendar that moves</h3><p>Days pass from the 25th day of the second month of the year 900 to the year 922, following the lunar calendar of the time, including long and short months and leap months. Once you pass the Shotai Incident on the 25th day of the first month of 901, Michizane's ox cart no longer appears, and the townspeople change what they say and where they go. The nobles' ox carts leave their mansions for the palace on schedule. The seasons turn: plum, cherry, new leaves, autumn colour and bare branches, with sunrise and sunset moving through the year. Each day is clear, cloudy or rainy. The East and West Markets open in alternate halves of the month. At night only bonfires and oil lamps break the darkness, as they did then.</p></div></div>
 <div class="row"><figure><img src="../img/gekiga-otenmon.jpg" width="1500" height="857" alt="Otenmon Gate photographed in gekiga style, drawn with ink lines and screentone" loading="lazy" decoding="async"></figure>
@@ -199,13 +201,14 @@ footer a{color:#d8dee5}
 <div class="row"><figure><img src="../img/kanshi-kannin.jpg" width="1500" height="857" alt="The robot at the doorway of a government office where officials sit on the floor writing, one speaking in a bubble" loading="lazy" decoding="async"></figure>
 <div><h3>Requests</h3><p>Find a lost child, deliver a love letter, catch a thief of dried fish, look into the pillars of Rajomon Gate, and more. These quest-like requests deepen your ties with the townspeople, bring new stories, and open the way into the palace and the mansions of the nobility.</p></div></div>
 <ul class="feat">
+<li><h3>A place to stay</h3>The robot has nowhere to live, but some people will lend it a bed: the upper floor of Rajomon Gate, the porters' hut at the market, and a servants' row house in a noble mansion. Stay at the hut and you can help unload boats at the riverbank; stay at the row house and you can fly kites and trade riddles with the young lord. The wind-up key on its back means the robot cannot lie down, so at night it sits still in its room and wakes in the morning after a roommate winds it up.</li>
 </ul>
 </section>
 <section id="map">
 <h2>Map of Heian-kyo</h2>
-<p>The capital seen from directly above inside the game. The numbers mark the places where you can start walking, in a city about 5.2 km north to south and 4.5 km east to west. North is up. Suzaku Avenue runs south from the palace precinct at the top to Rajomon Gate. East of it (right) is the Left Capital, and west of it (left) is the Right Capital. Much of the south-west of the Right Capital is still marsh and woodland. You can also start from the top of Mount Funaoka, north of the city.</p>
+<p>The capital seen from directly above inside the game. The numbers mark the places where you can start walking, in a city about 5.2 km north to south and 4.5 km east to west. North is up. Suzaku Avenue runs south from the palace precinct at the top to Rajomon Gate. East of it (right) is the Left Capital, and west of it (left) is the Right Capital. Much of the south-west of the Right Capital is still marsh and woodland. You can also start from two places in the outskirts, the top of Mount Funaoka to the north and Toba Port to the south. They are numbered as “Outskirts” in the bands above and below the map.</p>
 <!--MAP-->
-<svg class="map" viewBox="0 0 832 962" role="img" aria-labelledby="mapTitle"><title id="mapTitle">Map of Heian-kyo seen from directly above, with numbered markers for the 49 places where you can start walking</title>
+<svg class="map" viewBox="0 -48 832 1058" role="img" aria-labelledby="mapTitle"><title id="mapTitle">Map of Heian-kyo seen from directly above, with numbered markers for the 51 places where you can start walking. The outskirts are in the bands above and below</title>
 <image href="../img/heiankyo-map.jpg" width="832" height="962"/>
 <g transform="translate(416.1 156.4)"><title>1. Daigokuden Hall</title><circle r="10" fill="#b23b3b"/><text y="4">1</text></g>
 <g transform="translate(380.2 172.0)"><title>2. Burakuden Hall</title><circle r="10" fill="#b23b3b"/><text y="4">2</text></g>
@@ -256,6 +259,10 @@ footer a{color:#d8dee5}
 <g transform="translate(273.8 22.9)"><title>47. Papermakers&#x27; and copyists&#x27; quarter (Bureau of Books)</title><circle r="10" fill="#2f5a8a"/><text y="4">47</text></g>
 <g transform="translate(253.8 119.3)"><title>48. Kamiya-in Paper Mill</title><circle r="10" fill="#2f5a8a"/><text y="4">48</text></g>
 <g transform="translate(634.7 914.0)"><title>49. Seyakuin Dispensary</title><circle r="10" fill="#2f5a8a"/><text y="4">49</text></g>
+<line class="far" x1="416.0" y1="0" x2="416.0" y2="-14.0"/>
+<g transform="translate(416.0 -24.0)"><title>50. Mt. Funaoka Summit</title><circle r="10" fill="#5a5f66"/><text y="4">50</text><text class="far" x="18" y="5">Mt. Funaoka Summit, about 1.4 km north</text></g>
+<line class="far" x1="439.2" y1="962" x2="439.2" y2="976.0"/>
+<g transform="translate(439.2 986.0)"><title>51. Toba Port</title><circle r="10" fill="#5a5f66"/><text y="4">51</text><text class="far" x="18" y="5">Toba Port, about 2.6 km south</text></g>
 </svg>
 <div class="mapkey">
 <div><h3><i style="background:#b23b3b"></i>The palace precinct</h3><ol start="1"><li>Daigokuden Hall</li><li>Burakuden Hall</li><li>Inner Palace (Dairi)</li><li>Otenmon Gate</li><li>Suzakumon Gate</li><li>Bureau of Divination (Onmyo-ryo)</li></ol></div>
@@ -263,6 +270,7 @@ footer a{color:#d8dee5}
 <div><h3><i style="background:#2f6b4a"></i>Temples and shrines</h3><ol start="15"><li>To-ji Temple</li><li>Sai-ji Temple</li><li>Gojo Tenjin Shrine</li><li>Ichihime Shrine</li><li>Daishogun-do Hall</li><li>Rokkakudo Hall</li><li>Inabado Hall</li></ol></div>
 <div><h3><i style="background:#6e4f8a"></i>Residences, villas and gardens</h3><ol start="22"><li>Shinsen-en Garden</li><li>Suzaku-in</li><li>Reizei-in</li><li>Yozei-in</li><li>Machijiri-dono</li><li>Kaya-no-in</li><li>Horikawa-in</li><li>Kan-in</li><li>Higashi-Sanjo-dono</li><li>Nijo-no-miya</li><li>Ko-Nijo-in</li><li>Yamabuki-dono</li><li>Sugawara-in</li><li>Kobai-dono</li><li>Hakubai-dono</li><li>Teiji-no-in</li><li>Kawara-no-in</li></ol></div>
 <div><h3><i style="background:#2f5a8a"></i>Workshops, offices and neighbourhoods</h3><ol start="39"><li>Academic quarter</li><li>Aristocratic quarter</li><li>Commoners&#x27; quarter</li><li>Officials&#x27; quarter, northern Right Capital</li><li>Green spaces of the Right Capital</li><li>Carpenters&#x27; quarter (Bureau of Carpentry)</li><li>Palace repair workers&#x27; quarter</li><li>Craftsmen&#x27;s quarter (Bureau of Crafts)</li><li>Papermakers&#x27; and copyists&#x27; quarter (Bureau of Books)</li><li>Kamiya-in Paper Mill</li><li>Seyakuin Dispensary</li></ol></div>
+<div><h3><i style="background:#5a5f66"></i>Outskirts</h3><ol start="50"><li>Mt. Funaoka Summit</li><li>Toba Port</li></ol></div>
 </div>
 <!--/MAP-->
 </section>

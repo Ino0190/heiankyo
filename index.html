@@ -59,6 +59,8 @@ main figure img{cursor:zoom-in}
 svg.map,svg.ui{display:block;width:100%;height:auto;background:#d9cfb8}
 svg.map circle{stroke:#fff;stroke-width:2}
 svg.map text{fill:#fff;font:700 13px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
+svg.map text.far{fill:#2c2418;font-size:14px;font-weight:600;text-anchor:start}
+svg.map line.far{stroke:#5a5f66;stroke-width:2;stroke-dasharray:4 3}
 svg.ui circle{fill:#c9973b;stroke:#10161c;stroke-width:3}
 svg.ui text{fill:#10161c;font:700 22px -apple-system,"Helvetica Neue",Arial,sans-serif;text-anchor:middle}
 .mapkey{display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px;margin:12px 0 0;font-size:16px;line-height:1.6}
@@ -130,11 +132,26 @@ footer a{color:#d8dee5}
 <h1>平安京</h1>
 <p class="tag">昌泰三年（900）の都を、ブラウザで歩く</p>
 <p>造営からおよそ百年たった平安京を、国土地理院の標高データの上に推定復元した、3Dの箱庭です。ブリキのロボ「鉄の童」になって、空から都を眺め、通りを歩き、町の人の話を聞いて回ります。勝ち負けや決まった筋はなく、好きな所へ行って過ごせます。</p>
-<div class="cta"><a class="btn" href="heiankyo/">平安京を歩く</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
-<p class="note">初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
+<div class="cta"><a class="btn" href="heiankyo/?go=1">平安京を歩く（音が出ます）</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
+<p class="note">押すと読み込みが始まり、終わると空から都へ降ります（音楽つき・中の「音楽」で消せます）。初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
 </div>
 </header>
 <main>
+<section id="start">
+<h2>はじめての操作</h2>
+<p>入ったら、まずこの5つを試してみてください。あとは歩きながら覚えられます。ゲームの中の右上 ☰ の「あそびかた」でも見返せます。</p>
+<table class="uitab">
+<thead><tr><th>したいこと</th><th>PC</th><th>スマートフォン</th></tr></thead>
+<tbody>
+<tr><th>歩く</th><td>地面をクリックすると、そこへ歩く。遠くをクリックするほど速い</td><td>地面をタップすると、そこへ歩く</td></tr>
+<tr><th>見回す</th><td>左ドラッグ。WASD でも動ける</td><td>画面をドラッグ</td></tr>
+<tr><th>話しかける</th><td>人に近づいて E</td><td>人の吹き出しか「話しかける」の札をタップ</td></tr>
+<tr><th>しぐさ</th><td>B お辞儀・G 手を振る・Y 笛・Q 踊る（町の人が返してくれる）</td><td>下の「動作」から</td></tr>
+<tr><th>名所へ行く</th><td colspan="2">左上の行き先の一覧か地図の印を選ぶと、「歩いて行く」か「すぐ移る」を選べる</td></tr>
+<tr><th>そのほか</th><td colspan="2">T たどる（都の年表）・N 聞き書き帳・☰ 夜や音楽・星座の切り替え。迷ったら「おまかせ」（O）で、鉄の童が勝手に歩いていく</td></tr>
+</tbody>
+</table>
+</section>
 <section id="uses">
 <h2>こんな使い方ができます</h2>
 <ul class="uses">
@@ -162,7 +179,7 @@ footer a{color:#d8dee5}
 <div class="row"><figure><img src="img/zenkei.jpg" width="1500" height="857" alt="北山を背にした平安京の全景。碁盤目の条坊と鴨川・桂川が見える" loading="lazy" decoding="async"></figure>
 <div><h3>空から巡る</h3><p>ドローンツアーで、羅城門から朱雀大路・大内裏・東寺など19か所を飛んで巡れます。ドラッグとホイールで、地表すれすれから真上まで見回せます。南北約5.2km・東西約4.5kmの条坊を、まわりの山と川の地形ごと見渡せます。</p></div></div>
 <div class="row rev"><figure><img src="img/nijo-robo.jpg" width="1500" height="857" alt="二条大路を歩くロボと、町の人の吹き出し。左奥に朱雀門" loading="lazy" decoding="async"></figure>
-<div><h3>地上を歩く</h3><p>50の地点から歩き始め、地面をクリック（スマートフォンはタップ）して進みます。一部の建物は中に入ることもできます。すれ違う町の人のつぶやきが、吹き出しで頭の上に出ます。</p></div></div>
+<div><h3>地上を歩く</h3><p>51の地点から歩き始め、地面をクリック（スマートフォンはタップ）して進みます。一部の建物は中に入ることもできます。すれ違う町の人のつぶやきが、吹き出しで頭の上に出ます。</p></div></div>
 <h3 class="galh">名所を訪ねる</h3>
 <div class="gal">
 <figure><img src="img/rajomon.jpg" width="1500" height="857" alt="京の南端の羅城門と、九条大路沿いの東寺の伽藍" loading="lazy" decoding="async"><figcaption><b>羅城門と京の南端</b>都の正門・羅城門の左右に、東寺と西寺が向かい合います。</figcaption></figure>
@@ -173,7 +190,7 @@ footer a{color:#d8dee5}
 <figure><img src="img/dairi.jpg" width="1500" height="857" alt="檜皮葺の殿舎が回廊の中に並ぶ内裏" loading="lazy" decoding="async"><figcaption><b>内裏</b>紫宸殿・清涼殿・後宮の殿舎を、檜皮葺の屋根で作っています。</figcaption></figure>
 </div>
 <div class="row"><figure><video data-src="img/suzakumon-talk.mp4" poster="img/suzakumon-talk.jpg" width="1280" height="806" muted loop playsinline preload="none" aria-label="朱雀門の前で、官人と町の人が吹き出しで話している動画"></video></figure>
-<div><h3>町の人と話す</h3><p>ゲームの中には約3,000人の町の人がいて、場所・時刻・季節・天気で話が変わります。身分や仕える家、左大臣方か右大臣方かで話し方も変わります。応天門の変や宴の松原の鬼など、900年より前の出来事が噂に上ります。聞いた話は「聞き書き帳」に、その日の出来事は「日録」に残ります。</p></div></div>
+<div><h3>町の人と話す</h3><p>ゲームの中には約4,900人の町の人がいて、場所・時刻・季節・天気で話が変わります。身分や仕える家、左大臣方か右大臣方かで話し方も変わります。「身の上を聞く」と、生まれた国、国元の家族、昔の暮らし、いまの悩みを話してくれます。近所に住む人どうしは一つの家の者として話がつながります。応天門の変や宴の松原の鬼など、900年より前の出来事が噂に上ります。聞いた話は「聞き書き帳」に、その日の出来事は「日録」に残ります。</p></div></div>
 <div class="row rev"><figure><img src="img/suzaku-oji.jpg" width="1500" height="857" alt="柳並木の朱雀大路を進む牛車と騎馬の一行" loading="lazy" decoding="async"></figure>
 <div><h3>暦が進む</h3><p>昌泰三年二月二十五日から延喜二十二年（922）まで、大の月・小の月・閏月を当時の暦どおりに日が進みます。延喜元年（901）正月二十五日の昌泰の変を越えると、道真の牛車は出なくなり、町の人の話や居場所も変わります。公卿の牛車は刻限どおりに邸を出て出仕します。季節がめぐり、草木は梅・桜・若葉・紅葉・枯れ木と移り、日の出と日の入りの時刻も変わります。天気は晴れ・曇り・雨が日ごとに変わります。東市と西市は半月交替で開きます。夜は篝火と灯明だけの暗かった当時を再現しています。</p></div></div>
 <div class="row"><figure><img src="img/gekiga-otenmon.jpg" width="1500" height="857" alt="劇画調で撮った応天門。墨線と網点で描かれている" loading="lazy" decoding="async"></figure>
@@ -183,14 +200,15 @@ footer a{color:#d8dee5}
 <div class="row"><figure><img src="img/kanshi-kannin.jpg" width="1500" height="857" alt="官司の戸口で、床に座って書き物をする官人たちとロボ。官人の吹き出しが出ている" loading="lazy" decoding="async"></figure>
 <div><h3>頼みごと</h3><p>迷子探し・恋文・干物盗人・羅城門の柱など、クエストのようなものが用意されています。済ませると、住民との関係が深まって新しい話が聞けたり、内裏や貴族の邸の中へ入れるようになったりします。</p></div></div>
 <ul class="feat">
+<li><h3>居候する</h3>住む所のないロボに、寝床を貸してくれる人がいます。羅城門の二階、市の人夫小屋、貴族の邸の下働きの長屋の3か所です。人夫小屋に住めば河岸の荷揚げを、長屋に住めば若君の凧揚げやなぞなぞの相手を手伝えます。ロボは背中のゼンマイがあって横になれないので、夜は部屋で座って止まり、同居の人に巻いてもらって朝を迎えます。</li>
 <li><h3>English</h3>英語表示では台詞もすべて英訳で出て、大内裏・牛車・陰陽師などの基礎の解説が加わります。</li>
 </ul>
 </section>
 <section id="map">
 <h2>平安京の地図</h2>
-<p>ゲームの中を真上から撮った地図です。南北約5.2km・東西約4.5kmの京域に、歩き始められる地点を番号で示しています。地図は北が上です。北の端の大内裏から朱雀大路が南の羅城門へ延び、朱雀大路の東（右）が左京、西（左）が右京です。右京の南西には、湿地や林のままの土地が広がっています。都の北にある船岡山の山頂からも歩き始められます。</p>
+<p>ゲームの中を真上から撮った地図です。南北約5.2km・東西約4.5kmの京域に、歩き始められる地点を番号で示しています。地図は北が上です。北の端の大内裏から朱雀大路が南の羅城門へ延び、朱雀大路の東（右）が左京、西（左）が右京です。右京の南西には、湿地や林のままの土地が広がっています。都の外の郊外にある、北の船岡山の山頂と、南の鳥羽津からも歩き始められます。この2か所は、地図の上と下の帯に「郊外」として番号を付けています。</p>
 <!--MAP-->
-<svg class="map" viewBox="0 0 832 962" role="img" aria-labelledby="mapTitle"><title id="mapTitle">真上から見た平安京の地図。歩き始められる49の地点に番号の印</title>
+<svg class="map" viewBox="0 -48 832 1058" role="img" aria-labelledby="mapTitle"><title id="mapTitle">真上から見た平安京の地図。歩き始められる51の地点に番号の印。郊外は地図の上と下の帯</title>
 <image href="img/heiankyo-map.jpg" width="832" height="962"/>
 <g transform="translate(416.1 156.4)"><title>1. 大極殿</title><circle r="10" fill="#b23b3b"/><text y="4">1</text></g>
 <g transform="translate(380.2 172.0)"><title>2. 豊楽殿</title><circle r="10" fill="#b23b3b"/><text y="4">2</text></g>
@@ -241,6 +259,10 @@ footer a{color:#d8dee5}
 <g transform="translate(273.8 22.9)"><title>47. 図書町</title><circle r="10" fill="#2f5a8a"/><text y="4">47</text></g>
 <g transform="translate(253.8 119.3)"><title>48. 紙屋院</title><circle r="10" fill="#2f5a8a"/><text y="4">48</text></g>
 <g transform="translate(634.7 914.0)"><title>49. 施薬院</title><circle r="10" fill="#2f5a8a"/><text y="4">49</text></g>
+<line class="far" x1="416.0" y1="0" x2="416.0" y2="-14.0"/>
+<g transform="translate(416.0 -24.0)"><title>50. 船岡山山頂</title><circle r="10" fill="#5a5f66"/><text y="4">50</text><text class="far" x="18" y="5">船岡山山頂　北へ約1.4km</text></g>
+<line class="far" x1="439.2" y1="962" x2="439.2" y2="976.0"/>
+<g transform="translate(439.2 986.0)"><title>51. 鳥羽津</title><circle r="10" fill="#5a5f66"/><text y="4">51</text><text class="far" x="18" y="5">鳥羽津　南へ約2.6km</text></g>
 </svg>
 <div class="mapkey">
 <div><h3><i style="background:#b23b3b"></i>宮城（大内裏）</h3><ol start="1"><li>大極殿</li><li>豊楽殿</li><li>内裏</li><li>応天門</li><li>朱雀門</li><li>陰陽寮</li></ol></div>
@@ -248,6 +270,7 @@ footer a{color:#d8dee5}
 <div><h3><i style="background:#2f6b4a"></i>寺と社</h3><ol start="15"><li>東寺</li><li>西寺</li><li>五條天神</li><li>市比賣社</li><li>大将軍堂</li><li>六角堂</li><li>因幡堂</li></ol></div>
 <div><h3><i style="background:#6e4f8a"></i>邸・院・苑</h3><ol start="22"><li>神泉苑</li><li>朱雀院</li><li>冷然院</li><li>陽成院</li><li>町尻殿</li><li>賀陽院</li><li>堀河院</li><li>閑院</li><li>東三条殿</li><li>二条宮</li><li>小二条院</li><li>山吹殿</li><li>菅原院</li><li>紅梅殿</li><li>白梅殿</li><li>亭子院</li><li>六条河原院</li></ol></div>
 <div><h3><i style="background:#2f5a8a"></i>役所の町と暮らし</h3><ol start="39"><li>官学地区</li><li>貴族邸街区</li><li>庶民街区</li><li>右京北部の官人街</li><li>右京の緑地</li><li>木工町</li><li>修理職町</li><li>内匠町</li><li>図書町</li><li>紙屋院</li><li>施薬院</li></ol></div>
+<div><h3><i style="background:#5a5f66"></i>郊外</h3><ol start="50"><li>船岡山山頂</li><li>鳥羽津</li></ol></div>
 </div>
 <!--/MAP-->
 </section>
@@ -326,7 +349,7 @@ footer a{color:#d8dee5}
 <section class="again">
 <h2 style="color:#f4f1e9;border-color:#c9973b">千年前の都へ</h2>
 <p>羅城門の前から、朱雀大路を北へ歩いてみてください。</p>
-<a class="btn" href="heiankyo/">平安京を歩く</a>
+<a class="btn" href="heiankyo/?go=1">平安京を歩く（音が出ます）</a>
 </section>
 </main>
 <footer><div class="in"><dl>
