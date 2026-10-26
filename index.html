@@ -109,6 +109,7 @@ footer dt{color:#8fa0ae;white-space:nowrap}
 footer dd{margin:0}
 footer a{color:#d8dee5}
 @media(max-width:640px){h1{font-size:46px}.tag{font-size:21px}.hero .in{padding-bottom:40px}.shots,.notes{grid-template-columns:1fr}h2{font-size:25px}footer dl{grid-template-columns:1fr;gap:2px}footer dt{margin-top:8px}}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -132,7 +133,7 @@ footer a{color:#d8dee5}
 <h1>平安京</h1>
 <p class="tag">昌泰三年（900）の都を、ブラウザで歩く</p>
 <p>造営からおよそ百年たった平安京を、国土地理院の標高データの上に推定復元した、3Dの箱庭です。ブリキのロボ「鉄の童」になって、空から都を眺め、通りを歩き、町の人の話を聞いて回ります。勝ち負けや決まった筋はなく、好きな所へ行って過ごせます。</p>
-<div class="cta"><a class="btn" href="heiankyo/?go=1">平安京を歩く（音が出ます）</a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/">設定資料集を読む</a></div>
+<div class="cta"><a class="btn" href="heiankyo/?go=1" target="_blank" rel="noopener">平安京を歩く（音が出ます）<span class="vh">（新しいタブで開きます）</span></a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/" target="_blank" rel="noopener">設定資料集を読む<span class="vh">（新しいタブで開きます）</span></a><a class="sub" href="wiki/" target="_blank" rel="noopener">平安京wiki（人・場所・頼みごと）<span class="vh">（新しいタブで開きます）</span></a></div>
 <p class="note">押すと読み込みが始まり、終わると空から都へ降ります（音楽つき・中の「音楽」で消せます）。初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
 </div>
 </header>
@@ -172,7 +173,7 @@ footer a{color:#d8dee5}
 <li>東寺の五重塔は、着工から長くかかり、9世紀の末にようやく建ちました。</li>
 <li>内裏は遷都以来の姿を保っています。</li>
 </ul>
-<p><a href="research/#doc-建物と都の来歴794-900">建物と都の来歴（794〜900年）の調査ノートを読む</a></p>
+<p><a href="research/#doc-建物と都の来歴794-900" target="_blank" rel="noopener">建物と都の来歴（794〜900年）の調査ノートを読む<span class="vh">（新しいタブで開きます）</span></a></p>
 </section>
 <section id="play">
 <h2>平安京でできること</h2>
@@ -200,7 +201,7 @@ footer a{color:#d8dee5}
 <div class="row"><figure><img src="img/kanshi-kannin.jpg" width="1500" height="857" alt="官司の戸口で、床に座って書き物をする官人たちとロボ。官人の吹き出しが出ている" loading="lazy" decoding="async"></figure>
 <div><h3>頼みごと</h3><p>迷子探し・恋文・干物盗人・羅城門の柱など、クエストのようなものが用意されています。済ませると、住民との関係が深まって新しい話が聞けたり、内裏や貴族の邸の中へ入れるようになったりします。</p></div></div>
 <ul class="feat">
-<li><h3>居候する</h3>住む所のないロボに、寝床を貸してくれる人がいます。羅城門の二階、市の人夫小屋、貴族の邸の下働きの長屋の3か所です。人夫小屋に住めば河岸の荷揚げを、長屋に住めば若君の凧揚げやなぞなぞの相手を手伝えます。ロボは背中のゼンマイがあって横になれないので、夜は部屋で座って止まり、同居の人に巻いてもらって朝を迎えます。</li>
+<li><h3>居候する</h3>住む所のないロボに、寝床を貸してくれる人がいます。羅城門の二階、市の人夫小屋、貴族の邸の下働きの長屋の3か所です。人夫小屋に住めば河岸の荷揚げを、長屋に住めば若君の凧揚げやなぞなぞの相手を手伝えます。ロボは背中のゼンマイがあって横になれないので、夜は部屋で座って止まり、同居の人に巻いてもらって朝を迎えます。部屋の葛籠には持ち物を預けられ、居候先は地図に印が出ます。</li>
 <li><h3>English</h3>英語表示では台詞もすべて英訳で出て、大内裏・牛車・陰陽師などの基礎の解説が加わります。</li>
 </ul>
 </section>
@@ -321,15 +322,16 @@ footer a{color:#d8dee5}
 <h2>考証について</h2>
 <p>建物・街路・暮らしは、都城図・街路の寸法・発掘資料・古記録を突き合わせて推定しました。史料で確かめられる所と推定で補った所を分けて記録し、調査ノート28件を設定資料集にまとめています。</p>
 <div class="notes">
-<a href="research/#cat-時代設定"><h3>対象年代</h3><span>舞台は昌泰三年（900）。暦が進む延喜二十二年（922）までに並びうる建物・制度・暮らしを選び、その前後の出来事と照らし合わせています。</span><em>章「時代設定」を読む →</em></a>
-<a href="research/#cat-都市の骨格"><h3>条坊・町割り・建物配置</h3><span>一辺約121mの町を単位に、大内裏・官司・東西市・寺・神泉苑の位置を決めています。</span><em>章「都市の骨格」を読む →</em></a>
-<a href="research/#doc-寝殿造と中下級官人住宅"><h3>皇族・公家・庶民の居宅</h3><span>内裏、寝殿造の邸、中下級官人の家、庶民の長屋を、確度の差を書き分けて置いています。</span><em>「寝殿造と中下級官人住宅」を読む →</em></a>
-<a href="research/#cat-暮らしと環境"><h3>身分ごとに異なる一日</h3><span>出仕する公家、邸で働く女房や牛飼、市の商人や職人の一日を調べています。</span><em>章「暮らしと環境」を読む →</em></a>
-<a href="research/#guide-food"><h3>食・衣・道具</h3><span>大饗の膳と庶民の食事、位階で変わる装束、道具を作る人までを扱います。</span><em>「はじめに」の食・衣・道具を読む →</em></a>
-<a href="research/#cat-周辺と交通"><h3>都へ入る人と物</h3><span>塩・干魚・木材・米が、街道・淀津・鳥羽津・牛車で京へ入る流れです。</span><em>章「周辺と交通」を読む →</em></a>
+<a href="research/#cat-時代設定" target="_blank" rel="noopener"><h3>対象年代</h3><span>舞台は昌泰三年（900）。暦が進む延喜二十二年（922）までに並びうる建物・制度・暮らしを選び、その前後の出来事と照らし合わせています。</span><em>章「時代設定」を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
+<a href="research/#cat-都市の骨格" target="_blank" rel="noopener"><h3>条坊・町割り・建物配置</h3><span>一辺約121mの町を単位に、大内裏・官司・東西市・寺・神泉苑の位置を決めています。</span><em>章「都市の骨格」を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
+<a href="research/#doc-寝殿造と中下級官人住宅" target="_blank" rel="noopener"><h3>皇族・公家・庶民の居宅</h3><span>内裏、寝殿造の邸、中下級官人の家、庶民の長屋を、確度の差を書き分けて置いています。</span><em>「寝殿造と中下級官人住宅」を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
+<a href="research/#cat-暮らしと環境" target="_blank" rel="noopener"><h3>身分ごとに異なる一日</h3><span>出仕する公家、邸で働く女房や牛飼、市の商人や職人の一日を調べています。</span><em>章「暮らしと環境」を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
+<a href="research/#guide-food" target="_blank" rel="noopener"><h3>食・衣・道具</h3><span>大饗の膳と庶民の食事、位階で変わる装束、道具を作る人までを扱います。</span><em>「はじめに」の食・衣・道具を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
+<a href="research/#cat-周辺と交通" target="_blank" rel="noopener"><h3>都へ入る人と物</h3><span>塩・干魚・木材・米が、街道・淀津・鳥羽津・牛車で京へ入る流れです。</span><em>章「周辺と交通」を読む →</em><span class="vh">（新しいタブで開きます）</span></a>
 </div>
-<p class="morech">ほかの章：<a href="research/#cat-大内裏と官庁">大内裏と官庁</a>・<a href="research/#cat-学問と教育">学問と教育</a>・<a href="research/#cat-寺社">寺社</a>・<a href="research/#cat-未分類">内裏・朝堂院・朱雀院の復元メモ</a></p>
-<a class="btn2" href="research/">設定資料集を読む（調査ノート28件）</a>
+<p class="morech">ほかの章：<a href="research/#cat-大内裏と官庁" target="_blank" rel="noopener">大内裏と官庁<span class="vh">（新しいタブで開きます）</span></a>・<a href="research/#cat-学問と教育" target="_blank" rel="noopener">学問と教育<span class="vh">（新しいタブで開きます）</span></a>・<a href="research/#cat-寺社" target="_blank" rel="noopener">寺社<span class="vh">（新しいタブで開きます）</span></a>・<a href="research/#cat-未分類" target="_blank" rel="noopener">内裏・朝堂院・朱雀院の復元メモ<span class="vh">（新しいタブで開きます）</span></a></p>
+<a class="btn2" href="research/" target="_blank" rel="noopener">設定資料集を読む（調査ノート28件）<span class="vh">（新しいタブで開きます）</span></a>
+<p class="morech">ゲームの中の人・場所・頼みごと・ことば・年表は、<a href="wiki/" target="_blank" rel="noopener">平安京wiki（試作）<span class="vh">（新しいタブで開きます）</span></a>にまとめています。</p>
 </section>
 <section id="hakoniwakit">
 <h2>HakoniwaKit とは</h2>
@@ -341,7 +343,7 @@ footer a{color:#d8dee5}
 <dt>なぜ900年なのですか</dt><dd>計画された建物がそろって建っていた時期で、翌年の正月に右大臣菅原道真が都を追われる昌泰の変が起きます。暦を進めると、その昌泰の変、延喜への改元（901）、藤原時平の死（909）を迎えます。</dd>
 <dt>無料で遊べますか</dt><dd>無料です。登録もいりません。ブラウザで開くと動きます。</dd>
 <dt>スマートフォンでも動きますか</dt><dd>動きます。ドラッグで見回し、地面をタップして移動します。初回の読み込みが大きいので、Wi-Fiでの利用をおすすめします。</dd>
-<dt>どこまで史実どおりですか</dt><dd>地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、<a href="research/">設定資料集</a>に確度を書いています。</dd>
+<dt>どこまで史実どおりですか</dt><dd>地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、<a href="research/" target="_blank" rel="noopener">設定資料集<span class="vh">（新しいタブで開きます）</span></a>に確度を書いています。</dd>
 <dt>撮った画像を自分の作品に使えますか</dt><dd>個人の作品（漫画・イラスト・動画など）の背景に使えます。公開するときは「HakoniwaKit 平安京」と書き添えてください。商用で使いたいときはご相談ください。</dd>
 <dt>遊んだ続きはどうなりますか</dt><dd>日付と聞いた話はブラウザに残り、次に開くと続きから始まります。</dd>
 </dl>
@@ -349,14 +351,14 @@ footer a{color:#d8dee5}
 <section class="again">
 <h2 style="color:#f4f1e9;border-color:#c9973b">千年前の都へ</h2>
 <p>羅城門の前から、朱雀大路を北へ歩いてみてください。</p>
-<a class="btn" href="heiankyo/?go=1">平安京を歩く（音が出ます）</a>
+<a class="btn" href="heiankyo/?go=1" target="_blank" rel="noopener">平安京を歩く（音が出ます）<span class="vh">（新しいタブで開きます）</span></a>
 </section>
 </main>
 <footer><div class="in"><dl>
 <dt>制作</dt><dd>3Dモデル・コード © 2026 Ikuo Inouchi</dd>
 <dt>地形</dt><dd>国土地理院 地理院タイル（数値標高モデル）を加工</dd>
 <dt>河川</dt><dd>© OpenStreetMap contributors（ODbL）</dd>
-<dt>建築・区画</dt><dd>史料に基づく推定復元（<a href="research/">設定資料集</a>）</dd>
+<dt>建築・区画</dt><dd>史料に基づく推定復元（<a href="research/" target="_blank" rel="noopener">設定資料集<span class="vh">（新しいタブで開きます）</span></a>）</dd>
 <dt>ライブラリ</dt><dd>three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd>
 </dl></div></footer>
 <script>

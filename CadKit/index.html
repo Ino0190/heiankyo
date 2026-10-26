@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="ae537f42bf6d4ed9ddce038a6d67f0c66350af6b93562058292c9e81b0d4f45e">
+<meta name="heian-release" content="c474f13b2a05df1ef789149c5284afb6f607ff99f87053731e16a526c3fd138d">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -431,6 +431,9 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 /* 持ち物（2026-10-23）。札は蹴鞠と同じ和紙。もらった・渡したの知らせ（.heian-bag-toast）は画面上の中央に2.6秒 */
 .heian-bag ul{list-style:none;margin:6px 0 8px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}.heian-bag li{display:flex;justify-content:space-between;border-bottom:1px dotted rgba(96,76,52,.3)}
 .heian-bag .bg-n{font-size:14px;color:#6b5a44;margin:4px 0 8px}
+/* 葛籠（2026-10-13）: 持ち物と葛籠の中を上下に。品ごとのボタンで1つずつ預ける・出す */
+.heian-yado-box .bg-n{font-size:14px;color:#6b5a44;margin:6px 0 2px}.heian-yado-box ul{list-style:none;margin:0 0 6px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}
+.heian-yado-box li button{width:100%;min-height:40px;padding:4px 8px;text-align:left;font-size:15px}.heian-yado-box li:not(:has(button)){font-size:14px;color:#6b5a44}
 .heian-bag-toast{position:absolute;z-index:6;left:50%;top:110px;transform:translateX(-50%);padding:6px 16px;font-size:16px;background:rgba(250,246,236,.95);color:#2b241c;border:1px solid rgba(96,76,52,.35);border-radius:6px;pointer-events:none;white-space:nowrap}
 .heian-dialog-choices button:disabled{opacity:.45;cursor:default}
 /* 荷舟の札（2026-10-23）。行き先の一覧 */
@@ -446,6 +449,11 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
  .heian-archery .ar-h{font-size:16px}.heian-archery .ar-sub{margin:0 0 4px;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
  .heian-archery .ar-wind{margin:0 0 2px}.heian-archery .ar-pow{margin:0 0 4px}.heian-archery .ar-marks{margin:0 0 2px}.heian-archery .ar-msg{margin:0 0 4px;min-height:1.45em}
 }
+.heian-map-yado{/* 居候先（2026-10-13）。家の形の字を、茶の地に白の縁で。押せる（歩いて行く） */position:absolute;z-index:6;min-width:20px;height:20px;padding:0 2px;border:2px solid #fff;border-radius:3px;background:#7a4a24;color:#fff;font-size:14px;line-height:15px;transform:translate(-50%,-50%);cursor:pointer;box-shadow:0 0 5px rgba(0,0,0,.45)}
+.heian-map-yado:focus-visible{outline:2px solid #d2a64f;outline-offset:2px}
+/* 🚫 2026-10-13 地図の中のボタンの共通の見た目（明るい地・字の大きさ0）に負けて、⌂ が字の無い灰色の四角に見えた（井内さん「居候できる場所をマップで選べない」）。地図の中では必ずこの見た目 */
+.heian-mini-map .heian-map-yado,.heian-map-city .heian-map-yado{width:auto!important;min-width:20px!important;height:20px!important;padding:0 3px!important;background:#7a4a24!important;color:#fff!important;font-size:14px!important;line-height:15px!important;border:2px solid #fff!important;border-radius:3px!important;z-index:8!important}
+.heian-mini-map .heian-map-yado:hover,.heian-map-city .heian-map-yado:hover{background:#a8642e!important}
 .heian-map-omakase{/* おまかせの行き先（2026-10-20）。朱の菱形＝現在地（青い丸）と見分ける */position:absolute;z-index:7;width:11px;height:11px;border:2px solid #fff;background:#d9542b;transform:translate(-50%,-50%) rotate(45deg);pointer-events:none;box-shadow:0 0 6px rgba(217,84,43,.85)}
 .heian-omakase-tag{/* おまかせ散歩の札（2026-10-20）。下の動作の帯の上・知らせ（heian-note-toast）より上 */position:absolute;z-index:4;left:50%;bottom:156px;transform:translateX(-50%);padding:4px 14px;background:rgba(43,36,28,.78);color:#f6ecd4;font-size:14px;border-radius:4px;pointer-events:none;white-space:nowrap}
 .heian-trip-choice .heian-trip-sub{font-size:14px;color:#d9ccb0}
@@ -17550,7 +17558,7 @@ const HEIAN_SPEECH_SOSHI_GROUPS=[['chaen',/茶園/],['meryo',/馬寮/],['okura',
 // 話し手の種類に使ってよい台詞の種類（女は庶民の台詞も話す、など）
 // 🚫 町の群衆に「家司」「女房」の模型が無く、貴族邸の台詞が一度も出ていなかった（2026-09-26）。邸の近くの男女は邸の下働きとして話す（台詞は at で場所に縛られる）
 // 1.87 庶民に「旅人」の一言も（指示書1-7・🚫 群衆に旅人の種類が無く、共通の旅人の一言16行がだれにも言われていなかった）
-const HEIAN_SPEECH_WHO={庶民:['庶民','家司','旅人'],女:['女','庶民','女房'],客:['客','庶民'],人夫:['人夫','庶民'],行商:['行商','庶民'],従者:['従者','庶民'],牛飼童:['牛飼童','童'],母:['母','女','庶民'],
+const HEIAN_SPEECH_WHO={流れ者:['流れ者','庶民','旅人'],庶民:['庶民','家司','旅人'], /* 流れ者＝羅城門の下に座る名前の無い人（2026-10-13） */女:['女','庶民','女房'],客:['客','庶民'],人夫:['人夫','庶民'],行商:['行商','庶民'],従者:['従者','庶民'],牛飼童:['牛飼童','童'],母:['母','女','庶民'],
  洗い女:['洗い女','女','庶民'],炊女:['炊女','女','庶民'],下人:['下人','庶民','家司'],厩の者:['厩の者','庶民'],
  火長:['火長','検非違使'],船頭:['船頭','人夫','庶民']}; // 1.97 夜回りの火長（heianPatrol）。検非違使の夜の行も話す // 暮らしの営みの話し手（1.77）
 // 公卿の車の供の候補 key（heianSpeechCollect の 'o'+編成番号+'_'+人の番号）。車が見えていない（邸にいる）間は null
@@ -18582,20 +18590,31 @@ window.__heianProfile=key=>{const p=heianWalk?.position,c=(p?heianSpeechCollect(
 // ---- 居候（2026-10-13 井内さん「１で、何箇所か設定しておく」: ①羅城門の楼上 ②開いている市の人夫小屋 ③凧揚げの邸の下働きの長屋）。
 //  町の人との話の最初の節に「住む所を探している」→申し出の文→「お願いする」で、その所の入口に「F：〜に入る」が出る（heianInteriorDoorAt）。部屋は HEIAN_INTERIORS の yado_*。
 //  記録 localStorage heian-yado {at:{rajo:{x,z,r},…},visits:{rajo:n}}。何か所でも許される。【創作】申し出の言葉・条件
-const heianYado=(()=>{try{const v=JSON.parse(localStorage.getItem('heian-yado')||'null');if(v&&v.at)return{at:v.at,visits:v.visits||{},slept:v.slept||0};}catch(e){}return{at:{},visits:{},slept:0};})(); /* slept＝朝まで休んだ回数（巻く人の言葉を順に替える） */
+const heianYado=(()=>{try{const v=JSON.parse(localStorage.getItem('heian-yado')||'null');if(v&&v.at)return{at:v.at,visits:v.visits||{},slept:v.slept||0,box:v.box&&typeof v.box==='object'?v.box:{}};}catch(e){}return{at:{},visits:{},slept:0,box:{}};})(); /* box＝部屋ごとの葛籠の中身 {rajo:{米:2}} */ /* slept＝朝まで休んだ回数（巻く人の言葉を順に替える） */
 const heianYadoSave=()=>{try{localStorage.setItem('heian-yado',JSON.stringify(heianYado));}catch(e){}};
 // 羅城門の楼上の背景の写真（平安京/terrain/yado-rajo-bg.jpg）。台詞のデータと同じ置き場の候補を順に試す。一度読んだら使い回す
-let heianYadoBgTex=null;const heianYadoBgWait=[];
-function heianYadoBgTexture(cb){if(heianYadoBgTex)return cb(heianYadoBgTex);heianYadoBgWait.push(cb);if(heianYadoBgWait.length>1)return;
- const L=new THREE.TextureLoader(),paths=HEIAN_DATA_PATHS.map(p=>p+'yado-rajo-bg.jpg'),next=i=>{if(i>=paths.length){console.warn('羅城門の背景の写真を読めません');return;}
-  L.load(paths[i],t=>{t.colorSpace=THREE.SRGBColorSpace;heianYadoBgTex=t;for(const f of heianYadoBgWait.splice(0))f(t);},undefined,()=>next(i+1));};next(0);}
+// 2026-10-13 部屋ごとの写真（yado-rajo-bg.jpg・yado-ichi-bg.jpg・yado-tei-bg.jpg＝heian-yado-bg.py）。name ごとに一度だけ読む
+const heianYadoBgTex={},heianYadoBgWait={};
+// 🚫 2026-10-13 井内さん「背景が見えない」「下働きの長屋も背景がない」: jpg を TextureLoader で直に読んでいたので、手元で開いた時（file://）は
+//    ブラウザが画像を別の出どころとして WebGL へ渡さず、写真の板が白いままだった（検査のヘッドレスは --allow-file-access-from-files で通っていた）。
+//    ⇒ 写真は data URL にして terrain/heian-yado-bg.js（HEIAN_YADO_BG＝{rajo,ichi,tei}・heian-yado-bg.py が書く）に入れ、台詞や扁額と同じ script で読む＝file:// でも公開でも同じ
+let heianYadoBgData=null;
+function heianYadoBgTexture(name,cb){if(typeof name==='function'){cb=name;name='rajo';}if(heianYadoBgTex[name])return cb(heianYadoBgTex[name]);const W=heianYadoBgWait[name]||(heianYadoBgWait[name]=[]);W.push(cb);if(W.length>1)return;
+ heianYadoBgData=heianYadoBgData||loadHeianDataFile('HEIAN_YADO_BG','heian-yado-bg.js','居候の部屋の写真');
+ heianYadoBgData.then(d=>{const src=d?.[name];if(!src){console.warn('居候の部屋の写真が無い',name);return;}
+  new THREE.TextureLoader().load(src,t=>{t.colorSpace=THREE.SRGBColorSpace;heianYadoBgTex[name]=t;for(const f of W.splice(0))f(t);},undefined,e=>console.warn('居候の部屋の写真を読めません',name,e));})
+ .catch(e=>{heianYadoBgData=null;W.length=0;console.warn('居候の部屋の写真を読めません（heian-yado-bg.js）',e);});}
 // 知らせ（門番の札と同じ見た目・次の一歩の案内は付けない）
 function heianYadoToast(who,text){const hud=document.getElementById('heianGameHud');if(!hud)return;hud.querySelectorAll('.heian-guard-toast').forEach(e=>e.remove());const el=document.createElement('div');el.className='heian-blessing heian-quest-toast heian-guard-toast';el.setAttribute('role','status');
  const h=document.createElement('strong');h.textContent=heianTrCap(who);const q=document.createElement('p');q.textContent=heianTrText(text);if(heianLang==='en')el.lang='en';el.append(h,q);hud.appendChild(el);const t0=performance.now(),step=()=>{const t=(performance.now()-t0)/4200;el.style.opacity=String(Math.min(1,t*6)*Math.min(1,(1-t)*4));if(t<1)requestAnimationFrame(step);else el.remove();};requestAnimationFrame(step);}
 const HEIAN_LODGINGS={
  rajo:{room:'yado_rajo',who:'羅城門の流れ者',ask:'住む所が無いんだ',
-  match:c=>!c.char&&/^(庶民|人夫|旅人|乞食)$/.test(c.who)&&Math.hypot((c.x??0)-0,(c.z??0)-HEIAN_RAJOMON_Z)<900,
-  offer:()=>'住む所が無い？ …なら、わしらと一緒にこの門の上を使えよ。雨漏りはするし烏もおるが、屋根の下には違いない',door:()=>({x:0,z:HEIAN_RAJOMON_Z-110,r:200}) /* 門の都の側（朱雀大路の南の端）。門の下を通り抜けるたびに札が出ないよう、門の中心からは離す */},
+  /* 🚫 2026-10-13 井内さん「羅城門に行ったけど、上に入れてくれる人がいなかった」: 名前の無い人（!c.char）だけにしていたが、羅城門のまわりの人夫・庶民の体は
+     名前のある住人（羅城門の下の男・番匠の真柄・木運びの乙麻呂・筑紫の使い・陸奥の馬曳き＝bind at:rajomon）が先に使っていて、名前の無い人は400m先の朱雀大路の行列くらいしか残らなかった。
+     ⇒ 楼の下で寝起きしている「羅城門の下の男」（rajomon_otoko）が第一の申し出役。名前の無い人は門から1500以内 */
+  match:c=>c.char?.id==='rajomon_otoko'||(!c.char&&/^(庶民|人夫|旅人|乞食|流れ者)$/.test(c.who)&&Math.hypot((c.x??0)-0,(c.z??0)-HEIAN_RAJOMON_Z)<1500),
+  offer:c=>c?.char?.id==='rajomon_otoko'?'住む所が無い？ わしはこの楼の下で寝起きしとるが、上は雨漏りがひどうて誰も使わん。上を使えよ。烏もおるが、屋根の下には違いない'
+   :'住む所が無い？ …なら、わしらと一緒にこの門の上を使えよ。雨漏りはするし烏もおるが、屋根の下には違いない',door:()=>({x:0,z:HEIAN_RAJOMON_Z-110,r:200}) /* 門の都の側（朱雀大路の南の端）。門の下を通り抜けるたびに札が出ないよう、門の中心からは離す */},
  ichi:{room:'yado_ichi',who:'市の人夫小屋',ask:'寝る所を探している',
   match:c=>{const o=heianOpenMarket(Math.floor(heianClock.day));return(c.char?.id==='ichitsukasa'&&o==='eastMarket')||(c.char?.id==='nishi_toji'&&o==='westMarket');},
   offer:c=>(c.char?.id==='ichitsukasa'?'見回りの途中だ、手短にな。…寝る所が無いのか。':'寝る所か。')+'河岸の荷揚げを手伝うなら、人夫の小屋を使うてよい。その大きな体なら、俵も軽かろう',
@@ -18610,13 +18629,14 @@ const HEIAN_YADO_PLACE_EN={rajo:'the upper floor of Rajomon Gate',ichi:'the mark
 Object.assign(HEIAN_UI_LINES_EN,{'羅城門の流れ者':'Drifters at Rajomon Gate','市の人夫小屋':'Market porters’ hut','下働きの長屋':'Servants’ row house','羅城門の楼上':'Rajomon Gate, upper floor','下働きの長屋の三の間':'Servants’ row house, third room',
  '羅城門の楼上（居候）':'Rajomon Gate, upper floor (your lodging)','市の人夫小屋（居候）':'Market porters’ hut (your lodging)','下働きの長屋（居候）':'Servants’ row house (your lodging)',
  '住む所が無いんだ':'I have nowhere to live','寝る所を探している':'I’m looking for a place to sleep','凧を揚げるのを手伝う':'Help fly the kite','お願いする':'Yes, please','また今度':'Another time','ありがとう':'Thank you',
+ '住む所が無い？ わしはこの楼の下で寝起きしとるが、上は雨漏りがひどうて誰も使わん。上を使えよ。烏もおるが、屋根の下には違いない':'Nowhere to live? I sleep under this gate, but the upper floor leaks so badly nobody uses it. Take it. There are crows, but it’s a roof all the same.',
  '住む所が無い？ …なら、わしらと一緒にこの門の上を使えよ。雨漏りはするし烏もおるが、屋根の下には違いない':'Nowhere to live? …Then use the top of this gate with us. The roof leaks and there are crows, but it’s a roof all the same.',
  '見回りの途中だ、手短にな。…寝る所が無いのか。河岸の荷揚げを手伝うなら、人夫の小屋を使うてよい。その大きな体なら、俵も軽かろう':'I’m on my rounds, so make it quick. …No place to sleep? If you help unload at the riverbank, you can use the porters’ hut. With a body that size, the bales will feel light.',
  '寝る所か。河岸の荷揚げを手伝うなら、人夫の小屋を使うてよい。その大きな体なら、俵も軽かろう':'A place to sleep? If you help unload at the riverbank, you can use the porters’ hut. With a body that size, the bales will feel light.',
  '（糸を持って一緒に走ると、凧がぐんと高く上がった。若君が手を打って喜ぶ。そこへ家司が出てきた）\n家司「若君があのようにお笑いになるのは久しぶりじゃ。ときどき若君のお相手をしてくれるなら、下働きの長屋の三の間を使うがよい」':'(You run with the string, and the kite soars. The young lord claps with delight. Then the steward comes out.)\nSteward: “It has been a long time since the young lord laughed like that. If you will keep him company now and then, you may use the third room of the servants’ row house.”',
  '埃と藁のにおい。…今夜からここが寝床だ':'Dust and straw. …This is your bed from tonight.','俵と縄のにおい。人夫たちが寝息を立てている':'It smells of rice bales and rope. The porters are breathing softly in their sleep.','小さな板の間。壁には若君の凧が掛けてある':'A small plank-floored room. The young lord’s kite hangs on the wall.','今夜からここが寝床だ':'This is your bed from tonight.',
  '身の上を聞く':'Ask about their life','家の者のことを聞く':'Ask about their family','話はこれくらいよ':'That’s all I have to tell.','わしの話なぞ、つまらんよ':'My story? It’s nothing worth hearing.','家の者か…まあ、おる':'My family? …Well, I have one.',
- '若君':'young lord','人夫頭':'head porter','荷揚げ':'Unloading','旅人':'traveler'});
+ '若君':'young lord','人夫頭':'head porter','荷揚げ':'Unloading','旅人':'traveler','流れ者':'drifter'});
 function heianYadoChoices(c){const out=[];for(const[id,L]of Object.entries(HEIAN_LODGINGS))if(!heianYado.at[id]&&L.match(c))out.push([L.ask,'@yado:'+id]);return out.slice(0,1);}
 function heianYadoShow(id,ctx){const d=heianDialog.dlg,c=heianDialog.cand,L=HEIAN_LODGINGS[id];if(!d||!L)return;d.nodes=d.nodes||{};
  d.nodes['__yado_'+id]={t:L.offer(c),c:[['お願いする','@yadoOk:'+id],['ほかの話',d.start||'s'],['また今度',d.nodes.bye?'bye':'$end']]};return heianDialogShow('__yado_'+id,ctx);}
@@ -18624,11 +18644,37 @@ function heianYadoAccept(id){const c=heianDialog.cand,L=HEIAN_LODGINGS[id],door=
  heianYado.at[id]={x:Math.round(door.x),z:Math.round(door.z),r:door.r};heianYadoSave();
  const t=heianJE(L.who+'に寝泊まりできるようになった。入口で「F：入る」','You can now sleep at '+HEIAN_YADO_PLACE_EN[id]+'. Press F at the entrance to go in.');heianNoteAdd({kind:'talk',who:c?.who||'',char:c?.char?.id||null,text:t});heianYadoToast(L.who,t);heianSfxCount?.('yado');return true;}
 // 部屋に入った時（初めての時だけ、一言）
-function heianYadoVisit(id){const n=(heianYado.visits[id]||0)+1;heianYado.visits[id]=n;heianYadoSave();if(n===1){const L=HEIAN_LODGINGS[id];heianYadoToast(L.who,{rajo:'埃と藁のにおい。…今夜からここが寝床だ',ichi:'俵と縄のにおい。人夫たちが寝息を立てている',tei:'小さな板の間。壁には若君の凧が掛けてある'}[id]||'今夜からここが寝床だ');}}
+// 入るたびに「休む」の知らせ（初めての時は部屋の一言のあと）。🚫 休めることを知らせていなかった（2026-10-13 井内さん「長屋に入れたけど、寝れない」）
+function heianYadoVisit(id){const n=(heianYado.visits[id]||0)+1;heianYado.visits[id]=n;heianYadoSave();const L=HEIAN_LODGINGS[id],hint=()=>{if(heianInterior?.def?.yado===id&&!heianYadoSleep.on)heianYadoToast(L.who,HEIAN_YADO_SLEEP.hint[0]);};
+ if(n===1){heianYadoToast(L.who,{rajo:'埃と藁のにおい。…今夜からここが寝床だ',ichi:'俵と縄のにおい。人夫たちが寝息を立てている',tei:'小さな板の間。壁には若君の凧が掛けてある'}[id]||'今夜からここが寝床だ');setTimeout(hint,4400);}else hint();}
+// ---- 部屋の写真の明るさ（2026-10-13 井内さん「昼とか夜と連動したい」）。写真と窓の外の絵は日の当たらない板なので、刻の昼光（heianClockLight.dayLight）で暗くし、
+//  日の出・日の入りの前後（太陽高度 12°より下）は夕焼けの色、夜は月夜の青に寄せる。窓から差し込む光の筋も昼光に合わせて薄くする。0.5秒ごと
+function heianYadoRoomLight(I,force){const now=performance.now();if(!force&&now-I.lightAt<500)return;I.lightAt=now;const L=heianClockLight(heianClock.hour),d=L.dayLight,alt=L.sunAltDeg;
+ const warm=d>0?1-THREE.MathUtils.smoothstep(alt,0,12):0,c=new THREE.Color(1,1,1).lerp(new THREE.Color(1,.62,.42),warm*.75).multiplyScalar(.14+.86*d).lerp(new THREE.Color(.12,.14,.24),(1-d)*.85);
+ for(const m of I.photos)m.material.color.copy(c);const sh=I.group.getObjectByName('部屋・差し込む光');if(sh)sh.visible=d>.15;I.light={day:+d.toFixed(2),warm:+warm.toFixed(2)};}
+// ---- 持ち物を預ける葛籠（2026-10-13 井内さん「持ち物を入れる箱とかも欲しいよね」）。部屋ごとに1つ（D.box）。そばで F→窓で1つずつ預ける・取り出す。記録 heianYado.box[id]
+const HEIAN_YADO_BOX_REACH=36;
+function heianYadoBoxNear(I){const b=I?.def?.box;if(!b)return false;const p=heianWalk.position;return Math.hypot(p.x-(I.cx+b[0]),p.z-(I.cz+b[1]))<HEIAN_YADO_BOX_REACH;}
+function heianYadoBoxPanel(open){const hud=document.getElementById('heianGameHud');if(!hud)return;let el=hud.querySelector('.heian-yado-box');const en=heianLang==='en',id=heianInterior?.def?.yado;
+ if(open===false||!id){el?.remove();return;}if(open===true&&el&&!el.dataset.keep){el.remove();return;}
+ if(!el){el=document.createElement('div');el.className='heian-kemari heian-yado-box'; /* 🚫 heian-bag を付けると、持ち物が増減するたびに heianBagPanel がこの窓を持ち物の札に作り替える */el.setAttribute('role','dialog');el.setAttribute('aria-label',en?'Wicker chest':'葛籠');el.addEventListener('pointerdown',e=>e.stopPropagation());hud.appendChild(el);}
+ delete el.dataset.keep;el.textContent='';const B=heianYado.box[id]||(heianYado.box[id]={}),I0=heianBag.items;
+ const h=document.createElement('div');h.className='km-h';h.textContent=en?'Wicker chest — '+HEIAN_YADO_PLACE_EN[id]:'葛籠（'+HEIAN_LODGINGS[id].who+'）';
+ const col=(title,src,dir)=>{const s=document.createElement('div');s.className='yb-col';const t=document.createElement('p');t.className='bg-n';t.textContent=title;s.appendChild(t);const ul=document.createElement('ul');
+  const it=Object.entries(src).filter(([,k])=>k>0);if(!it.length){const li=document.createElement('li');li.textContent=en?'(empty)':'（空）';ul.appendChild(li);}
+  for(const[n,k]of it){const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.textContent=heianBagName(n)+' ×'+k+'　'+(dir>0?(en?'Store 1':'1つ預ける'):(en?'Take 1':'1つ出す'));
+   b.addEventListener('click',e=>{e.stopPropagation();if(dir>0){if(!(I0[n]>0))return;heianBagAdd(n,-1,false);B[n]=(B[n]||0)+1;}else{if(!(B[n]>0))return;B[n]--;if(!B[n])delete B[n];heianBagAdd(n,1,false);}heianYadoSave();el.dataset.keep='1';heianYadoBoxPanel('refresh');});li.appendChild(b);ul.appendChild(li);}
+  s.appendChild(ul);return s;};
+ const note=document.createElement('p');note.className='bg-n';note.textContent=en?'Stored things stay in this room. Rice and cloth you carry are what you can spend at the market.':'預けた物はこの部屋に残る。市で使えるのは持ち歩いている物だけ';
+ const bs=document.createElement('div');bs.className='km-btns';const x=document.createElement('button');x.type='button';x.textContent=en?'Close':'閉じる';x.addEventListener('click',e=>{e.stopPropagation();el.remove();});bs.append(x);
+ el.append(h,col(en?'You carry':'持ち物',I0,1),col(en?'In the chest':'葛籠の中',B,-1),note,bs);}
+window.__heianYadoBox=(cmd,n)=>{if(cmd==='open')heianYadoBoxPanel(true);const id=heianInterior?.def?.yado;return{near:heianYadoBoxNear(heianInterior),open:!!document.querySelector('.heian-yado-box'),box:id?{...(heianYado.box[id]||{})}:null,bag:{...heianBag.items},light:heianInterior?.light||null};}; // 検証用
 // ---- 朝まで休む（2026-10-13 井内さん「寝るとき、ロボットはゼンマイがあるから寝られないけど、どうしようか」→案3）。
-//  ロボは横にならない。居候の部屋で夜（19時〜翌5時）に Z（「朝まで休む」）で座って止まり、暗転の間に同居の人が背中のゼンマイを巻いてくれて、卯の刻（6時）に起きる。
+//  ロボは横にならない。居候の部屋で夜（18時〜翌5時）に Z（「朝まで休む」）で座って止まり、暗転の間に同居の人が背中のゼンマイを巻いてくれて、卯の刻（6時）に起きる。
 //  羅城門＝旅人・人夫小屋＝人夫が夜のうちに、長屋＝若君が朝いちばんに来て巻く。起きた朝はゼンマイが勢いよく回る（heianKeyWind）。言葉と巻く人は【創作】
-const HEIAN_YADO_SLEEP=Object.freeze({night:[19,5],wake:6,
+const HEIAN_YADO_SLEEP=Object.freeze({night:[18,5],wake:6,
+ nap:['（壁ぎわに座って目の灯を落とし、日が傾くのを待つ）','(Sitting by the wall with its eye-lights dimmed, the Iron Child waits for the sun to sink.)'],dusk:['……日が暮れてきた。夜は「朝まで休む」で、朝まで休める','…Evening has come. At night, “Rest till morning” lets you sleep until dawn.'],
+ hint:['「休む」（Z）で、夜は朝まで、昼は日暮れまで休める','“Rest” (Z): at night until morning, by day until evening.'],
  lines:{rajo:[['旅人','夜中に目の灯が消えかけとったでな。背中のねじを巻いたら、ぴかりと戻ったわい','Your eye-lights were going out in the night. I wound the screw on your back and they blinked right back on.'],['旅人','止まっとったぞ。背中の鍵、ぎりぎりまで巻いといた。…これで合うとるのか？','You had stopped. I wound the key on your back as far as it goes. …That is right, isn’t it?'],['庶民','烏より先に起きたか。夜のうちに巻いといてやったぞ','Up before the crows? I wound you up during the night.']],
   ichi:[['人夫','夜明け前に巻いといた。俵を担ぐより、よっぽど軽い仕事じゃ','I wound you before dawn. Far lighter work than hauling bales.'],['人夫','背中の鍵を回すとキリキリ鳴るのが面白うてな。皆で代わる代わる巻いたぞ','That key on your back clicks so nicely when you turn it. We all took turns winding it.'],['人夫','よう止まって寝とったのう。巻いといたから、今日も荷揚げを頼むぞ','You slept still as a post. You’re wound up, so give us a hand with the unloading again today.']],
   tei:[['若君','おはよう、鉄の童！ わたしが巻いたんじゃ。…乳母には内緒ぞ','Good morning, Iron Child! I wound you up myself. …Don’t tell my nurse.'],['若君','朝いちばんに来て巻いてやったぞ。今日も凧を揚げような','I came first thing this morning to wind you up. Let’s fly the kite again today.'],['若君','鉄の童は、巻かぬと動かぬのじゃな。明日もわたしが巻いてやる','So you can’t move unless you’re wound up, Iron Child. I’ll wind you again tomorrow.']]},
@@ -18636,12 +18682,26 @@ const HEIAN_YADO_SLEEP=Object.freeze({night:[19,5],wake:6,
  wind:['……夜のうちに、だれかが背中の鍵を回している。キリ、キリ、キリ……','…In the night, someone is turning the key on its back. Click, click, click…'],
  windTei:['……夜が明けるころ、廊を駆けてくる小さな足音。キリ、キリ、キリ……','…As dawn breaks, small footsteps come running down the corridor. Click, click, click…']});
 // 休んだ時の文の英訳を訳の表へ（聞き書き帳を開き直しても英語で出るよう、読み込み時に全部足す）
-{const S=HEIAN_YADO_SLEEP;for(const[ja,en]of[S.dark,S.wind,S.windTei])HEIAN_UI_LINES_EN[ja]=en;
+{const S=HEIAN_YADO_SLEEP;for(const[ja,en]of[S.dark,S.wind,S.windTei,S.nap,S.dusk,S.hint])HEIAN_UI_LINES_EN[ja]=en;
  for(const[id,L]of Object.entries(S.lines))for(const[who,ja,en]of L){const W=HEIAN_UI_LINES_EN[who]||who,head=W.charAt(0).toUpperCase()+W.slice(1);HEIAN_UI_LINES_EN[who+'「'+ja+'」']=head+': “'+en+'”';
   HEIAN_UI_LINES_EN[{rajo:'羅城門の流れ者',ichi:'市の人夫小屋',tei:'下働きの長屋'}[id]+'で一晩休んだ。'+who+'「'+ja+'」']='Spent the night at '+{rajo:'the upper floor of Rajomon Gate',ichi:'the market porters’ hut',tei:'the servants’ row house'}[id]+'. '+head+': “'+en+'”';}}
 const heianYadoSleep={on:false,el:null,n:0};
-function heianYadoCanSleep(){const I=heianInterior,h=heianClock.hour,N=HEIAN_YADO_SLEEP.night;return!!(I?.def?.type==='room'&&I.def.yado&&!heianYadoSleep.on&&!heianDialog.open&&!heianPhotoMode&&(h>=N[0]||h<N[1]));}
-function heianYadoSleepStart(){if(!heianYadoCanSleep())return false;const id=heianInterior.def.yado,S=heianYadoSleep,hud=document.getElementById('heianGameHud');if(!hud)return false;
+// 🚫 2026-10-13 井内さん「貴族の屋敷の長屋に入れたけど、寝れない」: 初版は夜（19〜5時）だけ「朝まで休む」を出していて、昼に入ると休む手が何も無かった（帯にも出ない・知らせも無い）。
+//  ⇒ 部屋にいればいつでも休める。夜（18時〜翌5時）は朝まで（ゼンマイを巻いてもらう）、昼は「日暮れまで休む」で酉の刻（18時）まで。部屋に入るたび（1回ごと）に知らせる
+const heianYadoNight=()=>{const h=heianClock.hour,N=HEIAN_YADO_SLEEP.night;return h>=N[0]||h<N[1];};
+function heianYadoCanSleep(){const I=heianInterior;return!!(I?.def?.type==='room'&&I.def.yado&&!heianYadoSleep.on&&!heianDialog.open&&!heianPhotoMode);}
+const heianYadoRestLabel=()=>heianYadoNight()?(heianLang==='en'?'Rest till morning':'朝まで休む'):(heianLang==='en'?'Rest till evening':'日暮れまで休む');
+// 昼の休み: 座って目の灯を落とし、日暮れ（18時）まで時を進める。巻く人は来ない
+function heianYadoNapStart(){const S=heianYadoSleep,hud=document.getElementById('heianGameHud');if(!hud)return false;S.on=true;heianInteriorButton(null);if(!heianRobotSitting())heianRobotAct('sit',{sleep:true});
+ const el=document.createElement('div');el.className='heian-yado-night';el.setAttribute('role','status');if(heianLang==='en')el.lang='en';
+ el.style.cssText='position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:#140d06;opacity:0;transition:opacity .9s;pointer-events:auto';
+ const p=document.createElement('p');p.style.cssText='max-width:720px;margin:0 24px;color:#ece4d0;font-size:18px;line-height:1.9;text-align:center;text-wrap:balance;transition:opacity .5s';el.appendChild(p);
+ el.addEventListener('pointerdown',e=>e.stopPropagation());hud.appendChild(el);S.el=el;const say=t=>{p.style.opacity='0';setTimeout(()=>{p.textContent=heianTrText(t);p.style.opacity='1';},350);},at=(ms,f)=>setTimeout(()=>{try{f();}catch(e){console.warn(e);}},ms);
+ at(1200,()=>{el.style.opacity='.92';});at(2000,()=>say(HEIAN_YADO_SLEEP.nap[0]));
+ at(4400,()=>{const d=Math.floor(heianClock.day),E=HEIAN_YADO_SLEEP.night[0];heianClock.hour=E;applyHeianTimeOfDay(E,d);heianClockSyncUI?.();heianSaveDate(true);say(HEIAN_YADO_SLEEP.dusk[0]);});
+ at(6800,()=>{el.style.opacity='0';const rt=heianTinRobotRuntime;if(rt)heianRobotStandUp(rt);});
+ at(7800,()=>{el.remove();S.el=null;S.on=false;heianActionBarSync();});return true;}
+function heianYadoSleepStart(){if(!heianYadoCanSleep())return false;if(!heianYadoNight())return heianYadoNapStart();const id=heianInterior.def.yado,S=heianYadoSleep,hud=document.getElementById('heianGameHud');if(!hud)return false;
  S.on=true;heianInteriorButton(null);if(!heianRobotSitting())heianRobotAct('sit',{sleep:true});
  const el=document.createElement('div');el.className='heian-yado-night';el.setAttribute('role','status');
  el.style.cssText='position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:#05070c;opacity:0;transition:opacity .9s;pointer-events:auto';
@@ -19447,6 +19507,20 @@ window.__heianArchery=()=>({open:heianArchery.open,phase:heianArchery.phase,wind
 // 検証用: 狙いと風と引き分けを決めて1本射る（hold 秒引いてから放つ）
 window.__heianArcheryTest=(i=0,o={})=>{const S=heianArcherySites[i],A=heianArchery;if(!S)return false;if(!A.open&&!heianArcheryOpen(S))return false;if(A.phase==='done')heianArcheryPress();if(A.phase!=='aim')return false;
  A.aimX=o.aimX??0;A.aimY=o.aimY??0;if(o.wind!=null)A.wind=o.wind;heianArcheryPress();A.t0=performance.now()-1000*(o.hold??2);heianArcheryPress();return true;};
+// 左上の地図に居候先の印（2026-10-13 井内さん「居候先をマップでもみれるといいね」）。寝泊まりを許された所（heianYado.at）に家の形の印。押すとそこへ歩いて行く（遠ければ地点の札と同じ選ぶ札）
+let heianYadoMapAt=0;
+function heianYadoMapSync(force){const now=performance.now();if(!force&&now-heianYadoMapAt<500)return;heianYadoMapAt=now;
+ const map=document.querySelector('.heian-map-player')?.parentElement;if(!map)return;const en=heianLang==='en';
+ for(const[id,L]of Object.entries(HEIAN_LODGINGS)){const A=heianYado.at[id];let m=map.querySelector('.heian-map-yado[data-yado="'+id+'"]');
+  if(!A||!heianWalk.active){if(m)m.hidden=true;continue;}
+  if(!m){m=document.createElement('button');m.type='button';m.className='heian-map-yado';m.dataset.yado=id;m.textContent='⌂';
+   /* 🚫 2026-10-13 井内さん「居候できる場所をマップで選べない」: 初版は押すと黙って歩き出すだけ（ほかの印は「歩いて行く／すぐ移る」を選べる）。⇒ ほかの地点と同じ選ぶ札（heianTripChoice）を通す。
+      部屋の中から押したら、外へ出てから。すぐ移る＝入口の前に立つ */
+   m.addEventListener('pointerdown',e=>e.stopPropagation());m.addEventListener('click',e=>{e.stopPropagation();const B=heianYado.at[id];if(!B||!heianWalk.active)return;if(heianInterior)heianInteriorExit(true,'map');
+    const nm=heianLang==='en'?HEIAN_YADO_PLACE_EN[id]:L.who,pt={id:'yado-'+id,name:nm,x:B.x,z:B.z,spawn:{x:B.x,z:B.z},jump:()=>{if(heianDialog.open)heianDialogClose(true);heianInteriorPlace([B.x,B.z+60],[B.x,B.z]);heianWalkAmbientAnchor=null;syncHeianWalkAmbient(true);}};
+    if(!heianTripChoice(pt,heianGameSelectedId,null)){if(!heianWalkToPlace(pt))pt.jump();}});map.appendChild(m);}
+  const t=(en?'Your lodging: '+HEIAN_YADO_PLACE_EN[id]:'居候先：'+L.who);if(m.title!==t){m.title=t;m.setAttribute('aria-label',t);}
+  m.hidden=false;m.style.left=heianMapPctX(A.x)+'%';m.style.top=heianMapPctZ(A.z)+'%';}}
 // 左上の地図に、おまかせの行き先の印（2026-10-20 井内さん「左上のマップに目的地が出てもいい」）。現在地の点と同じ座標の写し方（heianMapPctX/Z）
 function heianOmakaseMapSync(force){const O=heianOmakase,now=performance.now();if(!force&&now-O.mapAt<300)return;O.mapAt=now;
  const map=document.querySelector('.heian-map-player')?.parentElement;if(!map)return;let m=map.querySelector('.heian-map-omakase');
@@ -26767,7 +26841,10 @@ function createHeianCourtLifeRuntime(){
      ['eshi',4200,9990,'絵所の見習い','定位置の庶民',laborRobe2,Math.PI,false],
      ['ninnaji',-4200,9990,'仁和寺の寺男','定位置の庶民',laborRobe2,0,false],
      ['mino_otoko',-13500,30200,'美濃の男','定位置の庶民',laborRobe2,Math.PI/2,false],
-     ['masago',22350,27250,'河原の洗い女','定位置の女',womanRobe,-Math.PI/2,true]]){
+     ['masago',22350,27250,'河原の洗い女','定位置の女',womanRobe,-Math.PI/2,true],
+     /* 2026-10-13 井内さん「羅城門の下に人がいなくて上に行けない」: 楼上を貸してくれる「羅城門の下の男」は昼（8〜16時）は担ぎに出ていて、門の下に誰もいなかった。
+        ⇒ 名前の無い流れ者を1人、門の下の東の柱の陰にいつも座らせる（who '流れ者'＝名前のある住人の bind に取られない・HEIAN_LODGINGS.rajo が申し出る）。位置は推定 */
+     [null,70,HEIAN_RAJOMON_Z-40,'門の下の流れ者','流れ者',laborRobe2,-Math.PI/2,false]]){
      const st=resolveHeianWalkPoint(x0,z0,8)||{x:x0,z:z0};
      const q=buildHeianStreetPerson(k,mats,robe,nm,{hat:female?null:'eboshi'});
      if(female){k.add(q.group,k.geometry.cylinder,skirt,[0,4,0],[3.5,.5,3.5]);k.add(q.group,k.geometry.sphere,k.mats.dark,[0,13.5,.8],[2,2.5,1.5]);}
@@ -28725,15 +28802,15 @@ const HEIAN_INTERIORS={
  //  入口は鉄の童が居候を許された所（heianYado の記録・heianLodgingOffer）。tags＝台詞の場所タグ。【創作】部屋の形と中身（当時の楼上・人夫の小屋・長屋の室の様子は推定）
  yado_rajo:{type:'room',yado:'rajo',name:'羅城門の楼上',label:'羅城門の楼上（居候）',tags:['rajomon'],W:240,D:150,H:72,floor:'plank',wall:0x6a4a36,ruin:true,pitch:-.62,spawn:[0,40],look:[0,-30],
   posts:[[-90,-45],[0,-45],[90,-45],[-90,35],[90,35]],
-  clutter:[['mushiro',-70,-30,0,1],['tsuzura',-96,-58,15,1],['wara',95,-50,0,1.3],['wara',-100,45,40,1],['kawara',40,20,0,1],['kawara',60,-10,70,.8],['kame',105,10,0,1],['hibachi',-40,0,0,1],['cobweb',-118,-72,0,1],['cobweb',118,-72,90,1],['crow',30,-72,0,1],['hole',20,-15,0,1],['daiza',0,-62,0,1]],
+  clutter:[['mushiro',-70,-30,0,1],['tsuzura',-96,-58,15,1],['wara',95,-50,0,1.3],['wara',-100,45,40,1],['kawara',40,20,0,1],['kawara',60,-10,70,.8],['kame',105,10,0,1],['hibachi',-40,0,0,1],['cobweb',-118,-72,0,1],['cobweb',118,-72,90,1],['crow',30,-72,0,1],['hole',20,-15,0,1],['daiza',0,-62,0,1]],box:[-96,-58],
   people:[['庶民',-104,-20,60,'sleep'],['旅人',80,-25,-100,'sit']]},
  yado_ichi:{type:'room',yado:'ichi',name:'市の人夫小屋',label:'市の人夫小屋（居候）',tags:['eastMarket','westMarket'],W:190,D:140,H:58,floor:'earth',lowBack:true,platform:[-95,95,-70,-20,7],wall:0x7a6248,pitch:-.62,spawn:[0,45],look:[0,-20],
   posts:[[-94,-68],[94,-68],[-94,68],[94,68],[0,-68]],
-  clutter:[['mushiro',-55,-45,0,1],['mushiro',0,-45,0,1],['mushiro',55,-45,0,1],['tawara',80,20,0,1],['tawara',92,40,0,1],['tawara',70,48,90,1],['nawa',-80,30,0,1],['tenbin',-92,0,0,1],['waraji',-40,-68,0,1],['kame',30,40,0,1.1],['kamado',-78,55,0,1],['mushiro',-20,15,90,.8]],
+  clutter:[['mushiro',-55,-45,0,1],['mushiro',0,-45,0,1],['mushiro',55,-45,0,1],['tawara',80,20,0,1],['tawara',92,40,0,1],['tawara',70,48,90,1],['nawa',-80,30,0,1],['tenbin',-92,0,0,1],['waraji',-40,-68,0,1],['kame',30,40,0,1.1],['kamado',-78,55,0,1],['mushiro',-20,15,90,.8],['tsuzura',-84,-58,0,1]],box:[-84,-58] /* 持ち物を預ける葛籠（2026-10-13） */,
   people:[['人夫',-55,-42,10,'sleep'],['人夫',55,-40,-10,'sit'],['人夫',60,25,200,'sit']]},
  yado_tei:{type:'room',yado:'tei',name:'下働きの長屋の三の間',label:'下働きの長屋（居候）',tags:['nobles'],W:170,D:130,H:60,floor:'plank',platform:[-85,85,-65,30,6],earthFront:true,wall:0x8a7356,pitch:-.62,spawn:[0,50],look:[0,-15],
   posts:[[-84,-63],[84,-63],[-84,63],[84,63]],
-  clutter:[['mushiro',-30,-30,0,1],['tsuzura',-70,-52,0,1],['ikou',60,-56,0,1],['tsukue',20,-45,0,1],['todai',-5,-50,0,1],['kite',0,-63,0,1],['tana',-78,-10,90,1],['kamado',-62,50,0,1],['kame',-30,52,0,1],['houki',70,52,0,1]],
+  clutter:[['mushiro',-30,-30,0,1],['tsuzura',-70,-52,0,1],['ikou',60,-56,0,1],['tsukue',20,-45,0,1],['todai',-5,-50,0,1],['kite',0,-63,0,1],['tana',-78,-10,90,1],['kamado',-62,50,0,1],['kame',-30,52,0,1],['houki',70,52,0,1]],box:[-70,-52],
   people:[]}
 };
 // 屋内の部品を作る道具（材質は色ごとに1つ）
@@ -28917,6 +28994,10 @@ function heianInteriorBuildRoom(D){
  // 外の景色（2026-10-13 井内さん「外の景色も雰囲気おこうか」）。🚫 外が茶色一色の地面で殺風景だった。歩ける所（部屋の中）は変えない
  const gable=(x,z,w,d,y,rise,hex,name)=>{const a=Math.atan2(rise,d/2),L=Math.hypot(rise,d/2)+4;for(const s of[-1,1]){const m=box(x,z+s*d/4,w+8,L,0,1.8,hex,name);m.position.y=y+rise/2;m.rotation.x=s*a;}box(x,z,w+8,3,y+rise,2.4,0x3a3028,name+'の棟');};
  const rnd=(()=>{let v=D.W*7+D.D;return()=>{v=(v*16807)%2147483647;return v/2147483647;};})();
+ // 写真の板（2026-10-13 井内さん「長屋などの外も」→1と2・「昼とか夜と連動したい」）。日の当たらない板なので、明るさと夕焼けの色は heianYadoRoomLight が刻ごとに掛ける（photos に入れる）
+ //  uv＝[offsetX,offsetY,repeatX,repeatY]（窓の外の絵は写真の一部を切り出す）
+ const photos=[],photoAt=(name,w,h,x,y,z,label,uv)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:0xffffff,fog:false}));m.name=label;m.position.set(x,y,z);m.castShadow=m.receiveShadow=false;g.add(m);photos.push(m);
+  heianYadoBgTexture(name,t=>{let q=t;if(uv){q=t.clone();q.offset.set(uv[0],uv[1]);q.repeat.set(uv[2],uv[3]);q.needsUpdate=true;}m.material.map=q;m.material.needsUpdate=true;});return m;};
  if(D.yado==='rajo'){ /* 楼の上: まわりに縁と高欄、その外へ下の層の瓦屋根が下り、ずっと下に都の屋根が霞む */
   box(0,0,4000,4000,-196,1,0x9a958a,'楼の下の都',{emissive:0x3a3832});
   box(0,0,W+90,Dp+90,-4,2,0x6a5038,'楼上の縁');
@@ -28928,7 +29009,7 @@ function heianInteriorBuildRoom(D){
   for(const s of[-1,1]){const m=box(s*(hw+45+L/2*Math.cos(a)),0,L,Dp+90,0,2,tile,'下の層の瓦屋根');m.position.y=-6-L/2*Math.sin(a);m.rotation.z=-s*a;}
   /* 奥（−z）＝北＝都の内（2026-10-13 井内さん「羅城門の背景は平安京の街並みでもいいのでは？撮影しておいた画像をぼやかして入れる」）。
      羅城門の楼の高さから北を撮った都の写真（yado-rajo-bg.jpg・CadKit/heian-yado-bg.py が撮ってぼかす）を、破れた壁の向こうに大きな板で立てる。写真の地平（上から35%）を床の高さに合わせる＝見下ろすカメラの目の高さ。🚫 箱の町家と丸い北山は作り物に見えた（撮影 qy1・sy1） */
-  {const m=add(new THREE.PlaneGeometry(3200,1800),0xb8c8d8,0,-250,-720,'楼から見る都（写真）',{fog:false});m.material=new THREE.MeshBasicMaterial({color:0xffffff,fog:false});m.castShadow=m.receiveShadow=false;heianYadoBgTexture(t=>{m.material.map=t;m.material.needsUpdate=true;});}}
+  photoAt('rajo',3200,1800,0,-250,-720,'楼から見る都（写真）');}
  else if(D.yado==='ichi'){ /* 市の河岸: 裏に堀川と荷舟、左に隣の小屋、右に俵を積んだ差し掛け */
   box(0,0,4000,4000,-6,1,0x8a7a60,'部屋・外の地面',{emissive:0x241e16});
   box(0,-hd-75,W+600,60,-5,2,HEIAN_WATER_COLOR,'裏の堀川',{emissive:0x10202a});for(const s of[-1,1])box(0,-hd-75+s*32,W+600,4,-5,4,0x7a6a52,'堀川の岸の板');
@@ -28936,7 +29017,12 @@ function heianInteriorBuildRoom(D){
   box(-hw-85,-10,120,110,0,48,0x7a6248,'隣の人夫小屋');gable(-hw-85,-10,120,110,48,26,0x6a5a45,'隣の小屋の板屋根');box(-hw-85,45.5,22,1,0,34,0x2a1e16,'隣の小屋の戸口');
   for(const[x,z]of[[hw+30,-50],[hw+90,-50],[hw+30,30],[hw+90,30]])cyl(x,z,1.6,0,40,0x6e5236,'差し掛けの柱',g,6);{const m=box(hw+60,-10,80,96,0,2,0x6a5a45,'差し掛けの屋根');m.position.y=42;m.rotation.z=.18;}
   for(let k=0;k<9;k++){const m=add(new THREE.CylinderGeometry(6,6,16,10),0xc2a868,hw+38+(k%3)*16,6+Math.floor(k/3)*11,-30+((k*5)%3)*24,'積んだ俵');m.rotation.x=Math.PI/2;}
-  for(let k=0;k<4;k++)box(-hw+20+k*40,hd+60,30,18,0,1,0xb39c66,'干した筵');}
+  for(let k=0;k<4;k++)box(-hw+20+k*40,hd+60,30,18,0,1,0xb39c66,'干した筵');
+  /* 近く（1）: 河岸の道の荷車と、隣の小屋の先にもう1軒。遠く（2）: 堀川越しの東の岸の町並みの写真（下の3割の堀川は切ってある＝作り物の堀川の向こう岸に写真の岸を合わせる） */
+  box(hw+150,40,130,100,0,44,0x7a6248,'並びの人夫小屋');gable(hw+150,40,130,100,44,24,0x6a5a45,'並びの小屋の板屋根');
+  {const cx=-hw-30,cz=hd+95;box(cx,cz,16,34,9,2,0x8a6f4d,'河岸の荷車');for(const s of[-1,1])cyl(cx+s*9,cz+6,8,8,2,0x3a3229,'荷車の輪',g,10);for(let k=0;k<2;k++){const m=add(new THREE.CylinderGeometry(5,5,13,10),0xc2a868,cx,15,cz-6+k*11,'荷車の俵');m.rotation.z=Math.PI/2;}}
+  /* 🚫 初版は板を部屋のすぐ裏（-hd-170・幅110m）に立てて、写真の手前の道と人が大きく写った（撮影 rm3）。羅城門と同じく遠く（-720）に大きく立て、写真の地平（上から60%）を床の高さに */
+  photoAt('ichi',1500,594,0,179,-420,'堀川越しの町並み（写真）');}
  else if(D.yado==='tei'){ /* 邸の下働きの長屋: 左右に続く隣の間（屋根つき）、裏に邸の築地と松、表に井戸と物干し */
   box(0,0,4000,4000,-6,1,0x9a8a6a,'部屋・外の地面',{emissive:0x241e16});
   for(const s of[-1,1]){const x=s*(hw+92);box(x,0,176,Dp,0,H,D.wall,'隣の間');gable(x,0,176,Dp,H,30,0x6a5a45,'長屋の板屋根');
@@ -28945,7 +29031,11 @@ function heianInteriorBuildRoom(D){
   for(const m of heianPineMeshes([{x:-70,z:-hd-140,y:0,rot:.4,s:1.3},{x:110,z:-hd-150,y:0,rot:2,s:1.1}],'邸の庭の松'))g.add(m);
   cyl(-hw-30,hd+40,9,0,10,0x7a6a58,'井戸の井筒',g,12);for(const s of[-1,1])box(-hw-30+s*11,hd+40,2,2,0,28,0x6e5236,'井戸の柱');box(-hw-30,hd+40,26,2,26,2,0x6e5236,'井戸の桁');
   for(const x of[hw+20,hw+90])box(x,hd+45,2,2,0,30,0x6e5236,'物干しの柱');box(hw+55,hd+45,74,1.2,29,1.2,0x8a6a40,'物干しの竿');
-  for(const[x,c]of[[hw+35,0x5a6e8a],[hw+60,0xd8d0b8],[hw+80,0x8a5a4a]])box(x,hd+45,16,.5,12,17,c,'干した衣');}
+  for(const[x,c]of[[hw+35,0x5a6e8a],[hw+60,0xd8d0b8],[hw+80,0x8a5a4a]])box(x,hd+45,16,.5,12,17,c,'干した衣');
+  /* 近く（1）: 長屋の前を掃く下働きの箒と桶、築地の内の植え込み。遠く（2）: 邸の庭と寝殿の写真（夏・下の2割の長屋の屋根は切ってある）を築地の向こうに */
+  box(-hw-150,hd+30,2,2,0,30,0x8a6f4d,'立て掛けた箒').rotation.z=.25;cyl(hw+130,hd+20,6,0,9,0x8a6a44,'水桶',g,10);
+  for(const[x,z,s]of[[-160,-hd-120,1],[40,-hd-118,.8],[230,-hd-124,1.1]]){const m=add(new THREE.SphereGeometry(16*s,8,6),0x4f6a3a,x,10*s,z,'築地の内の植え込み');m.scale.y=.7;}
+  photoAt('tei',2400,1091,0,143,-720,'邸の庭と寝殿（写真）');} /* 地平（上から47.5%）を床の高さに＝塀の上に寝殿の屋根。🚫 初版（-hd-300・下端を地面）は池ばかり大きく写った（撮影 rm2） */
  else box(0,0,4000,4000,-6,1,0x8a7a60,'部屋・外の地面',{emissive:0x241e16});
  if(D.floor==='earth'||D.earthFront)picks.push(box(0,0,W,Dp,-2,2,0x8c7458,'部屋・土間'));
  else{picks.push(box(0,0,W,Dp,-2,2,0x8a6a48,'部屋・板床'));for(let x=-hw+12;x<hw;x+=12)box(x,0,.5,Dp-1,0,.12,D.ruin?0x2a1e16:0x5a4430,'部屋・板の継ぎ目');}
@@ -28953,13 +29043,18 @@ function heianInteriorBuildRoom(D){
   box((P[0]+P[1])/2,P[3]+.6,P[1]-P[0],1.4,0,P[4]+.2,DARK,'部屋・上がり框');floors.push({minX:P[0],maxX:P[1],minZ:P[2],maxZ:P[3],top:P[4],name:'板の間'});}
  // 壁: 奥と左右（板壁＋押縁）。手前は外す。奥の壁に窓（連子・光の筋）
  // 奥の壁: 羅城門は板が破れて外（下の層の屋根と都）が見える／市の小屋は河岸の側が腰板だけ（堀川と荷舟が見える）。🚫 全部を高い壁にすると外の景色が隠れた（撮影 oy1・oy2）
- if(D.ruin){const g0=10,g1=90;box((-hw-4+g0)/2,-hd-2,g0+hw+4,4,0,H,D.wall,'部屋・奥の板壁');box((g1+hw+4)/2,-hd-2,hw+4-g1,4,0,H,D.wall,'部屋・奥の板壁');box((g0+g1)/2,-hd-2,g1-g0,4,0,12,D.wall,'部屋・奥の板壁の残り');box((g0+g1)/2,-hd-2,g1-g0,4,H-10,10,D.wall,'部屋・奥の板壁の残り');
+ // 窓（2026-10-13 井内さん「窓からは景色が見えてほしいな」）: 奥の壁の窓は穴を開け（🚫 前は窓の奥に黒い板を貼っていた）、すぐ外に写真の一部を切り出した絵を立てる＝連子の間から外が見える
+ const WIN=!D.lowBack?{x:D.ruin?-50:40,y:H*.45,w:44,h:20}:null;
+ const wallX=(x0,x1,name)=>{if(!WIN||WIN.x-WIN.w/2<x0||WIN.x+WIN.w/2>x1){box((x0+x1)/2,-hd-2,x1-x0,4,0,H,D.wall,name);return;}const a=WIN.x-WIN.w/2,b=WIN.x+WIN.w/2;
+  box((x0+a)/2,-hd-2,a-x0,4,0,H,D.wall,name);box((b+x1)/2,-hd-2,x1-b,4,0,H,D.wall,name);box(WIN.x,-hd-2,WIN.w,4,0,WIN.y,D.wall,name+'（窓の下）');box(WIN.x,-hd-2,WIN.w,4,WIN.y+WIN.h,H-WIN.y-WIN.h,D.wall,name+'（窓の上）');};
+ if(D.ruin){const g0=10,g1=90;wallX(-hw-4,g0,'部屋・奥の板壁');box((g1+hw+4)/2,-hd-2,hw+4-g1,4,0,H,D.wall,'部屋・奥の板壁');box((g0+g1)/2,-hd-2,g1-g0,4,0,12,D.wall,'部屋・奥の板壁の残り');box((g0+g1)/2,-hd-2,g1-g0,4,H-10,10,D.wall,'部屋・奥の板壁の残り');
   for(const[x,h,r]of[[22,30,.12],[38,18,-.2],[64,26,.18],[80,14,-.1]]){const m=box(x,-hd-2,7,3,12,h,D.wall,'破れた板');m.rotation.z=r;}}
  else if(D.lowBack){box(0,-hd-2,W+8,4,0,20,D.wall,'部屋・奥の腰板');for(let x=-hw;x<=hw;x+=W/4)cyl(x,-hd-2,2,0,H,0x6e5236,'部屋・河岸の柱',g,8);box(0,-hd-2,W+8,3,H-14,6,0x3a2c22,'部屋・河岸の上の板');}
- else box(0,-hd-2,W+8,4,0,H,D.wall,'部屋・奥の板壁');
+ else wallX(-hw-4,hw+4,'部屋・奥の板壁');
  for(const s of[-1,1])box(s*(hw+2),0,4,Dp,0,H,D.wall,'部屋・脇の板壁');
  if(!D.lowBack)for(let x=-hw+16;x<hw;x+=16)if(!(D.ruin&&x>8&&x<92))box(x,-hd+.4,1.4,1.2,0,H-2,DARK,'部屋・押縁');
- if(!D.lowBack){const wx=D.ruin?-50:40,wy=H*.45;box(wx,-hd+.2,44,.6,wy,20,0x1d140e,'部屋・窓の奥');for(let k=-2;k<=2;k++)box(wx+k*8,-hd+1,1.6,1.4,wy,20,WOOD,'部屋・連子');
+ if(!D.lowBack){const wx=WIN.x,wy=WIN.y;for(let k=-2;k<=2;k++)box(wx+k*8,-hd+1,1.6,1.4,wy,20,WOOD,'部屋・連子');
+  photoAt(D.yado,WIN.w+12,WIN.h+10,wx,wy+WIN.h/2,-hd-7,'部屋・窓の外（写真）',D.yado==='rajo'?[.30,.46,.30,.17]:[.38,.34,.30,.2]);
   const shaft=add(new THREE.PlaneGeometry(40,H*1.1),0xfff0c8,wx,wy*.6,-hd+30,'部屋・差し込む光',{transparent:true,opacity:.14,depthWrite:false,side:THREE.DoubleSide,emissive:0xffe0a0});shaft.rotation.x=-.9;shaft.castShadow=shaft.receiveShadow=false;}
  // 柱と梁（羅城門は太い丸柱の朱が剥げた色）
  for(const[x,z]of D.posts||[])cyl(x,z,D.ruin?4.4:2.4,0,H,D.ruin?0x8a4a34:WOOD,'部屋・柱',g,D.ruin?14:8);
@@ -29000,7 +29095,7 @@ function heianInteriorBuildRoom(D){
   if(pose==='sleep'){const b=add(new THREE.CylinderGeometry(3.4,4,13,10),c,0,3.4,0,who+'・衣',null,G);b.rotation.x=Math.PI/2;add(new THREE.SphereGeometry(2.2,10,8),skin,0,3.2,8.6,who+'・顔',null,G);add(new THREE.BoxGeometry(14,1.4,20),0xb39c66,0,.7,1,who+'・筵',null,G);head=8;}
   else{add(new THREE.CylinderGeometry(3.6,5.4,7,10),c,0,3.5,0,who+'・衣',null,G);add(new THREE.SphereGeometry(2.2,10,8),skin,0,9.6,.2,who+'・顔',null,G);add(new THREE.BoxGeometry(2.6,3.4,2.8),0x15110e,0,12.6,-.2,who+'・烏帽子',null,G);head=14;}
   block(x-7,x+7,z-7,z+7,'人');people.push({id:null,who,x,z,headY:y+head+3,pose});}
- return{group:g,floors,blocks,picks,people};}
+ return{group:g,floors,blocks,picks,people,photos};}
 const heianInteriorBuilt={};
 // 屋内の Group を作る（邸の中心が原点の相対座標）。返す floors＝床の矩形と天端、blocks＝通れない矩形、picks＝クリックで歩く先の面、people＝人の位置
 function heianInteriorBuild(id){
@@ -29121,7 +29216,7 @@ function heianInteriorEnter(id,force=false){
  built.group.position.set(cx,baseY,cz);scene.add(built.group);
  const hidden=new Map();for(const o of heianInteriorHideList()){hidden.set(o,o.visible);o.visible=false;}
  heianDialogClose(true);
- heianInterior={id,def:D,cx,cz,baseY,group:built.group,floors:built.floors,blocks:built.blocks,picks:built.picks,hidden,returnTo:{x:p.x,z:p.z},
+ heianInterior={id,def:D,cx,cz,baseY,group:built.group,floors:built.floors,blocks:built.blocks,picks:built.picks,photos:built.photos||[],lightAt:-1,hidden,returnTo:{x:p.x,z:p.z},
   people:built.people.map(q=>({...q,x:q.x+cx,z:q.z+cz,headY:baseY+q.headY}))};
  heianInteriorPlace([cx+D.spawn[0],cz+D.spawn[1]],[cx+D.look[0],cz+D.look[1]]);if(D.pitch)heianWalk.setPitch(D.pitch);heianSpeech.lastScan=0;if(D.yado)heianYadoVisit(D.yado);return true;}
 let heianInteriorLastExit=null;
@@ -29167,6 +29262,9 @@ function heianInteriorTick(){
   {if(!I.roofIn){I.roofIn=[];I.group.traverse(o=>{if(/^大極殿・(化粧屋根裏|垂木|母屋の桁|棟木)$/.test(o.name))I.roofIn.push(o);});}
    if(I.roofIn.length){const c=camera.position,lx=c.x-I.cx,lz=c.z-I.cz,b=(()=>{const q=I.roofBox||(I.roofBox=new THREE.Box3());q.makeEmpty();const r=I.roofIn[0];r.geometry.computeBoundingBox();q.copy(r.geometry.boundingBox).applyMatrix4(r.matrixWorld);return q;})()/* 🚫 最初の1回だけ測って覚えたら、屋内の層を置く前（原点）の箱のままで、中にいても屋根裏が消えた（撮影 dai-in4） */,inside=c.x>b.min.x&&c.x<b.max.x&&c.z>b.min.z&&c.z<b.max.z&&c.y<b.max.y;
     for(const o of I.roofIn)if(o.visible!==inside)o.visible=inside;}}
+  if(I.def.type==='room'){heianYadoRoomLight(I); /* 居候の部屋: 写真の明るさを刻に合わせ、葛籠のそばでは「葛籠を開ける」 */
+   if(!heianPhotoMode&&!heianDialog.open&&!heianYadoSleep.on&&heianYadoBoxNear(I)){heianInteriorButton(hud,heianLang==='en'?'F: Open the wicker chest (store belongings)':'F：葛籠を開ける（持ち物を預ける）',()=>heianYadoBoxPanel(true));return;}
+   if(document.querySelector('.heian-yado-box')&&!heianYadoBoxNear(I))heianYadoBoxPanel(false);}
   heianInteriorButton(heianPhotoMode||heianDialog.open||heianYadoSleep.on?null:hud,heianLang==='en'?'F: Go outside ('+(HEIAN_INTERIOR_LABEL_EN[I.def.label]||heianTr(I.def.label))+')':'F：外へ出る（'+I.def.label+'）',()=>heianInteriorExit());return;} // 対話の窓と重ねない
  const door=heianWalk.active&&!heianPhotoMode&&!heianDialog.open?heianInteriorDoorAt(heianWalk.position):null;
  if(door){const lb=HEIAN_INTERIORS[door].label;heianInteriorButton(hud,heianLang==='en'?'F: Enter '+(HEIAN_INTERIOR_LABEL_EN[lb]||heianTr(lb)):'F：'+lb+'に入る',()=>heianInteriorEnter(door));return;}
@@ -29250,7 +29348,7 @@ function heianActionBarSync(){
 function heianLiftBtnSync(){const help=heianGameHelpEl;if(!help||help.dataset.mode!=='actions')return;const lb=help.querySelector('[data-act="lift"]');if(!lb)return;const rt=heianTinRobotRuntime,carry=!!rt?.carry,txt=carry?'下ろす':'持ち上げる';
  if(lb.firstChild&&lb.firstChild.nodeValue!==txt)lb.firstChild.nodeValue=txt;const show=carry||!!(rt&&heianLiftNearest(rt));if(lb.hidden===show)lb.hidden=!show;
  const kb=help.querySelector('[data-act="kemaribring"]');if(kb){const s=heianKemariBringable();if(kb.hidden===s)kb.hidden=!s;} // 鞠を出す: 大内裏の昼だけ
- const yb=help.querySelector('[data-act="yasumu"]');if(yb){const s=heianYadoCanSleep();if(yb.hidden===s)yb.hidden=!s;}} // 朝まで休む: 居候の部屋で夜だけ
+ const yb=help.querySelector('[data-act="yasumu"]');if(yb){const s=heianYadoCanSleep();if(yb.hidden===s)yb.hidden=!s;if(s){const t=heianYadoRestLabel();if(yb.firstChild&&yb.firstChild.nodeValue!==t)yb.firstChild.nodeValue=t;}}} // 休む: 居候の部屋にいる間（夜は朝まで・昼は日暮れまで）
 // ---- 動作「ついていく」（2026-10-13 井内さん「動作に『ついていく』をつけたい。牛車とか、検非違使とか火長みたいな巡回する人に自動で追随して歩く機能」）。
 //  近く（reach 以内）で動いている牛車・検非違使・荷運び・行商・火長の夜回りのうち一番近い組へ、V かボタンで追随する。相手から keep の距離まで寄り、相手の歩みに合わせて歩く
 //  （追随の本体は歩行コントローラ heianWalk.follow）。止まっている牛車（朱雀門前で主人を待つ車）は対象にしない。もう一度 V・WASD・地面クリックで終わる
@@ -29614,7 +29712,9 @@ const HEIAN_GAME_LOCATIONS=[
  {id:'fixedNorth',name:'定位置：北から（大内裏ごし）',x:0,z:22000,mapMarker:false,fixed:{position:[0,28000,-56000],fov:38},description:'大内裏を手前に置き、南の羅城門へ向かって都の中軸を俯瞰する。'},
  {id:'fixedEast',name:'定位置：左京上空（既定の俯瞰）',x:0,z:22000,mapMarker:false,fixed:{position:[56000,48000,76000],fov:42},description:'左京の上空から都と東山・鴨川を含めて見渡す、既定の俯瞰と同じ画角。'},
  {id:'fixedWest',name:'定位置：右京上空',x:0,z:22000,mapMarker:false,fixed:{position:[-56000,48000,76000],fov:42},description:'右京の上空から。桂川と西の低湿地、都の西半分を大きく捉える。'},
- {id:'fixedTop',name:'定位置：真上（条坊の図）',x:0,z:22000,mapMarker:false,fixed:{position:[0,96000,22001],fov:34},description:'真上から見た条坊。碁盤目の街路と大内裏・東西市の位置関係がわかる。'}
+ /* 2026-10-13 井内さん「真上、もう少しだけ一条大路の上にスペースを取りたい。今ギリギリ」: 🚫 旧（中心 z22000・高さ9600m）は一条大路が画面の上の縁ちょうど（1500×857 で y≈0）で、上の帯のボタンに重なった。
+    ⇒ 見る中心を z18800 へ北へ寄せ、高さを 10400m に少し上げる＝一条大路が上の帯の下（y≈75）。羅城門は y≈790（旧 776） */
+ {id:'fixedTop',name:'定位置：真上（条坊の図）',x:0,z:18800,mapMarker:false,fixed:{position:[0,104000,18801],fov:34},description:'真上から見た条坊。碁盤目の街路と大内裏・東西市の位置関係がわかる。'}
 ];
 const HEIAN_DRONE_ROUTE=[
  {id:'overviewStart',name:'平安京全景',x:0,z:22000,radius:78000,altitude:48000,lookHeight:0,angle:.8,orbit:.06,dwell:4800,description:'794年に造営された都。碁盤目の街路と朱雀大路を軸に、北端の大内裏から南端の羅城門まで広がる。'},
@@ -31321,7 +31421,7 @@ function syncHeianMapPlayer(){
  // 2026-10-05 歩いている所で地図を切り替える（井内さん「市内を歩いているのにマップが郊外マップのままの時がある」）。
  // 🚫 旧は地点を選んだ時だけ切り替えていて、オープニング・俯瞰・定位置（広域）のあとに「歩く」を押すと、市内でも郊外の地図のままだった。京域の外へ歩き出た時も戻らなかった。
  // 京域の枠はドローンの切り替えと同じ（南は羅城門の先 46600 まで）
- {const inCity=Math.abs(p.x)<22550&&p.z>-7000&&p.z<46600;if(inCity===heianMapWide)setHeianMapWide(!inCity);}marker.style.left=heianMapPctX(p.x)+'%';marker.style.top=heianMapPctZ(p.z)+'%';marker.style.transform='translate(-50%,-50%) rotate('+heianWalk.travelHeading+'rad)';marker.dataset.x=Math.round(p.x);marker.dataset.z=Math.round(p.z);
+ {const inCity=Math.abs(p.x)<22550&&p.z>-7000&&p.z<46600;if(inCity===heianMapWide)setHeianMapWide(!inCity);}heianYadoMapSync();marker.style.left=heianMapPctX(p.x)+'%';marker.style.top=heianMapPctZ(p.z)+'%';marker.style.transform='translate(-50%,-50%) rotate('+heianWalk.travelHeading+'rad)';marker.dataset.x=Math.round(p.x);marker.dataset.z=Math.round(p.z);
  // 見ている向き: カメラの水平の向き。地図は北が上（world -z）＝上から時計回りの角度
  const view=document.querySelector('.heian-map-view');if(view){const d=new THREE.Vector3();camera.getWorldDirection(d);const ok=Math.hypot(d.x,d.z)>1e-3;view.hidden=!ok;
   if(ok){const deg=Math.atan2(d.x,-d.z)*180/Math.PI;view.style.left=marker.style.left;view.style.top=marker.style.top;view.style.transform='translate(-50%,-50%) rotate('+deg.toFixed(1)+'deg)';view.dataset.deg=Math.round((deg+360)%360);}}
