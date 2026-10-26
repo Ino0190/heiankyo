@@ -83,7 +83,7 @@ const finish=(keep=false)=>{if(!settled){if(mainTitle.textContent!==LP[lang].tit
 const loadFrame=()=>{lastProgressAt=Date.now();loadStartedAt=lastProgressAt;frame.src=frameBase+'&attempt='+retryCount+'#heiangame';};
 const retryLoading=message=>{if(settled)return;if(retryCount>=1){fail(message);return;}retryCount++;progressText.textContent=lang==='en'?'Reconnecting automatically...':'自動で読み込み直しています…';console.warn('HEIAN_CONTENT_RETRY attempt='+retryCount+' '+String(message||''));loadFrame();};
 // 読み込み中は見所23枚（空撮・東寺・朱雀大路・大内裏・東市とロボ・劇画の応天門・蹴鞠・省庁・牛車とお供・春・秋・冬・雨・星座の夜空など）をクロスフェードで順に見せる。撮り直し＝CadKit/heian-launch.py
-const HEIAN_BUILD='c474f13b2a05df1ef789149c5284afb6f607ff99f87053731e16a526c3fd138d',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
+const HEIAN_BUILD='799a3ee3958597f6cd0492a03e831d23a7856e0bbf740c0721471fb31b3f40f6',assetVersion=HEIAN_BUILD.startsWith('__')?String(Date.now()):HEIAN_BUILD;
 /* 2026-10-13 撮り直し（3840×2160・光と影）で22枚＋全景。最初の1枚が届くまでは起動画面の地に全景の小さい版（launch-bg-sm.jpg）を敷く＝真っ暗にならない */
 const slides=['launch-bg.jpg',...Array.from({length:22},(_,i)=>`launch-${String(i+1).padStart(2,'0')}.jpg`)].map(src=>src+'?v='+assetVersion);
 // 写真は「今の1枚」と「次の1枚」だけ読む（2026-10-18 井内さん「起動を軽く」A）。
