@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="heian-release" content="c474f13b2a05df1ef789149c5284afb6f607ff99f87053731e16a526c3fd138d">
+<meta name="heian-release" content="799a3ee3958597f6cd0492a03e831d23a7856e0bbf740c0721471fb31b3f40f6">
 <title>CadKit — ブラウザ3次元CAD（mm実寸）</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='414 291 285 285'%3E%3Cpath fill='%23fafafa' fill-rule='evenodd' d='M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z'/%3E%3Cpath fill='%23fafafa' d='M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z'/%3E%3C/svg%3E">
 <style>
@@ -464,6 +464,7 @@ body:not(.heian-walking) .heian-chore-carry{display:none}
 .heian-notebook header{display:flex;align-items:center;gap:12px;height:auto;min-height:0;padding:12px 16px 8px;border-bottom:1px solid rgba(96,76,52,.2);background:none;position:static} /* 🚫 編集画面の header の決まり（高さ固定）が効いて、スマホで帯が検索欄の下に潜った */
 .heian-notebook h2{margin:0;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:24px;font-weight:600;letter-spacing:.08em;color:#3a2e22}
 .heian-notebook .nb-tabs{display:flex;gap:4px;margin-left:8px}
+.heian-notebook .nb-ach-off{opacity:.55} /* 実績のまだの物（2026-10-13） */
 .heian-notebook .nb-tabs button,.heian-notebook .nb-close{min-height:36px;padding:4px 12px;font:inherit;font-size:15px;background:transparent;color:#5a4632;border:1px solid rgba(96,76,52,.3);border-radius:4px;cursor:pointer}
 .heian-notebook .nb-tabs button[aria-selected="true"]{background:#7a5720;border-color:#7a5720;color:#fff4d8}
 .heian-notebook .nb-close{margin-left:auto}
@@ -16265,7 +16266,13 @@ function makeDaidairi(){const burakuDetailState=HEIAN_HERITAGE_DETAIL_ADOPTED?ne
  (HEIAN_HERITAGE_DETAIL_ADOPTED?heianDistantHeritageKit(k):k).gate2(0,ZS,250,'朱雀門',wall,true,8); // 大垣(z=ZS)が門の奥行き中央を通る（2026-08-16井内さん指摘）
  // 朱雀門の前の左右に衛士の詰所（2026-10-24 井内さん「朱雀門の前にも左右に衛士の詰め所があったっぽいね」）。板葺の小屋（幅6m・奥行4m・推定）を大垣の外、門の脇（±23m）へ。
  //  門衛（miyaGuardSpots の ±4.4m）と朱雀大路の通りを塞がない位置。形と寸法は推定
- for(const s of[-1,1])gable(wall,s*230,ZS+40,60,40,-1,16,9,'朱雀門'+(s<0?'西':'東')+'衛士詰所板葺');
+ // 2026-10-13 井内さん「背が低すぎる・屋根の向きを90度・扉と窓と柱・少し壁から道側に」: 🚫 旧は幅6m×奥行4m・軒1.9m（棟が大垣と平行）で、大垣にくっついていた。
+ //  ⇒ 幅4m×奥行6m（棟を南北＝妻を道へ向ける）・軒約3.1m、大垣から 4.5m 道（南）へ離す。四隅と長手の中ほどに柱、南の妻に板戸、門の側の長手に連子窓（形は推定）
+ for(const s of[-1,1]){const L='朱雀門'+(s<0?'西':'東')+'衛士詰所',cx=s*230,cz=ZS+75,hw=20,hd=30,inX=cx-s*hw; /* inX＝門の側の壁 */
+  gable(wall,cx,cz,40,60,-1,26,11,L+'板葺');
+  for(const[x,z]of[[cx-hw,cz-hd],[cx+hw,cz-hd],[cx-hw,cz+hd],[cx+hw,cz+hd],[cx-hw,cz],[cx+hw,cz]])wall.push(col(x,z,2,29,1.6,L+'柱'));
+  wall.push(box(cx,cz+hd+.9,14,1.6,2,21,L+'蔀戸の板戸'));wall.push(box(cx,cz+hd+1.3,16,1,23,2,L+'柱の鴨居'));
+  wall.push(box(inX-s*.9,cz-8,1.6,18,13,10,L+'連子窓の枠'));for(let k=-3;k<=3;k++)wall.push(box(inX-s*1.4,cz-8+k*2.4,.8,.8,13,10,L+'連子窓の柱'));}
  // 上東門・上西門は屋根なしの土門（tsuchiGate）。残る東西6門は入母屋の宮城門
  tsuchiGate(X,-4274,'z','上東門');tsuchiGate(-X,-4274,'z','上西門');
  for(const[gz,name]of[[-1422,'陽明門'],[1431,'待賢門'],[4297,'郁芳門']])miyaGate(X,gz,'z',name);
@@ -17724,6 +17731,87 @@ window.__heianBojoNotice=()=>({shown:heianBojoNotice.shown,last:heianBojoNotice.
 window.__heianBojoProbe=(x,z,reset=false)=>{if(reset){heianBojoNotice.in=heianBojoNotice.last=null;}heianBojoTick({x,z});return window.__heianBojoNotice();}; // 検証用: その位置に立ったとして札を判定する
 window.__heianQuest={state:()=>JSON.parse(JSON.stringify(heianQuest.s)),set:e=>heianQuestSet(e),gate:g=>heianQuestGate(g),reset:()=>{heianQuest.s={};heianQuestSave();},cond:c=>heianQuestCond(c),
  gatesOff:v=>{if(v!=null)heianQuestGatesOff=!!v;return heianQuestGatesOff;},zoneAt:(x,z)=>heianQuestZoneAt(x,z)?.gate||null,lastGuard:()=>heianQuest.lastGuard||null};
+// ---- 実績（2026-10-13 井内さん「実績解除とかでもいい」「ドローンツアーを全編見た」「船岡山に登った」「発見の数」「鳥羽津へ行った」「何回拝んだ」「居候の一ヶ所目で、ねぐらの確保」ほか）。
+//  今ある遊びと記録を数えるだけ（新しい遊びは作らない）。取れたら上に札を1回（同時に取れたら1枚にまとめる）。聞き書き帳の「実績」で一覧（取れていない物は名前だけ・隠し実績は ？？？）。
+//  記録 localStorage heian-ach {got:{id:日},c:{数},s:{集合:[…]}}。どこにも送らない。名前と区切りの数は【創作】
+const heianAch=(()=>{let v=null;try{v=JSON.parse(localStorage.getItem('heian-ach')||'null');}catch(e){}v=v&&typeof v==='object'?v:{};return{got:v.got||{},c:v.c||{},s:v.s||{},dirty:false,at:0};})();
+const heianAchSave=()=>{heianAch.dirty=false;try{localStorage.setItem('heian-ach',JSON.stringify({got:heianAch.got,c:heianAch.c,s:heianAch.s}));}catch(e){}};
+function heianAchBump(k,n=1){heianAch.c[k]=(heianAch.c[k]||0)+n;heianAch.dirty=true;heianAchSoon();}
+function heianAchSet(k,v){const a=heianAch.s[k]||(heianAch.s[k]=[]);v=String(v);if(a.includes(v))return;a.push(v);if(a.length>600)a.shift();heianAch.dirty=true;heianAchSoon();}
+let heianAchSoonT=0;function heianAchSoon(){if(!heianAchSoonT)heianAchSoonT=setTimeout(()=>{heianAchSoonT=0;heianAchCheck();},600);}
+const heianAchC=k=>heianAch.c[k]||0,heianAchS=k=>(heianAch.s[k]||[]).length,heianAchKm=k=>heianAchC(k)/10000; /* 距離は 10単位＝1m で数える */
+const heianAchVisit=id=>typeof heianKnownPlaces!=='undefined'&&heianKnownPlaces[id]==='visit';
+const heianAchQuests=()=>typeof HEIAN_QUEST_NAMES==='undefined'?0:Object.keys(HEIAN_QUEST_NAMES).filter(k=>!k.includes(':')&&heianQuestGet(k)>=(HEIAN_QUEST_DONE[k]||9)).length;
+const heianAchDisc=()=>typeof heianDiscoverCount==='function'?heianDiscoverCount():{found:0,total:1};
+const heianAchYado=()=>typeof heianYado==='undefined'?{n:0,slept:0}:{n:Object.keys(heianYado.at||{}).length,slept:heianYado.slept||0};
+// [id, 名, 英名, 条件, 英の条件, 取れたか, 隠す]
+const HEIAN_ACH=[
+ ['tour','天翔ける童','Sky-Roving Child','ドローンツアーを全編見た','Watched the whole drone tour',()=>heianAchC('tour')>=1],
+ ['funaoka','船岡の頂','Atop Funaoka','船岡山の山頂に登った','Climbed to the top of Mt. Funaoka',()=>heianAchVisit('funaokaTop')],
+ ['toba','都の外へ','Beyond the Capital','鳥羽津まで行った','Went as far as Toba Port',()=>heianAchVisit('tobatsu')],
+ ['disc10','都の歩き始め','Finding Your Way','名所を10か所発見した','Discovered 10 places',()=>heianAchDisc().found>=10],
+ ['disc30','都の道に明るい','Knows the Streets','名所を30か所発見した','Discovered 30 places',()=>heianAchDisc().found>=30],
+ ['discAll','都のすみずみ','Every Corner','すべての名所を発見した','Discovered every place',()=>{const d=heianAchDisc();return d.total>0&&d.found>=d.total;}],
+ ['walk1','歩き初め','First Steps','歩いて1km進んだ','Walked 1 km',()=>heianAchKm('walk')>=1],
+ ['walk10','健脚','Strong Legs','歩いて10km進んだ','Walked 10 km',()=>heianAchKm('walk')>=10],
+ ['walk42','鉄の足','Iron Feet','歩いて42km進んだ','Walked 42 km',()=>heianAchKm('walk')>=42],
+ ['hover10','風を切る童','Cutting the Wind','ホバーで10km進んだ','Hovered 10 km',()=>heianAchKm('hover')>=10],
+ ['loop','京の外回り','Round the Capital','都の四隅（京極と一条・九条の角）をすべて回った','Reached all four corners of the capital',()=>heianAchS('corner')>=4],
+ ['talk10','顔見知り','Familiar Face','10人と話した','Talked with 10 people',()=>heianAchS('talk')>=10],
+ ['talk50','町の噂好き','Town Gossip','50人と話した','Talked with 50 people',()=>heianAchS('talk')>=50],
+ ['talk200','都の顔','Face of the Capital','200人と話した','Talked with 200 people',()=>heianAchS('talk')>=200],
+ ['named30','名のある人々','People of Note','名前のある住人30人と話した','Talked with 30 named residents',()=>heianAchS('char')>=30],
+ ['find10','拾い上手','Good Eye','落ちている物を10個拾った','Picked up 10 things',()=>heianAchC('find')>=10],
+ ['find50','目ざとい童','Sharp Eyes','落ちている物を50個拾った','Picked up 50 things',()=>heianAchC('find')>=50],
+ ['koyasu','南の海の貝','Shell of the Southern Sea','子安貝を拾った','Found a cowrie shell',()=>heianAchC('koyasu')>=1,true],
+ ['pray10','信心深い','Devout','10回拝んだ','Prayed 10 times',()=>heianAchC('pray')>=10],
+ ['pray50','願をかける童','Child of Many Prayers','50回拝んだ','Prayed 50 times',()=>heianAchC('pray')>=50],
+ ['yado1','ねぐらの確保','A Place to Sleep','居候先が1か所できた','Found a first place to stay',()=>heianAchYado().n>=1],
+ ['yado3','三つの寝床','Three Beds','居候先が3か所すべてできた','Found all three places to stay',()=>heianAchYado().n>=3],
+ ['sleep1','巻かれて朝','Wound Up by Morning','居候先で一晩休んだ','Rested a night at your lodging',()=>heianAchYado().slept>=1],
+ ['sleep10','居候暮らし','Lodger’s Life','居候先で10晩休んだ','Rested 10 nights at your lodgings',()=>heianAchYado().slept>=10],
+ ['niage30','人夫の仲間','One of the Porters','荷揚げで通算30俵を運んだ','Carried 30 bales in all',()=>heianAchC('niage')>=30],
+ ['waka5','なぞなぞ名人','Riddle Master','若君のなぞなぞ5題すべてに当てた','Solved all five of the young lord’s riddles',()=>heianAchS('waka')>=5],
+ ['follow5','追跡者','The Tail','牛車・荷車・行列に5回ついていった','Followed carts or processions 5 times',()=>heianAchC('follow')>=5],
+ ['follow20','影のごとく','Like a Shadow','牛車・荷車・行列に20回ついていった','Followed carts or processions 20 times',()=>heianAchC('follow')>=20],
+ ['trade1','初めての買い物','First Purchase','市で品を替えた','Traded at a market stall',()=>heianAchC('trade')>=1],
+ ['gift10','贈り上手','Generous Child','人に10回贈り物をした','Gave 10 gifts',()=>heianAchC('gift')>=10],
+ ['photo10','絵師見習い','Apprentice Painter','撮影モードで10枚撮った','Took 10 photos',()=>heianAchC('photo')>=10],
+ ['fue','笛の音','Notes of the Flute','笛を吹いた','Played the flute',()=>heianAchC('fue')>=1],
+ ['hayashi','囃子を呼ぶ','Calling the Musicians','踊りの輪に囃子方が出た','Danced until the musicians joined in',()=>heianAchC('hayashi')>=1],
+ ['kemari30','鞠の上手','Kemari Expert','蹴鞠が30回続いた','Kept the kemari ball up 30 times',()=>(typeof heianKemari!=='undefined'?heianKemari.best:0)>=30],
+ ['quest1','頼まれ事始め','First Errand','頼みごとを1本済ませた','Finished an errand',()=>heianAchQuests()>=1],
+ ['quest10','頼れる童','Dependable Child','頼みごとを10本済ませた','Finished 10 errands',()=>heianAchQuests()>=10],
+ ['quest30','都の頼みの綱','The Capital’s Helper','頼みごとを30本済ませた','Finished 30 errands',()=>heianAchQuests()>=30],
+ ['gates','門籍三通','On Every Gate List','内裏・後宮・邸の門籍がそろった','Got onto the gate lists of the Inner Palace, the Empress’s quarters and the mansion',()=>['dairi','kokyu','tei'].every(g=>heianQuest.s.gate?.[g])],
+ ['seasons','四季を巡る','Through the Seasons','春・夏・秋・冬を都で過ごした','Spent spring, summer, autumn and winter in the capital',()=>heianAchS('season')>=4],
+ ['rain','雨の中を','In the Rain','雨の日に都を歩いた','Walked the capital in the rain',()=>heianAchC('rain')>=1],
+ ['hyakki','百鬼に遭う','Met the Night Parade','百鬼夜行に行き合った','Ran into the Night Parade of a Hundred Demons',()=>!!heianQuest.s.gate?.hyakki,true],
+ ['shotai','昌泰の変の後','After the Shotai Incident','延喜元年正月二十五日（昌泰の変）を越えた','Lived past the Shotai Incident (901)',()=>{const d=typeof heianDayOf==='function'?heianDayOf(901,1,25):null;return d!=null&&heianClock.day>=d;},true]];
+// 取れたかを見る（2秒ごと・数えた直後）。初めて開いた日に前から済んでいた物が一度に取れたら、札は1枚にまとめる
+function heianAchCheck(){const now=[];for(const[id,,, , ,ok]of HEIAN_ACH){if(heianAch.got[id])continue;let y=false;try{y=!!ok();}catch(e){}if(y){heianAch.got[id]=Math.floor(heianClock.day);now.push(id);}}
+ if(now.length||heianAch.dirty)heianAchSave();if(!now.length||typeof heianDirectorApi==='undefined')return now;
+ const en=heianLang==='en',d=HEIAN_ACH.find(a=>a[0]===now[0]),got=Object.keys(heianAch.got).length;
+ heianDirectorApi.toast({cls:'heian-discover-toast heian-ach-toast',title:(en?'Achievement: ':'実績　')+(en?d[2]:d[1]),text:(en?d[4]:d[3])+(now.length>1?(en?` (and ${now.length-1} more)`:`（ほか${now.length-1}件）`):'')+(en?` · ${got} of ${HEIAN_ACH.length}`:`　${got}／${HEIAN_ACH.length}`),ms:4600});
+ for(const id of now){const a=HEIAN_ACH.find(q=>q[0]===id);heianNoteAdd?.({kind:'robot',char:null,who:null,text:heianJE('実績「'+a[1]+'」（'+a[3]+'）','Achievement “'+a[2]+'” ('+a[4]+')')});}return now;}
+// 歩いた距離・ホバーの距離・都の四隅・雨・季節（1秒ごと）。一瞬で移った分（1秒に 150m より大きい）は数えない
+const HEIAN_ACH_CORNERS=[[-22240,-7150],[22240,-7150],[-22240,45250],[22240,45250]];let heianAchLast=null,heianAchTickN=0;
+setInterval(()=>{try{if(!heianGameMode||!heianWalk?.active||heianInterior){heianAchLast=null;return;}const p=heianWalk.position;
+ if(heianAchLast){const d=Math.hypot(p.x-heianAchLast.x,p.z-heianAchLast.z);if(d>2&&d<1500){heianAch.c[heianWalk.hovering?'hover':'walk']=(heianAch.c[heianWalk.hovering?'hover':'walk']||0)+d;heianAch.dirty=true;if(heianWeather==='rain'&&!heianAch.c.rain)heianAchBump('rain');}}
+ heianAchLast={x:p.x,z:p.z};HEIAN_ACH_CORNERS.forEach(([x,z],i)=>{if(Math.hypot(p.x-x,p.z-z)<900)heianAchSet('corner',i);});
+ if(typeof heianSeason==='string'&&!(heianAch.s.season||[]).includes(heianSeason))heianAchSet('season',heianSeason);
+ if(++heianAchTickN%3===0)heianAchCheck();}catch(e){}},1000);
+// 効果音を数える所（heianSfxCount）から拾う出来事
+const HEIAN_ACH_SFX={find:'find','bag-trade':'trade',niage:'niage',fueSession:'hayashi',fue:'fue'};
+function heianAchTalk(c){if(!c)return;if(c.char)heianAchSet('char',c.char.id);heianAchSet('talk',c.char?'c:'+c.char.id:c.key+'@'+Math.round((c.x??0)/100)+','+Math.round((c.z??0)/100));}
+// 聞き書き帳の「実績」
+function heianAchRender(list){const en=heianLang==='en',got=Object.keys(heianAch.got).length,p=document.createElement('p');p.className='nb-count';p.textContent=en?`Achievements ${got} of ${HEIAN_ACH.length}`:`実績 ${got}／${HEIAN_ACH.length}`;list.append(p);
+ const rows=HEIAN_ACH.slice().sort((a,b)=>(heianAch.got[b[0]]!=null)-(heianAch.got[a[0]]!=null));
+ for(const[id,ja,enN,cj,ce,,hid]of rows){const g=heianAch.got[id],row=document.createElement('div');row.className='nb-item'+(g!=null?'':' nb-ach-off');
+  const t=document.createElement('p');t.className='nb-text';t.textContent=g!=null?(en?'🏅 '+enN:'🏅 '+ja):hid?'？？？':(en?enN:ja);
+  const m=document.createElement('div');m.className='nb-meta';m.textContent=g!=null?(en?ce+' · '+heianCalendarLabelEn(g):cj+'　'+heianCalendar(g).label):(en?'Not yet':'まだ');row.append(t,m);list.append(row);}}
+window.__heianAch=(cmd,k,v)=>{if(cmd==='reset'){heianAch.got={};heianAch.c={};heianAch.s={};heianAchSave();}if(cmd==='bump')heianAchBump(k,v||1);if(cmd==='set')heianAchSet(k,v);if(cmd==='check')heianAchCheck();
+ return{got:Object.keys(heianAch.got),n:HEIAN_ACH.length,c:{...heianAch.c},s:Object.fromEntries(Object.entries(heianAch.s).map(([a,b])=>[a,b.length]))};}; // 検証用
 // ---- 日常連作（2026-10-15・外部レビューの依頼「プレイヤーが何もしなくても、住人の暮らしが日を追って変わり、再訪で気づける」）
 // データは台詞パックの L.serials（terrain/quests/serial-*.js）。進み方は日付だけ＝会話・頼みごとに依らない。報酬・知らせ・目印・強制会話は出さない
 // 状態は localStorage heian-serial {v:1,s:{id:{start,seen:[段]}}}。start:'arrive'＝その家の裏へ歩いて初めて着いた日を起点にする。
@@ -18784,7 +18872,7 @@ function heianWakaShow(cmd,ctx){const d=heianDialog.dlg,c=heianDialog.cand;if(!d
   let i=(day*3)%Q.length;while(U.has(i))i=(i+1)%Q.length;U.add(i);const it=Q[i],ord=[0,1,2].sort(()=>Math.random()-.5);
   d.nodes['__wakaQ'+i]={t:it.q,c:ord.map(j=>[it.a[j],'@waka:a'+i+'_'+(j?0:1)])};return heianDialogShow('__wakaQ'+i,ctx);}
  const m=/^a(\d+)_([01])$/.exec(cmd);if(!m)return;const it=Q[+m[1]],ok=m[2]==='1',id='__wakaA'+m[1];
- d.nodes[id]={t:ok?it.th:'ちがうよ〜。答えは「'+it.a[0]+'」じゃ',c:[['もう一問','@waka:q'],['凧を一緒に揚げる','@waka:kite'],['また今度',bye]]};if(ok)heianWakaPay(500);return heianDialogShow(id,ctx);}
+ d.nodes[id]={t:ok?it.th:'ちがうよ〜。答えは「'+it.a[0]+'」じゃ',c:[['もう一問','@waka:q'],['凧を一緒に揚げる','@waka:kite'],['また今度',bye]]};if(ok){heianWakaPay(500);heianAchSet('waka',m[1]);}return heianDialogShow(id,ctx);}
 window.__heianNiage=cmd=>{if(cmd==='start')heianNiageStart();if(cmd==='goto'&&heianNiage){const d=heianNiage.dest,s=heianNiage.s;heianInteriorPlace([d.x+s*20,d.z],[d.x-s*200,d.z]);}if(cmd==='reset'){heianNiageClear();delete heianBagFlags().niage;}const N=heianNiage;return{n:heianBagFlags().niage||0,dest:N?{x:Math.round(N.dest.x),z:Math.round(N.dest.z)}:null,item:N?N.item.mesh.position.toArray().map(Math.round):null,held:!!N?.item.held};}; // 検証用
 window.__heianYadoDebug=()=>{const I=heianInterior;if(!I)return null;const b=new THREE.Box3().setFromObject(I.group);let vis=0,tot=0;I.group.traverse(o=>{if(o.isMesh){tot++;let v=true;for(let q=o;q;q=q.parent)if(!q.visible)v=false;if(v)vis++;}});return{inScene:I.group.parent===scene,gvis:I.group.visible,box:[b.min.toArray().map(Math.round),b.max.toArray().map(Math.round)],vis,tot,cam:camera.position.toArray().map(Math.round),robot:heianWalk.position.toArray().map(Math.round),base:Math.round(I.baseY)};}; // 検証用
 window.__heianYado=(cmd,id,x,z)=>{if(cmd==='reset'){heianYado.at={};heianYado.visits={};heianYadoSave();}else if(cmd==='set'&&HEIAN_LODGINGS[id])heianYado.at[id]={x,z,r:170};else if(cmd==='enter')return heianInteriorEnter(HEIAN_LODGINGS[id]?.room,true);return JSON.parse(JSON.stringify(heianYado));}; // 検証用
@@ -19571,7 +19659,7 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
  const tools=document.createElement('div');tools.className='nb-tools';const search=document.createElement('input');search.type='search';search.placeholder=heianNbT('語で探す（例: 紅）','Search (e.g. rouge)');search.value=heianNb.q;search.setAttribute('aria-label',search.placeholder);
  const filt=document.createElement('div');filt.className='nb-filter';tools.append(search);
  const list=document.createElement('div');list.className='nb-list';
- const TABS=[['notes',heianNbT('聞き書き','Heard')],['diary',heianNbT('日録','Diary')],['photos',heianNbT('写真','Photos')],['people',heianNbT('人物','People')],['places',heianNbT('場所','Places')]]; // 2026-10-12 写真（日録に残した撮った絵）
+ const TABS=[['notes',heianNbT('聞き書き','Heard')],['diary',heianNbT('日録','Diary')],['photos',heianNbT('写真','Photos')],['people',heianNbT('人物','People')],['places',heianNbT('場所','Places')],['ach',heianNbT('実績','Feats')]]; /* 2026-10-13 実績 */ // 2026-10-12 写真（日録に残した撮った絵）
  const render=()=>{for(const b of tabs.children)b.setAttribute('aria-selected',String(b.dataset.tab===heianNb.tab));list.replaceChildren();filt.replaceChildren();
   const items=heianNotebook.items.slice().reverse(),F=heianNb.filter,q=heianNb.q.trim();
   if(F){filt.textContent=(F.kind==='char'?heianNbT('人: ','Person: '):F.kind==='place'?heianNbT('場所: ','Place: '):heianNbT('話題: ','Topic: '))+F.label;const x=document.createElement('button');x.type='button';x.textContent=heianNbT('すべて','Show all');x.addEventListener('click',()=>{heianNb.filter=null;render();});filt.append(x);}
@@ -19597,6 +19685,7 @@ function heianNotebookOpen(tab){if(heianNb.el){heianNotebookClose();return;}heia
    return;}
   if(heianNb.tab==='diary')return heianDiaryRender(list,q,empty);
   if(heianNb.tab==='photos')return heianShotsRender(list,q,empty,render);
+  if(heianNb.tab==='ach')return heianAchRender(list);
   // 人物・場所: 帳面に出てくる人と場所を、話の数と最後に聞いた日で並べる
   const key=heianNb.tab==='people'?(x=>x.char||x.who):(x=>x.place),groups=new Map();
   for(const x of items){const k=key(x);if(!k)continue;const g=groups.get(k)||{k,n:0,last:x,refer:0};g.n++;groups.set(k,g);}
@@ -20199,7 +20288,7 @@ function updateHeianDialog(now,ctx,rp,hud){
  if(heianDialog.hint){if(!target){heianDialog.hint.remove();heianDialog.hint=null;heianDialog.hintCand=null;}
   else if(heianDialog.hintCand!==target.key){heianDialog.hintCand=target.key;heianDialog.hint.textContent=heianLang==='en'?(heianIsTouch?'Talk to ':'E: Talk to ')+(target.char?heianTr(target.char.name):'the '+heianTr(target.who)):(heianIsTouch?'':'E：')+(target.char?target.char.name:target.who)+'に話しかける';}} // 1.88。2026-10-20 スマホはキーが無いので「E：」を付けない（押せるボタン）
 }
-function heianDialogTalk(c=heianDialogTarget()){if(!c)return false;if(c.char)heianDir().najimiTalk(c.char.id,heianClock.day); // なじみ度: 話しかけると+0.5（1日1回）
+function heianDialogTalk(c=heianDialogTarget()){if(!c)return false;heianAchTalk(c);if(c.char)heianDir().najimiTalk(c.char.id,heianClock.day); // なじみ度: 話しかけると+0.5（1日1回）
  const ctx=heianDialog.ctx||heianWorldState();return heianDialogOpen(c,heianDialogFor(c,ctx.tags),ctx);}
 // クリックした人に話しかける（2026-09-28井内さん「話しかける相手を選べるといいな。クリックしてもその人を選べないのが不自然」）。
 // 頭と足元を画面へ写した縦長の枠（幅は背丈の0.35倍・最小14px）に入った人のうち、枠の中心に近い人。
@@ -25906,7 +25995,7 @@ function heianFindTick(){const W=heianWalk;if(!heianGameMode||!W?.active||heianI
  const cam=camera.position;for(const[key,s]of S){if(!s?.g)continue;const gl=s.g.userData.glint,ph=(now*.38+s.ph/6.283)%1,fl=window.__heianFindFlash?1:ph<.1?Math.sin(ph/.1*Math.PI):0,tw=.5+.5*Math.sin(now*4+s.ph),dc=Math.hypot(s.x-cam.x,s.y-cam.y,s.z-cam.z),far=Math.max(1,dc/150);
   gl.material.rotation=now*.6+fl*.8;gl.scale.setScalar((5+tw*2.5+fl*16)*far);gl.position.y=1.4+fl*1.5;
   if(Math.hypot(s.x-p.x,s.z-p.z)<X.pick&&Math.abs((p.y??s.y)-s.y)<30){F['find:'+key]=1;heianBagAdd(s.kind,1,false);s.g.removeFromParent();s.g=null;S.set(key,null);heianFind.picked++;
-   const en=heianLang==='en',nm=heianBagName(s.kind);heianBagToast(en?'Picked up a '+nm:(s.kind==='銭'?'寛平大宝の銭':s.kind)+'を拾った');heianSfxCount('find');
+   const en=heianLang==='en',nm=heianBagName(s.kind);heianBagToast(en?'Picked up a '+nm:(s.kind==='銭'?'寛平大宝の銭':s.kind)+'を拾った');heianSfxCount('find');if(s.kind==='子安貝')heianAchBump('koyasu');
    try{const A=heianSfxAudio();if(A?.on){heianSfxTin(A,A.ctx.currentTime+.01,.03);heianSfxTone(A,A.ctx.currentTime+.06,{f:1320,g:.04,d:.25});}}catch(e){}}}}
 window.__heianFind=()=>({shown:heianFind.n,picked:heianFind.picked,near:[...heianFind.spots.values()].filter(s=>s?.g).slice(0,8).map(s=>({kind:s.kind,x:Math.round(s.x),z:Math.round(s.z)}))}); // 検証用
 window.__heianBag=(o={})=>{if(o.reset){heianBag={items:{},day:null,flags:{}};heianBagSave();}if(o.add)for(const[n,k]of Object.entries(o.add))heianBagAdd(n,k,false);if(o.panel)heianBagPanel(true);
@@ -25951,7 +26040,7 @@ function heianBagShow(arg){const d=heianDialog.dlg,c=heianDialog.cand,en=heianLa
   heianBagAdd(f,1,false);return heianBagDlg('@bag:fish',heianDialogRand(HEIAN_BAG_TALK.fish),en?'Got '+N(f)+'.':f+'をもらった',back);}
  if(kind==='gift'){const who=c.char?.id||c.key;
   if(sub){if(!heianBagHas(sub)||!heianBagOnce('gift:'+who))return heianBagDlg('@bag:gift',heianDialogRand(HEIAN_BAG_TALK.giftNo),'',back);
-   heianBagAdd(sub,-1,false);if(c.char)heianDir().najimiAdd(c.char.id,1);
+   heianBagAdd(sub,-1,false);heianAchBump('gift');if(c.char)heianDir().najimiAdd(c.char.id,1);
    // 拾った物を贈ると、相手ごとに返事が変わる（2026-10-24 B）: 蛤の貝は女の人が喜ぶ（貝合わせ）・桜貝は童が喜ぶ・子安貝はだれでも驚く・銭は珍しがる
    const fem=/女|母|姫|尼/.test(c.who||''),T=HEIAN_BAG_TALK,sp=sub==='蛤の貝'?(fem?T.hamaguriF:T.hamaguri):sub==='桜貝'?(c.who==='童'?T.sakuraKid:T.sakura):sub==='子安貝'?T.koyasu:sub==='銭'?T.zeni:null;
    if(sp&&c.char&&(sub==='子安貝'||(sub==='蛤の貝'&&fem)||(sub==='桜貝'&&c.who==='童')))heianDir().najimiAdd(c.char.id,1); // 喜ぶ物は馴染みがもう1つ上がる
@@ -29379,7 +29468,7 @@ function heianFollowToggle(prefer=null){const W=heianWalk;if(!W?.active||!heianG
  let last=null;
  // 牛車は旅の終わり（門の内・邸・車宿）で姿を消す（HEIAN_TRIP_CARTS・公卿の車は邸へ帰る）。消えたら最後に見えた場所の名前を添えて、ついていくのを終える
  const ok=W.follow(()=>{const q=best.pos();if(!q){const at=last?heianPlaceNameAt(last.x,last.z):'';W.stopFollow(best.arrived?.()?best.label+'は'+(at?at+'で':'')+'着いて、姿を消した':best.label+'が見えなくなった');return null;}last=q;if(heianInterior||heianPhotoMode||heianDialog.open)return{pause:true};return{x:q.x,z:q.z,keep:best.keep,lose:HEIAN_FOLLOW.lose};});
- if(ok)setStatus(best.label+'についていく（もう一度 V・WASD・クリックでやめる）');return ok;}
+ if(ok){heianAchBump('follow');}if(ok)setStatus(best.label+'についていく（もう一度 V・WASD・クリックでやめる）');return ok;}
 function heianFollowButtonSync(on){if(!on){heianFollowInfo=null;heianFollowBest=null;}const b=heianGameHelpEl?.querySelector?.('[data-act="follow"]');if(!b)return;const t=on?'ついていくのをやめる':'ついていく';if(b.firstChild&&b.firstChild.nodeValue!==t)b.firstChild.nodeValue=t;b.classList.toggle('on',!!on);}
 // ---- ついていく間、誰についていっているかを画面に出す（2026-10-14井内さん「ついていくを実行中、誰について言っているかわかるようにしたい」）。
 //  相手の頭上に「名前 ○m」と▼の札。相手が画面の外にいる間は、画面の縁に向きの矢印と名前・距離。やめる・見失う・着いて消えると札も消える。
@@ -29466,7 +29555,7 @@ function heianWorshipTargets(){if(heianWorship.cache&&heianWorship.cache.n===hei
   else{const a=w.at||w.fn?.();if(a)list.push({...w,x:a[0],z:a[1],hx:a[2],hz:a[2]});}}
  heianWorship.cache={n:heianNamedPlaces.length+heianTsujiShrines.length*1000,list};return list;}
 function heianWorshipAt(p){if(heianInterior)return null;for(const w of heianWorshipTargets()){const dx=Math.max(0,Math.abs(p.x-w.x)-w.hx),dz=Math.max(0,Math.abs(p.z-w.z)-w.hz);if(Math.hypot(dx,dz)<HEIAN_WORSHIP_REACH)return w;}return null;}
-function heianWorshipDo(w){if(heianWorship.busy)return;heianWorship.busy=true;heianInteriorButton(null);
+function heianWorshipDo(w){if(heianWorship.busy)return;heianWorship.busy=true;heianAchBump('pray');heianInteriorButton(null);
  const c=heianWorship.count[w.key]=(heianWorship.count[w.key]||0)+1;try{localStorage.setItem('heian-worship',JSON.stringify(heianWorship.count));}catch(e){}
  const hud=document.getElementById('heianGameHud'),el=document.createElement('div');el.className='heian-blessing';el.setAttribute('role','status');
  const h=document.createElement('strong');h.textContent=(w.tera?'合掌　':'拝礼　')+w.label;const p=document.createElement('p');p.textContent=w.t;const s=document.createElement('small');s.textContent=c>1?'ここに参るのは '+c+' 度目':'はじめての参拝';
@@ -29908,7 +29997,7 @@ const HEIAN_SFX_LEVEL=.6; // 足音は1秒に5歩ほど鳴るので BGM より�
 const HEIAN_STEP_SOUNDS=Object.freeze({sand:{type:'bandpass',f:1150,q:.8,g:.16,d:.09},grass:{type:'lowpass',f:650,q:.7,g:.13,d:.13},
  wood:{type:'bandpass',f:420,q:1.3,g:.09,d:.07,thump:165},stone:{type:'highpass',f:2300,q:.7,g:.08,d:.05,click:true},water:{type:'bandpass',f:900,q:1.5,g:.15,d:.2,splash:true}});
 const heianSfx={count:{},steps:{},last:null,noise:null,hum:null,murmur:null,crowdN:0,quiet:1,danceUntil:0,phase:0,lastSurface:'sand',avoid:{steer:0,yield:0,last:null},dodging:0};
-function heianSfxCount(k){heianSfx.count[k]=(heianSfx.count[k]||0)+1;heianSfx.last=k;}
+function heianSfxCount(k){heianSfx.count[k]=(heianSfx.count[k]||0)+1;heianSfx.last=k;if(HEIAN_ACH_SFX[k])heianAchBump(HEIAN_ACH_SFX[k]);} /* 実績（2026-10-13） */
 function heianSfxAudio(){const A=heianTourMusic?.sfxOut?.();if(!A)return null;
  if(!heianSfx.noise||heianSfx.noise.ctx!==A.ctx){const n=A.ctx.sampleRate*2,b=A.ctx.createBuffer(1,n,A.ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;heianSfx.noise={ctx:A.ctx,buf:b};heianSfx.hum=null;heianSfx.murmur=null;heianSfx.rain=null;}
  return A;}
@@ -31237,7 +31326,7 @@ window.__heianDroneGroundProbe=()=>{
   const sameLabel=(next.label||next.name)===(current.label||current.name);if(crossed&&!sameLabel&&runtime.openingLabelIndex!==runtime.openingIndex+1){runtime.openingLabelIndex=runtime.openingIndex+1;runtime.openingLabelEvents.push({name:next.label||next.name,cueZ:next.cueZ??null,cameraZ:camera.position.z,errorZ:Number.isFinite(next.cueZ)?Math.abs(camera.position.z-next.cueZ):0});const title=document.getElementById('heianGameInfoTitle'),text=document.getElementById('heianGameInfoText');if(title)title.textContent=legLabel(next)||next.name;if(text&&next.desc)text.textContent=legDesc(next);setStatus('平安京オープニング：'+next.name);}
   if(k>=1){runtime.openingIndex++;runtime.phaseStart=now;runtime.openingLegElapsed=0;openingStage(runtime.openingIndex);if(runtime.openingIndex>=runtime.opening.length-1)return finishOpening();}return true;};
  const start=()=>{if(runtime.active)return true;if(!heianGameMode)return false;if(runtime.openingActive||runtime.cruising)stop('',false);if(heianWalk.active)heianWalk.stop('ドローンツアーへ切替');setupCamera();pickMarket();planRoute();runtime.index=-1;runtime.phase='travel';runtime.phaseStart=runtime.lastNow=performance.now();runtime.fromP.copy(camera.position);runtime.pathLeg=null;runtime.active=true;runtime.cruising=false;beginHeianTourEvent();heianTourMusic?.setTraveling(true);heianTourMusic?.start();const dest=pose(route[0]);controls.target.copy(dest.target);camera.lookAt(controls.target);const title=document.getElementById('heianGameInfoTitle'),text=document.getElementById('heianGameInfoText');if(title)title.textContent='羅城門へ';if(text)text.textContent='全景位置から羅城門を中心に捉えて移動する。';setStatus('ドローンツアー：羅城門へ移動');sync();return true;};
- const beginCruise=now=>{if(heianTourEventStartedAt)endHeianTourEvent('complete');const final=route.at(-1),state=pose(final,(final.orbit??.16),1);runtime.active=false;runtime.openingActive=false;runtime.cruising=true;runtime.phase='cruise';runtime.lastNow=now;runtime.cruiseTarget.copy(state.target);runtime.cruiseAngle=Math.atan2(camera.position.x-state.target.x,camera.position.z-state.target.z);if(heianTourMusic&&heianTourMusic.inspect?.().enabled&&!heianTourMusic.active)heianTourMusic.start();heianTourMusic?.setTraveling(false);sync();setStatus('平安京全景：街上空をゆっくり旋回中');return true;};
+ const beginCruise=now=>{if(heianTourEventStartedAt){endHeianTourEvent('complete');heianAchBump('tour');}const final=route.at(-1),state=pose(final,(final.orbit??.16),1);runtime.active=false;runtime.openingActive=false;runtime.cruising=true;runtime.phase='cruise';runtime.lastNow=now;runtime.cruiseTarget.copy(state.target);runtime.cruiseAngle=Math.atan2(camera.position.x-state.target.x,camera.position.z-state.target.z);if(heianTourMusic&&heianTourMusic.inspect?.().enabled&&!heianTourMusic.active)heianTourMusic.start();heianTourMusic?.setTraveling(false);sync();setStatus('平安京全景：街上空をゆっくり旋回中');return true;};
  const startOverviewCruise=()=>{if(!heianGameMode)return false;if(runtime.active||runtime.openingActive)stop('',true);if(heianWalk.active)heianWalk.stop('平安京上空へ戻った');setupCamera();const state=pose(overviewStop);runtime.index=route.length-1;apply(state);runtime.overviewReturnError=camera.position.distanceTo(state.position);
   // 左下の説明を全景へ切り替える（俯瞰へ戻っても直前の地点の説明が残っていた・2026-08-17井内さん報告）
   const title=document.getElementById('heianGameInfoTitle'),text=document.getElementById('heianGameInfoText');if(title)title.textContent=locName(overviewStop);if(text)text.textContent=locDesc(overviewStop);
@@ -32086,7 +32175,7 @@ function captureHeianGameCanvas(stamp=true){
  const r2=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true,stencil:true});
  try{r2.setPixelRatio(1);r2.setSize(w,h,false);r2.outputColorSpace=renderer.outputColorSpace;r2.toneMapping=renderer.toneMapping;r2.toneMappingExposure=renderer.toneMappingExposure;r2.shadowMap.enabled=renderer.shadowMap.enabled;r2.shadowMap.type=renderer.shadowMap.type;r2.render(scene,camera);const out=document.createElement('canvas');out.width=w;out.height=h;out.getContext('2d').drawImage(r2.domElement,0,0);if(stamp)stampHeianPhoto(out,record);out.__heianPhotoRecord=record;return out;}finally{r2.dispose();}
 }
-async function saveHeianGamePhoto(){
+async function saveHeianGamePhoto(){heianAchBump('photo');
  if(!heianPhotoMode||!heianPhotoBar)return null;heianPhotoBar.hidden=true;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
  // 2026-10-12 撮ったらすぐ PNG を落とす形から、撮った絵の窓（heianShotOpen）を開く形へ。保存・日録・共有は窓のボタンで（勝手に保存も送信もしない）
  try{const canvas=captureHeianGameCanvas(false);if(!canvas)throw new Error('描画を写せない');const meta=heianShotMeta(),record=canvas.__heianPhotoRecord;heianShotOpen(canvas,meta);
