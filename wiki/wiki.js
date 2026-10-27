@@ -9,9 +9,13 @@ document.querySelectorAll('[data-known]').forEach(function(el){
  else if(played&&(v||start.indexOf(id)>=0)){s.className='badge heard';s.textContent='聞いたことがある';}
  else return;
  el.appendChild(s);});
+// 取った実績の印（実績のページ）。ゲームが残した記録 heian-ach の got を読むだけ（書き換えない）
+var ach={};try{ach=(JSON.parse(localStorage.getItem('heian-ach')||'{}')||{}).got||{};}catch(e){ach={};}
+document.querySelectorAll('[data-ach]').forEach(function(el){if(ach[el.getAttribute('data-ach')]==null)return;var s=document.createElement('span');s.className='badge';s.textContent='取った';el.appendChild(s);});
+var achn=document.getElementById('achn'),achc=Object.keys(ach).length;if(achn&&achc){achn.textContent='このブラウザで取った実績：'+achc+'件';achn.hidden=false;}
 // 写真を押すと大きく見る（入口ページと同じ動き。閉じるボタン・画面のどこかを押す・Esc で閉じる）
-// 番号の印を重ねた画面の写真（遊び方の svg.ui）は、印ごと写して大きく見る
-var zimgs=document.querySelectorAll('figure.photo img,figure.photo svg.ui'),zd=document.createElement('dialog');
+// 番号の印を重ねた画面の写真（遊び方の svg.ui）と盤双六の盤の図（svg.board）は、絵ごと写して大きく見る
+var zimgs=document.querySelectorAll('figure.photo img,figure.photo svg.ui,figure.photo svg.board'),zd=document.createElement('dialog');
 if(zimgs.length&&typeof zd.showModal==='function'){
  var zb=document.createElement('button'),zf=document.createElement('figure'),zi=document.createElement('img'),zc=document.createElement('figcaption');
  zd.className='zoom';zd.setAttribute('aria-label','写真を大きく見る');zb.type='button';zb.textContent='閉じる';
