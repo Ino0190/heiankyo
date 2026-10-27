@@ -21,6 +21,9 @@ window.HEIAN_CONTENT_FILES=[
  'quests/facilities-offices.js',     // 官司の戸口の間の勤務者（図書寮・木工寮・典薬寮・陰陽寮・神祇官・左京職）＋「紙が一束足りない」（2026-10-11）
  'quests/serial-makiwari.js',        // 日常連作「薪割りの男と隣の女」（L.serials・日付だけで4段に進む）2026-10-15
  'quests/npc-small-confidences.js',  // 小さな本音と数日後の余韻（既存人物4人・5話）2026-10-24 井内さん作・2026-10-25 取り込み
+ 'quests/serial-hirotari.js',        // 連作「お前の席」広足編（羅城門の下の流れ者・状態は heian-hirotari-v1）2026-10-27 井内さん作・2026-10-13 取り込み
+ 'quests/tanomi-kurashi.js',         // 暮らしの頼みごと（ドブの石・部屋に飾る）。石・礼・飾り棚は index.html の heianTanomi 2026-10-13
+ 'quests/serial-waka-adventure.js',  // 連作「凧より遠くへ」若君編（居候先の凧揚げの若君・状態は heian-waka-adventure-v1・接続は index.html の heianWakaAdv）2026-10-27 井内さん作・2026-10-13 取り込み
 ];
 // 試験用。ゲームを ?devpacks=1 で開いたときだけ読む（本番の人は読まない）。データだけで追加できることの確認用
 window.HEIAN_CONTENT_DEV_FILES=[
