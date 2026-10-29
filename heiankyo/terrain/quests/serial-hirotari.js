@@ -1,7 +1,7 @@
 /* 平安京・連作「お前の席」 / Ver 1.0 2026-10-27
  * Data & independent state machine. Load after heian-lines.js via quests/manifest.js.
  * Integration hooks are described in HIROTARI_KIRO_HANDOFF.md.
- * History, personality and dialogue of Hirotari: D (fiction).
+ * History, personality and dialogue of Hamanushi (formerly Hirotari; renamed 2026-10-29): D (fiction).
  * This module does not move actors, show UI, or alter any existing lodging data.
  */
 (function(root){
@@ -33,7 +33,7 @@
     {id:'hard',label:tx('大変だね','That sounds difficult'),reply:tx('昔からこうだ。門の屋根は広いが、穴も多い。','It’s always been like this. A wide roof, and plenty of holes.')}]},
   name:{title:tx('名を聞く','Asking a name'),start:tx('お前はいつも、わしを何と呼んどる？','What do you call me, then?'),
    choices:[
-    {id:'ask',label:tx('名前を聞いてもいい？','May I ask your name?'),reply:tx('名か。……広足という。長いこと、そう呼ぶ者もおらんかった。お前は覚えておいてくれるか。','My name? …Hirotari. Nobody has called me that in a long while. Will you remember it?'),revealsName:true},
+    {id:'ask',label:tx('名前を聞いてもいい？','May I ask your name?'),reply:tx('名か。……浜主という。長いこと、そう呼ぶ者もおらんかった。お前は覚えておいてくれるか。','My name? …Hamanushi. Nobody has called me that in a long while. Will you remember it?'),revealsName:true},
     {id:'later',label:tx('別に呼ばなくても困らないよ','I can manage without a name'),reply:tx('まあ、わしも困らんよ。','I suppose I can too.'),defer:true}]},
   seat:{title:tx('お前の席','Your place'),start:tx('おお、帰ったか。ずいぶん歩いておったようだな。','Ah, you’re back. You must have done a great deal of walking.'),
    choices:[
@@ -42,7 +42,7 @@
     {id:'home',label:tx('ただいま','I am home'),reply:tx('……おう。そこ、空けてあるぞ。','…Well then. I kept your place clear.')}]},
   south:{title:tx('南へ行く荷','Loads bound south'),start:tx('南へ下る荷があるそうだ。鳥羽の先へ行くという。','I hear there’s cargo heading south, past Toba.'),
    choices:[
-    {id:'go',label:tx('広足も行くの？','Will you go too?'),reply:tx('さあな。昔はよく荷を担いだ。……まだ働けるかな。','Who knows? I used to carry loads myself. …I wonder if I still can.')},
+    {id:'go',label:tx('浜主も行くの？','Will you go too?'),reply:tx('さあな。昔はよく荷を担いだ。……まだ働けるかな。','Who knows? I used to carry loads myself. …I wonder if I still can.')},
     {id:'work',label:tx('昔は何をしていたの？','What did you do before?'),reply:tx('担げるものは何でもさ。人に言うほどのことでもない。','Whatever needed carrying. Nothing worth a story.')},
     {id:'bye',label:tx('気をつけて','Take care'),reply:tx('何の話だ。まだ行くと決めたわけではないぞ。','What’s this? I haven’t decided to go anywhere.')}]}
  };
@@ -85,7 +85,7 @@
   if(!Object.prototype.hasOwnProperty.call(RUMORS,key)||state.rumors.includes(key))return null;
   return{id:key,...copy(RUMORS[key])};}
  function heardRumor(key){if(!Object.prototype.hasOwnProperty.call(RUMORS,key))return false;if(!state.rumors.includes(key))state.rumors.push(key);save();return true;}
- function label(){return state.hasName?'広足':'流れ者';}
+ function label(){return state.hasName?'浜主':'流れ者'; /* 2026-10-29 井内さん「広足が2人いるらしいので、流れ者の名前は変えた方がいいかも」＝三河の運脚 hirotari と重ならない名に（状態の id・localStorage は広足編のまま） */}
  function present(){return state.departedDay===null;}
  function status(){return copy(state);}
  function reset(){state=fresh();save();return status();}
