@@ -25,6 +25,8 @@ window.HEIAN_CONTENT_FILES=[
  'quests/shop-life.js',             // 市の売り子の暮らし（店の者・運び手。身の上を聞くと話す。仕入れ先は将来の頼みごとの材料・index.html heianProfilePieces）2026-10-28
  'quests/tutorial-cart-mud.js',     // はじめての頼みごと「泥にはまった牛車」（犬丸・朱雀門の西・L.setpieces＝置き物と出来事の最初の例・礼に犬丸の竹笛＝笛が吹けるようになる）2026-10-29 井内さん作・取り込み
  'quests/tanomi-kurashi.js',         // 暮らしの頼みごと（ドブの石・部屋に飾る）。石・礼・飾り棚は index.html の heianTanomi 2026-10-13
+ 'quests/robot-maru.js',            // まる（鞠の童）が歩いているときだけ出る町の人の一言6行（条件 robotMaru＝index.html の heianSpeechCond）2026-10-30 井内さん承認
+ 'quests/rajo-loft.js',             // 羅城門の楼上を訪れる人（夜の老婆・昼の老人。場所タグ interior_yado_rajo。出る日・刻は index.html の heianLoft）2026-10-30 井内さんの改修指示書
  'quests/serial-waka-adventure.js',  // 連作「凧より遠くへ」若君編（居候先の凧揚げの若君・状態は heian-waka-adventure-v1・接続は index.html の heianWakaAdv）2026-10-27 井内さん作・2026-10-13 取り込み
 ];
 // 試験用。ゲームを ?devpacks=1 で開いたときだけ読む（本番の人は読まない）。データだけで追加できることの確認用

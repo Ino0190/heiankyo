@@ -18,8 +18,8 @@
     return;
   }
   L.quests[ID]={ja:'泥にはまった牛車',en:'The Ox Cart in the Mud'};
-  const d={char:'inumaru',at:'suzakumon',title:'犬丸',start:'s',
-    n:'D 創作（初心者の自然な操作体験）。犬丸は朱雀門前の牛飼童。兄は竹丸。牛の名は黒麻呂。'};
+  const d={char:'inumaru',at:'rajomon',title:'犬丸',start:'s',
+    n:'D 創作（初心者の自然な操作体験）。犬丸はふだん朱雀門前で待つ牛飼童。この頼みごとでは羅城門を入ってすぐの所で車が泥にはまる（2026-10-31）。兄は竹丸。牛の名は黒麻呂。'};
   L.dialogs.push(
     {
       ...d,id:'kuruma-nukarumi-ask',if:'q:kuruma_nukarumi<1',
@@ -60,14 +60,14 @@
   );
   // インテグレーション向けの参照データ。演出や状態変更は本体側で行う。
   window.HEIAN_CART_MUD_CONFIG=Object.freeze({
-    id:ID,version:2,person:'inumaru',place:'suzakumon',
-    onboarding:Object.freeze({entry:'suzakumon-practice',nearPracticeExit:true,practiceFinal:'bow',softCue:true,acceptance:'optional'}),
+    id:ID,version:3,person:'inumaru',place:'rajomon',
+    onboarding:Object.freeze({entry:'rajomon-practice',nearPracticeExit:true,practiceFinal:'fue',softCue:true,acceptance:'optional'}),
     fluteUnlock:Object.freeze({newGameStartsWithoutFlute:true,unlockOnOwnedFlute:true,preserveLegacySaves:true}),
     states:Object.freeze({unmet:0,agreed:1,freed:2,received:9}),
     reward:Object.freeze({id:'inumaru_bamboo_flute',ja:'犬丸の竹笛',en:'Inumaru’s Bamboo Flute'}),
     contact:Object.freeze({distance:8,action:'lift',desktopKey:'R',fluteKey:'Y'}),
     hints:Object.freeze({
-      spot:'朱雀門の練習の先で牛が鳴き、牛飼童が困っている',
+      spot:'羅城門をくぐった先で牛が鳴き、牛飼童が困っている',/* 2026-10-31 朱雀門から羅城門へ */
       lift:'沈んだ車輪の近くで「持ち上げる」',
       after:'持ち物に「犬丸の竹笛」が加わった。笛を吹いてみよう（Y）'
     })
@@ -75,14 +75,17 @@
 })();
 // ---- 2026-10-29 Kiro 取り込み: 置き物と出来事（L.setpieces・CadKit/index.html の heianSp）で、牛車・牛・犬丸・ぬかるみを置き、
 //  受けたあと（q=1）沈んだ輪の後ろで R（スマホは「動作」の同じボタン）→ 車が抜けて q=2、礼の会話で q=9 → 犬丸の竹笛を持ち物へ（笛が吹けるようになる）。
-//  場所: 朱雀門の西、二条大路の南の路肩（朱雀大路の牛車の列・門前で待つ車を塞がない）。座標は撮影で決めた値。区分 D 創作
+//  場所: 2026-10-31 から羅城門を入ってすぐの朱雀大路の東寄り（練習を羅城門で始める）。前は朱雀門の西、二条大路の南の路肩。区分 D 創作
 (function(){
   const L = window.HEIAN_LINES;
   if (!L || !L.quests || !L.quests.kuruma_nukarumi) return;
   const S = L.setpieces = L.setpieces || {};
   const ID = 'kuruma_nukarumi';
+  // 2026-10-31 井内さん「羅城門をくぐったら、泥にはまった牛車がいる」: 練習を羅城門で始めるので、羅城門を入ってすぐの朱雀大路の東寄り（九条大路の北の縁 z45068 の9m北）へ移した。
+  //  rot 0＝車の前（牛）が北＝都の中へ向かう車。車の局所 +x＝東（路肩の側・沈んだ輪）。門から来ると車の後ろ（持ち上げる所）が手前に見える。
+  //  旧は朱雀門の西 {x:-780, z:7345, rot:-Math.PI/2}（🚫 x−950 は路肩の柳の陰で、近づくとカメラが柳の枝に入った・撮影 cm1・cmc）
   S[ID] = {
-    q: ID, at: {x:-780, z:7345, rot:-Math.PI/2}, near: 1200,   // 🚫 x−950 は路肩の柳の陰で、近づくとカメラが柳の枝に入った（撮影 cm1・cmc）   // rot −90°＝車の前（牛）が東＝朱雀門の方を向く。車の局所 +x＝南（路肩の側）
+    q: ID, at: {x:260, z:44980, rot:0}, near: 1200,
     parts: [
       {id:'cart', kind:'oxcart', coat:0},                        // 牛は黒（黒麻呂）
       {id:'mud', kind:'mud', dx:6, dz:8, r:30, rz:.75},           // 沈んだ南の輪のまわり。車の後ろ（西）へはみ出して見える
