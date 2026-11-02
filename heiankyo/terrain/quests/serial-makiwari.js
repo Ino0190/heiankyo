@@ -6,7 +6,7 @@
 // 仕組みは CadKit/index.html の「日常連作」（L.serials）。書き方:
 //  spot  … 置き場の種類と、その近くの点（いちばん近い置き場を家の裏の原点にする）。
 //          原点の座標は「lx＝薪の山のある側が＋・lz＝家の裏壁の側が＋」。割る台は (0,7)、薪の山は lx 7〜29・lz 6〜14 にある
-//  cast  … 出る人（char＝L.people の id。bind:{serial:'makiwari'} の人は、この連作の体にだけ載る）
+//  cast  … 出る人（char＝L.people の id。heian-people.js で serial:'makiwari' に割り当てた人は、この連作の体にだけ載る）
 //  stages… day＝起点から何日目（0始まり）。actors＝その日の役と場所（at が埋まっていたら alt を順に試す）。
 //          props＝置き物（box: p 位置・s 大きさ・ry 向き・rx/rz 傾き・c 色）。seen＝近くで見たとき聞き書き帳に残す文（1段に1回）。
 //          talk＝二人がそろって近くにいるときの掛け合い。recent＝その段の「近ごろ見たもの」
@@ -16,7 +16,7 @@
   if (!L) return;
   const add = p => { if (!L.people.some(q => q.id === p.id)) L.people.push(p); };
   add({id:'makiwari_otoko', name:'黒麻呂', who:'庶民', age:46, model:'庶民の街区の長屋の裏で、毎朝薪を割る男',
-    bind:{serial:'makiwari'}, from:'山城国', home:'庶民の街区の長屋（裏に薪置場）', work:'薪を割って隣近所へ分ける。ほかは日雇い',
+    from:'山城国', home:'庶民の街区の長屋（裏に薪置場）', work:'薪を割って隣近所へ分ける。ほかは日雇い',
     family:'妻は先に死んだ。娘は西の京へ嫁いだ', story:'若いころは山から薪を担いで下ろしていた。いまは長屋の裏で割るだけだが、朝の斧の音だけは昔のまま',
     recent:['朝の薪は乾いとる。よう割れる'], wants:'腰が続くうちは、自分の薪は自分で割ること',
     day:[[6,17,'commoners','薪割り','serial:makiwari=0'],[6,17,'commoners','腰','serial:makiwari=1'],[6,17,'commoners','見張り','serial:makiwari=2'],[6,17,'commoners','また薪割り','serial:makiwari>=3'],[17,6,'commoners','家']],
@@ -30,7 +30,7 @@
     knows:{makiwari_tonari:'隣のは、口は悪いが手は早い'},
     kb:{dom:{'工':1},lens:'実直',src:[]}, axis:{mibun:'町の者',house:null,tachiba:'中立',chusei:null}, n:'D 創作（日常連作 薪割り）'});
   add({id:'makiwari_tonari', name:'常女', who:'女', age:39, model:'黒麻呂の隣に住む女。朝餉の支度をしながら、斧の音にぼやく',
-    bind:{serial:'makiwari'}, from:'山城国', home:'庶民の街区の長屋（黒麻呂の隣）', work:'洗い物と縫い物の手間仕事',
+    from:'山城国', home:'庶民の街区の長屋（黒麻呂の隣）', work:'洗い物と縫い物の手間仕事',
     family:'夫は東市の荷運び。子が二人', story:'隣の黒麻呂とは、この長屋に来てからの付き合い。朝の斧の音には毎日文句を言うが、竈の薪は隣から分けてもらっている',
     recent:['隣の斧の音で、今朝も目が覚めた'], wants:'朝くらい、静かに起きたい',
     day:[[5,11,'commoners','朝餉','serial:makiwari=0'],[5,11,'commoners','静かな朝','serial:makiwari=1'],[5,17,'commoners','片付け','serial:makiwari=2'],[5,11,'commoners','いつもの朝','serial:makiwari>=3'],[11,19,'commoners','夕餉'],[19,5,'commoners','家']],

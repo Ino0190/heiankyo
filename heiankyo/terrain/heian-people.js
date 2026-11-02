@@ -1,0 +1,1473 @@
+// 平安京の名前のある人物の居場所・体への割当・通勤経路（schema 1）。台詞、日課、見た目、出現条件は持たない。
+// bindと座標を直しても建築assetsの焼き込みは不要。人数や会話は heian-lines.js／residents.json が正本。
+window.HEIAN_PEOPLE={
+  "schemaVersion": 1,
+  "bindings": {
+    "abe_korekata": {
+      "x": -3163,
+      "z": -5036,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "akane": {
+      "at": "eastMarket",
+      "who": [
+        "売り子"
+      ],
+      "r": 2000
+    },
+    "ako": {
+      "at": "eastMarket",
+      "r": 2000,
+      "who": [
+        "女",
+        "客"
+      ]
+    },
+    "ayame": {
+      "at": "commoners",
+      "who": [
+        "女"
+      ],
+      "r": 1500
+    },
+    "ayume": {
+      "at": "westMarket",
+      "who": [
+        "売り子"
+      ],
+      "r": 2000
+    },
+    "banjo": {
+      "at": "rajomon",
+      "who": [
+        "人夫"
+      ],
+      "r": 1500
+    },
+    "bocho": {
+      "at": "commoners",
+      "who": [
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "chidori": {
+      "at": "gojoTenjinWalk",
+      "who": [
+        "女"
+      ],
+      "r": 1200
+    },
+    "dainagon_keishi": {
+      "at": "nobles",
+      "who": [
+        "官人",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "eimon_jo": {
+      "x": 2700,
+      "z": -950,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "enjo": {
+      "at": "modoribashi",
+      "who": [
+        "僧"
+      ],
+      "r": 2000
+    },
+    "eshi": {
+      "x": 4200,
+      "z": 9990,
+      "who": [
+        "定位置の庶民"
+      ],
+      "r": 90
+    },
+    "funya_takamichi": {
+      "x": 1986,
+      "z": 5404,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "gakunin": {
+      "at": "daidairi",
+      "who": [
+        "官人"
+      ],
+      "r": 2000
+    },
+    "gakusho_chihou": {
+      "x": 1125,
+      "z": 9587,
+      "who": [
+        "学生"
+      ],
+      "r": 900
+    },
+    "gakusho_senpai": {
+      "x": 1198,
+      "z": 6192,
+      "who": [
+        "官人"
+      ],
+      "office": "shikibu",
+      "r": 400
+    },
+    "gakusho_tomo": {
+      "x": 1125,
+      "z": 9587,
+      "who": [
+        "学生"
+      ],
+      "r": 900
+    },
+    "geki": {
+      "x": 2601,
+      "z": 3700,
+      "who": [
+        "官人"
+      ],
+      "office": "dajokan",
+      "r": 400
+    },
+    "hamanari": {
+      "at": "eastMarket",
+      "r": 2000,
+      "who": [
+        "客"
+      ]
+    },
+    "harukaze": {
+      "at": "eastKorokan",
+      "who": [
+        "官人",
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "harunari": {
+      "x": -60,
+      "z": 6600,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "heita": {
+      "x": -4972,
+      "z": 5571,
+      "who": [
+        "馬部"
+      ],
+      "r": 1400
+    },
+    "hida_hirotari": {
+      "x": 6630,
+      "z": 8800,
+      "who": [
+        "庶民",
+        "人夫"
+      ],
+      "r": 1500
+    },
+    "hirotari": {
+      "at": "suzaku",
+      "who": [
+        "人夫"
+      ],
+      "r": 2500
+    },
+    "hiwada": {
+      "at": "nobles",
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "hocho": {
+      "at": "nobles",
+      "who": [
+        "官人",
+        "家司",
+        "庶民"
+      ],
+      "r": 2500
+    },
+    "hyoe_menoto": {
+      "interior": "chunagon"
+    },
+    "ichitsukasa": {
+      "at": "eastMarket",
+      "who": [
+        "官人"
+      ],
+      "r": 2000
+    },
+    "ise": {
+      "x": 1775,
+      "z": -2040,
+      "who": [
+        "女房"
+      ],
+      "r": 2200
+    },
+    "ishimaro": {
+      "x": -3727,
+      "z": 670,
+      "who": [
+        "人夫"
+      ],
+      "r": 900
+    },
+    "iwamaru": {
+      "at": "funaokaTop",
+      "who": [
+        "庶民",
+        "僧"
+      ],
+      "r": 1500
+    },
+    "kacho_takamori": {
+      "at": "suzaku",
+      "who": [
+        "火長",
+        "衛士"
+      ],
+      "r": 3000
+    },
+    "kaede": {
+      "x": 0,
+      "z": 7250,
+      "who": [
+        "牛飼童"
+      ],
+      "r": 2000
+    },
+    "kaji": {
+      "at": "commoners",
+      "who": [
+        "庶民",
+        "人夫"
+      ],
+      "r": 2000
+    },
+    "kamiya": {
+      "x": -9400,
+      "z": -700,
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "life": [
+        "paper"
+      ],
+      "r": 1500
+    },
+    "kamo_negi": {
+      "x": 22350,
+      "z": 26700,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "kangaku_hakase": {
+      "x": 2363,
+      "z": 11750,
+      "who": [
+        "官人"
+      ],
+      "r": 500
+    },
+    "kangakuin": {
+      "x": 2363,
+      "z": 12000,
+      "who": [
+        "学生"
+      ],
+      "r": 600
+    },
+    "karamono": {
+      "at": "eastMarket",
+      "who": [
+        "客",
+        "旅人"
+      ],
+      "r": 1500
+    },
+    "kawara_baba": {
+      "x": 21600,
+      "z": 27500,
+      "who": [
+        "女",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "kawaraji": {
+      "x": 6630,
+      "z": 9000,
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "kemari_youth": {
+      "x": -390,
+      "z": 5260,
+      "who": [
+        "官人"
+      ],
+      "r": 150
+    },
+    "kenshin": {
+      "at": "saiji",
+      "who": [
+        "僧"
+      ],
+      "r": 1500
+    },
+    "ki_haseo": {
+      "x": 1897,
+      "z": 9444,
+      "who": [
+        "儒者"
+      ],
+      "r": 90
+    },
+    "ki_yoshimochi": {
+      "x": 1367,
+      "z": 9564,
+      "who": [
+        "儒者"
+      ],
+      "r": 90
+    },
+    "kinu_akindo": {
+      "at": "eastMarket",
+      "who": [
+        "売り子"
+      ],
+      "r": 2000
+    },
+    "kitanokata": {
+      "interior": "chunagon"
+    },
+    "kizukai": {
+      "at": "rajomon",
+      "who": [
+        "人夫"
+      ],
+      "r": 1500
+    },
+    "kome_akindo": {
+      "at": "westMarket",
+      "who": [
+        "売り子",
+        "客"
+      ],
+      "r": 2000
+    },
+    "komori": {
+      "at": "commoners",
+      "who": [
+        "女",
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "korekiyo": {
+      "at": "kawaranoin",
+      "who": [
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "koreyuki": {
+      "x": 2467,
+      "z": 2486,
+      "who": [
+        "官人"
+      ],
+      "r": 900
+    },
+    "kosaisho": {
+      "at": "higashiSanjo",
+      "who": [
+        "女"
+      ],
+      "r": 1500
+    },
+    "kotakamaru": {
+      "interior": "chunagon"
+    },
+    "kotaro": {
+      "key": "x0"
+    },
+    "kunimitsu": {
+      "x": -4972,
+      "z": 672,
+      "who": [
+        "人夫"
+      ],
+      "r": 900
+    },
+    "kurodo": {
+      "x": 1725,
+      "z": -560,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "kuromaro": {
+      "at": "eastMarket",
+      "r": 2000,
+      "who": [
+        "客",
+        "庶民"
+      ]
+    },
+    "kusushi": {
+      "x": -3765,
+      "z": 1921,
+      "who": [
+        "官人"
+      ],
+      "office": "tenyaku",
+      "r": 400
+    },
+    "makiwari_otoko": {
+      "serial": "makiwari"
+    },
+    "makiwari_tonari": {
+      "serial": "makiwari"
+    },
+    "masago": {
+      "x": 22350,
+      "z": 27250,
+      "who": [
+        "定位置の女"
+      ],
+      "r": 90
+    },
+    "masume": {
+      "at": "westMarket",
+      "who": [
+        "売り子"
+      ],
+      "r": 1200
+    },
+    "masumi": {
+      "at": "shinsenen",
+      "who": [
+        "庶民",
+        "僧",
+        "官人"
+      ],
+      "r": 1500
+    },
+    "matori": {
+      "at": "nobles",
+      "who": [
+        "庶民",
+        "人夫"
+      ],
+      "r": 2000
+    },
+    "miko": {
+      "at": "gojoTenjinWalk",
+      "who": [
+        "女"
+      ],
+      "r": 2000
+    },
+    "minamoto_suezumi": {
+      "x": 2601,
+      "z": 3700,
+      "who": [
+        "官人"
+      ],
+      "office": "dajokan",
+      "r": 400
+    },
+    "mino_otoko": {
+      "x": -13500,
+      "z": 30200,
+      "who": [
+        "定位置の庶民"
+      ],
+      "r": 90
+    },
+    "miyoshi_kiyoyuki": {
+      "x": 1527,
+      "z": 9694,
+      "who": [
+        "儒者"
+      ],
+      "r": 90
+    },
+    "mochime": {
+      "x": 0,
+      "z": 7250,
+      "who": [
+        "売り子",
+        "女"
+      ],
+      "r": 2000
+    },
+    "mutsu": {
+      "at": "rajomon",
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "myobo": {
+      "x": 1125,
+      "z": 9587,
+      "who": [
+        "学生"
+      ],
+      "r": 900
+    },
+    "naishi": {
+      "x": 1725,
+      "z": -1700,
+      "who": [
+        "女房"
+      ],
+      "r": 1300
+    },
+    "nakahara_naomichi": {
+      "x": 3176,
+      "z": 3549,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "nakanokimi": {
+      "interior": "chunagon"
+    },
+    "niage": {
+      "at": "horikawa",
+      "who": [
+        "人夫",
+        "庶民",
+        "客"
+      ],
+      "r": 1200
+    },
+    "ninnaji": {
+      "x": -4200,
+      "z": 9990,
+      "who": [
+        "定位置の庶民"
+      ],
+      "r": 90
+    },
+    "nishi_toji": {
+      "at": "westMarket",
+      "who": [
+        "売り子",
+        "客"
+      ],
+      "r": 2000
+    },
+    "nishikibe": {
+      "at": "commoners",
+      "who": [
+        "女"
+      ],
+      "r": 2000
+    },
+    "nyobo_yomi": {
+      "x": 1725,
+      "z": -1700,
+      "who": [
+        "女房"
+      ],
+      "r": 1500
+    },
+    "ochi_mao": {
+      "at": "suzakumon",
+      "who": [
+        "衛士"
+      ],
+      "r": 1200
+    },
+    "oimatsu": {
+      "x": -2292,
+      "z": -6250,
+      "who": [
+        "人夫"
+      ],
+      "r": 1000
+    },
+    "okina_katari": {
+      "key": "x1"
+    },
+    "okura_shi": {
+      "x": -3429,
+      "z": -5118,
+      "who": [
+        "官人"
+      ],
+      "office": "okura",
+      "r": 400
+    },
+    "omi_hamatari": {
+      "x": 0,
+      "z": 6900,
+      "who": [
+        "衛士"
+      ],
+      "r": 900
+    },
+    "omi_ishimaro": {
+      "x": 0,
+      "z": 6900,
+      "who": [
+        "衛士"
+      ],
+      "r": 900
+    },
+    "onimaru": {
+      "at": "eastMarket",
+      "r": 2000,
+      "who": [
+        "客",
+        "庶民"
+      ]
+    },
+    "ono_ujio": {
+      "x": -3176,
+      "z": 6263,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "ookura_yoshiyuki": {
+      "x": 1607,
+      "z": 9534,
+      "who": [
+        "儒者"
+      ],
+      "r": 90
+    },
+    "otomo_imanari": {
+      "x": 960,
+      "z": 6217,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "rajomon_otoko": {
+      "at": "rajomon",
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "renkan": {
+      "at": "toji",
+      "who": [
+        "僧"
+      ],
+      "r": 1500
+    },
+    "rokakudo_so": {
+      "at": "rokakudo",
+      "who": [
+        "僧",
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "rusui": {
+      "at": "kawaranoin",
+      "who": [
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "saeki_omichi": {
+      "x": -3176,
+      "z": 5001,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "sakanoue_korenori": {
+      "x": 1125,
+      "z": 9587,
+      "who": [
+        "学生"
+      ],
+      "r": 700
+    },
+    "sakeuri": {
+      "at": "eastMarket",
+      "who": [
+        "売り子",
+        "女"
+      ],
+      "r": 2000
+    },
+    "sakon": {
+      "interior": "chunagon"
+    },
+    "sakyo_shisho": {
+      "x": 1020,
+      "z": 10321,
+      "who": [
+        "官人"
+      ],
+      "office": "sakyoshiki",
+      "r": 400
+    },
+    "sanae": {
+      "at": "eastMarket",
+      "r": 2000,
+      "who": [
+        "売り子"
+      ]
+    },
+    "sangaku": {
+      "at": "suzaku",
+      "who": [
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "sansei": {
+      "x": 1125,
+      "z": 9587,
+      "who": [
+        "学生"
+      ],
+      "r": 900
+    },
+    "sawarabi": {
+      "at": "rajomon",
+      "who": [
+        "女"
+      ],
+      "r": 1500
+    },
+    "seyakuin": {
+      "x": 12060,
+      "z": 43160,
+      "who": [
+        "女",
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "shakyosei": {
+      "at": "toji",
+      "who": [
+        "僧",
+        "官人"
+      ],
+      "r": 2000
+    },
+    "someshi": {
+      "at": "commoners",
+      "who": [
+        "女"
+      ],
+      "r": 2000
+    },
+    "sugawara_takami": {
+      "x": 2027,
+      "z": 9604,
+      "who": [
+        "儒者"
+      ],
+      "r": 90
+    },
+    "sugoroku": {
+      "at": "commoners",
+      "who": [
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "sumobito": {
+      "at": "suzaku",
+      "who": [
+        "人夫",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "suzumemaru": {
+      "at": "commoners",
+      "who": [
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "tachibana_yasunari": {
+      "x": 2867,
+      "z": 3549,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "tadatsune": {
+      "x": 4953,
+      "z": -2841,
+      "who": [
+        "衛士"
+      ],
+      "r": 1400
+    },
+    "tahito": {
+      "at": "ukyoPaddies",
+      "who": [
+        "庶民"
+      ],
+      "r": 1500
+    },
+    "taira_kiyosue": {
+      "at": "nobles",
+      "who": [
+        "官人"
+      ],
+      "r": 2000
+    },
+    "tajihi_toyomasu": {
+      "x": -822,
+      "z": 6263,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "takemaru": {
+      "at": "eastMarket",
+      "who": [
+        "客",
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "takemitsu": {
+      "key": "kugyo:tt_yamabuki:1"
+    },
+    "takuhatsu_so": {
+      "at": "eastMarket",
+      "who": [
+        "僧",
+        "庶民",
+        "客"
+      ],
+      "r": 2500
+    },
+    "tamaro": {
+      "at": "horikawa",
+      "who": [
+        "人夫"
+      ],
+      "r": 1500
+    },
+    "tanba_tomoo": {
+      "x": 1105,
+      "z": 2519,
+      "who": [
+        "史生"
+      ],
+      "r": 500
+    },
+    "toji_ouna": {
+      "at": "rajomon",
+      "who": [
+        "女"
+      ],
+      "r": 1500
+    },
+    "toramaru": {
+      "key": "kugyo:tt_yamabuki:0"
+    },
+    "tsugejo": {
+      "at": "westMarket",
+      "who": [
+        "売り子"
+      ],
+      "r": 2000
+    },
+    "tsukushi": {
+      "at": "rajomon",
+      "who": [
+        "庶民",
+        "人夫"
+      ],
+      "r": 2000
+    },
+    "tsurayuki": {
+      "x": 1757,
+      "z": 9714,
+      "who": [
+        "官人"
+      ],
+      "r": 400
+    },
+    "ukyo_bocho": {
+      "at": "westMarket",
+      "who": [
+        "庶民",
+        "客"
+      ],
+      "r": 2200
+    },
+    "ukyo_sakan": {
+      "x": -1700,
+      "z": 8450,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "uneme": {
+      "x": 1725,
+      "z": -1700,
+      "who": [
+        "女房"
+      ],
+      "r": 1300
+    },
+    "uomaro": {
+      "at": "horikawa",
+      "who": [
+        "庶民",
+        "人夫"
+      ],
+      "r": 1200
+    },
+    "urabe": {
+      "x": 4763,
+      "z": 4672,
+      "who": [
+        "官人"
+      ],
+      "office": "jingikan",
+      "r": 400
+    },
+    "wake_koreo": {
+      "x": 12060,
+      "z": 43749,
+      "who": [
+        "下人",
+        "官人"
+      ],
+      "r": 1500
+    },
+    "wake_yoshinari": {
+      "x": -3727,
+      "z": 2170,
+      "who": [
+        "官人"
+      ],
+      "r": 600
+    },
+    "yadonushi": {
+      "at": "commoners",
+      "who": [
+        "庶民"
+      ],
+      "r": 2000
+    },
+    "yasuomi": {
+      "x": 50,
+      "z": 6600,
+      "who": [
+        "定位置の官人"
+      ],
+      "r": 90
+    },
+    "yasuyuki": {
+      "at": "kobaiden",
+      "who": [
+        "官人"
+      ],
+      "r": 2000
+    },
+    "zenne": {
+      "at": "westMarket",
+      "who": [
+        "客"
+      ],
+      "r": 2500
+    },
+    "zoushime": {
+      "x": 1725,
+      "z": -1700,
+      "who": [
+        "女房"
+      ],
+      "r": 1300
+    }
+  },
+  "eraBindings": {
+    "kotota": {
+      "yoha": {
+        "bind": {
+          "at": "estate_tokihira",
+          "who": [
+            "従者"
+          ],
+          "r": 2000
+        }
+      },
+      "koki": {
+        "bind": null
+      }
+    },
+    "omi_hamatari": {
+      "yoha": {
+        "bind": {
+          "at": "suzakumon",
+          "who": [
+            "衛士"
+          ],
+          "r": 2000
+        }
+      }
+    },
+    "omi_ishimaro": {
+      "yoha": {
+        "bind": {
+          "at": "suzakumon",
+          "who": [
+            "衛士"
+          ],
+          "r": 2000
+        }
+      }
+    }
+  },
+  "weatherBindings": {},
+  "laterBindings": {},
+  "specialBindings": {
+    "inumaru": {
+      "kind": "kugyo",
+      "formation": "hikaru",
+      "person": 0
+    },
+    "toji": {
+      "kind": "kugyo",
+      "formation": "michizane",
+      "person": 1
+    },
+    "kotota": {
+      "kind": "kugyo",
+      "formation": "michizane",
+      "person": 2
+    },
+    "toramaru": {
+      "kind": "kugyo",
+      "formation": "tt_yamabuki",
+      "person": 0
+    },
+    "takemitsu": {
+      "kind": "kugyo",
+      "formation": "tt_yamabuki",
+      "person": 1
+    },
+    "kotaro": {
+      "kind": "quest",
+      "choices": [
+        {
+          "if": "q:maigo>=8",
+          "key": "x2"
+        },
+        {
+          "if": "q:maigo>=1",
+          "key": "x0"
+        }
+      ]
+    },
+    "okina_katari": {
+      "kind": "key",
+      "key": "x1"
+    },
+    "shosho": {
+      "kind": "key",
+      "key": "l0"
+    },
+    "fumimaro": {
+      "kind": "key",
+      "key": "s0"
+    },
+    "hatsuo": {
+      "kind": "troupe",
+      "name": "租庸調の人夫",
+      "person": 0
+    },
+    "shigezane": {
+      "kind": "troupe",
+      "name": "朱雀大路の騎乗検非違使",
+      "person": 0
+    },
+    "kikume": {
+      "kind": "context",
+      "name": "kikume"
+    },
+    "kogiku": {
+      "kind": "context",
+      "name": "kogiku"
+    },
+    "masanari": {
+      "kind": "context",
+      "name": "masanari"
+    },
+    "yasumaro": {
+      "kind": "context",
+      "name": "yasumaro"
+    },
+    "heita": {
+      "kind": "context",
+      "name": "heita"
+    }
+  },
+  "commuteGates": [
+    {
+      "id": "joto",
+      "name": "上東門",
+      "out": [
+        5960,
+        -4274
+      ],
+      "in": [
+        5250,
+        -4274
+      ]
+    },
+    {
+      "id": "yomei",
+      "name": "陽明門",
+      "out": [
+        5960,
+        -1422
+      ],
+      "in": [
+        5250,
+        -1422
+      ]
+    },
+    {
+      "id": "taiken",
+      "name": "待賢門",
+      "out": [
+        5960,
+        1431
+      ],
+      "in": [
+        5250,
+        1431
+      ]
+    },
+    {
+      "id": "ikuho",
+      "name": "郁芳門",
+      "out": [
+        5960,
+        4297
+      ],
+      "in": [
+        5250,
+        4297
+      ]
+    },
+    {
+      "id": "josai",
+      "name": "上西門",
+      "out": [
+        -5960,
+        -4274
+      ],
+      "in": [
+        -5250,
+        -4274
+      ]
+    },
+    {
+      "id": "inpu",
+      "name": "殷富門",
+      "out": [
+        -5960,
+        -1422
+      ],
+      "in": [
+        -5250,
+        -1422
+      ]
+    },
+    {
+      "id": "sohe",
+      "name": "藻壁門",
+      "out": [
+        -5960,
+        1431
+      ],
+      "in": [
+        -5250,
+        1431
+      ]
+    },
+    {
+      "id": "danten",
+      "name": "談天門",
+      "out": [
+        -5960,
+        4297
+      ],
+      "in": [
+        -5250,
+        4297
+      ]
+    },
+    {
+      "id": "suzaku",
+      "name": "朱雀門",
+      "out": [
+        0,
+        7350
+      ],
+      "in": [
+        0,
+        6350
+      ]
+    }
+  ],
+  "commuters": {
+    "eimon_jo": {
+      "home": [
+        7242,
+        20700
+      ],
+      "gate": "ikuho"
+    },
+    "funya_takamichi": {
+      "home": [
+        9969,
+        6300
+      ],
+      "gate": "ikuho"
+    },
+    "gakunin": {
+      "home": [
+        -11332,
+        -650
+      ],
+      "gate": "inpu"
+    },
+    "geki": {
+      "home": [
+        9969,
+        20700
+      ],
+      "gate": "ikuho"
+    },
+    "harunari": {
+      "home": [
+        4363,
+        14650
+      ],
+      "gate": "suzaku"
+    },
+    "koreyuki": {
+      "home": [
+        9969,
+        9300
+      ],
+      "gate": "ikuho"
+    },
+    "kurodo": {
+      "home": [
+        12726,
+        9300
+      ],
+      "gate": "ikuho"
+    },
+    "kusushi": {
+      "home": [
+        9969,
+        15000
+      ],
+      "gate": "ikuho"
+    },
+    "masanari": {
+      "home": [
+        -9969,
+        2150
+      ],
+      "gate": "inpu"
+    },
+    "minamoto_suezumi": {
+      "home": [
+        14059,
+        9946
+      ],
+      "gate": "ikuho"
+    },
+    "nakahara_naomichi": {
+      "home": [
+        7242,
+        2150
+      ],
+      "gate": "taiken"
+    },
+    "okura_shi": {
+      "home": [
+        -7242,
+        4980
+      ],
+      "gate": "danten"
+    },
+    "otomo_imanari": {
+      "home": [
+        7242,
+        6300
+      ],
+      "gate": "ikuho"
+    },
+    "tachibana_yasunari": {
+      "home": [
+        7242,
+        3580
+      ],
+      "gate": "ikuho"
+    },
+    "taira_kiyosue": {
+      "home": [
+        14059,
+        15320
+      ],
+      "gate": "ikuho"
+    },
+    "tajihi_toyomasu": {
+      "home": [
+        9969,
+        3580
+      ],
+      "gate": "taiken"
+    },
+    "tanba_tomoo": {
+      "home": [
+        7242,
+        700
+      ],
+      "gate": "taiken"
+    },
+    "tsurayuki": {
+      "home": [
+        12726,
+        13300
+      ],
+      "gate": "ikuho"
+    },
+    "wake_yoshinari": {
+      "home": [
+        11332,
+        20700
+      ],
+      "gate": "ikuho"
+    },
+    "yasuomi": {
+      "home": [
+        1697,
+        13300
+      ],
+      "gate": "suzaku"
+    }
+  },
+  "courtLadyRoutes": [
+    {
+      "axis": "x",
+      "fixed": -2560,
+      "a": 1380,
+      "b": 1930,
+      "name": "後宮中央の東西大廊"
+    },
+    {
+      "axis": "x",
+      "fixed": -3150,
+      "a": 1150,
+      "b": 2170,
+      "name": "後宮北の帯の東西廊"
+    },
+    {
+      "axis": "z",
+      "fixed": 1090,
+      "a": -2510,
+      "b": -2225,
+      "name": "西の帯の南北廊"
+    },
+    {
+      "axis": "z",
+      "fixed": 2190,
+      "a": -2510,
+      "b": -2210,
+      "name": "東の帯の南北廊"
+    }
+  ],
+  "fixedBodies": {
+    "rajo_hirotari": {
+      "site": "rajomon",
+      "offset": [
+        70,
+        -40
+      ]
+    },
+    "kotaro_lost": {
+      "x": 8520,
+      "z": 32420
+    },
+    "okina_katari": {
+      "x": 6150,
+      "z": 32930
+    },
+    "kotaro_found": {
+      "anchor": "okina_katari",
+      "offset": [
+        -2,
+        14
+      ]
+    },
+    "market_officer": {
+      "x": 6150,
+      "z": 33110
+    },
+    "yamiichi_1": {
+      "x": 8470,
+      "z": 34300
+    },
+    "yamiichi_2": {
+      "x": 8500,
+      "z": 34330
+    }
+  }
+};
