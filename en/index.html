@@ -110,6 +110,33 @@ footer dd{margin:0}
 footer a{color:#d8dee5}
 @media(max-width:640px){h1{font-size:46px}.tag{font-size:21px}.hero .in{padding-bottom:40px}.shots,.notes{grid-template-columns:1fr}h2{font-size:25px}footer dl{grid-template-columns:1fr;gap:2px}footer dt{margin-top:8px}}
 .vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* @FIXB 2026-11-04 スマホの指あたり44px・3列表をカードに・英語リンクを見つけやすく（UB-02/UB-03/UA-L2） */
+.cta a.sub{display:inline-flex;align-items:center;min-height:44px;padding:4px 6px}
+.cta a.sub[hreflang="en"],.cta a.sub[hreflang="ja"]{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.topskip{margin:14px 0 0}
+.topskip a{display:inline-flex;align-items:center;min-height:44px;color:#f4f1e9;font-size:16px;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){
+.morech a{display:inline-block;padding:7px 2px}
+table.uitab.uitab-cards thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+table.uitab.uitab-cards,table.uitab.uitab-cards tbody,table.uitab.uitab-cards tr,table.uitab.uitab-cards th,table.uitab.uitab-cards td{display:block;width:auto}
+table.uitab.uitab-cards tr{margin:0 0 14px;padding:10px 12px;background:#fff;border:1px solid #e0d5bd}
+table.uitab.uitab-cards tbody th{width:auto;padding:0 0 6px;border:0;font-size:18px}
+table.uitab.uitab-cards td{border:0;padding:3px 0}
+table.uitab.uitab-cards td:not([colspan]):first-of-type::before{content:"PC　";color:#6b5a40;font-size:13px}
+table.uitab.uitab-cards td:nth-of-type(2)::before{content:"スマホ　";color:#6b5a40;font-size:13px}
+}
+/* @robots-lp 2026-11-03 井内さん「キャラクター選択はランディングページ、Wiki両方に載せて欲しい」 */
+.robots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px;margin:20px 0 0}
+.robots .rb{display:flex;flex-direction:column;background:#fffaf0;border:1px solid #e0d6bf;padding:18px}
+.robots .rb img{display:block;height:210px;max-width:100%;width:auto;object-fit:contain;margin:0 auto 10px;background:#f3efe4}
+.robots .rb h3{margin:0 0 2px;font-size:20px}
+.robots .rb .sub{margin:0 0 10px;color:#6b5a3c;font-size:15px}
+.robots .rb p{margin:0 0 12px;font-size:16px;line-height:1.75}
+.robots .rb .enter{margin:auto 0 0}
+.robots .rb .enter a{display:inline-block;padding:9px 20px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}
+.robots .rb .enter a:hover{background:#ddb05a}
+.robots .diff{grid-column:1/-1;margin:4px 0 0;color:#5f513c}
+@media(max-width:640px){.robots{grid-template-columns:1fr}}
 
 .vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
@@ -137,7 +164,8 @@ footer a{color:#d8dee5}
 <p>You are a survey robot sent from the 21st century to Heian-kyo in the year 900. Photograph its buildings and scenery, talk with the people of the capital, and learn how they lived, worked and dressed. What you see and hear is kept in your Notebook. Help the townspeople with their requests and you may learn more. There are no deadlines and no winning or losing.</p>
 <p>Heian-kyo is the city that became today's Kyoto.</p>
 <div class="cta"><a class="btn" href="../heiankyo/?lang=en&amp;go=1" target="_blank" rel="noopener">Go to Heian-kyo (with sound)<span class="vh"> (opens in a new tab)</span></a><a class="sub" href="../" hreflang="ja" lang="ja">日本語</a><a class="sub" href="../research/" hreflang="ja" target="_blank" rel="noopener">Research notes (Japanese)<span class="vh"> (opens in a new tab)</span></a><a class="sub" href="../wiki/" hreflang="ja" target="_blank" rel="noopener">Heian-kyo wiki (Japanese)<span class="vh"> (opens in a new tab)</span></a></div>
-<p class="note">Press it and the city starts loading in a new tab. When it is ready, you appear in the sky above the capital (with music; turn it off with “Music” inside). The first visit downloads about 25 MB and takes one to three minutes. Runs in desktop and mobile browsers.</p>
+<p class="topskip"><a href="#robots">Choose a robot and enter ↓</a></p>
+<p class="note">Press it and the city starts loading in a new tab. When it is ready, you appear in the sky above the capital (with music; turn it off with “Music” inside). The first visit downloads about 32 MB and takes one to three minutes. Runs in desktop and mobile browsers.</p>
 </div>
 </header>
 <main>
@@ -173,7 +201,7 @@ footer a{color:#d8dee5}
 <h3>The buildings in the year 900</h3>
 <ul class="hist">
 <li>The Great Hall of State (Daigokuden) burned in 876 and was rebuilt in 879. The hall you see is the second one.</li>
-<li>Otenmon Gate burned in the Otenmon Incident of 866 and was rebuilt. Thirty-five years have passed, but people who saw the fire still live in the city.</li>
+<li>Otenmon Gate burned in the Otenmon Incident of 866 and was rebuilt. Thirty-four years have passed, but people who saw the fire still live in the city.</li>
 <li>Rajomon Gate fell in a great storm in 816. The gate you see is the second one.</li>
 <li>The five-storey pagoda of Toji Temple took decades to build and was finally completed at the end of the ninth century.</li>
 <li>The imperial palace (Dairi) keeps its form from the founding of the capital.</li>
@@ -209,6 +237,25 @@ footer a{color:#d8dee5}
 <li><h3>Town pastimes</h3>Sugoroku at the street-corner boards, archery at a guards' range, kemari west of the Chodoin, spinning tops with the children, and the cargo boats on the Horikawa canal. Talk to the people playing and they let you join in, sometimes with a small reward. “What you can do today” in the top bar lists what is open now.</li>
 <li><h3>A place to stay</h3>The robot has nowhere to live, but some people will lend it a bed: the upper floor of Rajomon Gate, the porters' hut at the market, and a servants' row house in a noble mansion. Stay at the hut and you can help unload boats at the riverbank; stay at the row house and you can fly kites and trade riddles with the young lord. The robot does not lie down. At night it sits still in its room, and wakes in the morning after a roommate winds up the Iron Child's key or blows fresh air into the Ball Child. Each room has a wicker chest for your belongings, and your lodgings are marked on the map.</li>
 </ul>
+</section>
+<section id="robots">
+<h2>Choose your robot</h2>
+<p>You explore Heian-kyo as one of three small robots, sent back from the 21st century to survey the city in the year 900. They look and move differently, so pick whichever you like. You can switch any time from the ☰ menu (&ldquo;Robot&rdquo;).</p>
+<div class="robots">
+<figure class="rb"><img src="../img/robot-tin.svg" width="197.5" height="295.9" alt="Iron Child, a tin robot with an antenna, glowing eyes and a wind-up key on its back" loading="lazy" decoding="async">
+<h3>Iron Child</h3><p class="sub">Tin robot</p>
+<p>A silver-and-red tin body, with a single antenna, glowing eyes and a wind-up key on its back. Its tin feet clack as it walks; click far away and it hovers there. Hit a wall and it reels back, stars circling its head for a moment. A classic tin robot that stays grounded and jumps with Space.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=tin" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
+<figure class="rb"><img src="../img/robot-maru.svg" width="171.0" height="295.9" alt="Ball Child, a round balloon robot with teal glowing eyes and mouth" loading="lazy" decoding="async">
+<h3>Ball Child</h3><p class="sub">Balloon robot</p>
+<p>A round, inflated body in beige and orange; its eyes and mouth glow teal, and at night its torso faintly lights up. It bounces as it walks and floats when it stands still. Space fires a jet that lifts it up and lets it drift down, and it boings back off walls. A soft robot that floats and bounces.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=maru-a" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
+<figure class="rb"><img src="../img/robot-spider.svg" width="344.2" height="295.9" alt="Tsuchigumo, a low yellow-and-cream robot with six legs and six wheels" loading="lazy" decoding="async">
+<h3>Tsuchigumo</h3><p class="sub">Six-legged robot</p>
+<p>A low yellow-and-cream body carried by six legs, each ending in a wheel. Repeated clicks change it from a six-legged walk to a skip, a wheeled run and finally a sprint at about 92 km/h. Click a roof and it makes one jump from outside the building to land there, runs across the roof, then lowers itself from the edge on a thread. It cannot stay airborne or use ladders: it races across the ground and rooftops.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=spider" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
+<p class="diff">The Iron Child is strong, the Ball Child can fly on its jet, and Tsuchigumo is the fastest robot on the ground.</p>
+</div>
 </section>
 <section id="map">
 <h2>Map of Heian-kyo</h2>
