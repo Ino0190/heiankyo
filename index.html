@@ -110,6 +110,33 @@ footer dd{margin:0}
 footer a{color:#d8dee5}
 @media(max-width:640px){h1{font-size:46px}.tag{font-size:21px}.hero .in{padding-bottom:40px}.shots,.notes{grid-template-columns:1fr}h2{font-size:25px}footer dl{grid-template-columns:1fr;gap:2px}footer dt{margin-top:8px}}
 .vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* @FIXB 2026-11-04 スマホの指あたり44px・3列表をカードに・英語リンクを見つけやすく（UB-02/UB-03/UA-L2） */
+.cta a.sub{display:inline-flex;align-items:center;min-height:44px;padding:4px 6px}
+.cta a.sub[hreflang="en"],.cta a.sub[hreflang="ja"]{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.topskip{margin:14px 0 0}
+.topskip a{display:inline-flex;align-items:center;min-height:44px;color:#f4f1e9;font-size:16px;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){
+.morech a{display:inline-block;padding:7px 2px}
+table.uitab.uitab-cards thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+table.uitab.uitab-cards,table.uitab.uitab-cards tbody,table.uitab.uitab-cards tr,table.uitab.uitab-cards th,table.uitab.uitab-cards td{display:block;width:auto}
+table.uitab.uitab-cards tr{margin:0 0 14px;padding:10px 12px;background:#fff;border:1px solid #e0d5bd}
+table.uitab.uitab-cards tbody th{width:auto;padding:0 0 6px;border:0;font-size:18px}
+table.uitab.uitab-cards td{border:0;padding:3px 0}
+table.uitab.uitab-cards td:not([colspan]):first-of-type::before{content:"PC　";color:#6b5a40;font-size:13px}
+table.uitab.uitab-cards td:nth-of-type(2)::before{content:"スマホ　";color:#6b5a40;font-size:13px}
+}
+/* @robots-lp 2026-11-03 井内さん「キャラクター選択はランディングページ、Wiki両方に載せて欲しい」 */
+.robots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px;margin:20px 0 0}
+.robots .rb{display:flex;flex-direction:column;background:#fffaf0;border:1px solid #e0d6bf;padding:18px}
+.robots .rb img{display:block;height:210px;max-width:100%;width:auto;object-fit:contain;margin:0 auto 10px;background:#f3efe4}
+.robots .rb h3{margin:0 0 2px;font-size:20px}
+.robots .rb .sub{margin:0 0 10px;color:#6b5a3c;font-size:15px}
+.robots .rb p{margin:0 0 12px;font-size:16px;line-height:1.75}
+.robots .rb .enter{margin:auto 0 0}
+.robots .rb .enter a{display:inline-block;padding:9px 20px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}
+.robots .rb .enter a:hover{background:#ddb05a}
+.robots .diff{grid-column:1/-1;margin:4px 0 0;color:#5f513c}
+@media(max-width:640px){.robots{grid-template-columns:1fr}}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -121,7 +148,7 @@ footer a{color:#d8dee5}
 {"@type":"Question","name":"スマートフォンでも動きますか","acceptedAnswer":{"@type":"Answer","text":"動きます。ドラッグで見回し、地面をタップして移動します。初回の読み込みが大きいので、Wi-Fiでの利用をおすすめします。"}},
 {"@type":"Question","name":"どこまで史実どおりですか","acceptedAnswer":{"@type":"Answer","text":"地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、設定資料集に確度を書いています。"}},
 {"@type":"Question","name":"撮った画像を自分の作品に使えますか","acceptedAnswer":{"@type":"Answer","text":"個人の作品（漫画・イラスト・動画など）の背景に使えます。公開するときは「HakoniwaKit 平安京」と書き添えてください。商用で使いたいときはご相談ください。"}},
-{"@type":"Question","name":"遊んだ続きはどうなりますか","acceptedAnswer":{"@type":"Answer","text":"日付と聞いた話はブラウザに残り、次に開くと続きから始まります。"}}]}
+{"@type":"Question","name":"遊んだ続きはどうなりますか","acceptedAnswer":{"@type":"Answer","text":"日付と聞いた話、撮った写真はブラウザに残り、次に開くと続きから始まります。どこにも送りません。"}}]}
 ]}
 </script>
 <script data-goatcounter="https://ino0190.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -132,16 +159,17 @@ footer a{color:#d8dee5}
 <p class="series"><svg viewBox="414 291 285 285" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M557.82 294.27C633.96 294.27 695.68 355.99 695.68 432.13C695.68 508.27 633.96 569.99 557.82 569.99C481.68 569.99 419.96 508.27 419.96 432.13C419.96 355.99 481.68 294.27 557.82 294.27ZM447.11 432.13C447.11 493.27 496.68 542.84 557.82 542.84C618.96 542.84 668.52 493.27 668.52 432.13C668.52 370.99 618.96 321.43 557.82 321.43C496.68 321.43 447.11 370.99 447.11 432.13Z"/><path fill="currentColor" d="M586.49 351.44h29.07v224.03h-29.07ZM497.43 291.45h29.07v224.03h-29.07ZM414.48 489.87V460.8h224.03v29.07ZM474.47 403.46V374.4h224.04v29.06Z"/></svg>HakoniwaKit</p>
 <h1>平安京</h1>
 <p class="tag">昌泰三年（900）の都を、ブラウザで歩く</p>
-<p>あなたは21世紀から、昌泰三年（900）の平安京へ調査に派遣されるロボット「鉄の童」です。建物や景色を撮り、都に住む人々と話して、当時の暮らし・仕事・風俗・人々の生き方を調べます。見たり聞いたりしたことは「聞き書き帳」に残ります。住人の頼まれごとをこなすと、もっと多くの話が聞けるかもしれません。締め切りや勝ち負けはありません。</p>
+<p>あなたは21世紀から、昌泰三年（900）の平安京へ調査に派遣されるロボットです。建物や景色を撮り、都に住む人々と話して、当時の暮らし・仕事・風俗・人々の生き方を調べます。見たり聞いたりしたことは「聞き書き帳」に残ります。住人の頼まれごとをこなすと、もっと多くの話が聞けるかもしれません。締め切りや勝ち負けはありません。</p>
 <div class="cta"><a class="btn" href="heiankyo/?go=1" target="_blank" rel="noopener">平安京へ（音が出ます）<span class="vh">（新しいタブで開きます）</span></a><a class="sub" href="en/" hreflang="en" lang="en">English</a><a class="sub" href="research/" target="_blank" rel="noopener">設定資料集を読む<span class="vh">（新しいタブで開きます）</span></a><a class="sub" href="wiki/" target="_blank" rel="noopener">平安京wiki（人・場所・頼みごと）<span class="vh">（新しいタブで開きます）</span></a></div>
-<p class="note">押すと新しいタブで読み込みが始まり、読み終わると平安京の上空に出ます（音楽つき・中の「音楽」で消せます）。初回は約25MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
+<p class="topskip"><a href="#robots">遊ぶ童（ロボット）を選んで入る ↓</a></p>
+<p class="note">押すと新しいタブで読み込みが始まり、読み終わると平安京の上空に出ます（音楽つき・中の「音楽」で消せます）。初回は約32MBを読み込み、1〜3分かかります。PC・スマートフォンのブラウザで動きます。</p>
 </div>
 </header>
 <main>
 <section id="start">
 <h2>はじめての操作</h2>
 <p>入ったら、まずこの5つを試してみてください。あとは歩きながら覚えられます。ゲームの中の右上 ☰ の「あそびかた」でも見返せます。</p>
-<table class="uitab">
+<table class="uitab uitab-cards">
 <thead><tr><th>したいこと</th><th>PC</th><th>スマートフォン</th></tr></thead>
 <tbody>
 <tr><th>歩く</th><td>地面をクリックすると、そこへ歩く。遠くをクリックするほど速い</td><td>地面をタップすると、そこへ歩く</td></tr>
@@ -149,13 +177,13 @@ footer a{color:#d8dee5}
 <tr><th>話しかける</th><td>人に近づいて E</td><td>人の吹き出しか「話しかける」の札をタップ</td></tr>
 <tr><th>しぐさ</th><td>B お辞儀・G 手を振る・Y 笛・Q 踊る（町の人が返してくれる）</td><td>下の「動作」から</td></tr>
 <tr><th>名所へ行く</th><td colspan="2">左上の行き先の一覧か地図の印を選ぶと、「歩いて行く」か「すぐ移る」を選べる</td></tr>
-<tr><th>そのほか</th><td colspan="2">T たどる（都の年表）・N 聞き書き帳・☰ 夜や音楽・星座の切り替え。迷ったら「おまかせ」（O）で、鉄の童が勝手に歩いていく</td></tr>
+<tr><th>そのほか</th><td colspan="2">T たどる（都の年表）・N 聞き書き帳・☰ 夜や音楽・星座の切り替え。迷ったら「おまかせ」（O）で、ロボットが勝手に歩いていく</td></tr>
 </tbody>
 </table>
 </section>
 <section id="uses">
 <h2>こんな使い方ができます</h2>
-<p>鉄の童は、21世紀から平安京の調査に派遣されたロボットです。調査の目的は、千年前の都がどんな所だったのか、そこに暮らす人々がどんな仕事をし、何を楽しみ、どう生きていたのかを確かめて、21世紀へ伝えることです。そのために都を隅々まで歩き、さまざまな建物や景色を撮影し、人々の話を聞いて、21世紀へ送る報告を聞き書き帳にまとめていきます。</p>
+<p>ロボットは、21世紀から平安京の調査に派遣されました。調査の目的は、千年前の都がどんな所だったのか、そこに暮らす人々がどんな仕事をし、何を楽しみ、どう生きていたのかを確かめて、21世紀へ伝えることです。そのために都を隅々まで歩き、さまざまな建物や景色を撮影し、人々の話を聞いて、21世紀へ送る報告を聞き書き帳にまとめていきます。</p>
 <p>ゲームとして遊ぶほかに、こんな使い方もできます。</p>
 <ul class="uses">
 <li><h3>都を散歩する</h3>朱雀大路の広さや、大内裏までの遠さを、歩いて確かめられます。</li>
@@ -165,12 +193,12 @@ footer a{color:#d8dee5}
 </section>
 <section id="about">
 <h2>昌泰三年（900）の平安京</h2>
-<p>桓武天皇は794年に都を平安京へ移しました。鉄の童が降り立つのは、それからおよそ百年後の昌泰三年（900）、醍醐天皇の代の都です。左大臣は藤原時平、右大臣は菅原道真。翌年の正月、道真は大宰権帥に落とされて都を去ります。羅城門・大極殿・朝堂院・内裏・東寺・西寺が並んで建っていた時期にあたります。</p>
+<p>桓武天皇は794年に都を平安京へ移しました。ロボットが降り立つのは、それからおよそ百年後の昌泰三年（900）、醍醐天皇の代の都です。左大臣は藤原時平、右大臣は菅原道真。翌年の正月、道真は大宰権帥に落とされて都を去ります。羅城門・大極殿・朝堂院・内裏・東寺・西寺が並んで建っていた時期にあたります。</p>
 <p>条坊がすべて家で埋まることはなく、右京では農地に変わり始めた所もありました。都の中には、その空き地や湿地も広がっています。</p>
 <h3>900年の建物の来歴</h3>
 <ul class="hist">
 <li>大極殿は貞観十八年（876）に焼け、元慶三年（879）に建て直された二代目です。</li>
-<li>応天門は貞観八年（866）の応天門の変で焼け、建て直されています。変から35年経ちましたが火災を見た人がまだ都にいます。</li>
+<li>応天門は貞観八年（866）の応天門の変で焼け、建て直されています。変から34年経ちましたが火災を見た人がまだ都にいます。</li>
 <li>羅城門は弘仁七年（816）の大風で倒れ、建て直された二代目です。</li>
 <li>東寺の五重塔は、着工から長くかかり、9世紀の末にようやく建ちました。</li>
 <li>内裏は遷都以来の姿を保っています。</li>
@@ -195,18 +223,37 @@ footer a{color:#d8dee5}
 <div class="row"><figure><video data-src="img/suzakumon-talk.mp4" poster="img/suzakumon-talk.jpg" width="1280" height="806" muted loop playsinline preload="none" aria-label="朱雀門の前で、官人と町の人が吹き出しで話している動画"></video></figure>
 <div><h3>町の人と話す</h3><p>ゲームの中には約4,900人の町の人がいて、場所・時刻・季節・天気で話が変わります。身分や仕える家、左大臣方か右大臣方かで話し方も変わります。「身の上を聞く」と、生まれた国、国元の家族、昔の暮らし、いまの悩みを話してくれます。近所に住む人どうしは一つの家の者として話がつながります。応天門の変や宴の松原の鬼など、900年より前の出来事が噂に上ります。聞いた話は「聞き書き帳」に、その日の出来事は「日録」に残ります。</p></div></div>
 <div class="row rev"><figure><img src="img/suzaku-oji.jpg" width="1500" height="857" alt="柳並木の朱雀大路を進む牛車と騎馬の一行" loading="lazy" decoding="async"></figure>
-<div><h3>暦が進む</h3><p>昌泰三年二月二十五日から延喜二十二年（922）まで、大の月・小の月・閏月を当時の暦どおりに日が進みます。延喜元年（901）正月二十五日の昌泰の変を越えると、道真の牛車は出なくなり、町の人の話や居場所も変わります。公卿の牛車は刻限どおりに邸を出て出仕します。季節がめぐり、草木は梅・桜・若葉・紅葉・枯れ木と移り、日の出と日の入りの時刻も変わります。天気は晴れ・曇り・雨が日ごとに変わります。東市と西市は半月交替で開きます。夜は篝火と灯明だけの暗かった当時を再現しています。</p></div></div>
+<div><h3>暦が進む</h3><p>昌泰三年二月二十五日から延喜二十二年（922）まで、大の月・小の月・閏月を当時の暦どおりに日が進みます。昌泰四年（901）正月二十五日の昌泰の変を越えると、道真の牛車は出なくなり、町の人の話や居場所も変わります。公卿の牛車は刻限どおりに邸を出て出仕します。季節がめぐり、草木は梅・桜・若葉・紅葉・枯れ木と移り、日の出と日の入りの時刻も変わります。天気は晴れ・曇り・雨が日ごとに変わります。東市と西市は半月交替で開きます。夜は篝火と灯明だけの暗かった当時を再現しています。</p></div></div>
 <div class="row"><figure><img src="img/gekiga-otenmon.jpg" width="1500" height="857" alt="劇画調で撮った応天門。墨線と網点で描かれている" loading="lazy" decoding="async"></figure>
-<div><h3>撮影してSNSへ</h3><p>気に入った眺めを、撮影モードで画像に残せます。日付・天気・場所の入った投稿文が付き、共有ボタンからそのままSNSへ投稿できます。ロボを消して街並みだけを撮ることも、墨線と網点の劇画調で撮ることもできます。撮った画像は、ご自身の漫画やイラスト、動画の背景にも使えます（条件は「よくある質問」に書いています）。</p></div></div>
+<div><h3>撮影してSNSへ</h3><p>気に入った眺めを、撮影モードで画像に残せます。撮った絵は、写っている建物や道の名前と一緒に聞き書き帳へ自動で残り、ずっと残したい写真には📌を付けられます。日付・天気・場所の入った投稿文が付き、共有ボタンからそのままSNSへ投稿できます。ロボを消して街並みだけを撮ることも、墨線と網点の劇画調で撮ることもできます。撮った画像は、ご自身の漫画やイラスト、動画の背景にも使えます（条件は「よくある質問」に書いています）。</p></div></div>
 <div class="row rev"><figure><img src="img/yozora.jpg" width="1500" height="857" alt="夜の大極殿の上の星空。北極星（ポラリス）・帝（コカブ）・北斗の名前と線が出ている" loading="lazy" decoding="async"></figure>
 <div><h3>当時の夜空</h3><p>星は、今の星表から地軸の首振り（歳差）を計算して戻した、西暦901年ごろの位置で出ます。今の北極星（ポラリス）は、当時は天の北極から約7°離れていて、真北に止まって見えません。月は満ち欠けし、惑星もその日の暦に合わせて動きます。中国式の星座（星官）の線と名前も出せて、晴れた夜は町の人が星の言い伝えを話します。</p></div></div>
 <div class="row"><figure><img src="img/kanshi-kannin.jpg" width="1500" height="857" alt="官司の戸口で、床に座って書き物をする官人たちとロボ。官人の吹き出しが出ている" loading="lazy" decoding="async"></figure>
 <div><h3>頼みごと</h3><p>迷子探し・恋文・干物盗人・羅城門の柱など、クエストのようなものが用意されています。済ませると、住民との関係が深まって新しい話が聞けたり、内裏や貴族の邸の中へ入れるようになったりします。</p></div></div>
 <ul class="feat">
 <li><h3>町で遊ぶ</h3>辻の盤双六、衛府の射場の弓、朝堂院の西の蹴鞠、童との独楽、堀川の荷舟。遊んでいる人に話しかけると、仲間に入れてもらえます。褒美がもらえることもあります。上の帯の「今日できること」に、いま開いている遊びが並びます。</li>
-<li><h3>居候する</h3>住む所のないロボに、寝床を貸してくれる人がいます。羅城門の二階、市の人夫小屋、貴族の邸の下働きの長屋の3か所です。人夫小屋に住めば河岸の荷揚げを、長屋に住めば若君の凧揚げやなぞなぞの相手を手伝えます。ロボは背中のゼンマイがあって横になれないので、夜は部屋で座って止まり、同居の人に巻いてもらって朝を迎えます。部屋の葛籠には持ち物を預けられ、居候先は地図に印が出ます。</li>
+<li><h3>居候する</h3>住む所のないロボに、寝床を貸してくれる人がいます。羅城門の二階、市の人夫小屋、貴族の邸の下働きの長屋の3か所です。人夫小屋に住めば河岸の荷揚げを、長屋に住めば若君の凧揚げやなぞなぞの相手を手伝えます。ロボは横にならず、夜は部屋で座って止まります。鉄の童は背中のゼンマイを同居の人に巻いてもらい、鞠の童は息を入れ直してもらって朝を迎えます。部屋の葛籠には持ち物を預けられ、居候先は地図に印が出ます。</li>
 <li><h3>English</h3>英語表示では台詞もすべて英訳で出て、大内裏・牛車・陰陽師などの基礎の解説が加わります。</li>
 </ul>
+</section>
+<section id="robots">
+<h2>遊ぶロボットを選ぶ</h2>
+<p>平安京は、3体のロボットのどれかで歩けます。21世紀から昌泰三年（900）の都の調査に来た、小さなロボットです。姿も動きも違うので、好きなものを選んでください。あとから右上の ☰ の「ロボット」で、いつでも替えられます。</p>
+<div class="robots">
+<figure class="rb"><img src="img/robot-tin.svg" width="197.5" height="295.9" alt="鉄の童（ブリキロボ）。頭にアンテナ、顔に光る目、背中にゼンマイの鍵" loading="lazy" decoding="async">
+<h3>鉄の童</h3><p class="sub">ブリキロボ</p>
+<p>銀と赤のブリキの体。頭にアンテナが1本、顔に光る目、背中にゼンマイの鍵があります。歩くとブリキの足がコトッと鳴り、遠くを選ぶと少し浮いて走ります。壁にぶつかるとドシンとのけぞり、しばらく頭の上を星が回ります。地をしっかり踏みしめて歩き、Space で跳ぶ、昔ながらのロボットです。</p>
+<p class="enter"><a href="heiankyo/?robot=tin" target="_blank" rel="noopener">この童で入る<span class="vh">（新しいタブで開きます）</span></a></p></figure>
+<figure class="rb"><img src="img/robot-maru.svg" width="171.0" height="295.9" alt="鞠の童（風船ロボ）。丸くふくらんだ体、青緑に光る目と口" loading="lazy" decoding="async">
+<h3>鞠の童</h3><p class="sub">風船ロボ</p>
+<p>ベージュとオレンジの、丸くふくらんだ体。目と口は青緑に光り、夜は胴がほんのり灯ります。歩くと軽く弾み、立ち止まるとふわふわ浮きます。Space は噴射で、火を噴いて浮かび、ゆっくり降ります。壁にぶつかるとボヨヨーンと跳ね返る、浮いて弾むやわらかいロボットです。</p>
+<p class="enter"><a href="heiankyo/?robot=maru-a" target="_blank" rel="noopener">この童で入る<span class="vh">（新しいタブで開きます）</span></a></p></figure>
+<figure class="rb"><img src="img/robot-spider.svg" width="344.2" height="295.9" alt="土蜘蛛（六脚ロボ）。黄と白の低い胴、六本の脚と車輪" loading="lazy" decoding="async">
+<h3>土蜘蛛</h3><p class="sub">六脚ロボ</p>
+<p>黄と白の低い体を六本脚で支え、脚先には六つの車輪があります。歩く、六脚でスキップ、車輪で走行、高速走行の順に速くなり、最高速は時速約92kmです。屋根をクリックすると建物外側から一度のジャンプで乗り、屋根上を走り、縁から糸で降ります。飛び続けることはできず、梯子も使えない、地上と屋根を駆けるロボットです。</p>
+<p class="enter"><a href="heiankyo/?robot=spider" target="_blank" rel="noopener">この童で入る<span class="vh">（新しいタブで開きます）</span></a></p></figure>
+<p class="diff">鉄の童は力持ち、鞠の童は噴射で飛べる風船、土蜘蛛は六脚と車輪で地上を駆ける最速のロボットです。</p>
+</div>
 </section>
 <section id="map">
 <h2>平安京の地図</h2>
@@ -348,7 +395,7 @@ footer a{color:#d8dee5}
 <dt>スマートフォンでも動きますか</dt><dd>動きます。ドラッグで見回し、地面をタップして移動します。初回の読み込みが大きいので、Wi-Fiでの利用をおすすめします。</dd>
 <dt>どこまで史実どおりですか</dt><dd>地形は国土地理院の数値標高モデル、街路は文献の寸法から積算しています。建物の細部や庶民の家など直接の資料が少ない所は推定で補い、<a href="research/" target="_blank" rel="noopener">設定資料集<span class="vh">（新しいタブで開きます）</span></a>に確度を書いています。</dd>
 <dt>撮った画像を自分の作品に使えますか</dt><dd>個人の作品（漫画・イラスト・動画など）の背景に使えます。公開するときは「HakoniwaKit 平安京」と書き添えてください。商用で使いたいときはご相談ください。</dd>
-<dt>遊んだ続きはどうなりますか</dt><dd>日付と聞いた話はブラウザに残り、次に開くと続きから始まります。</dd>
+<dt>遊んだ続きはどうなりますか</dt><dd>日付と聞いた話、撮った写真はブラウザに残り、次に開くと続きから始まります。どこにも送りません。</dd>
 </dl>
 </section>
 <section class="again">

@@ -2,15 +2,15 @@
 
 [English follows the Japanese.](#english)
 
-昌泰三年（900）の平安京を、国土地理院の数値標高モデルと現況の河川データの上に推定復元し、ブラウザだけで歩けるようにしたものです。造営から約百年。右大臣・菅原道真が左遷される前の年の都を、ブリキのロボ「鉄の童」になって空から巡り、地上を歩き、町の人と話せます。
+昌泰三年（900）の平安京を、国土地理院の数値標高モデルと現況の河川データの上に推定復元し、ブラウザだけで歩けるようにしたものです。造営から約百年。右大臣・菅原道真が左遷される前の年の都を、ブリキの「鉄の童」、風船の「鞠の童」、六脚の「土蜘蛛」から選んで巡り、町の人と話せます。
 
 公開ページ: https://ino0190.github.io/heiankyo/
 
 ## はじめに
 
-1. 起動画面で「読み込みを開始」を押す（初回は約120MB・通信は圧縮されて約25MB。1〜3分）
-2. オープニングの飛行のあと、上のボタンから「市内を歩く」か「ドローンツアー」を選ぶ
-3. 歩いているときは地面をクリック。近くの人に吹き出しが出たら E で話しかける
+1. 起動画面で「平安京へ（音が出ます）」を押す（初回の通信は約32MB、1〜3分）
+2. オープニングの飛行のあと、上のボタンから「歩く」か「眺める」を選ぶ
+3. 初めて歩くときは、鉄の童・鞠の童・土蜘蛛から1体を選ぶ。地面をクリックし、近くの人に吹き出しが出たら E で話しかける
 
 日付は遊んだ日数に合わせて進み、続きから再開できます。来るたびに季節・市の日・月・天気・町の人の話が少しずつ変わります。
 
@@ -21,12 +21,14 @@
 - 俯瞰: 地表すれすれから真上まで、ドラッグとホイールで都の全景を見る。雲の影が地面を流れる
 
 ### 歩く
-- 50の地点から歩き始める。地面をクリックで目的地、WASD でも動く
-- 速さは4段: 近くは歩く・少し遠いと大股・遠いと浮いて走る（ホバー）・遠くを続けてクリックすると加速。段ごとに音が違う
+- 51の地点から歩き始める。地面をクリックで目的地、WASD でも動く
+- 速さは4段: 近くは歩く・少し遠いと大股・遠いと浮いて走る（ホバー）・遠くを続けてクリックすると加速。段ごとに音が違う。土蜘蛛は六脚歩行・六脚スキップ・車輪走行・高速走行の4段で、実測の最高速は約92km/h
+- ロボットは3体から選べる: 力持ちの鉄の童、噴射で飛べる鞠の童、六本脚と六つの車輪で走る土蜘蛛。あとから ☰ で替えられる
+- 土蜘蛛は屋根をクリックすると、建物外側の踏切位置から一度のジャンプでクリック面へ乗る。同じ屋根では棟を含めて徒歩か走行し、地上を指すと屋根縁まで進んでから糸で降り、その目的地まで移動を続ける
 - 坂では登りが遅く下りが速い。町の人はよけ、牛車はロボのほうがよける
 - 足音は砂・草・板・石・水で変わる。人の多い所はざわめき、大内裏は静かで、内裏に近いほど静か
 - 屋内: 中納言家（寝殿・北の対・西の対）と大極殿の中を歩ける。入口で F
-- 居候: 羅城門の二階・市の人夫小屋・貴族の邸の下働きの長屋に寝泊まりできる（話しかけた人が貸してくれる）。人夫小屋に住むと河岸の荷揚げ、長屋に住むと若君の凧揚げ・なぞなぞの相手を手伝える。夜は部屋で Z（朝まで休む）: 座って止まったロボのゼンマイを同居の人が巻き、朝6時に起きる
+- 居候: 羅城門の二階・市の人夫小屋・貴族の邸の下働きの長屋に寝泊まりできる（話しかけた人が貸してくれる）。人夫小屋に住むと河岸の荷揚げ、長屋に住むと若君の凧揚げ・なぞなぞの相手を手伝える。夜は部屋で Z（朝まで休む）: 鉄の童はゼンマイを巻いてもらい、鞠の童は息を入れ直してもらい、土蜘蛛は六つの車輪へ油を差してもらって朝6時に起きる
 
 ### しぐさと町の人の返し
 - 段: アンテナより低い段はよじ登る。Space で跳ぶと、アンテナの球より低い所にしがみつく・段から飛び降りる。地面のクリックは階段へ回るか登るかを自分で選ぶ
@@ -39,7 +41,7 @@
 - 近くの人の吹き出しに台詞が出る（一言約1,300・掛け合い約160）。場所・刻・季節・市の日・天気・月齢で出る話が変わる
 - E で話しかけると、身の上・近ごろ見たもの・望み・知り合いのこと・土地の言い伝えを聞ける。選択肢は一度に4つまで
 - 身の上を聞く: 名前の無い町の人も、生まれた国・国元の家族・昔の暮らし・いまの悩みを話す。近所に住む人どうしは同じ家の者として話がつながる
-- 名前のある住人は約140人。それぞれに一日の居場所と仕事があり、身分・仕える家・右大臣方/左大臣方の立場で話し方が変わる
+- 名前のある住人は148人。それぞれに一日の居場所と仕事があり、身分・仕える家・右大臣方/左大臣方の立場で話し方が変わる
 - 聞き込み: 「〇〇のこと、知ってる？」と話題を振ると、人によって知っている深さ（噂・事情・真相）が違い、知らない人は知っていそうな人を教える。紹介された人へはそのまま歩いて会いに行ける。聞いた深さは手元に記録される
 - 聞き書き帳（N・上の「聞き書き帳」）: 誰が・いつ・どこで・何と言ったかが自動で残る。語で探すと同じ話題の別の人の話が並び、食い違いが見える。人物・場所ごとにも見られ、📌で留められる。頼みごとの一覧や進み具合は出さない
 - 日録（聞き書き帳の「日録」）: 一日ごとに、天気・歩いた所・会った人・聞いた話・夜の月を短い文で書く。撮影モードで撮った絵もその日に並ぶ
@@ -102,6 +104,9 @@
 
 | 版 | 中身 |
 | --- | --- |
+| 1.193 | 3体目のロボット「土蜘蛛」を追加。六本脚と六つの車輪で、歩行・六脚スキップ・車輪走行・高速走行の4段階（実測約92km/h）。A・Dで操舵、Wで加速、Sで減速・後退し、自動走行中の一時操舵後は目的地へ戻る。屋根をクリックすると建物外側から一度のジャンプでクリック面へ乗り、棟を含む同じ屋根は徒歩か走行、地上を指すと屋根縁まで進んでから腹の後ろの糸で降り、その目的地まで進む。専用のお辞儀・踊り・笛・待機動作、顔横の前照灯、後ろの灯の残光、柔らかな接地影を追加。屋根・壁のクリック地点を正しく拾い、黄色い目的地光を到着まで残す。開始ボタンの処理中表示と時刻バーの直接操作、夜時刻からの再開も直した |
+| 1.189 | 築地のそばや建物の中・軒下でも、カメラがロボを画面から外さず、寄りすぎない。ロボ選びの窓を開いたまま英語に替えても、窓の中が替わる。始め方の枠が出ている間は、上の帯の「歩く／眺める」を控えめにした。雨で休みの遊びは、今日できることで「晴れた日に」と出て押せない。下の帯に写真のボタンをいつも出す。偏つぎは、今日できることから向かうと開いている市の売り子の前に着き、話しかけの札に「（偏つぎ）」と出る。地点の選択に東市と西市がいつも並び、休みの市には「今日は休み」と出る。スマホでは、町の人をタップするとそこまで歩いて話しかけ、☰ はパネルの中だけで動き、場面をなぞっても閉じない。入口ページは文字のリンクを指で押しやすくし、狭い画面では操作の表をカードに畳み、上から遊ぶロボットの節へ飛べる。年号を正した（昌泰の変は昌泰四年（901）正月、応天門の変から34年）。Wiki の探すが節の見出し（遠射など）も拾う。伊勢の説明の「中宮温子」を、900年の呼び方「皇太夫人温子（もと宇多天皇の女御）」に改めた |
+| 1.188 | 雨の日だけの遊び「偏つぎ」（市の軒下で雨宿りの人と、旁に合う偏を選ぶ）。台詞の言い回しを平安の言い方に寄せた（約1200行）。鞠の童が胴でゆっくり息をし、膨らむと浮き、胸の明かりも同じ拍で灯る。始め方を画面の真ん中の1か所にまとめ、上の帯を「歩く／眺める」の切り替えと窓を開くボタンに分けた。行き先へすぐ移っても練習に戻されず、練習（羅城門から）は☰からいつでも始められる。ロボ選びの窓を上に寄せ、2体を同じ縮尺で大きく描いた。入口ページと Wiki の「この童で入る」で、その童のまま入れる。門の楼上と建物のそばで、カメラがロボを画面から外さない。鉄の童のホバーは腰から前へ傾ける。鞠の童はホバー中に噴射してもホバーの速さで進み、滑空中にも加速できる。蹴鞠は輪に入って蹴る遊びと、話しながら蹴る鞠の会に分けた。英語の切り替えを全体に広げ、選んだ言語を覚える。雨の日も市の人が軒下に残る。時計の横は「今日の市」。スマホの画面と始め方を直した。Wiki に遊ぶロボットと弓の遠射の節を足し、盤双六の写真を新しい盤にした |
 | 1.187 | 遠くをクリックしたとき、逆の向きへホバーしないようにした（龍尾壇など大内裏の中）。踊りに後から加わる人の囃子を、ロボの拍に合わせた。浮いているときに地面に網点が出ないようにした。川のそばで水の音がする（鴨川・桂川は約80m、堀川は約30m、大宮川は約20mまで）。踊りと笛の間は BGM を止める |
 | 1.186 | 大きな地図（入口ページの絵に通りの名・M キー）。雨の日を約3分の1にし、にわか雨・霧雨を足した。厳冬期は雪が降り、地面や屋根が白くなる。前の続きから始まり、オープニングは初回だけ。踊りと囃子を止めるまで続ける。QAで見つかった不具合15件のうち14件を直した。弓の遠射は射場の横の遠い的3つを使う |
 | 1.185 | 初回と☰で鉄の童・鞠の童を選べる。CadKitの8方向線画を同じ縮尺で並べ、ゆっくり回して見せる。官人・女性・童・牛飼童の服と髪、四角い24マスの盤双六、力をためて放す独楽、3門の楼上4方向と地上への移動を追加。弓は黒星への中りが累計3本になると、約41mから約62mの遠射を試せる |
@@ -302,7 +307,7 @@ Cloudflare側の蓄積データを公開ページから取得する機能はな�
 <a id="english"></a>
 # HakoniwaKit 平安京 (Heian-kyo)
 
-A browser-based reconstruction of Heian-kyo as it may have looked in the year 900. You play a small tin robot that the townspeople call "the Iron Child": fly over the capital, walk its streets, and talk with the people who live there.
+A browser-based reconstruction of Heian-kyo as it may have looked in the year 900. Explore as one of three small robots: the tin Iron Child, the balloon-like Ball Child, or the six-legged Tsuchigumo. Fly over the capital, walk its streets and rooftops, and talk with the people who live there.
 
 Live page: https://ino0190.github.io/heiankyo/en/
 
@@ -315,19 +320,20 @@ Live page: https://ino0190.github.io/heiankyo/en/
 
 ## Getting started
 
-1. Press "Start loading" (about 120 MB on the first visit, about 25 MB over the network; one to three minutes).
-2. After the opening flight, choose "Walk the city" or "Drone tour" at the top.
-3. While walking, click the ground. When someone near you speaks, press E to talk.
+1. Press “Go to Heian-kyo (with sound)” (about 32 MB over the network on the first visit; one to three minutes).
+2. After the opening flight, choose “Walk” or “View” at the top.
+3. The first time you walk, choose the Iron Child, Ball Child or Tsuchigumo. Click the ground to move; when someone nearby speaks, press E to talk.
 
 The calendar moves on with the days you play, and you continue where you left off. Each visit, the season, the market day, the moon, the weather and what people talk about are a little different.
 
 ## What you can do
 
 - **Fly**: a continuous drone tour of 19 sites, and an overview you can tilt from street level to straight above, with cloud shadows drifting over the ground.
-- **Walk**: start from any of 50 places. Four speeds: walk, long strides, hover, and boosts when you keep clicking far away — each with its own sound. Slopes slow you down, people step aside, and you step aside for ox carts. Footsteps change with sand, grass, wood, stone and water; crowds murmur, and the palace grows quieter toward the Emperor's residence. Walk inside a noble's mansion and the Great Hall of State (press F at the entrance).
-- **A place to stay**: people lend the homeless robot a bed: the upper floor of Rajomon Gate, the porters' hut at the market, or a servants' row house in a noble mansion. Living at the hut, you can help unload bales at the riverbank; living at the row house, you can fly kites and trade riddles with the young lord. The robot's wind-up key keeps it from lying down, so at night press Z in your room: it sits still, a roommate winds it up, and it wakes at six.
+- **Walk**: start from any of 51 places. Four speeds: walk, long strides, hover, and boosts when you keep clicking far away — each with its own sound. Slopes slow you down, people step aside, and you step aside for ox carts. Footsteps change with sand, grass, wood, stone and water; crowds murmur, and the palace grows quieter toward the Emperor's residence. Walk inside a noble's mansion and the Great Hall of State (press F at the entrance).
+- **Three robots**: choose the strong tin Iron Child, the jet-powered balloon-like Ball Child, or Tsuchigumo with six legs and six wheels. Tsuchigumo changes from walking to skipping, wheeled running and a measured top speed of about 92 km/h. Click any roof and it makes one jump from outside the building to the clicked surface; it walks or runs across continuous roofs and lowers itself from the edge on a thread before continuing to the ground destination.
+- **A place to stay**: people lend the homeless robot a bed: the upper floor of Rajomon Gate, the porters' hut at the market, or a servants' row house in a noble mansion. Living at the hut, you can help unload bales at the riverbank; living at the row house, you can fly kites and trade riddles with the young lord. At night press Z in your room: a roommate winds the Iron Child's key, reinflates the Ball Child, or oils Tsuchigumo's six wheels, and the robot wakes at six.
 - **Gestures**: Space jump, Q dance, B bow, F pray, G wave. People bow and wave back; on the great terrace, the whole line of officials bows in return. Keep dancing and people join in, a flute and a sho mouth organ start up, and the crowd keeps dancing for a while after you stop.
-- **Talk**: about 1,300 one-liners and 160 short exchanges that change with place, hour, season, market day, weather and moon. Ask anyone about their life: their home province, the family back there, how they used to live and what worries them now; neighbours speak as one household. About 140 named residents, each with a daily routine, a rank, a household and a side in court politics. Ask "Do you know about …?" — some know only the rumor, some the truth, and some will send you to someone else. Read "What is …?" notes on people, events and basic Heian life, with sources where lines are based on history.
+- **Talk**: about 1,300 one-liners and 160 short exchanges that change with place, hour, season, market day, weather and moon. Ask anyone about their life: their home province, the family back there, how they used to live and what worries them now; neighbours speak as one household. 148 named residents, each with a daily routine, a rank, a household and a side in court politics. Ask "Do you know about …?" — some know only the rumor, some the truth, and some will send you to someone else. Read "What is …?" notes on people, events and basic Heian life, with sources where lines are based on history.
 - **Notebook (N)**: who said what, when and where is noted automatically. Search a word to see different people's versions side by side — and where they disagree. Browse by person or place, and pin what matters. There is no quest list or progress counter.
 - **Timeline (T)**: the capital's history from its founding in 794 to 926. The present year (900) is marked; later events are shown faded as "yet to come", since nobody here knows them yet. Open "More" for a short explanation, or jump to the place where it happened.
 - **View**: the drone tour, the overview, photo mode and five fixed views (from the south, from the north, over the east and west halves, and straight down).
