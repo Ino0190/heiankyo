@@ -99,7 +99,7 @@ h1{margin:4px 0 20px;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-s
   <p class="kicker" id="kick">調査の使命</p>
   <p class="mission" id="mis">21世紀から、昌泰三年（900）の平安京を調べに来たロボット「鉄の童」になります。都はどんな所で、どんな人たちが、どんなふうに暮らしていたのか。建物を写真に撮り、いろいろな身分の人に話を聞いて、噂・風俗・暮らし・楽しみ・政治・官僚機構を聞き書き帳に書き留めます。集めた記録は、いつか21世紀へ報告します。締め切りや勝ち負けはありません。</p>
   <button class="go" id="go" type="button">平安京へ行く</button>
-  <p class="note" id="nt">約25MBを読み込みます（1〜3分）。音が出ます。</p>
+  <p class="note" id="nt">約32MBを読み込みます（1〜3分）。音が出ます。</p>
   <dl class="credit" id="cr" hidden><dt>制作</dt><dd>3Dモデル・コード © 2026 Ikuo Inouchi（HakoniwaKit）</dd><dt>地形</dt><dd>国土地理院 地理院タイル（数値標高モデル）を加工</dd><dt>河川</dt><dd>© OpenStreetMap contributors（ODbL）</dd><dt>建築・区画</dt><dd>史料に基づく推定復元</dd><dt>ライブラリ</dt><dd>three.js（MIT）・manifold-3d（Apache-2.0）・opencascade.js（LGPL-2.1）</dd></dl>
  </div>
 </section>
@@ -507,7 +507,7 @@ if(EMB){addEventListener('message',e=>{if(e.source!==parent)return;const d=e.dat
  addEventListener('pointerdown',()=>{try{AU?.C?.resume?.();}catch(_){}},{passive:true}); // 親で押した操作が届かず音が止まっているときは、触れたら鳴らす
  const toParent=m=>{try{parent.postMessage(m,location.protocol==='file:'?'*':location.origin);}catch(_){}};
  if(ENTRY){ // 入口の札: 版・英語の切り替え・制作の欄を出す。押すと親へ proto-go（親が読み込み・音楽を始める）→ 組み立てへ
-  const en=Q.get('lang')==='en',E={kick:'SURVEY MISSION',mis:'You are Tetsu-no-Warawa, a survey robot sent from the 21st century to Heian-kyo in the year 900. What was the capital like, who lived there, and how? Photograph its buildings, talk with people of every rank, and record rumours, customs, daily life, pastimes, politics and the workings of the court in your Notebook. One day you will report back to the 21st century. There are no deadlines and no winning or losing.',go:'Go to Heian-kyo',nt:'About 25 MB will be downloaded (one to three minutes). With sound.'};
+  const en=Q.get('lang')==='en',E={kick:'SURVEY MISSION',mis:'You are Tetsu-no-Warawa, a survey robot sent from the 21st century to Heian-kyo in the year 900. What was the capital like, who lived there, and how? Photograph its buildings, talk with people of every rank, and record rumours, customs, daily life, pastimes, politics and the workings of the court in your Notebook. One day you will report back to the 21st century. There are no deadlines and no winning or losing.',go:'Go to Heian-kyo',nt:'About 32 MB will be downloaded (one to three minutes). With sound.'};
   if(en){for(const k in E)$(k).textContent=E[k];document.documentElement.lang='en';}
   if(Q.get('ver')){$('ver').textContent=Q.get('ver');$('ver').hidden=false;}$('cr').hidden=false;
   const lb=$('langB');lb.hidden=false;lb.textContent=en?'日本語':'English';lb.addEventListener('click',()=>toParent({type:'proto-lang',lang:en?'ja':'en'}));
