@@ -3,7 +3,7 @@ body{margin:0;background:#f3efe4;color:#2c2418;font-family:-apple-system,BlinkMa
 a{color:#6b3f22}a:hover{color:#8b2e1a}
 a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #c9973b;outline-offset:2px}
 .skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:8px;padding:6px 12px;background:#fff;z-index:2}
-.in,main{width:min(820px,calc(100% - 40px));margin:0 auto}
+.in,main{width:min(1080px,calc(100% - 40px));margin:0 auto}
 header.site{background:#2c2418;color:#f3efe4;padding:14px 0 8px}
 header.site .in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
 .brand{color:#f3efe4;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:21px;font-weight:600;text-decoration:none}
@@ -26,7 +26,7 @@ html{overflow-x:clip}
 .hero{position:relative;display:grid;align-items:end;min-height:clamp(440px,70vh,720px);margin:-28px calc(50% - 50vw) 20px;color:#f4f1e9;background:#10161c;overflow:hidden}
 .hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,22,28,.7) 0%,rgba(16,22,28,.35) 38%,rgba(16,22,28,0) 64%),linear-gradient(0deg,rgba(16,22,28,.85) 0%,rgba(16,22,28,.3) 40%,rgba(16,22,28,0) 62%)}
-.hero .hi{position:relative;z-index:1;width:min(820px,calc(100% - 40px));margin:0 auto;padding:0 0 46px}
+.hero .hi{position:relative;z-index:1;width:min(1080px,calc(100% - 40px));margin:0 auto;padding:0 0 46px}
 .hero .series{margin:0 0 4px;font-size:15px;font-weight:700;letter-spacing:.06em;color:#e9dcc0}
 .hero h1{margin:0;color:#f4f1e9;font-size:56px;line-height:1.15;letter-spacing:.06em;text-shadow:0 2px 14px rgba(0,0,0,.5)}
 .hero .copy{margin:8px 0 12px;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;line-height:1.5;letter-spacing:.04em;text-shadow:0 1px 8px rgba(0,0,0,.5)}
@@ -35,7 +35,7 @@ html{overflow-x:clip}
 .hero .cta a{color:#f4f1e9;font-size:16px}.hero .cta a:hover{color:#fff}
 .hero .cta a.btn{display:inline-block;padding:11px 26px;font-size:17px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}.hero .cta a.btn:hover{background:#dcae55;color:#10161c}
 .hero .hcap{position:absolute;right:14px;bottom:8px;z-index:1;margin:0;font-size:14px;color:rgba(244,241,233,.85);text-shadow:0 1px 4px rgba(0,0,0,.8)}
-@media(max-width:600px){.hero{display:block;min-height:0}.hero>img{position:static;display:block;height:250px}.hero::after{display:none}
+@media(max-width:600px){.in,main,.hero .hi{width:calc(100% - 28px)}.hero{display:block;min-height:0}.hero>img{position:static;display:block;height:250px}.hero::after{display:none}
  .hero .hi{padding:18px 0 28px}.hero h1{font-size:40px}.hero .copy{font-size:20px}.hero .hcap{top:220px;bottom:auto;right:10px}}
 p{margin:0 0 14px}.lead{font-size:18px}.crumbs{margin:0 0 4px;font-size:14px}.meta{color:#5f513c;font-size:16px}
 /* @robots-wiki 2026-11-05 遊ぶロボットの3体（入口ページと同じ色の考え方） */

@@ -27,7 +27,7 @@ body{margin:0;background:#f3efe4;color:#2c2418;font-family:-apple-system,BlinkMa
 a{color:#6b3f22}
 .hero{position:relative;min-height:min(88vh,760px);display:grid;align-items:end;color:#f4f1e9;background:#10161c center/cover no-repeat url("../img/zenkei.jpg")}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,22,28,.15) 0%,rgba(16,22,28,.55) 45%,rgba(16,22,28,.9) 100%)}
-.hero .in{position:relative;width:min(820px,calc(100% - 40px));margin:0 auto;padding:0 0 64px}
+.hero .in{position:relative;width:min(1080px,calc(100% - 40px));margin:0 auto;padding:0 0 64px}
 .series{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:17px;font-weight:700}
 .series svg{width:22px;height:22px;flex:none}
 h1{margin:0;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:64px;line-height:1.15;font-weight:600;letter-spacing:.08em}
@@ -38,7 +38,7 @@ h1{margin:0;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font
 .btn:hover{background:#ddb05a}
 .cta a.sub{color:#f4f1e9;font-size:16px}
 .note{margin:14px 0 0!important;color:#aeb9c3!important;font-size:15px!important}
-main{width:min(820px,calc(100% - 40px));margin:0 auto;padding:16px 0 48px}
+main{width:min(1080px,calc(100% - 40px));margin:0 auto;padding:16px 0 48px}
 section{margin:48px 0 0}
 h2{margin:0 0 16px;padding:0 0 10px;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:30px;line-height:1.4;color:#5c3a1e;border-bottom:2px solid #b79b63}
 h3{margin:0 0 6px;font-size:19px;color:#5c3a1e}
@@ -125,18 +125,29 @@ table.uitab.uitab-cards td{border:0;padding:3px 0}
 table.uitab.uitab-cards td:not([colspan]):first-of-type::before{content:"PC　";color:#6b5a40;font-size:13px}
 table.uitab.uitab-cards td:nth-of-type(2)::before{content:"スマホ　";color:#6b5a40;font-size:13px}
 }
-/* @robots-lp 2026-11-03 井内さん「キャラクター選択はランディングページ、Wiki両方に載せて欲しい」 */
-.robots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px;margin:20px 0 0}
-.robots .rb{display:flex;flex-direction:column;background:#fffaf0;border:1px solid #e0d6bf;padding:18px}
-.robots .rb img{display:block;height:210px;max-width:100%;width:auto;object-fit:contain;margin:0 auto 10px;background:#f3efe4}
-.robots .rb h3{margin:0 0 2px;font-size:20px}
-.robots .rb .sub{margin:0 0 10px;color:#6b5a3c;font-size:15px}
-.robots .rb p{margin:0 0 12px;font-size:16px;line-height:1.75}
-.robots .rb .enter{margin:auto 0 0}
-.robots .rb .enter a{display:inline-block;padding:9px 20px;font-weight:600;color:#10161c;background:#c9973b;text-decoration:none}
+/* @robots-lp 2026-11-05 A案: 3体を同じ描画高・同じ足元で比較する */
+.robots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:26px 0 0}
+.robots .rb{display:grid;grid-template-rows:190px auto auto 1fr auto;gap:12px;min-width:0;margin:0;padding:18px;background:#fffaf0;border:1px solid #ded2bb;border-radius:16px;box-shadow:0 8px 24px rgba(76,54,29,.07);transition:border-color .18s,box-shadow .18s,transform .18s}
+.robots .rb:hover{border-color:#c7ae7d;box-shadow:0 12px 30px rgba(76,54,29,.11);transform:translateY(-2px)}
+.robots .robot-visual{position:relative;overflow:hidden;width:100%;height:190px;background:linear-gradient(145deg,#f8f4ea,#ece5d7);border-radius:12px}
+.robots .robot-visual img{position:absolute;left:50%;top:var(--robot-top);display:block;width:auto;height:var(--robot-height);max-width:none;margin:0;padding:0;transform:translateX(-50%);cursor:default}
+.robots .rb-tin{--robot-height:185px;--robot-top:27px}
+.robots .rb-maru{--robot-height:233px;--robot-top:-7px}
+.robots .rb-spider{--robot-height:175px;--robot-top:14px}
+.robots .robot-name{display:flex;align-items:end;justify-content:space-between;gap:10px}
+.robots .robot-name h3{margin:0;font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;font-size:22px;line-height:1.35}
+.robots .robot-name .sub{flex:none;margin:0;padding:3px 8px;border-radius:999px;background:#eee5d2;color:#6b5a3c;font-size:13px;line-height:1.5}
+.robots .robot-tags{display:flex;flex-wrap:wrap;gap:7px;margin:0;padding:0;list-style:none}
+.robots .robot-tags li{padding:4px 9px;border:1px solid #d8c9ab;border-radius:999px;background:#fffdf8;color:#67482c;font-size:12px;font-weight:700;line-height:1.4}
+.robots .robot-copy{margin:0;font-size:15px;line-height:1.7}
+.robots .rb .enter{margin:0}
+.robots .rb .enter a{display:grid;place-items:center;width:100%;min-height:46px;padding:10px 16px;border-radius:9px;background:#c9973b;color:#17110a;font-size:16px;font-weight:700;text-align:center;text-decoration:none}
 .robots .rb .enter a:hover{background:#ddb05a}
-.robots .diff{grid-column:1/-1;margin:4px 0 0;color:#5f513c}
-@media(max-width:640px){.robots{grid-template-columns:1fr}}
+.robots .rb .enter a:focus-visible{outline:3px solid #5c3a1e;outline-offset:3px}
+.robots .diff{grid-column:1/-1;margin:0;padding:13px 16px;border-left:3px solid #c9973b;background:#eee5d2;color:#5f513c;font-size:15px;line-height:1.65}
+@media(max-width:900px){.robots{grid-template-columns:1fr}.robots .rb{grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto auto 1fr auto;column-gap:20px}.robots .robot-visual{grid-column:1;grid-row:1/5}.robots .rb>.robot-name,.robots .rb>.robot-tags,.robots .rb>.robot-copy,.robots .rb>.enter{grid-column:2}}
+@media(max-width:680px){.hero .in,main{width:calc(100% - 28px)}.robots{gap:16px}.robots .rb{grid-template-columns:1fr;grid-template-rows:190px auto auto 1fr auto;padding:15px}.robots .robot-visual{grid-column:1;grid-row:auto}.robots .rb>.robot-name,.robots .rb>.robot-tags,.robots .rb>.robot-copy,.robots .rb>.enter{grid-column:1}.robots .rb:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.robots .rb{transition:none}}
 
 .vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
@@ -242,19 +253,22 @@ table.uitab.uitab-cards td:nth-of-type(2)::before{content:"スマホ　";color:#
 <h2>Choose your robot</h2>
 <p>You explore Heian-kyo as one of three small robots, sent back from the 21st century to survey the city in the year 900. They look and move differently, so pick whichever you like. You can switch any time from the ☰ menu (&ldquo;Robot&rdquo;).</p>
 <div class="robots">
-<figure class="rb"><img src="../img/robot-tin.svg" width="197.5" height="295.9" alt="Iron Child, a tin robot with an antenna, glowing eyes and a wind-up key on its back" loading="lazy" decoding="async">
-<h3>Iron Child</h3><p class="sub">Tin robot</p>
-<p>A silver-and-red tin body, with a single antenna, glowing eyes and a wind-up key on its back. Its tin feet clack as it walks; click far away and it hovers there. Hit a wall and it reels back, stars circling its head for a moment. A classic tin robot that stays grounded and jumps with Space.</p>
-<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=tin" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
-<figure class="rb"><img src="../img/robot-maru.svg" width="171.0" height="295.9" alt="Ball Child, a round balloon robot with teal glowing eyes and mouth" loading="lazy" decoding="async">
-<h3>Ball Child</h3><p class="sub">Balloon robot</p>
-<p>A round, inflated body in beige and orange; its eyes and mouth glow teal, and at night its torso faintly lights up. It bounces as it walks and floats when it stands still. Space fires a jet that lifts it up and lets it drift down, and it boings back off walls. A soft robot that floats and bounces.</p>
-<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=maru-a" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
-<figure class="rb"><img src="../img/robot-spider.svg" width="344.2" height="295.9" alt="Tsuchigumo, a low yellow-and-cream robot with six legs and six wheels" loading="lazy" decoding="async">
-<h3>Tsuchigumo</h3><p class="sub">Six-legged robot</p>
-<p>A low yellow-and-cream body carried by six legs, each ending in a wheel. Repeated clicks change it from a six-legged walk to a skip, a wheeled run and finally a sprint at about 92 km/h. Click a roof and it makes one jump from outside the building to land there, runs across the roof, then lowers itself from the edge on a thread. It cannot stay airborne or use ladders: it races across the ground and rooftops.</p>
-<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=spider" target="_blank" rel="noopener">Enter as this one<span class="vh"> (opens in a new tab)</span></a></p></figure>
-<p class="diff">The Iron Child is strong, the Ball Child can fly on its jet, and Tsuchigumo is the fastest robot on the ground.</p>
+<article class="rb rb-tin"><div class="robot-visual"><img src="../img/robot-tin.svg" width="197.5" height="295.9" alt="Iron Child, a tin robot with an antenna, glowing eyes and a wind-up key on its back" loading="lazy" decoding="async"></div>
+<div class="robot-name"><h3>Iron Child</h3><p class="sub">Tin robot</p></div>
+<ul class="robot-tags"><li>Strong</li><li>Hover</li><li>Jump</li></ul>
+<p class="robot-copy">A classic tin robot that plants its feet firmly. It hovers on longer trips and can carry heavy loads.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=tin" target="_blank" rel="noopener">Start as Iron Child<span class="vh"> (opens in a new tab)</span></a></p></article>
+<article class="rb rb-maru"><div class="robot-visual"><img src="../img/robot-maru.svg" width="171.0" height="295.9" alt="Ball Child, a round balloon robot with teal glowing eyes and mouth" loading="lazy" decoding="async"></div>
+<div class="robot-name"><h3>Ball Child</h3><p class="sub">Balloon robot</p></div>
+<ul class="robot-tags"><li>Jet</li><li>Float</li><li>Bounce</li></ul>
+<p class="robot-copy">A soft balloon robot that bounces lightly as it walks. Its jet lifts it into the air, and walls send it boinging back.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=maru-a" target="_blank" rel="noopener">Start as Ball Child<span class="vh"> (opens in a new tab)</span></a></p></article>
+<article class="rb rb-spider"><div class="robot-visual"><img src="../img/robot-spider.svg" width="344.2" height="295.9" alt="Tsuchigumo, a low yellow-and-cream robot with six legs and six wheels" loading="lazy" decoding="async"></div>
+<div class="robot-name"><h3>Tsuchigumo</h3><p class="sub">Six-legged robot</p></div>
+<ul class="robot-tags"><li>Six legs &amp; wheels</li><li>About 92 km/h</li><li>Rooftops</li></ul>
+<p class="robot-copy">Six legs and six wheels carry it across streets and rooftops. It jumps onto a roof in one move and lowers itself from the edge on a thread.</p>
+<p class="enter"><a href="../heiankyo/?lang=en&amp;robot=spider" target="_blank" rel="noopener">Start as Tsuchigumo<span class="vh"> (opens in a new tab)</span></a></p></article>
+<p class="diff">Choose Iron Child for strength, Ball Child for flight, or Tsuchigumo for speed across streets and rooftops.</p>
 </div>
 </section>
 <section id="map">
