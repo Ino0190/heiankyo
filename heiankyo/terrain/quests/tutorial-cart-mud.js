@@ -26,7 +26,7 @@
       nodes:{
         s:{t:'こら黒麻呂、動くな！ ……おお、鉄の童。車輪が泥にはまった。手を貸してくれんか？',
           c:[['手伝おう','yes'],['どうすればいい？','how'],['またあとで','$end']]},
-        how:{t:'牛はわしが見ておく。お前は車の後ろから、沈んだ側を少し持ち上げてくれ。',
+        how:{t:'牛はわれが見ておく。お前は車の後ろから、沈んだ側を少し持ち上げてくれ。',
           c:[['やってみる','yes'],['またあとで','$end']]},
         yes:{t:'助かる！ 牛が落ち着くまで待ってな。後ろの車輪のところだぞ。',
           set:'kuruma_nukarumi=1',end:true}
@@ -34,14 +34,14 @@
     },
     {
       ...d,id:'kuruma-nukarumi-wait',if:'q:kuruma_nukarumi=1',
-      nodes:{s:{t:'車の後ろへ回れ。沈んだ輪の近くで「持ち上げる」だ。牛はわしが見ておる。',
+      nodes:{s:{t:'車の後ろへ回れ。沈んだ輪の近くで「持ち上げる」だ。牛はわれが見ておる。',
         c:[['わかった','$end'],['もう少し教えて','detail']]},
         detail:{t:'車の前や牛のそばは危ない。後ろからゆっくり持ち上げてくれ。',end:true}}
     },
     {
       ...d,id:'kuruma-nukarumi-reward',if:'q:kuruma_nukarumi=2',
       nodes:{
-        s:{t:'抜けた、抜けた！ 黒麻呂も無事じゃ。お前、力持ちだなあ。',
+        s:{t:'抜けた、抜けた！ 黒麻呂も無事だ。お前、力持ちだなあ。',
           c:[['よかった','thanks'],['またあとで','$end']]},
         thanks:{t:'兄の竹丸が作った笛が、もう一本ある。礼に持っていってくれんか。',
           c:[['笛を受け取る','gift'],['今はいい','later']]},
@@ -106,7 +106,7 @@
       {on:'lesson:bow', r:1200, q:[0], once:'save', sfx:['moo','creak'], say:{who:'inumaru', t:'こら黒麻呂、動くな！ ……そこの鉄の童！', en:'Easy, Kuromaro, don’t move! … You there, Iron Child!'}},
       {on:'near', r:320, q:[0], once:true, sfx:['moo'], say:{who:'inumaru', t:'おーい、鉄の童。ちょっと手を貸してくれんか', en:'Hey, Iron Child. Could you lend me a hand?'}},
       {on:'near', r:320, q:[0,1], every:70, sfx:['moo']},
-      {on:'act:fue', r:350, q:[9], once:'save', say:{who:'inumaru', t:'おお、鳴った！ わしより上手いではないか！', en:'You did it! That’s better than I can manage!'}}
+      {on:'act:fue', r:350, q:[9], once:'save', say:{who:'inumaru', t:'おお、鳴った！ われより上手いではないか！', en:'You did it! That’s better than I can manage!'}}
     ],
     items: {
       inumaru_bamboo_flute: {name:'犬丸の竹笛', en:'Inumaru’s bamboo flute', unlock:['fue'],
@@ -114,11 +114,11 @@
     },
     en: {
       'こら黒麻呂、動くな！ ……おお、鉄の童。車輪が泥にはまった。手を貸してくれんか？':'Easy, Kuromaro! Don’t move! … Oh, Iron Child. The wheel’s sunk into the mud. Could you lend me a hand?',
-      '牛はわしが見ておく。お前は車の後ろから、沈んだ側を少し持ち上げてくれ。':'I’ll keep the ox calm. Lift the sunken side of the cart just a little, from behind.',
+      '牛はわれが見ておく。お前は車の後ろから、沈んだ側を少し持ち上げてくれ。':'I’ll keep the ox calm. Lift the sunken side of the cart just a little, from behind.',
       '助かる！ 牛が落ち着くまで待ってな。後ろの車輪のところだぞ。':'Thank you! Wait until he’s settled. Mind you, from behind the wheel!',
-      '車の後ろへ回れ。沈んだ輪の近くで「持ち上げる」だ。牛はわしが見ておる。':'Go around behind the cart. Use Lift near the sunken wheel. I’ll look after the ox.',
+      '車の後ろへ回れ。沈んだ輪の近くで「持ち上げる」だ。牛はわれが見ておる。':'Go around behind the cart. Use Lift near the sunken wheel. I’ll look after the ox.',
       '車の前や牛のそばは危ない。後ろからゆっくり持ち上げてくれ。':'Keep clear of the ox and the front of the cart. Lift gently from behind.',
-      '抜けた、抜けた！ 黒麻呂も無事じゃ。お前、力持ちだなあ。':'It’s free! And Kuromaro’s safe! You’re stronger than you look.',
+      '抜けた、抜けた！ 黒麻呂も無事だ。お前、力持ちだなあ。':'It’s free! And Kuromaro’s safe! You’re stronger than you look.',
       '兄の竹丸が作った笛が、もう一本ある。礼に持っていってくれんか。':'My brother Takemaru made me two bamboo flutes. Will you take the spare one as thanks?',
       'そうか。気が向いたら声をかけてくれ。':'All right. Ask me again if you change your mind.',
       '竹の横笛だ。音が出るか、吹いてみてくれよ。':'A little bamboo flute. Try it and see if you can make a sound.',

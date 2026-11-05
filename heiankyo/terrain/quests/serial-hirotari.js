@@ -23,22 +23,22 @@
  const SCENES={
   winding:{title:tx('巻き加減','The winding key'),start:tx('昨日は、あれでよかったか。背中のねじを回すのは初めてでな。','Was it all right yesterday? I had never turned a key on someone’s back before.'),
    choices:[
-    {id:'fine',label:tx('ちょうどよかった','Just right'),reply:tx('そうか。加減が分からんので、手探りじゃった。','Good. I was only guessing how far to turn it.')},
+    {id:'fine',label:tx('ちょうどよかった','Just right'),reply:tx('そうか。加減が分からんので、手探りだった。','Good. I was only guessing how far to turn it.')},
     {id:'strong',label:tx('少し強かった','A little too strong'),reply:tx('そうかそうか。今夜は少し控えよう。','I see. I’ll turn it more gently tonight.')},
-    {id:'thanks',label:tx('ありがとう','Thank you'),reply:tx('礼はいらん。わしも妙なものを巻いて面白かった。','No need to thank me. It was something new to try.')}]},
+    {id:'thanks',label:tx('かたじけない','Thank you'),reply:tx('礼はいらん。われも妙なものを巻いて面白かった。','No need to thank me. It was something new to try.')}]},
   rain:{title:tx('雨の場所','A dry corner'),start:tx('あそこの雨漏りがひどくなってな。お前の座る所は、こっちへ寄せておいた。','The roof leaks worse over there. I moved your place a little, out of the wet.'),
    choices:[
-    {id:'thanks',label:tx('ありがとう','Thank you'),reply:tx('濡れんに越したことはない。','Better to keep dry, all the same.')},
+    {id:'thanks',label:tx('かたじけない','Thank you'),reply:tx('濡れんに越したことはない。','Better to keep dry, all the same.')},
     {id:'fine',label:tx('濡れても平気だよ','I do not mind getting wet'),reply:tx('お前が平気でも、敷物は腐る。','You may not mind, but the mat would rot.')},
     {id:'hard',label:tx('大変だね','That sounds difficult'),reply:tx('昔からこうだ。門の屋根は広いが、穴も多い。','It’s always been like this. A wide roof, and plenty of holes.')}]},
-  name:{title:tx('名を聞く','Asking a name'),start:tx('お前はいつも、わしを何と呼んどる？','What do you call me, then?'),
+  name:{title:tx('名を聞く','Asking a name'),start:tx('お前はいつも、われを何と呼んどる？','What do you call me, then?'),
    choices:[
     {id:'ask',label:tx('名前を聞いてもいい？','May I ask your name?'),reply:tx('名か。……浜主という。長いこと、そう呼ぶ者もおらんかった。お前は覚えておいてくれるか。','My name? …Hamanushi. Nobody has called me that in a long while. Will you remember it?'),revealsName:true},
-    {id:'later',label:tx('別に呼ばなくても困らないよ','I can manage without a name'),reply:tx('まあ、わしも困らんよ。','I suppose I can too.'),defer:true}]},
+    {id:'later',label:tx('別に呼ばなくても困らないよ','I can manage without a name'),reply:tx('まあ、われも困らんよ。','I suppose I can too.'),defer:true}]},
   seat:{title:tx('お前の席','Your place'),start:tx('おお、帰ったか。ずいぶん歩いておったようだな。','Ah, you’re back. You must have done a great deal of walking.'),
    choices:[
     {id:'stay',label:tx('まだここにいていい？','May I still stay here?'),reply:tx('構わん。あそこはお前の席だ。','Of course. That place is yours.')},
-    {id:'town',label:tx('都を歩いていた','I was walking through the city'),reply:tx('そうか。都は広いからな。わしにはよう歩けん。','A vast city. These legs of mine won’t take me so far.')},
+    {id:'town',label:tx('都を歩いていた','I was walking through the city'),reply:tx('そうか。都は広いからな。われにはよう歩けん。','A vast city. These legs of mine won’t take me so far.')},
     {id:'home',label:tx('ただいま','I am home'),reply:tx('……おう。そこ、空けてあるぞ。','…Well then. I kept your place clear.')}]},
   south:{title:tx('南へ行く荷','Loads bound south'),start:tx('南へ下る荷があるそうだ。鳥羽の先へ行くという。','I hear there’s cargo heading south, past Toba.'),
    choices:[
@@ -52,7 +52,7 @@
   porter:{title:tx('荷運びの噂','A porter’s rumor'),start:tx('そういや、羅城門にいた年寄りが荷のことを聞きに来た。昔、担ぎをしていたそうだな。','An older fellow from Rajomon came asking about porter work. Said he used to carry loads.'),
    choices:[{id:'ok',label:tx('どこへ行ったの？','Where did he go?'),reply:tx('そこまでは聞かなんだ。仕事を見つけたなら、どこぞで飯を食っとるだろう。','I didn’t ask. If he found work, perhaps he’s eating somewhere tonight.')}]},
   boat:{title:tx('鳥羽津の噂','A rumor at Toba'),start:tx('門の男？ 似た風体の者を見た気もするが、旅の男は皆、似て見える。','A man from the gate? I may have seen someone like that. Travellers often look alike to me.'),
-   choices:[{id:'ok',label:tx('ありがとう','Thank you'),reply:tx('わしの話は当てにせんことだ。','Don’t put too much faith in my word.')}]}
+   choices:[{id:'ok',label:tx('かたじけない','Thank you'),reply:tx('われの話は当てにせんことだ。','Don’t put too much faith in my word.')}]}
  };
  function accept(day){touchStart(day);uniqueDay(day);save();return copy(state);}
  function enter(day,weather){touchStart(day);const n=dayOf(day);if(n===null)return null;

@@ -10,7 +10,7 @@
     {at:['street','commoners'],who:'庶民',if:'robotMaru',t:'おや、丸いのう。…風を詰めた袋か？',n:'D 創作'},
     {at:['street','commoners'],who:'庶民',if:'robotMaru',t:'ぷにぷにしておるのう。…つついてよいか？',n:'D 創作'},
     {at:['street','commoners'],who:'庶民',if:'robotMaru',t:'針の先には気をつけなされよ。…その体にはな',n:'D 創作'},
-    {at:['street','commoners','kamo'],who:'庶民',if:'robotMaru',t:'雨が降ったら、しぼんでしまわんか心配じゃ',n:'D 創作'},
+    {at:['street','commoners','kamo'],who:'庶民',if:'robotMaru',t:'雨が降ったら、しぼんでしまわんか心配だ',n:'D 創作'},
     {at:['street','commoners','kamo'],who:'童',if:'robotMaru',t:'ねえ、蹴ったら跳ねる？ 鞠みたいだ',n:'D 創作'},
     {at:['street','commoners'],who:'童',if:'robotMaru',t:'この子、ふわふわしてる！ 一緒に蹴鞠しよう',n:'D 創作'}
   );
