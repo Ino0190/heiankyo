@@ -90,12 +90,12 @@
       {id:'cart', kind:'oxcart', coat:0},                        // 牛は黒（黒麻呂）
       {id:'mud', kind:'mud', dx:6, dz:8, r:30, rz:.75},           // 沈んだ南の輪のまわり。車の後ろ（西）へはみ出して見える
       {id:'mizu', kind:'puddle', dx:12, dz:20, r:9, rz:.6},       // 昨日の雨の水たまり（推定の演出）
-      {id:'inumaru', kind:'person', who:'inumaru', whoKind:'牛飼童', name:'犬丸', hat:null, hair:true, robe:0x7d6a4c, dx:-12, dz:-60, rot:Math.PI}
+      {id:'inumaru', kind:'person', who:'inumaru', whoKind:'牛飼童', name:'犬丸', hat:null, hair:true, robe:0x7d6a4c, dx:-40, dz:-140, rot:Math.PI} /* 2026-11-06 練習の作り直し（井内さん「少し羅城門を通り過ぎるように誘導、牛車の近くまで行って、先に犬丸と話す。牛車の方に行くために振り返させて、車輪を持ち上げる」）: 犬丸を牛の頭の先（牛車の14m北・4m西）に立たせる。門から来ると牛車の横を通り過ぎて犬丸と話し、沈んだ後ろの車輪は振り返った先になる。🚫 前は牛の横（dz-60）で、門から来ると手前で話せてしまい、車輪が前に見えたままだった */
     ],
     stages: {
       0: {cart:{tilt:[0,0,-.13], sink:1.6}},                    // 南の輪が泥に沈んで車が傾く
       1: '0',
-      2: {cart:{dz:-38, tilt:[0,0,0], sink:0}, inumaru:{dx:-14, dz:-96}},
+      2: {cart:{dz:-38, tilt:[0,0,0], sink:0}, inumaru:{dx:-40, dz:-165}}, /* 2026-11-06 抜けた車が北へ3.8m動くので、犬丸も牛の頭の先へ下がる（前は dx-14・dz-96） */
       9: {hide:'away', give:'inumaru_bamboo_flute'}             // 目の前では消さない。離れたら片づけて、犬丸はふだんの車へ戻る
     },
     acts: [

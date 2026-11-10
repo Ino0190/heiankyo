@@ -28,6 +28,14 @@ window.HEIAN_CONTENT_FILES=[
  'quests/robot-maru.js',            // まる（鞠の童）が歩いているときだけ出る町の人の一言6行（条件 robotMaru＝index.html の heianSpeechCond）2026-10-30 井内さん承認
  'quests/rajo-loft.js',             // 羅城門の楼上を訪れる人（夜の老婆・昼の老人。場所タグ interior_yado_rajo。出る日・刻は index.html の heianLoft）2026-10-30 井内さんの改修指示書
  'quests/serial-waka-adventure.js',  // 連作「凧より遠くへ」若君編（居候先の凧揚げの若君・状態は heian-waka-adventure-v1・接続は index.html の heianWakaAdv）2026-10-27 井内さん作・2026-10-13 取り込み
+ 'quests/setsuwa-hojo.js',      // 放生の亀と蟹（霊異記 上7・中12）。蓮観→東市→鴨川→賢心 2026-11-06
+ 'quests/setsuwa-hida.js',      // 飛騨の工の語り草（今昔24-5）。国光の厨子 2026-11-06
+ 'quests/setsuwa-heichu.js',    // 平中の噂と返し文（大和103・今昔30-1）。平中本人は出さない 2026-11-06
+ 'quests/setsuwa-karaneko.js',  // 法皇の唐猫（寛平御記）。neko_na の後に小菊が聞きたがる 2026-11-06
+ 'quests/lesson-rajomon.js',     // 練習の作り直し（羅城門の南120m・竹丸が話しかける・歩く/撮る/手伝う/笛の4章）。本体 HEIAN_LESSON と一緒に 2026-11-07
+ 'quests/talk-more.js',         // 会話のもう1往復（相づち・問い返し・土蜘蛛の入口・逆に何か教えてくれ）。本体 heianTalkMore* と一緒に 2026-11-07
+ 'quests/ach-icons.js',         // 実績一覧のアイコン46個（window.HEIAN_ACH_ICONS）。本体 heianAchRender と一緒に 2026-11-07
+ 'quests/rei-gifts.js',       // 頼みごとの礼の品（L.reiGifts＝頼みごとid→{ja,en,from,note}）。本体 heianReiGift と一緒に 2026-11-07
 ];
 // 試験用。ゲームを ?devpacks=1 で開いたときだけ読む（本番の人は読まない）。データだけで追加できることの確認用
 window.HEIAN_CONTENT_DEV_FILES=[
